@@ -52,7 +52,7 @@ namespace Strawberry::Graphics
 	Window::~Window()
 	{
 		Core::Assert(sInstanceCount > 0);
-		glfwDestroyWindow(mHandle);
+		if (mHandle) glfwDestroyWindow(mHandle);
 
 		if (--sInstanceCount == 0) Terminate();
 	}
