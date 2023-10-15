@@ -18,12 +18,15 @@ endif()
 
 
 add_library(StrawberryGraphics
-		src/Instance.cpp
-		include/Strawberry/Graphics/Instance.hpp
-		include/Strawberry/Graphics/Window.hpp
-		src/Window.cpp)
+		src/Strawberry/Graphics/Instance.cpp
+		src/Strawberry/Graphics/Instance.hpp
+		src/Strawberry/Graphics/Window.hpp
+		src/Strawberry/Graphics/Window.cpp
+		src/Strawberry/Graphics/Event.hpp
+		src/Strawberry/Graphics/Input/Key.hpp
+		src/Strawberry/Graphics/Input/Key.cpp)
 target_link_libraries(StrawberryGraphics PUBLIC StrawberryCore glfw Vulkan::Vulkan)
-target_include_directories(StrawberryGraphics PUBLIC include)
+target_include_directories(StrawberryGraphics PUBLIC src)
 set_target_properties(StrawberryGraphics PROPERTIES CXX_STANDARD 20)
 
 

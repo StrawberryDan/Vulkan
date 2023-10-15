@@ -4,18 +4,24 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
+// Strawberry Graphics
+#include "Strawberry/Graphics/Event.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Math/Vector.hpp"
+#include "Strawberry/Core/Types/Optional.hpp"
+#include "Strawberry/Core/Sync/Mutex.hpp"
 // GLFW 3
 #include "GLFW/glfw3.h"
 // Standard Library
 #include <string>
+#include <map>
+#include <deque>
 
 
 //======================================================================================================================
 //  Class Declaration
 //----------------------------------------------------------------------------------------------------------------------
-namespace Strawberry::Graphics
+namespace Strawberry::Graphics::Window
 {
 	class Window
 	{
@@ -25,9 +31,13 @@ namespace Strawberry::Graphics
 
 
 		static std::atomic<unsigned int> sInstanceCount;
+		static Core::Mutex<std::map<GLFWwindow*, Window*>> sInstanceMap;
 
 
 	public:
+		//======================================================================================================================
+		//  Construction, Destruction and Assignment
+		//----------------------------------------------------------------------------------------------------------------------
 		Window(const std::string& title, Core::Math::Vec2i size);
 		Window(const Window& rhs) = default;
 		Window& operator=(const Window& rhs) = default;
@@ -35,7 +45,20 @@ namespace Strawberry::Graphics
 		Window& operator=(Window&& rhs);
 		~Window();
 
+		Core::Optional<Event> NextEvent();
+
+		bool CloseRequested() const;
+
+
+	private:
+		static void OnKeyEvent(GLFWwindow* windowHandle, int key, int scancode, int action, int mods);
+
+
 	private:
 		GLFWwindow* mHandle;
+		std::deque<Event> mEventQueue;
 	};
+
+
+	void PollInput();
 }
