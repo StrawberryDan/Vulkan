@@ -22,7 +22,7 @@ namespace Strawberry::Graphics::Window
 
 		struct Text
 		{
-			uint32_t codepoint;
+			char32_t codepoint;
 		};
 	}
 
