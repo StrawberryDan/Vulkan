@@ -33,6 +33,7 @@ namespace Strawberry::Graphics::Window
 		Core::Assert(size[0] > 0 && size[1] > 0);
 		mHandle = glfwCreateWindow(size[0], size[1], title.c_str(), nullptr, nullptr);
 		glfwSetKeyCallback(mHandle, &Window::OnKeyEvent);
+		glfwSetCharCallback(mHandle, &Window::OnTextEvent);
 
 		sInstanceMap.Lock()->emplace(mHandle, this);
 	}
@@ -91,6 +92,7 @@ namespace Strawberry::Graphics::Window
 		return glfwWindowShouldClose(mHandle);
 	}
 
+
 	void Window::OnKeyEvent(GLFWwindow* windowHandle, int key, int scancode, int action, int mods)
 	{
 		Window* window = sInstanceMap.Lock()->at(windowHandle);
@@ -125,12 +127,24 @@ namespace Strawberry::Graphics::Window
 			{
 				.keyCode = Input::IntoKeyCode(key).UnwrapOr(Input::KeyCode::Unknown),
 				.scanCode = scancode,
+				.modifiers = GetModifier(mods),
 				.action = GetAction(action),
-				.modifiers = GetModifier(mods)
 			};
 
 		window->mEventQueue.emplace_back(event);
 	}
+
+
+	void Window::OnTextEvent(GLFWwindow* windowHandle, unsigned int codepoint)
+	{
+		Window* window = sInstanceMap.Lock()->at(windowHandle);
+
+		Events::Text event
+			{.codepoint = codepoint};
+
+		window->mEventQueue.emplace_back(event);
+	}
+
 
 	void PollInput()
 	{

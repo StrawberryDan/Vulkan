@@ -19,8 +19,13 @@ namespace Strawberry::Graphics::Window
 			Input::Modifiers modifiers;
 			Input::KeyAction action;
 		};
+
+		struct Text
+		{
+			uint32_t codepoint;
+		};
 	}
 
 
-	using Event = Core::Variant<Events::Key>;
+	using Event = Core::Variant<Events::Key, Events::Text>;
 }

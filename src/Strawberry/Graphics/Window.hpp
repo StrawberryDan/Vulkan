@@ -52,6 +52,7 @@ namespace Strawberry::Graphics::Window
 
 	private:
 		static void OnKeyEvent(GLFWwindow* windowHandle, int key, int scancode, int action, int mods);
+		static void OnTextEvent(GLFWwindow* windowHandle, unsigned int codepoint);
 
 
 	private:
