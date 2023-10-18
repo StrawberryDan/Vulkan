@@ -28,7 +28,7 @@ namespace Strawberry::Graphics
 	}
 
 
-	CommandPool::CommandPool(CommandPool&& rhs)
+	CommandPool::CommandPool(CommandPool&& rhs) noexcept
 		: mCommandPool(std::exchange(rhs.mCommandPool, nullptr))
 		  , mDevice(std::exchange(rhs.mDevice, nullptr)) {}
 

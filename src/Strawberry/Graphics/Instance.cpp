@@ -77,11 +77,11 @@ namespace Strawberry::Graphics
 	}
 
 
-	Instance::Instance(Instance&& rhs)
+	Instance::Instance(Instance&& rhs) noexcept
 		: mInstance(std::exchange(rhs.mInstance, nullptr)) {}
 
 
-	Instance& Instance::operator=(Instance&& rhs)
+	Instance& Instance::operator=(Instance&& rhs) noexcept
 	{
 		if (this != &rhs)
 		{

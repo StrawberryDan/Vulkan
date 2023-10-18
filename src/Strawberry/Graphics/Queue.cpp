@@ -18,7 +18,7 @@ namespace Strawberry::Graphics
 	}
 
 
-	Queue::Queue(Queue&& rhs)
+	Queue::Queue(Queue&& rhs) noexcept
 		: mQueue(std::exchange(rhs.mQueue, nullptr))
 	{}
 

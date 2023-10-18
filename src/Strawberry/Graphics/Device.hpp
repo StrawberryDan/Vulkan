@@ -30,11 +30,11 @@ namespace Strawberry::Graphics
 		friend class CommandPool;
 
 	public:
-		Device(const Instance& instance);
+		explicit Device(const Instance& instance);
 		Device(const Device& rhs) = delete;
 		Device& operator=(const Device& rhs) = delete;
-		Device(Device&& rhs);
-		Device& operator=(Device&& rhs);
+		Device(Device&& rhs) noexcept ;
+		Device& operator=(Device&& rhs) noexcept ;
 		~Device();
 
 

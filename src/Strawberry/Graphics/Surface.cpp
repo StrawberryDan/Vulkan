@@ -20,7 +20,7 @@ namespace Strawberry::Graphics
 	}
 
 
-	Surface::Surface(Surface&& rhs)
+	Surface::Surface(Surface&& rhs) noexcept
 		: mSurface(std::exchange(rhs.mSurface, nullptr))
 		, mInstance(std::exchange(rhs.mInstance, nullptr))
 	{}

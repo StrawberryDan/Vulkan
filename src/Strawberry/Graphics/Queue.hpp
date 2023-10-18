@@ -19,10 +19,10 @@ namespace Strawberry::Graphics
 	class Queue
 	{
 	public:
-		Queue(const Device& device);
+		explicit Queue(const Device& device);
 		Queue(const Queue& rhs) = delete;
 		Queue& operator=(const Queue& rhs) = delete;
-		Queue(Queue&& rhs);
+		Queue(Queue&& rhs) noexcept;
 		Queue& operator=(Queue&& rhs);
 		~Queue() = default;
 

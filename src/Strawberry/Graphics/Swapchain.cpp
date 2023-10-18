@@ -46,7 +46,7 @@ namespace Strawberry::Graphics
 	}
 
 
-	Swapchain::Swapchain(Swapchain&& rhs)
+	Swapchain::Swapchain(Swapchain&& rhs) noexcept
 		: mSwapchain(std::exchange(rhs.mSwapchain, nullptr))
 		, mDevice(std::exchange(rhs.mDevice, nullptr))
 	{}

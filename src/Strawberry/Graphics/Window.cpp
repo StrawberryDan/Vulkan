@@ -44,14 +44,14 @@ namespace Strawberry::Graphics::Window
 	}
 
 
-	Window::Window(Window&& rhs)
+	Window::Window(Window&& rhs) noexcept
 		: mHandle(std::exchange(rhs.mHandle, nullptr))
 	{
 		sInstanceMap.Lock()->insert_or_assign(mHandle, this);
 	}
 
 
-	Window& Window::operator=(Window&& rhs)
+	Window& Window::operator=(Window&& rhs) noexcept
 	{
 		if (this != &rhs)
 		{

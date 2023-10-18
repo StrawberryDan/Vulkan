@@ -22,10 +22,10 @@ namespace Strawberry::Graphics
 
 
 	public:
-		Surface(const Window::Window& window, const Device& device);
+		explicit Surface(const Window::Window& window, const Device& device);
 		Surface(const Surface& rhs) = delete;
 		Surface& operator=(const Surface& rhs) = delete;
-		Surface(Surface&& rhs);
+		Surface(Surface&& rhs) noexcept ;
 		Surface& operator=(Surface&& rhs);
 		~Surface();
 

@@ -156,12 +156,12 @@ namespace Strawberry::Graphics
 	}
 
 
-	Device::Device(Device&& rhs)
+	Device::Device(Device&& rhs) noexcept
 		: mPhysicalDevice(std::exchange(rhs.mPhysicalDevice, nullptr))
 		  , mDevice(std::exchange(rhs.mDevice, nullptr)) {}
 
 
-	Device& Device::operator=(Device&& rhs)
+	Device& Device::operator=(Device&& rhs) noexcept
 	{
 		if (this != &rhs)
 		{

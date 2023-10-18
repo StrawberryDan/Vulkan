@@ -15,13 +15,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics
 {
-	Pipeline::Pipeline(Pipeline&& rhs)
+	Pipeline::Pipeline(Pipeline&& rhs) noexcept
 		: mPipeline(std::exchange(rhs.mPipeline, nullptr))
 		, mDevice(std::exchange(rhs.mDevice, nullptr))
 	{}
 
 
-	Pipeline& Pipeline::operator=(Pipeline&& rhs)
+	Pipeline& Pipeline::operator=(Pipeline&& rhs) noexcept
 	{
 		if (this != &rhs)
 		{

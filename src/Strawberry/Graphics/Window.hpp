@@ -46,8 +46,8 @@ namespace Strawberry::Graphics::Window
 		Window(const std::string& title, Core::Math::Vec2i size);
 		Window(const Window& rhs) = default;
 		Window& operator=(const Window& rhs) = default;
-		Window(Window&& rhs);
-		Window& operator=(Window&& rhs);
+		Window(Window&& rhs) noexcept;
+		Window& operator=(Window&& rhs) noexcept;
 		~Window();
 
 		Core::Optional<Event> NextEvent();

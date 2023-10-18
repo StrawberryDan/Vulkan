@@ -13,45 +13,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics
 {
-	class Device;
+	class CommandPool;
 
 
-	class Pipeline
-	{
-		friend class Builder;
-
-
-	public:
-		class Builder;
-
-
-	public:
-		Pipeline(const Pipeline& rhs) = delete;
-		Pipeline& operator=(const Pipeline& rhs) = delete;
-		Pipeline(Pipeline&& rhs) noexcept ;
-		Pipeline& operator=(Pipeline&& rhs) noexcept ;
-		~Pipeline();
-
-
-	private:
-		Pipeline() = default;
-
-
-	private:
-		VkPipeline mPipeline = nullptr;
-		VkDevice mDevice = nullptr;
-	};
-
-
-	class Pipeline::Builder
+	class CommandBuffer
 	{
 	public:
-		explicit Builder(const Device& device);
+		explicit CommandBuffer(const CommandPool& commandPool);
+		CommandBuffer(const CommandBuffer& rhs) = delete;
+		CommandBuffer& operator=(const CommandBuffer& rhs) = delete;
+		CommandBuffer(CommandBuffer&& rhs) noexcept ;
+		CommandBuffer& operator=(CommandBuffer&& rhs);
+		~CommandBuffer();
 
-
-		[[nodiscard]] Pipeline Build() const;
 
 	private:
-		const Device* mDevice;
+		VkCommandBuffer mCommandBuffer;
+		VkCommandPool mCommandPool;
+		VkDevice mDevice;
 	};
 }

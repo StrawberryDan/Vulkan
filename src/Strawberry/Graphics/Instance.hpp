@@ -29,10 +29,10 @@ namespace Strawberry::Graphics
 		~Instance();
 
 		Instance(const Instance&) = delete;
-		Instance(Instance&&);
+		Instance(Instance&&) noexcept ;
 
 		Instance& operator=(const Instance&) = delete;
-		Instance& operator=(Instance&&);
+		Instance& operator=(Instance&&) noexcept ;
 
 		template <std::movable T, typename... Args> requires (std::constructible_from<T, const Instance&, Args...>)
 		T Create(Args... args) const { return T(*this, std::forward<Args>(args)...); }
