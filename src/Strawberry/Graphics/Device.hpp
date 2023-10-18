@@ -8,6 +8,7 @@
 #include <vulkan/vulkan.h>
 // Standard Library
 #include <concepts>
+#include <vector>
 
 
 //======================================================================================================================
@@ -25,6 +26,7 @@ namespace Strawberry::Graphics
 		friend class Pipeline;
 		friend class Swapchain;
 		friend class Surface;
+		friend class Queue;
 
 	public:
 		Device(const Instance& instance);
@@ -43,5 +45,6 @@ namespace Strawberry::Graphics
 		VkInstance mInstance;
 		VkPhysicalDevice mPhysicalDevice;
 		VkDevice mDevice;
+		uint32_t mQueueFamilyIndex;
 	};
 }

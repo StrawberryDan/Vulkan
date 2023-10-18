@@ -108,21 +108,21 @@ namespace Strawberry::Graphics
 		// Select Best Device
 		auto [physicalDevice, queueFamilyIndex, queueCount] = SelectPhysicalDevice(physicalDevices).Unwrap();
 		mPhysicalDevice = physicalDevice;
+		mQueueFamilyIndex = queueFamilyIndex;
 
 		// Select Queue Family
 		std::vector<float> priorities(queueCount, 1.0);
 
 		// Describes Queues
 		std::vector<VkDeviceQueueCreateInfo> queues;
-		queues.push_back(VkDeviceQueueCreateInfo
-							 {
-								 .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-								 .pNext = nullptr,
-								 .flags = 0,
-								 .queueFamilyIndex = queueFamilyIndex,
-								 .queueCount = queueCount,
-								 .pQueuePriorities = priorities.data()
-							 });
+		queues.push_back(VkDeviceQueueCreateInfo{
+			.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.queueFamilyIndex = queueFamilyIndex,
+			.queueCount = queueCount,
+			.pQueuePriorities = priorities.data()
+		});
 
 		// Select Layers
 		std::vector<const char*> layers;

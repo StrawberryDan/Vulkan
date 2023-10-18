@@ -33,6 +33,8 @@ add_library(StrawberryGraphics
 		src/Strawberry/Graphics/Surface.hpp
 		src/Strawberry/Graphics/Swapchain.cpp
 		src/Strawberry/Graphics/Swapchain.hpp
+		src/Strawberry/Graphics/Queue.cpp
+		src/Strawberry/Graphics/Queue.hpp
 )
 target_link_libraries(StrawberryGraphics PUBLIC StrawberryCore glfw Vulkan::Vulkan)
 target_include_directories(StrawberryGraphics PUBLIC src)
