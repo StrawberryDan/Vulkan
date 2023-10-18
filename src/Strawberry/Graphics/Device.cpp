@@ -29,22 +29,27 @@ namespace Strawberry::Graphics
 
 		std::vector<VkDeviceQueueCreateInfo> queues;
 		std::vector<const char*> layers;
-		std::vector<const char*> extensions;
+		std::vector<const char*> extensions
+			{
+				"VK_KHR_swapchain"
+			};
 		VkPhysicalDeviceFeatures features{};
 
+
+
 		VkDeviceCreateInfo createInfo
-		{
-			.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = 0,
-			.queueCreateInfoCount = static_cast<uint32_t>(queues.size()),
-			.pQueueCreateInfos = queues.data(),
-			.enabledLayerCount = static_cast<uint32_t>(layers.size()),
-			.ppEnabledLayerNames = layers.data(),
-			.enabledExtensionCount = static_cast<uint32_t>(extensions.size()),
-			.ppEnabledExtensionNames = extensions.data(),
-			.pEnabledFeatures = &features
-		};
+			{
+				.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+				.pNext = nullptr,
+				.flags = 0,
+				.queueCreateInfoCount = static_cast<uint32_t>(queues.size()),
+				.pQueueCreateInfos = queues.data(),
+				.enabledLayerCount = static_cast<uint32_t>(layers.size()),
+				.ppEnabledLayerNames = layers.data(),
+				.enabledExtensionCount = static_cast<uint32_t>(extensions.size()),
+				.ppEnabledExtensionNames = extensions.data(),
+				.pEnabledFeatures = &features
+			};
 
 		Core::AssertEQ(vkCreateDevice(mPhysicalDevice, &createInfo, nullptr, &mDevice), VK_SUCCESS);
 	}
@@ -52,8 +57,7 @@ namespace Strawberry::Graphics
 
 	Device::Device(Device&& rhs)
 		: mPhysicalDevice(std::exchange(rhs.mPhysicalDevice, nullptr))
-		, mDevice(std::exchange(rhs.mDevice, nullptr))
-	{}
+		  , mDevice(std::exchange(rhs.mDevice, nullptr)) {}
 
 
 	Device& Device::operator=(Device&& rhs)
