@@ -24,6 +24,9 @@ int main()
 	Graphics::CommandPool commandPool = device.Create<Graphics::CommandPool>();
 	Graphics::CommandBuffer commandBuffer = commandPool.Create<Graphics::CommandBuffer>();
 
+	commandBuffer.Begin();
+	commandBuffer.End();
+
 	while (!window.CloseRequested())
 	{
 		Graphics::Window::PollInput();

@@ -16,7 +16,7 @@ namespace Strawberry::Graphics
 {
 	CommandBuffer::CommandBuffer(const CommandPool& commandPool)
 		: mCommandBuffer{}
-		, mDevice(commandPool.mDevice)
+		  , mDevice(commandPool.mDevice)
 		  , mCommandPool(commandPool.mCommandPool)
 	{
 		VkCommandBufferAllocateInfo allocateInfo{
@@ -55,5 +55,24 @@ namespace Strawberry::Graphics
 		{
 			vkFreeCommandBuffers(mDevice, mCommandPool, 1, &mCommandBuffer);
 		}
+	}
+
+
+	void CommandBuffer::Begin()
+	{
+		VkCommandBufferBeginInfo beginInfo{
+			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.pInheritanceInfo = nullptr,
+		};
+
+		vkBeginCommandBuffer(mCommandBuffer, &beginInfo);
+	}
+
+
+	void CommandBuffer::End()
+	{
+		vkEndCommandBuffer(mCommandBuffer);
 	}
 }

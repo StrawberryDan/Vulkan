@@ -27,6 +27,10 @@ namespace Strawberry::Graphics
 		~CommandBuffer();
 
 
+		void Begin();
+		void End();
+
+
 	private:
 		VkCommandBuffer mCommandBuffer;
 		VkCommandPool mCommandPool;
