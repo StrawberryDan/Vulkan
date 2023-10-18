@@ -25,6 +25,8 @@ add_library(StrawberryGraphics
 		src/Strawberry/Graphics/Event.hpp
 		src/Strawberry/Graphics/Input/Key.hpp
 		src/Strawberry/Graphics/Input/Key.cpp
+		src/Strawberry/Graphics/Device.cpp
+		src/Strawberry/Graphics/Device.hpp
 )
 target_link_libraries(StrawberryGraphics PUBLIC StrawberryCore glfw Vulkan::Vulkan)
 target_include_directories(StrawberryGraphics PUBLIC src)

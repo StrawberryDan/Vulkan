@@ -1,12 +1,11 @@
 #pragma once
 
+
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 // Vulkan
-#include "vulkan/vulkan.h"
-// Standard Library
-#include <concepts>
+#include <vulkan/vulkan.h>
 
 
 //======================================================================================================================
@@ -14,27 +13,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics
 {
-	class Device;
+	class Instance;
 
 
-	class Instance
+	class Device
 	{
-		friend class Device;
-
-
 	public:
-		Instance();
-		~Instance();
+		Device(const Instance& instance);
 
-		Instance(const Instance&) = delete;
-		Instance(Instance&&);
 
-		Instance& operator=(const Instance&) = delete;
-		Instance& operator=(Instance&&);
-
-		template <std::movable T, typename... Args> requires (std::constructible_from<T, const Instance&, Args...>)
-		T Create(Args... args) const { return T(*this); }
 	private:
-		VkInstance mInstance = {};
+		VkPhysicalDevice mPhysicalDevice;
+		VkDevice mDevice;
 	};
 }
