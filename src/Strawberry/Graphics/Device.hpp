@@ -39,6 +39,7 @@ namespace Strawberry::Graphics
 
 
 	private:
+		VkInstance mInstance;
 		VkPhysicalDevice mPhysicalDevice;
 		VkDevice mDevice;
 	};

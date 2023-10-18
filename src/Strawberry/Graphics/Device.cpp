@@ -18,6 +18,7 @@ namespace Strawberry::Graphics
 {
 	Device::Device(const Instance& instance)
 		: mDevice{}
+		, mInstance(instance.mInstance)
 	{
 		uint32_t physicalDeviceCount = 0;
 		vkEnumeratePhysicalDevices(instance.mInstance, &physicalDeviceCount, nullptr);
