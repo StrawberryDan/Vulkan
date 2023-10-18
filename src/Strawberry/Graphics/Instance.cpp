@@ -4,8 +4,11 @@
 #include "Strawberry/Graphics/Instance.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Assert.hpp"
+// GLFW3
+#include <GLFW/glfw3.h>
 // Standard Library
 #include <memory>
+
 
 //======================================================================================================================
 //  Class Definitions
@@ -29,6 +32,19 @@ namespace Strawberry::Graphics
 			"VK_KHR_portability_enumeration"
 #endif
 		};
+
+		// Append glfw extensions
+		uint32_t glfwExtensionCount = 0;
+		const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+		Core::Assert(glfwExtensions != nullptr);
+
+		for (int i = 0; i < glfwExtensionCount; i++)
+		{
+			if (std::find(extensions.begin(), extensions.end(), glfwExtensions[i]) == extensions.end())
+			{
+				extensions.push_back(glfwExtensions[i]);
+			}
+		}
 
 		VkInstanceCreateInfo createInfo{};
 		createInfo.pNext = nullptr;
