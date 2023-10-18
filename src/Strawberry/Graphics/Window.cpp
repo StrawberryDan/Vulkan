@@ -98,12 +98,6 @@ namespace Strawberry::Graphics::Window
 	}
 
 
-	Surface Window::CreateSurface(const Instance& instance)
-	{
-		return Surface(*this, instance);
-	}
-
-
 	void Window::OnKeyEvent(GLFWwindow* windowHandle, int key, int scancode, int action, int mods)
 	{
 		Window* window = sInstanceMap.Lock()->at(windowHandle);

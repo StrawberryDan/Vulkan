@@ -54,7 +54,11 @@ namespace Strawberry::Graphics::Window
 
 		bool CloseRequested() const;
 
-		Surface CreateSurface(const Instance& instance);
+		template <std::movable T, typename... Args> requires (std::constructible_from<T, const Window&, std::add_lvalue_reference_t<std::add_const_t<std::decay_t<Args>>>...>)
+		T Create(Args... args)
+		{
+			return T(*this, std::forward<const Args&>(args)...);
+		}
 
 
 	private:
