@@ -46,6 +46,11 @@ namespace Strawberry::Graphics
 			}
 		}
 
+		std::vector<const char*> layers
+		{
+			"VK_LAYER_KHRONOS_validation"
+		};
+
 		VkInstanceCreateInfo createInfo{};
 		createInfo.pNext = nullptr;
 		createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -58,8 +63,8 @@ namespace Strawberry::Graphics
 		createInfo.pApplicationInfo = &applicationInfo;
 		createInfo.enabledExtensionCount = extensions.size();
 		createInfo.ppEnabledExtensionNames = extensions.data();
-		createInfo.enabledLayerCount = 0;
-		createInfo.ppEnabledLayerNames = nullptr;
+		createInfo.enabledLayerCount = layers.size();
+		createInfo.ppEnabledLayerNames = layers.data();
 
 		VkResult result = vkCreateInstance(&createInfo, nullptr, &mInstance);
 		Core::Assert(result == VK_SUCCESS);
