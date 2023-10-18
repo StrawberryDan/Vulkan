@@ -11,8 +11,8 @@ int main()
 	using namespace Strawberry;
 
 	Graphics::Window::Window window("StrawberryGraphics Test", Core::Math::Vec2i(1920, 1080));
-
 	Graphics::Instance instance;
+	Graphics::Surface surface = window.CreateSurface(instance);
 	Graphics::Device device = instance.Create<Graphics::Device>();
 	Graphics::Pipeline pipeline = device.Create<Graphics::Pipeline::Builder>().Build();
 

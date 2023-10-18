@@ -1,9 +1,12 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
-#include "Strawberry/Graphics/Window.hpp"
+#include "Window.hpp"
+#include "Instance.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Assert.hpp"
+// GLFW3
+#include "GLFW/glfw3.h"
 
 
 namespace Strawberry::Graphics::Window
@@ -32,6 +35,7 @@ namespace Strawberry::Graphics::Window
 		if (sInstanceCount++ == 0) Initialise();
 
 		Core::Assert(size[0] > 0 && size[1] > 0);
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		mHandle = glfwCreateWindow(size[0], size[1], title.c_str(), nullptr, nullptr);
 		glfwSetKeyCallback(mHandle, &Window::OnKeyEvent);
 		glfwSetCharCallback(mHandle, &Window::OnTextEvent);
@@ -91,6 +95,12 @@ namespace Strawberry::Graphics::Window
 	bool Window::CloseRequested() const
 	{
 		return glfwWindowShouldClose(mHandle);
+	}
+
+
+	Surface Window::CreateSurface(const Instance& instance)
+	{
+		return Surface(*this, instance);
 	}
 
 

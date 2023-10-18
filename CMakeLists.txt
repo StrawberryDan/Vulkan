@@ -29,9 +29,12 @@ add_library(StrawberryGraphics
 		src/Strawberry/Graphics/Device.hpp
 		src/Strawberry/Graphics/Pipeline.cpp
 		src/Strawberry/Graphics/Pipeline.hpp
+		src/Strawberry/Graphics/Surface.cpp
+		src/Strawberry/Graphics/Surface.hpp
 )
 target_link_libraries(StrawberryGraphics PUBLIC StrawberryCore glfw Vulkan::Vulkan)
 target_include_directories(StrawberryGraphics PUBLIC src)
+target_compile_definitions(StrawberryGraphics PUBLIC GLFW_INCLUDE_VULKAN)
 set_target_properties(StrawberryGraphics PROPERTIES CXX_STANDARD 20)
 
 

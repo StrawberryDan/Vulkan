@@ -12,6 +12,7 @@
 #include "Strawberry/Core/Sync/Mutex.hpp"
 // GLFW 3
 #include "GLFW/glfw3.h"
+#include "Surface.hpp"
 // Standard Library
 #include <string>
 #include <map>
@@ -23,8 +24,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics::Window
 {
+
 	class Window
 	{
+		friend class Graphics::Surface;
+
+
 	private:
 		static void Initialise();
 		static void Terminate();
@@ -48,6 +53,8 @@ namespace Strawberry::Graphics::Window
 		Core::Optional<Event> NextEvent();
 
 		bool CloseRequested() const;
+
+		Surface CreateSurface(const Instance& instance);
 
 
 	private:
