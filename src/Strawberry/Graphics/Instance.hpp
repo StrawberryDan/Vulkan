@@ -33,7 +33,7 @@ namespace Strawberry::Graphics
 		Instance& operator=(Instance&&);
 
 		template <std::movable T, typename... Args> requires (std::constructible_from<T, const Instance&, Args...>)
-		T Create(Args... args) const { return T(*this); }
+		T Create(Args... args) const { return T(*this, std::forward<Args>(args)...); }
 	private:
 		VkInstance mInstance = {};
 	};
