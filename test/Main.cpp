@@ -3,6 +3,7 @@
 #include "Strawberry/Graphics/Instance.hpp"
 #include "Strawberry/Graphics/Window.hpp"
 #include "Strawberry/Graphics/Device.hpp"
+#include "Strawberry/Graphics/Pipeline.hpp"
 
 
 int main()
@@ -11,6 +12,7 @@ int main()
 
 	Graphics::Instance instance;
 	Graphics::Device device = instance.Create<Graphics::Device>();
+	Graphics::Pipeline pipeline = device.Create<Graphics::Pipeline::Builder>().Build();
 
 	Graphics::Window::Window window("StrawberryGraphics Test", Core::Math::Vec2i(1920, 1080));
 
