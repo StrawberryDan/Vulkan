@@ -25,6 +25,15 @@ namespace Strawberry::Graphics
 		std::vector<VkPhysicalDevice> physicalDevices(physicalDeviceCount);
 		vkEnumeratePhysicalDevices(instance.mInstance, &physicalDeviceCount, physicalDevices.data());
 
+		std::vector<VkPhysicalDeviceProperties> properties;
+		std::transform(physicalDevices.begin(), physicalDevices.end(), std::back_inserter(properties),
+					   [](auto x)
+					   {
+						   VkPhysicalDeviceProperties properties;
+						   vkGetPhysicalDeviceProperties(x, &properties);
+						   return properties;
+					   });
+
 		mPhysicalDevice = physicalDevices[0];
 
 		std::vector<VkDeviceQueueCreateInfo> queues;

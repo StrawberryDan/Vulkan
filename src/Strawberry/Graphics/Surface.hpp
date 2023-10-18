@@ -18,6 +18,9 @@ namespace Strawberry::Graphics
 
 	class Surface
 	{
+		friend class Swapchain;
+
+
 	public:
 		Surface(const Window::Window& window, const Device& device);
 		Surface(const Surface& rhs) = delete;

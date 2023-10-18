@@ -4,6 +4,7 @@
 #include "Strawberry/Graphics/Window.hpp"
 #include "Strawberry/Graphics/Device.hpp"
 #include "Strawberry/Graphics/Pipeline.hpp"
+#include "Strawberry/Graphics/Swapchain.hpp"
 
 
 int main()
@@ -15,6 +16,7 @@ int main()
 	Graphics::Surface surface = window.Create<Graphics::Surface, const Graphics::Instance&>(instance);
 	Graphics::Device device = instance.Create<Graphics::Device>();
 	Graphics::Pipeline pipeline = device.Create<Graphics::Pipeline::Builder>().Build();
+	Graphics::Swapchain swapchain = device.Create<Graphics::Swapchain, const Graphics::Surface&>(surface, Core::Math::Vec2i{1920, 1080});
 
 	while (!window.CloseRequested())
 	{
