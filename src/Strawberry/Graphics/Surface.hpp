@@ -13,13 +13,13 @@
 namespace Strawberry::Graphics
 {
 	namespace Window { class Window; }
-	class Instance;
+	class Device;
 
 
 	class Surface
 	{
 	public:
-		Surface(const Window::Window& window, const Instance& instance);
+		Surface(const Window::Window& window, const Device& device);
 		Surface(const Surface& rhs) = delete;
 		Surface& operator=(const Surface& rhs) = delete;
 		Surface(Surface&& rhs);
@@ -30,5 +30,6 @@ namespace Strawberry::Graphics
 		VkSurfaceKHR mSurface;
 
 		VkInstance mInstance;
+		VkDevice mDevice;
 	};
 }

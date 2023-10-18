@@ -4,6 +4,7 @@
 #include "Surface.hpp"
 #include "Window.hpp"
 #include "Instance.hpp"
+#include "Device.hpp"
 
 
 //======================================================================================================================
@@ -11,8 +12,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics
 {
-	Surface::Surface(const Window::Window& window, const Instance& instance)
-		: mInstance(instance.mInstance)
+	Surface::Surface(const Window::Window& window, const Device& device)
+		: mInstance(device.mInstance)
+		, mDevice(device.mDevice)
 	{
 		Core::AssertEQ(glfwCreateWindowSurface(mInstance, window.mHandle, nullptr, &mSurface), GLFW_NO_ERROR);
 	}
