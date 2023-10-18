@@ -11,6 +11,7 @@ namespace Strawberry::Graphics::Window
 	void Window::Initialise()
 	{
 		Core::Assert(glfwInit() == GLFW_TRUE);
+		Core::Assert(glfwVulkanSupported());
 	}
 
 
