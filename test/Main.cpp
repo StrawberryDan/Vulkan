@@ -10,11 +10,11 @@ int main()
 {
 	using namespace Strawberry;
 
+	Graphics::Window::Window window("StrawberryGraphics Test", Core::Math::Vec2i(1920, 1080));
+
 	Graphics::Instance instance;
 	Graphics::Device device = instance.Create<Graphics::Device>();
 	Graphics::Pipeline pipeline = device.Create<Graphics::Pipeline::Builder>().Build();
-
-	Graphics::Window::Window window("StrawberryGraphics Test", Core::Math::Vec2i(1920, 1080));
 
 	while (!window.CloseRequested())
 	{
