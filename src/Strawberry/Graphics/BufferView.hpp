@@ -6,8 +6,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Vulkan
 #include <vulkan/vulkan.h>
-// Standard Library
-#include <concepts>
+#include "Buffer.hpp"
 
 
 //======================================================================================================================
@@ -18,26 +17,18 @@ namespace Strawberry::Graphics
 	class Device;
 
 
-	class Buffer
+	class BufferView
 	{
-		friend class BufferView;
-
-
 	public:
-		Buffer(const Device& device, uint64_t size, VkBufferUsageFlags usage);
-		Buffer(const Buffer& rhs) = delete;
-		Buffer& operator=(const Buffer& rhs) = delete;
-		Buffer(Buffer&& rhs) noexcept;
-		Buffer& operator=(Buffer&& rhs) noexcept;
-		~Buffer();
-
-
-		template <std::movable T, typename... Args>
-		T Create(Args... args) const { return T(*this, std::forward<Args>(args)...); }
-
+		explicit BufferView(const Buffer& buffer, VkFormat format, VkDeviceSize offset = 0, VkDeviceSize range = VK_WHOLE_SIZE);
+		BufferView(const BufferView& rhs) = delete;
+		BufferView& operator=(const BufferView& rhs) = delete;
+		BufferView(BufferView&& rhs) noexcept;
+		BufferView& operator=(BufferView&& rhs) noexcept;
+		~BufferView();
 
 	private:
-		VkBuffer mBuffer;
+		VkBufferView mBufferView;
 		VkDevice mDevice;
 	};
 }
