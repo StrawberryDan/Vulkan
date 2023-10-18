@@ -47,4 +47,31 @@ namespace Strawberry::Graphics
 
 		Core::AssertEQ(vkCreateDevice(mPhysicalDevice, &createInfo, nullptr, &mDevice), VK_SUCCESS);
 	}
+
+
+	Device::Device(Device&& rhs)
+		: mPhysicalDevice(std::exchange(rhs.mPhysicalDevice, nullptr))
+		, mDevice(std::exchange(rhs.mDevice, nullptr))
+	{}
+
+
+	Device& Device::operator=(Device&& rhs)
+	{
+		if (this != &rhs)
+		{
+			std::destroy_at(this);
+			std::construct_at(this, std::move(rhs));
+		}
+
+		return *this;
+	}
+
+
+	Device::~Device()
+	{
+		if (mDevice)
+		{
+			vkDestroyDevice(mDevice, nullptr);
+		}
+	}
 }
