@@ -27,6 +27,7 @@ namespace Strawberry::Graphics
 		friend class Swapchain;
 		friend class Surface;
 		friend class Queue;
+		friend class CommandPool;
 
 	public:
 		Device(const Instance& instance);

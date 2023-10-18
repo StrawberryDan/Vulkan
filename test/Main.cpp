@@ -6,6 +6,7 @@
 #include "Strawberry/Graphics/Pipeline.hpp"
 #include "Strawberry/Graphics/Swapchain.hpp"
 #include "Strawberry/Graphics/Queue.hpp"
+#include "Strawberry/Graphics/CommandPool.hpp"
 
 
 int main()
@@ -19,6 +20,7 @@ int main()
 	Graphics::Pipeline pipeline = device.Create<Graphics::Pipeline::Builder>().Build();
 	Graphics::Swapchain swapchain = device.Create<Graphics::Swapchain, const Graphics::Surface&>(surface, Core::Math::Vec2i{1920, 1080});
 	Graphics::Queue queue = device.Create<Graphics::Queue>();
+	Graphics::CommandPool commandPool = device.Create<Graphics::CommandPool>();
 
 	while (!window.CloseRequested())
 	{
