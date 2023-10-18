@@ -8,6 +8,7 @@
 #include "Strawberry/Graphics/Queue.hpp"
 #include "Strawberry/Graphics/CommandPool.hpp"
 #include "Strawberry/Graphics/CommandBuffer.hpp"
+#include "Strawberry/Graphics/Buffer.hpp"
 
 
 int main()
@@ -23,6 +24,7 @@ int main()
 	Graphics::Queue queue = device.Create<Graphics::Queue>();
 	Graphics::CommandPool commandPool = device.Create<Graphics::CommandPool>();
 	Graphics::CommandBuffer commandBuffer = commandPool.Create<Graphics::CommandBuffer>();
+	Graphics::Buffer buffer = device.Create<Graphics::Buffer>(1024, VK_BUFFER_USAGE_TRANSFER_DST_BIT);
 
 	commandBuffer.Begin();
 	commandBuffer.End();

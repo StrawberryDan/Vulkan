@@ -39,6 +39,8 @@ add_library(StrawberryGraphics
 		src/Strawberry/Graphics/CommandPool.hpp
 		src/Strawberry/Graphics/CommandBuffer.cpp
 		src/Strawberry/Graphics/CommandBuffer.hpp
+		src/Strawberry/Graphics/Buffer.cpp
+		src/Strawberry/Graphics/Buffer.hpp
 )
 target_link_libraries(StrawberryGraphics PUBLIC StrawberryCore glfw Vulkan::Vulkan)
 target_include_directories(StrawberryGraphics PUBLIC src)

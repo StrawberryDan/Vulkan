@@ -28,6 +28,7 @@ namespace Strawberry::Graphics
 		friend class Surface;
 		friend class Queue;
 		friend class CommandPool;
+		friend class Buffer;
 
 	public:
 		explicit Device(const Instance& instance);
