@@ -26,7 +26,6 @@ int main()
 	Graphics::CommandPool commandPool = device.Create<Graphics::CommandPool>();
 	Graphics::CommandBuffer commandBuffer = commandPool.Create<Graphics::CommandBuffer>();
 	Graphics::Buffer buffer = device.Create<Graphics::Buffer>(1024, VK_BUFFER_USAGE_TRANSFER_DST_BIT);
-	Graphics::BufferView bufferView = buffer.Create<Graphics::BufferView>(VK_FORMAT_R8G8B8A8_UINT);
 
 	commandBuffer.Begin();
 	commandBuffer.End();
