@@ -98,6 +98,12 @@ namespace Strawberry::Graphics::Window
 	}
 
 
+	void Window::SwapBuffers()
+	{
+		glfwSwapBuffers(mHandle);
+	}
+
+
 	void Window::OnKeyEvent(GLFWwindow* windowHandle, int key, int scancode, int action, int mods)
 	{
 		Window* window = sInstanceMap.Lock()->at(windowHandle);

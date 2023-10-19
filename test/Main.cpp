@@ -35,6 +35,7 @@ int main()
 
 	while (!window.CloseRequested())
 	{
+		window.SwapBuffers();
 		Graphics::Window::PollInput();
 
 		while (auto event = window.NextEvent())

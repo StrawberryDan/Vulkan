@@ -54,6 +54,8 @@ namespace Strawberry::Graphics::Window
 
 		bool CloseRequested() const;
 
+		void SwapBuffers();
+
 		template <std::movable T, typename... Args> requires (std::constructible_from<T, const Window&, Args...>)
 		T Create(Args... args)
 		{
