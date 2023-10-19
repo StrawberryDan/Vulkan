@@ -45,6 +45,8 @@ add_library(StrawberryGraphics
 		src/Strawberry/Graphics/BufferView.hpp
 		src/Strawberry/Graphics/DeviceMemory.cpp
 		src/Strawberry/Graphics/DeviceMemory.hpp
+		src/Strawberry/Graphics/Image.cpp
+		src/Strawberry/Graphics/Image.hpp
 )
 target_link_libraries(StrawberryGraphics PUBLIC StrawberryCore glfw Vulkan::Vulkan)
 target_include_directories(StrawberryGraphics PUBLIC src)
