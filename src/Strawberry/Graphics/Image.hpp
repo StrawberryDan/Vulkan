@@ -19,6 +19,9 @@ namespace Strawberry::Graphics
 
 	class Image
 	{
+		friend class ImageView;
+
+
 	public:
 		Image(const Device& device,
 			  uint32_t extent,
@@ -52,6 +55,10 @@ namespace Strawberry::Graphics
 		Image(Image&& rhs) noexcept ;
 		Image& operator=(Image&& rhs) noexcept;
 		~Image();
+
+
+		template <std::movable T, typename... Args>
+		T Create(Args... args) const { return T(*this, std::forward<Args>(args)...); }
 
 
 	private:
