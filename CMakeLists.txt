@@ -6,6 +6,12 @@ include(FetchContent)
 find_package(Vulkan REQUIRED)
 
 
+add_custom_target(
+		Shaders
+		COMMAND glslc ${CMAKE_CURRENT_SOURCE_DIR}/data/Shaders/Mesh.vert -o ${CMAKE_CURRENT_SOURCE_DIR}/data/Shaders/Mesh.vert.spirv
+		COMMAND glslc ${CMAKE_CURRENT_SOURCE_DIR}/data/Shaders/SolidColor.frag -o ${CMAKE_CURRENT_SOURCE_DIR}/data/Shaders/SolidColor.frag.spirv
+)
+
 FetchContent_Declare(GLFW
 	GIT_REPOSITORY "https://github.com/glfw/glfw.git"
 	GIT_TAG "3.3.8")
@@ -49,11 +55,14 @@ add_library(StrawberryGraphics
 		src/Strawberry/Graphics/Image.hpp
 		src/Strawberry/Graphics/ImageView.cpp
 		src/Strawberry/Graphics/ImageView.hpp
+		src/Strawberry/Graphics/ShaderModule.cpp
+		src/Strawberry/Graphics/ShaderModule.hpp
 )
 target_link_libraries(StrawberryGraphics PUBLIC StrawberryCore glfw Vulkan::Vulkan)
 target_include_directories(StrawberryGraphics PUBLIC src)
 target_compile_definitions(StrawberryGraphics PUBLIC GLFW_INCLUDE_VULKAN)
 set_target_properties(StrawberryGraphics PROPERTIES CXX_STANDARD 20)
+add_dependencies(StrawberryGraphics Shaders)
 
 
 add_executable(StrawberryGraphics_Test test/Main.cpp)

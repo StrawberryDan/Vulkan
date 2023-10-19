@@ -32,6 +32,7 @@ namespace Strawberry::Graphics
 		friend class BufferView;
 		friend class DeviceMemory;
 		friend class Image;
+		friend class ShaderModule;
 
 	public:
 		explicit Device(const Instance& instance);
