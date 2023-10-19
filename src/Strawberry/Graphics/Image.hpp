@@ -4,6 +4,7 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
+#include "DeviceMemory.hpp"
 // Vulkan
 #include <vulkan/vulkan.h>
 #include <Strawberry/Core/Math/Vector.hpp>
@@ -63,6 +64,7 @@ namespace Strawberry::Graphics
 
 	private:
 		VkImage mImage;
+		DeviceMemory mMemory;
 		VkDevice mDevice;
 	};
 }

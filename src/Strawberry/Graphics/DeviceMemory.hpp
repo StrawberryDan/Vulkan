@@ -19,6 +19,7 @@ namespace Strawberry::Graphics
 	class DeviceMemory
 	{
 		friend class Buffer;
+		friend class Image;
 
 
 	public:

@@ -64,7 +64,14 @@ namespace Strawberry::Graphics
 			.initialLayout = initialLayout
 		};
 
+
 		Core::AssertEQ(vkCreateImage(mDevice, &createInfo, nullptr, &mImage), VK_SUCCESS);
+
+
+		VkMemoryRequirements memoryRequirements;
+		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
+		mMemory = device.Create<DeviceMemory>(memoryRequirements.size, memoryRequirements.memoryTypeBits);
+		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.mDeviceMemory, 0), VK_SUCCESS);
 	}
 
 

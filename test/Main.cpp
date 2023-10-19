@@ -29,7 +29,6 @@ int main()
 	Graphics::CommandBuffer commandBuffer = commandPool.Create<Graphics::CommandBuffer>();
 	Graphics::Buffer buffer = device.Create<Graphics::Buffer>(1024, VK_BUFFER_USAGE_TRANSFER_DST_BIT);
 	Graphics::Image image = device.Create<Graphics::Image>(Core::Math::Vec2i(100, 100), VK_FORMAT_R8G8B8A8_UINT, VK_IMAGE_USAGE_TRANSFER_DST_BIT);
-	Graphics::ImageView imageView = image.Create<Graphics::ImageView>(VK_IMAGE_VIEW_TYPE_2D, VK_FORMAT_R8G8B8A8_UINT);
 
 	commandBuffer.Begin();
 	commandBuffer.End();
