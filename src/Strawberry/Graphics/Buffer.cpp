@@ -29,11 +29,18 @@ namespace Strawberry::Graphics
 		};
 
 		Core::AssertEQ(vkCreateBuffer(mDevice, &createInfo, nullptr, &mBuffer), VK_SUCCESS);
+
+		VkMemoryRequirements memoryRequirements;
+		vkGetBufferMemoryRequirements(mDevice, mBuffer, &memoryRequirements);
+
+		mMemory = device.Create<DeviceMemory>(memoryRequirements.size, memoryRequirements.memoryTypeBits);
+		Core::AssertEQ(vkBindBufferMemory(mDevice, mBuffer, mMemory.mDeviceMemory, 0), VK_SUCCESS);
 	}
 
 
 	Buffer::Buffer(Buffer&& rhs) noexcept
 		: mBuffer(std::exchange(rhs.mBuffer, nullptr))
+		, mMemory(std::move(rhs.mMemory))
 		  , mDevice(std::exchange(rhs.mDevice, nullptr)) {}
 
 

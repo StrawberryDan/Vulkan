@@ -30,6 +30,7 @@ namespace Strawberry::Graphics
 		friend class CommandPool;
 		friend class Buffer;
 		friend class BufferView;
+		friend class DeviceMemory;
 
 	public:
 		explicit Device(const Instance& instance);

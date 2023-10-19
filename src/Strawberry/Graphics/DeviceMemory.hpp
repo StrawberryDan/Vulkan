@@ -6,9 +6,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Vulkan
 #include <vulkan/vulkan.h>
-// Standard Library
-#include <concepts>
-#include "DeviceMemory.hpp"
 
 
 //======================================================================================================================
@@ -19,27 +16,23 @@ namespace Strawberry::Graphics
 	class Device;
 
 
-	class Buffer
+	class DeviceMemory
 	{
-		friend class BufferView;
+		friend class Buffer;
 
 
 	public:
-		Buffer(const Device& device, uint64_t size, VkBufferUsageFlags usage);
-		Buffer(const Buffer& rhs) = delete;
-		Buffer& operator=(const Buffer& rhs) = delete;
-		Buffer(Buffer&& rhs) noexcept;
-		Buffer& operator=(Buffer&& rhs) noexcept;
-		~Buffer();
-
-
-		template<std::movable T, typename... Args>
-		T Create(Args... args) const { return T(*this, std::forward<Args>(args)...); }
+		DeviceMemory() = default;
+		DeviceMemory(const Device& device, uint32_t size, VkMemoryPropertyFlags flags);
+		DeviceMemory(const DeviceMemory& rhs) = delete;
+		DeviceMemory& operator=(const DeviceMemory& rhs) = delete;
+		DeviceMemory(DeviceMemory&& rhs);
+		DeviceMemory& operator=(DeviceMemory&& rhs);
+		~DeviceMemory();
 
 
 	private:
-		VkBuffer mBuffer;
-		DeviceMemory mMemory;
-		VkDevice mDevice;
+		VkDeviceMemory mDeviceMemory = nullptr;
+		VkDevice mDevice = nullptr;
 	};
 }
