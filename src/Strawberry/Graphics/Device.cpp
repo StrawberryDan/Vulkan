@@ -130,6 +130,7 @@ namespace Strawberry::Graphics
 		// Select Extensions
 		std::vector<const char*> extensions
 			{
+				"VK_KHR_dynamic_rendering",
 				"VK_KHR_swapchain"
 			};
 		// Select Features

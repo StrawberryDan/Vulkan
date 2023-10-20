@@ -23,6 +23,9 @@ namespace Strawberry::Graphics
 
 	class ShaderModule
 	{
+		friend class Pipeline;
+
+
 	public:
 		ShaderModule(const Device& device, const std::filesystem::path& spirvFile);
 		ShaderModule(const Device& device, const Core::IO::DynamicByteBuffer& bytes);
