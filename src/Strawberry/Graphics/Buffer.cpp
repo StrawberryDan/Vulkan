@@ -32,6 +32,7 @@ namespace Strawberry::Graphics
 
 		VkMemoryRequirements memoryRequirements;
 		vkGetBufferMemoryRequirements(mDevice, mBuffer, &memoryRequirements);
+		memoryRequirements.memoryTypeBits |= VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
 
 		mMemory = device.Create<DeviceMemory>(memoryRequirements.size, memoryRequirements.memoryTypeBits);
 		Core::AssertEQ(vkBindBufferMemory(mDevice, mBuffer, mMemory.mDeviceMemory, 0), VK_SUCCESS);
