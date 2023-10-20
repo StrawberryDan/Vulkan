@@ -14,6 +14,7 @@
 namespace Strawberry::Graphics
 {
 	class Device;
+	class CommandBuffer;
 
 
 	class Queue
@@ -24,10 +25,15 @@ namespace Strawberry::Graphics
 		Queue& operator=(const Queue& rhs) = delete;
 		Queue(Queue&& rhs) noexcept;
 		Queue& operator=(Queue&& rhs);
-		~Queue() = default;
+		~Queue();
+
+
+		void Submit(const CommandBuffer& commandBuffer);
 
 
 	private:
 		VkQueue mQueue;
+		VkFence mSubmissionFence;
+		VkDevice mDevice;
 	};
 }
