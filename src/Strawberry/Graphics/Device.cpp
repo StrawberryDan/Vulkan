@@ -137,6 +137,22 @@ namespace Strawberry::Graphics
 		VkPhysicalDeviceFeatures features{};
 
 
+		// Check Portability Subset
+		uint32_t extensionPropertyCount = 0;
+		vkEnumerateDeviceExtensionProperties(mPhysicalDevice, nullptr, &extensionPropertyCount, nullptr);
+		std::vector<VkExtensionProperties> extensionProperties(extensionPropertyCount);
+		vkEnumerateDeviceExtensionProperties(mPhysicalDevice, nullptr, &extensionPropertyCount, extensionProperties.data());
+
+
+		// Add portability subset if available
+		if (std::any_of(extensionProperties.begin(), extensionProperties.end(), [] (VkExtensionProperties x) {
+			return strcmp(x.extensionName, "VK_KHR_portability_subset") == 0;
+		}))
+		{
+			extensions.push_back("VK_KHR_portability_subset");
+		}
+
+
 		// Enable Dynamic Rendering
 		VkPhysicalDeviceVulkan13Features Features1_3{};
 		Features1_3.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
