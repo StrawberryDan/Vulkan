@@ -18,6 +18,9 @@ namespace Strawberry::Graphics
 
 	class CommandBuffer
 	{
+		friend class Queue;
+
+
 	public:
 		explicit CommandBuffer(const CommandPool& commandPool);
 		CommandBuffer(const CommandBuffer& rhs) = delete;
@@ -29,6 +32,7 @@ namespace Strawberry::Graphics
 
 		void Begin(bool oneTimeSubmit);
 		void End();
+		void Reset();
 
 
 	private:

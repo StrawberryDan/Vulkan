@@ -75,4 +75,10 @@ namespace Strawberry::Graphics
 	{
 		Core::AssertEQ(vkEndCommandBuffer(mCommandBuffer), VK_SUCCESS);
 	}
+
+
+	void CommandBuffer::Reset()
+	{
+		Core::AssertEQ(vkResetCommandBuffer(mCommandBuffer, 0), VK_SUCCESS);
+	}
 }
