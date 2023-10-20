@@ -41,13 +41,10 @@ int main()
 		.Build();
 	Swapchain swapchain = device.Create<Swapchain, const Surface&>(surface, Core::Math::Vec2i{1920, 1080});
 	Queue queue = device.Create<Queue>();
-	CommandPool commandPool = device.Create<CommandPool>();
-	CommandBuffer commandBuffer = commandPool.Create<CommandBuffer>();
+	CommandPool commandPool = device.Create<CommandPool>(false);
 	Buffer buffer = device.Create<Buffer>(1024, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 	Image image = device.Create<Image>(Core::Math::Vec2i(100, 100), VK_FORMAT_R8G8B8A8_UINT, VK_IMAGE_USAGE_TRANSFER_DST_BIT);
 
-	commandBuffer.Begin();
-	commandBuffer.End();
 
 	while (!window.CloseRequested())
 	{
@@ -62,6 +59,11 @@ int main()
 				std::cout << (const char*) c.data() << std::endl;
 			}
 		}
+
+		CommandBuffer commandBuffer = commandPool.Create<CommandBuffer>();
+		commandBuffer.Begin(true);
+		commandBuffer.End();
+		queue.Submit(commandBuffer);
 	}
 
 	return 0;
