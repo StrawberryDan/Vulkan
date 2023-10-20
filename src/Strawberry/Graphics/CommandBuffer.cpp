@@ -58,21 +58,21 @@ namespace Strawberry::Graphics
 	}
 
 
-	void CommandBuffer::Begin()
+	void CommandBuffer::Begin(bool oneTimeSubmit)
 	{
 		VkCommandBufferBeginInfo beginInfo{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
 			.pNext = nullptr,
-			.flags = 0,
+			.flags = oneTimeSubmit ? VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT : VkCommandBufferUsageFlags(0),
 			.pInheritanceInfo = nullptr,
 		};
 
-		vkBeginCommandBuffer(mCommandBuffer, &beginInfo);
+		Core::AssertEQ(vkBeginCommandBuffer(mCommandBuffer, &beginInfo), VK_SUCCESS);
 	}
 
 
 	void CommandBuffer::End()
 	{
-		vkEndCommandBuffer(mCommandBuffer);
+		Core::AssertEQ(vkEndCommandBuffer(mCommandBuffer), VK_SUCCESS);
 	}
 }

@@ -27,7 +27,7 @@ namespace Strawberry::Graphics
 		~CommandBuffer();
 
 
-		void Begin();
+		void Begin(bool oneTimeSubmit);
 		void End();
 
 
