@@ -24,7 +24,7 @@ namespace Strawberry::Graphics
 
 
 	public:
-		explicit CommandPool(const Device& device);
+		explicit CommandPool(const Device& device, bool resetBit);
 		CommandPool(const CommandPool& rhs) = delete;
 		CommandPool& operator=(const CommandPool& rhs) = delete;
 		CommandPool(CommandPool&& rhs) noexcept ;

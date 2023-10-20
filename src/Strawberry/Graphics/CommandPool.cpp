@@ -14,13 +14,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics
 {
-	CommandPool::CommandPool(const Device& device)
+	CommandPool::CommandPool(const Device& device, bool resetBit)
 		: mDevice(device.mDevice)
 	{
 		VkCommandPoolCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
 			.pNext = nullptr,
-			.flags = 0,
+			.flags = resetBit ? VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT : VkCommandPoolCreateFlags(0),
 			.queueFamilyIndex = device.mQueueFamilyIndex
 		};
 
