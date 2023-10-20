@@ -137,7 +137,7 @@ namespace Strawberry::Graphics
 		VkPhysicalDeviceFeatures features{};
 
 
-		// Check Portability Subset
+		// Enumerate Extension Properties of Physical Device
 		uint32_t extensionPropertyCount = 0;
 		vkEnumerateDeviceExtensionProperties(mPhysicalDevice, nullptr, &extensionPropertyCount, nullptr);
 		std::vector<VkExtensionProperties> extensionProperties(extensionPropertyCount);
