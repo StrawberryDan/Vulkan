@@ -14,6 +14,7 @@
 #include "Strawberry/Graphics/ShaderModule.hpp"
 #include "Strawberry/Graphics/Framebuffer.hpp"
 #include "Strawberry/Core/Math/Matrix.hpp"
+#include "Strawberry/Core/Timing/Clock.hpp"
 
 
 int main()
@@ -62,6 +63,9 @@ int main()
 	Framebuffer framebuffer = pipeline.Create<Framebuffer>();
 
 
+	Core::Clock clock;
+
+
 	while (!window.CloseRequested())
 	{
 		Window::PollInput();
@@ -76,8 +80,13 @@ int main()
 		}
 
 
+		std::cout << *clock << std::endl;
+
+
 		Core::Math::Mat4f MVPMatrix;
-		Core::Math::Vec3f Color(1.0f, 0.5f, 0.5f);
+		Core::Math::Vec3f Color((std::sinf(*clock) + 1.0f) / 2.0f,
+								(std::cosf(0.25 * *clock) + 1.0f) / 2.0f,
+								(std::cosf(0.5 * *clock + M_PI_2) + 1.0f) / 2.0f);
 
 
 		commandBuffer.Begin(false);
