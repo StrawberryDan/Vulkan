@@ -11,7 +11,6 @@
 #include "Strawberry/Graphics/Buffer.hpp"
 #include "Strawberry/Graphics/BufferView.hpp"
 #include "Strawberry/Graphics/Image.hpp"
-#include "Strawberry/Graphics/ImageView.hpp"
 #include "Strawberry/Graphics/ShaderModule.hpp"
 #include "Strawberry/Graphics/Framebuffer.hpp"
 
