@@ -7,13 +7,12 @@
 #include "ImageView.hpp"
 #include "Image.hpp"
 #include "Pipeline.hpp"
+#include "Framebuffer.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Assert.hpp"
-#include "ImageView.hpp"
-#include "Framebuffer.hpp"
+#include "Strawberry/Core/Math/Vector.hpp"
 // Standard Library
 #include <memory>
-#include <Strawberry/Core/Math/Vector.hpp>
 
 
 //======================================================================================================================
