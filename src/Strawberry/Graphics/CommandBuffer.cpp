@@ -5,6 +5,7 @@
 #include "CommandPool.hpp"
 #include "Buffer.hpp"
 #include "ImageView.hpp"
+#include "Image.hpp"
 #include "Pipeline.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Assert.hpp"
