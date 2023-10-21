@@ -15,7 +15,8 @@
 namespace Strawberry::Graphics
 {
 	Buffer::Buffer(const Device& device, uint64_t size, VkBufferUsageFlags usage)
-		: mDevice(device.mDevice)
+		: mSize(size)
+		, mDevice(device.mDevice)
 	{
 		VkBufferCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
@@ -32,9 +33,8 @@ namespace Strawberry::Graphics
 
 		VkMemoryRequirements memoryRequirements;
 		vkGetBufferMemoryRequirements(mDevice, mBuffer, &memoryRequirements);
-		memoryRequirements.memoryTypeBits |= VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
 
-		mMemory = device.Create<DeviceMemory>(memoryRequirements.size, memoryRequirements.memoryTypeBits);
+		mMemory = device.Create<DeviceMemory>(memoryRequirements.size, memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		Core::AssertEQ(vkBindBufferMemory(mDevice, mBuffer, mMemory.mDeviceMemory, 0), VK_SUCCESS);
 	}
 
@@ -63,5 +63,31 @@ namespace Strawberry::Graphics
 		{
 			vkDestroyBuffer(mDevice, mBuffer, nullptr);
 		}
+	}
+
+
+	void Buffer::SetData(const Core::IO::DynamicByteBuffer& bytes)
+	{
+		if (!mMappedDataPtr)
+		{
+			Core::AssertEQ(vkMapMemory(mDevice, mMemory.mDeviceMemory, 0, mSize, 0, &mMappedDataPtr), VK_SUCCESS);
+			Core::AssertNEQ(mMappedDataPtr, nullptr);
+		}
+		std::memcpy(mMappedDataPtr, bytes.Data(), GetSize());
+
+		VkMappedMemoryRange range {
+			.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE,
+			.pNext = nullptr,
+			.memory = mMemory.mDeviceMemory,
+			.offset = 0,
+			.size = mSize,
+		};
+		Core::AssertEQ(vkFlushMappedMemoryRanges(mDevice, 1, &range), VK_SUCCESS);
+	}
+
+
+	uint64_t Buffer::GetSize() const
+	{
+		return mSize;
 	}
 }

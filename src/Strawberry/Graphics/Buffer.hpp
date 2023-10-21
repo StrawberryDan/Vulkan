@@ -6,6 +6,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Vulkan
 #include <vulkan/vulkan.h>
+// Strawberry Core
+#include <Strawberry/Core/IO/DynamicByteBuffer.hpp>
 // Standard Library
 #include <concepts>
 #include "DeviceMemory.hpp"
@@ -22,6 +24,7 @@ namespace Strawberry::Graphics
 	class Buffer
 	{
 		friend class BufferView;
+		friend class CommandBuffer;
 
 
 	public:
@@ -37,9 +40,17 @@ namespace Strawberry::Graphics
 		T Create(Args... args) const { return T(*this, std::forward<Args>(args)...); }
 
 
+		void SetData(const Core::IO::DynamicByteBuffer& bytes);
+
+
+		[[nodiscard]] uint64_t GetSize() const;
+
+
 	private:
+		uint64_t mSize;
 		VkBuffer mBuffer;
 		DeviceMemory mMemory;
 		VkDevice mDevice;
+		void* mMappedDataPtr = nullptr;
 	};
 }
