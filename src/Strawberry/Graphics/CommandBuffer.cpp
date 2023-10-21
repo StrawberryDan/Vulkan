@@ -114,7 +114,7 @@ namespace Strawberry::Graphics
 	}
 
 
-	void CommandBuffer::ImageMemoryBarrier(const Image& image, VkImageLayout targetLayout)
+	void CommandBuffer::ImageMemoryBarrier(const Image& image, VkImageAspectFlagBits aspect, VkImageLayout targetLayout)
 	{
 		VkImageMemoryBarrier imageMemoryBarrier{
 			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
@@ -127,7 +127,7 @@ namespace Strawberry::Graphics
 			.dstQueueFamilyIndex = mQueueFamilyIndex,
 			.image = image.mImage,
 			.subresourceRange{
-				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.aspectMask = aspect,
 				.baseMipLevel = 0,
 				.levelCount = 1,
 				.baseArrayLayer = 0,
