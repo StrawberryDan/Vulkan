@@ -47,7 +47,6 @@ int main()
 	CommandBuffer commandBuffer = commandPool.Create<CommandBuffer>();
 	Image image = device.Create<Image>(Core::Math::Vec2i(1920, 1080), VK_FORMAT_R32G32B32A32_SFLOAT,
 									   VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
-	ImageView imageView = image.Create<ImageView>(VK_IMAGE_VIEW_TYPE_2D, VK_FORMAT_R32G32B32A32_SFLOAT);
 
 
 	Buffer buffer = device.Create<Buffer>(3 * sizeof(float) * 3, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
@@ -57,7 +56,7 @@ int main()
 	verticies.Push<Core::Math::Vec3f>(Core::Math::Vec3f(0.0f, 1.0f, 0.0f));
 	buffer.SetData(verticies);
 
-	Framebuffer framebuffer = pipeline.Create<Framebuffer, const ImageView&>(imageView);
+	Framebuffer framebuffer = pipeline.Create<Framebuffer>(window.GetSize());
 
 
 	while (!window.CloseRequested())
@@ -76,7 +75,6 @@ int main()
 
 
 		commandBuffer.Begin(false);
-		commandBuffer.ImageMemoryBarrier(image, VK_IMAGE_LAYOUT_GENERAL);
 		commandBuffer.BeginRenderPass(pipeline, framebuffer);
 		commandBuffer.BindPipeline(pipeline);
 		commandBuffer.BindVertexBuffer(0, buffer);
