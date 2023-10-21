@@ -110,6 +110,7 @@ namespace Strawberry::Graphics
 		VkPipeline mPipeline = nullptr;
 		VkPipelineLayout mPipelineLayout = nullptr;
 		VkDevice mDevice = nullptr;
+		VkRenderPass mRenderPass = nullptr;
 	};
 
 

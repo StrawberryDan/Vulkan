@@ -40,6 +40,7 @@ namespace Strawberry::Graphics
 		{
 			vkDestroyPipelineLayout(mDevice, mPipelineLayout, nullptr);
 			vkDestroyPipeline(mDevice, mPipeline, nullptr);
+			vkDestroyRenderPass(mDevice, mRenderPass, nullptr);
 		}
 	}
 
@@ -146,7 +147,8 @@ namespace Strawberry::Graphics
 		};
 		VkRect2D scissorRegion{
 			.offset = {0, 0},
-			.extent = {static_cast<uint32_t>(mViewportSize.Value()[0]), static_cast<uint32_t>(mViewportSize.Value()[1])},
+			.extent = {static_cast<uint32_t>(mViewportSize.Value()[0]),
+					   static_cast<uint32_t>(mViewportSize.Value()[1])},
 		};
 		VkPipelineViewportStateCreateInfo viewPortState{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
@@ -160,7 +162,7 @@ namespace Strawberry::Graphics
 
 
 		// Rasterization State
-		VkPipelineRasterizationStateCreateInfo rasterizationState {
+		VkPipelineRasterizationStateCreateInfo rasterizationState{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
 			.pNext = 0,
 			.flags = 0,
@@ -178,7 +180,7 @@ namespace Strawberry::Graphics
 
 
 		// Multisampling State
-		VkPipelineMultisampleStateCreateInfo multisampleState {
+		VkPipelineMultisampleStateCreateInfo multisampleState{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -192,7 +194,7 @@ namespace Strawberry::Graphics
 
 
 		// Depth Stencil State
-		VkPipelineDepthStencilStateCreateInfo depthStencilState {
+		VkPipelineDepthStencilStateCreateInfo depthStencilState{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -208,7 +210,7 @@ namespace Strawberry::Graphics
 
 
 		// Color Blending State
-		VkPipelineColorBlendAttachmentState colorBlendAttachementState {
+		VkPipelineColorBlendAttachmentState colorBlendAttachementState{
 			.blendEnable = VK_FALSE,
 			.srcColorBlendFactor = VK_BLEND_FACTOR_ONE,
 			.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO,
@@ -216,9 +218,10 @@ namespace Strawberry::Graphics
 			.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
 			.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
 			.alphaBlendOp = VK_BLEND_OP_ADD,
-			.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT,
+			.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
+							  VK_COLOR_COMPONENT_A_BIT,
 		};
-		VkPipelineColorBlendStateCreateInfo colorBlendState {
+		VkPipelineColorBlendStateCreateInfo colorBlendState{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -231,7 +234,7 @@ namespace Strawberry::Graphics
 
 
 		// Dynamic State
-		VkPipelineDynamicStateCreateInfo dynamicState {
+		VkPipelineDynamicStateCreateInfo dynamicState{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -240,7 +243,7 @@ namespace Strawberry::Graphics
 		};
 
 
-		VkPipelineLayoutCreateInfo layoutCreateInfo {
+		VkPipelineLayoutCreateInfo layoutCreateInfo{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -254,24 +257,54 @@ namespace Strawberry::Graphics
 		pipeline.mPipelineLayout = layout;
 
 
-		// Pipeline Rendering Create Info
-		std::vector<VkFormat> colorAttachmentFormats{VK_FORMAT_R32G32B32A32_SFLOAT};
-		VkPipelineRenderingCreateInfo renderingCreateInfo {
-			.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO,
-			.pNext = nullptr,
-			.viewMask = 0,
-			.colorAttachmentCount = static_cast<uint32_t>(colorAttachmentFormats.size()),
-			.pColorAttachmentFormats = colorAttachmentFormats.data(),
-			.depthAttachmentFormat = VK_FORMAT_UNDEFINED,
-			.stencilAttachmentFormat = VK_FORMAT_UNDEFINED,
+		// Render Pass
+		VkAttachmentDescription attachment{
+			.flags = 0,
+			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
+			.samples = VK_SAMPLE_COUNT_1_BIT,
+			.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+			.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+			.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+			.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+			.initialLayout = VK_IMAGE_LAYOUT_GENERAL,
+			.finalLayout = VK_IMAGE_LAYOUT_GENERAL,
 		};
+		VkAttachmentReference colorAttachment {
+			.attachment = 0,
+			.layout = VK_IMAGE_LAYOUT_GENERAL,
+		};
+		VkSubpassDescription subpass{
+			.flags = 0,
+			.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
+			.inputAttachmentCount = 0,
+			.pInputAttachments = nullptr,
+			.colorAttachmentCount = 1,
+			.pColorAttachments = &colorAttachment,
+			.pResolveAttachments = nullptr,
+			.pDepthStencilAttachment = nullptr,
+			.preserveAttachmentCount = 0,
+			.pPreserveAttachments = nullptr,
+		};
+		VkRenderPassCreateInfo renderPassCreateInfo{
+			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.attachmentCount = 1,
+			.pAttachments = &attachment,
+			.subpassCount = 1,
+			.pSubpasses = &subpass,
+			.dependencyCount = 0,
+			.pDependencies = nullptr,
+		};
+		Core::AssertEQ(vkCreateRenderPass(mDevice->mDevice, &renderPassCreateInfo, nullptr, &pipeline.mRenderPass),
+					   VK_SUCCESS);
 
 
 		// Create the Pipeline
 		std::vector<VkGraphicsPipelineCreateInfo> createInfos{
 			VkGraphicsPipelineCreateInfo{
 				.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-				.pNext = &renderingCreateInfo,
+				.pNext = nullptr,
 				.flags = 0,
 				.stageCount = static_cast<uint32_t>(stages.size()),
 				.pStages = stages.data(),
@@ -285,7 +318,7 @@ namespace Strawberry::Graphics
 				.pColorBlendState = &colorBlendState,
 				.pDynamicState = &dynamicState,
 				.layout = layout,
-				.renderPass = VK_NULL_HANDLE,
+				.renderPass = pipeline.mRenderPass,
 				.subpass = mSubpass,
 				.basePipelineHandle = nullptr,
 				.basePipelineIndex = 0,
