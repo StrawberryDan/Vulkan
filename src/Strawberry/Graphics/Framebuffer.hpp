@@ -30,7 +30,7 @@ namespace Strawberry::Graphics
 
 
 	public:
-		Framebuffer(const Pipeline& view, Core::Math::Vec2i size, uint32_t colorAttachmentCount = 1);
+		Framebuffer(const Pipeline& view);
 		Framebuffer(const Framebuffer& rhs) = delete;
 		Framebuffer& operator=(const Framebuffer& rhs) = delete;
 		Framebuffer(Framebuffer&& rhs) noexcept;

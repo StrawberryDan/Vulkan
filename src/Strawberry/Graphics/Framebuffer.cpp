@@ -16,18 +16,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics
 {
-	Framebuffer::Framebuffer(const Pipeline& pipeline, Core::Math::Vec2i size, uint32_t colorAttachmentCount)
+	Framebuffer::Framebuffer(const Pipeline& pipeline)
 		: mDevice(pipeline.mDevice)
-		  , mSize(size)
+		  , mSize(pipeline.mViewportSize)
 		  , mDepthAttachment(CreateDepthImage(pipeline))
 		  , mDepthAttachmentView(CreateDepthImageView())
 		  , mStencilAttachment(CreateStencilImage(pipeline))
 		  , mStencilAttachmentView(CreateStencilImageView())
 	{
-		for (int i = 0; i < colorAttachmentCount; i++)
+		constexpr int COLOR_ATTACHMENT_COUNT = 1;
+		for (int i = 0; i < COLOR_ATTACHMENT_COUNT; i++)
 		{
-			mColorAttachments.emplace_back(pipeline.mDevice->Create<Image>(size, VK_FORMAT_R32G32B32A32_SFLOAT,
-																		   VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT));
+			mColorAttachments.emplace_back(pipeline.mDevice->Create<Image>(mSize, VK_FORMAT_R32G32B32A32_SFLOAT,
+																		   VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT));
 			mColorAttachmentViews.emplace_back(
 				mColorAttachments.back().Create<ImageView::Builder>()
 					.WithType(VK_IMAGE_VIEW_TYPE_2D)
@@ -119,7 +120,7 @@ namespace Strawberry::Graphics
 	Image Framebuffer::CreateDepthImage(const Pipeline& pipeline)
 	{
 		return pipeline.mDevice->Create<Image>(mSize, VK_FORMAT_D32_SFLOAT,
-											   VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
+											   VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
 
 	}
 
@@ -141,7 +142,7 @@ namespace Strawberry::Graphics
 
 	Image Framebuffer::CreateStencilImage(const Pipeline& pipeline)
 	{
-		return pipeline.mDevice->Create<Image>(mSize, VK_FORMAT_S8_UINT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
+		return pipeline.mDevice->Create<Image>(mSize, VK_FORMAT_S8_UINT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
 	}
 
 
