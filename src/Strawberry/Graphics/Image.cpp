@@ -104,11 +104,19 @@ namespace Strawberry::Graphics
 		};
 
 		Core::AssertEQ(vkCreateImage(mDevice, &createInfo, nullptr, &mImage), VK_SUCCESS);
+
+
+		VkMemoryRequirements memoryRequirements;
+		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
+
+		mMemory = device.Create<DeviceMemory>(memoryRequirements.size, memoryRequirements.memoryTypeBits);
+		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.mDeviceMemory, 0), VK_SUCCESS);
 	}
 
 
 	Image::Image(Image&& rhs) noexcept
 		: mImage(std::exchange(rhs.mImage, nullptr))
+		, mMemory(std::move(rhs.mMemory))
 		  , mDevice(std::exchange(rhs.mDevice, nullptr))
 		  , mSize(std::exchange(rhs.mSize, Core::Math::Vec3i()))
 	{
