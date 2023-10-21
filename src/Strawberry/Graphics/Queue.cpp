@@ -20,6 +20,7 @@ namespace Strawberry::Graphics
 	{
 		vkGetDeviceQueue(mDevice, device.mQueueFamilyIndex, 0, &mQueue);
 
+
 		VkFenceCreateInfo fenceCreateInfo {
 			.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
 			.pNext = nullptr,
@@ -64,14 +65,14 @@ namespace Strawberry::Graphics
 			.pNext = nullptr,
 			.waitSemaphoreCount = 0,
 			.pWaitSemaphores = nullptr,
-			.pWaitDstStageMask = 0,
+			.pWaitDstStageMask = nullptr,
 			.commandBufferCount = 1,
 			.pCommandBuffers = &commandBuffer.mCommandBuffer,
 			.signalSemaphoreCount = 0,
-			.pSignalSemaphores = nullptr
+			.pSignalSemaphores = nullptr,
 		};
+		Core::AssertEQ(vkQueueSubmit(mQueue, 1, &submitInfo, mSubmissionFence), VK_SUCCESS);
 
-		vkQueueSubmit(mQueue, 1, &submitInfo, mSubmissionFence);
 		vkWaitForFences(mDevice, 1, &mSubmissionFence, VK_TRUE, std::numeric_limits<uint64_t>::max());
 		vkResetFences(mDevice, 1, &mSubmissionFence);
 	}
