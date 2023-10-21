@@ -143,8 +143,15 @@ namespace Strawberry::Graphics
 	}
 
 
-	void CommandBuffer::BeginRenderPass(const Pipeline& pipeline, const Framebuffer& framebuffer)
+	void CommandBuffer::BeginRenderPass(const Pipeline& pipeline, Framebuffer& framebuffer)
 	{
+		for (int i = 0; i < framebuffer.GetColorAttachmentCount(); i++)
+		{
+			ImageMemoryBarrier(framebuffer.GetColorAttachment(i), VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_GENERAL);
+		}
+		ImageMemoryBarrier(framebuffer.GetDepthAttachment(), VK_IMAGE_ASPECT_DEPTH_BIT, VK_IMAGE_LAYOUT_GENERAL);
+		ImageMemoryBarrier(framebuffer.GetStencilAttachment(), VK_IMAGE_ASPECT_STENCIL_BIT, VK_IMAGE_LAYOUT_GENERAL);
+
 		VkClearValue clearValue{
 			.color {.uint32{0, 0, 0, 0}}
 		};

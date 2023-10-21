@@ -44,7 +44,7 @@ namespace Strawberry::Graphics
 		void BindPipeline(const Pipeline& pipeline);
 
 
-		void BeginRenderPass(const Pipeline& pipeline, const Framebuffer& framebuffer);
+		void BeginRenderPass(const Pipeline& pipeline, Framebuffer& framebuffer);
 		void EndRenderPass();
 
 
