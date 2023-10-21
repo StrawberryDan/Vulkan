@@ -87,6 +87,7 @@ namespace Strawberry::Graphics
 	class Pipeline
 	{
 		friend class Builder;
+		friend class CommandBuffer;
 
 
 	public:
