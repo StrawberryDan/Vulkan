@@ -100,6 +100,7 @@ namespace Strawberry::Graphics::Window
 
 	void Window::SwapBuffers()
 	{
+		glfwSwapInterval(1);
 		glfwSwapBuffers(mHandle);
 	}
 
