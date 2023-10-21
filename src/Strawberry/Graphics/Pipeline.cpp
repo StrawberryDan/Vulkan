@@ -38,9 +38,9 @@ namespace Strawberry::Graphics
 	{
 		if (mPipeline)
 		{
-			vkDestroyPipelineLayout(mDevice, mPipelineLayout, nullptr);
-			vkDestroyPipeline(mDevice, mPipeline, nullptr);
-			vkDestroyRenderPass(mDevice, mRenderPass, nullptr);
+			vkDestroyPipelineLayout(mDevice->mDevice, mPipelineLayout, nullptr);
+			vkDestroyPipeline(mDevice->mDevice, mPipeline, nullptr);
+			vkDestroyRenderPass(mDevice->mDevice, mRenderPass, nullptr);
 		}
 	}
 
@@ -86,7 +86,7 @@ namespace Strawberry::Graphics
 	Pipeline Pipeline::Builder::Build() const
 	{
 		Pipeline pipeline;
-		pipeline.mDevice = mDevice->mDevice;
+		pipeline.mDevice = mDevice;
 
 
 		// Create Shader Stages

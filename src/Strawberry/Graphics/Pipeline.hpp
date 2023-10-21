@@ -114,7 +114,7 @@ namespace Strawberry::Graphics
 	private:
 		VkPipeline mPipeline = nullptr;
 		VkPipelineLayout mPipelineLayout = nullptr;
-		VkDevice mDevice = nullptr;
+		const Device* mDevice = nullptr;
 		VkRenderPass mRenderPass = nullptr;
 	};
 
