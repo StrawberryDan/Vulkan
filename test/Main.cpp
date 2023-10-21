@@ -43,6 +43,7 @@ int main()
 		.WithViewportSize(Core::Math::Vec2i(1920, 1080))
 		.WithPushConstantRange(VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float), 0)
 		.WithPushConstantRange(VK_SHADER_STAGE_FRAGMENT_BIT, 3 * sizeof(float), 16 * sizeof(float))
+		.WithDescriptorSetLayout(DescriptorSetLayout().WithBinding(VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1, VK_SHADER_STAGE_FRAGMENT_BIT))
 		.Build();
 	Swapchain swapchain = device.Create<Swapchain, const Surface&>(surface, Core::Math::Vec2i(1920, 1080));
 	Queue queue = device.Create<Queue>();
@@ -78,9 +79,6 @@ int main()
 				std::cout << (const char*) c.data() << std::endl;
 			}
 		}
-
-
-		std::cout << *clock << std::endl;
 
 
 		Core::Math::Mat4f MVPMatrix;
