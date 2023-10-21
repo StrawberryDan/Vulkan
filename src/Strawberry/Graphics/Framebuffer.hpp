@@ -4,10 +4,14 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
+#include "Image.hpp"
+#include "ImageView.hpp"
 // Vulkan
 #include <vulkan/vulkan.h>
 // Strawberry Core
 #include "Strawberry/Core/Math/Vector.hpp"
+// Standard Library
+#include <vector>
 
 
 //======================================================================================================================
@@ -26,7 +30,7 @@ namespace Strawberry::Graphics
 
 
 	public:
-		Framebuffer(const Pipeline& pipeline, const ImageView& colorAttachment);
+		Framebuffer(const Pipeline& view, Core::Math::Vec2i size, uint32_t colorAttachmentCount = 1);
 		Framebuffer(const Framebuffer& rhs) = delete;
 		Framebuffer& operator=(const Framebuffer& rhs) = delete;
 		Framebuffer(Framebuffer&& rhs) noexcept;
@@ -34,9 +38,31 @@ namespace Strawberry::Graphics
 		~Framebuffer();
 
 
+		uint32_t GetColorAttachmentCount() const;
+		const Image& GetColorAttachment(uint32_t index);
+		const Image& GetDepthAttachment();
+		const Image& GetStencilAttachment();
+
+
+	private:
+		Image CreateDepthImage(const Pipeline& pipeline);
+		ImageView CreateDepthImageView();
+		Image CreateStencilImage(const Pipeline& pipeline);
+		ImageView CreateStencilImageView();
+
+
 	private:
 		VkFramebuffer mFramebuffer;
-		VkDevice mDevice;
+		const Device* mDevice;
 		Core::Math::Vec2i mSize;
+
+
+		std::vector<Image> mColorAttachments;
+		std::vector<ImageView> mColorAttachmentViews;
+
+		Image mDepthAttachment;
+		ImageView mDepthAttachmentView;
+		Image mStencilAttachment;
+		ImageView mStencilAttachmentView;
 	};
 }
