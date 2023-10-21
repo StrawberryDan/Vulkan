@@ -32,7 +32,7 @@ namespace Strawberry::Graphics
 		std::vector<const char*> extensions =
 		{
 #if __APPLE__
-			"VK_KHR_portability_enumeration"
+			VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME,
 #endif
 		};
 
