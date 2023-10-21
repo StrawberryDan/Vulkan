@@ -87,6 +87,18 @@ namespace Strawberry::Graphics
 	}
 
 
+	Pipeline::Builder&
+	Pipeline::Builder::WithPushConstantRange(VkShaderStageFlags stage, uint32_t size, uint32_t offset)
+	{
+		mPushConstantRanges.emplace_back(VkPushConstantRange{
+			.stageFlags = stage,
+			.offset = offset,
+			.size = size,
+		});
+		return *this;
+	}
+
+
 	Pipeline Pipeline::Builder::Build() const
 	{
 		Pipeline pipeline;
@@ -254,8 +266,8 @@ namespace Strawberry::Graphics
 			.flags = 0,
 			.setLayoutCount = 0,
 			.pSetLayouts = nullptr,
-			.pushConstantRangeCount = 0,
-			.pPushConstantRanges = nullptr,
+			.pushConstantRangeCount = static_cast<uint32_t>(mPushConstantRanges.size()),
+			.pPushConstantRanges = mPushConstantRanges.data(),
 		};
 		VkPipelineLayout layout;
 		Core::AssertEQ(vkCreatePipelineLayout(mDevice->mDevice, &layoutCreateInfo, nullptr, &layout), VK_SUCCESS);

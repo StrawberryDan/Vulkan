@@ -138,6 +138,9 @@ namespace Strawberry::Graphics
 		Builder& WithViewportSize(Core::Math::Vec2i size);
 
 
+		Builder& WithPushConstantRange(VkShaderStageFlags stage, uint32_t size, uint32_t offset);
+
+
 		[[nodiscard]] Pipeline Build() const;
 
 
@@ -163,5 +166,7 @@ namespace Strawberry::Graphics
 		float mLineWidth = 1.0;
 
 		uint32_t mSubpass = 0;
+
+		std::vector<VkPushConstantRange> mPushConstantRanges;
 	};
 }
