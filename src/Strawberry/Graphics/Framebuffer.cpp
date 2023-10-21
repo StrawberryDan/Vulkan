@@ -8,6 +8,7 @@
 // Strawberry Core
 #include "Strawberry/Core/Assert.hpp"
 // Standard Library
+#include <algorithm>
 #include <memory>
 
 
