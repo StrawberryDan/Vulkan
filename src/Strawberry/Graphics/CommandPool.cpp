@@ -16,6 +16,7 @@ namespace Strawberry::Graphics
 {
 	CommandPool::CommandPool(const Device& device, bool resetBit)
 		: mDevice(device.mDevice)
+		, mQueueFamilyIndex(device.mQueueFamilyIndex)
 	{
 		VkCommandPoolCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
@@ -30,7 +31,11 @@ namespace Strawberry::Graphics
 
 	CommandPool::CommandPool(CommandPool&& rhs) noexcept
 		: mCommandPool(std::exchange(rhs.mCommandPool, nullptr))
-		  , mDevice(std::exchange(rhs.mDevice, nullptr)) {}
+		  , mDevice(std::exchange(rhs.mDevice, nullptr))
+		  , mQueueFamilyIndex(std::exchange(rhs.mQueueFamilyIndex, 0))
+	  {
+
+	  }
 
 
 	CommandPool& CommandPool::operator=(CommandPool&& rhs)

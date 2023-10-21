@@ -23,6 +23,7 @@ namespace Strawberry::Graphics
 		: mCommandBuffer{}
 		  , mDevice(commandPool.mDevice)
 		  , mCommandPool(commandPool.mCommandPool)
+		  , mQueueFamilyIndex(commandPool.mQueueFamilyIndex)
 	{
 		VkCommandBufferAllocateInfo allocateInfo{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
@@ -39,7 +40,11 @@ namespace Strawberry::Graphics
 	CommandBuffer::CommandBuffer(CommandBuffer&& rhs) noexcept
 		: mCommandBuffer(std::exchange(rhs.mCommandBuffer, nullptr))
 		  , mCommandPool(std::exchange(rhs.mCommandPool, nullptr))
-		  , mDevice(std::exchange(rhs.mDevice, nullptr)) {}
+		  , mDevice(std::exchange(rhs.mDevice, nullptr))
+		  , mQueueFamilyIndex(std::exchange(rhs.mQueueFamilyIndex, 0))
+	{
+
+	}
 
 
 	CommandBuffer& CommandBuffer::operator=(CommandBuffer&& rhs)

@@ -41,5 +41,6 @@ namespace Strawberry::Graphics
 	private:
 		VkCommandPool mCommandPool;
 		VkDevice mDevice;
+		uint32_t mQueueFamilyIndex;
 	};
 }
