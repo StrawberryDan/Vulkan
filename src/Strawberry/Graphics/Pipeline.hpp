@@ -102,6 +102,10 @@ namespace Strawberry::Graphics
 		~Pipeline();
 
 
+		template <std::movable T, typename... Args>
+		T Create(Args... args) const { return T(*this, std::forward<Args>(args)...); }
+
+
 	private:
 		Pipeline() = default;
 
