@@ -63,4 +63,45 @@ namespace Strawberry::Graphics
 			vkDestroyImageView(mDevice, mImageView, nullptr);
 		}
 	}
+
+
+	ImageView::Builder::Builder(const Image& image)
+		: mImage(&image)
+	{
+
+	}
+
+
+	ImageView::Builder& ImageView::Builder::WithType(VkImageViewType type)
+	{
+		mViewType = type;
+		return *this;
+	}
+
+
+	ImageView::Builder& ImageView::Builder::WithFormat(VkFormat format)
+	{
+		mFormat = format;
+		return *this;
+	}
+
+
+	ImageView::Builder& ImageView::Builder::WithSwizzling(VkComponentMapping mapping)
+	{
+		mComponentMapping = mapping;
+		return *this;
+	}
+
+
+	ImageView::Builder& ImageView::Builder::WithSubresourceRange(VkImageSubresourceRange range)
+	{
+		mSubresourceRange = range;
+		return *this;
+	}
+
+
+	ImageView ImageView::Builder::Build()
+	{
+		return ImageView(*mImage, *mViewType, *mFormat, mComponentMapping, mSubresourceRange);
+	}
 }
