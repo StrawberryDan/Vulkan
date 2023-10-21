@@ -104,6 +104,14 @@ namespace Strawberry::Graphics::Window
 	}
 
 
+	Core::Math::Vec2i Window::GetSize() const
+	{
+		Core::Math::Vec2i size;
+		glfwGetWindowSize(mHandle, &size[0], &size[1]);
+		return size;
+	}
+
+
 	void Window::OnKeyEvent(GLFWwindow* windowHandle, int key, int scancode, int action, int mods)
 	{
 		Window* window = sInstanceMap.Lock()->at(windowHandle);
