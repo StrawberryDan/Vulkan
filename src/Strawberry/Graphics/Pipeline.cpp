@@ -19,7 +19,11 @@ namespace Strawberry::Graphics
 {
 	Pipeline::Pipeline(Pipeline&& rhs) noexcept
 		: mPipeline(std::exchange(rhs.mPipeline, nullptr))
-		  , mDevice(std::exchange(rhs.mDevice, nullptr)) {}
+		  , mDevice(std::exchange(rhs.mDevice, nullptr))
+		  , mRenderPass(std::exchange(rhs.mRenderPass, nullptr))
+		  , mPipelineLayout(std::exchange(rhs.mPipelineLayout, nullptr))
+		  , mViewportSize(std::exchange(rhs.mViewportSize, {}))
+	  {}
 
 
 	Pipeline& Pipeline::operator=(Pipeline&& rhs) noexcept
@@ -87,6 +91,7 @@ namespace Strawberry::Graphics
 	{
 		Pipeline pipeline;
 		pipeline.mDevice = mDevice;
+		pipeline.mViewportSize = mViewportSize.Value();
 
 
 		// Create Shader Stages

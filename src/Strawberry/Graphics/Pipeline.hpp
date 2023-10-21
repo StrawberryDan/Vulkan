@@ -116,6 +116,7 @@ namespace Strawberry::Graphics
 		VkPipelineLayout mPipelineLayout = nullptr;
 		const Device* mDevice = nullptr;
 		VkRenderPass mRenderPass = nullptr;
+		Core::Math::Vec2i mViewportSize;
 	};
 
 
