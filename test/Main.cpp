@@ -46,11 +46,14 @@ int main()
 	CommandBuffer commandBuffer = commandPool.Create<CommandBuffer>();
 
 
-	Buffer buffer = device.Create<Buffer>(3 * sizeof(float) * 3, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+	Buffer buffer = device.Create<Buffer>(6 * sizeof(float) * 3, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 	Core::IO::DynamicByteBuffer vertices;
 	vertices.Push<Core::Math::Vec3f>(Core::Math::Vec3f(0.0f, 0.0f, 0.0f));
 	vertices.Push<Core::Math::Vec3f>(Core::Math::Vec3f(1.0f, 0.0f, 0.0f));
 	vertices.Push<Core::Math::Vec3f>(Core::Math::Vec3f(0.0f, 1.0f, 0.0f));
+	vertices.Push<Core::Math::Vec3f>(Core::Math::Vec3f(0.5f, 0.5f, 0.0f));
+	vertices.Push<Core::Math::Vec3f>(Core::Math::Vec3f(1.0f, 0.5f, 0.0f));
+	vertices.Push<Core::Math::Vec3f>(Core::Math::Vec3f(0.5f, 1.0f, 0.0f));
 	buffer.SetData(vertices);
 
 	Framebuffer framebuffer = pipeline.Create<Framebuffer>();
@@ -74,7 +77,7 @@ int main()
 		commandBuffer.BeginRenderPass(pipeline, framebuffer);
 		commandBuffer.BindPipeline(pipeline);
 		commandBuffer.BindVertexBuffer(0, buffer);
-		commandBuffer.Draw(3);
+		commandBuffer.Draw(6);
 		commandBuffer.EndRenderPass();
 		commandBuffer.CopyToSwapchain(swapchain, framebuffer.GetColorAttachment(0));
 		commandBuffer.ImageMemoryBarrier(swapchain.GetNextImage(), VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
