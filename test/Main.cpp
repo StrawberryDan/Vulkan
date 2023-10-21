@@ -13,6 +13,7 @@
 #include "Strawberry/Graphics/Image.hpp"
 #include "Strawberry/Graphics/ShaderModule.hpp"
 #include "Strawberry/Graphics/Framebuffer.hpp"
+#include "Strawberry/Core/Math/Matrix.hpp"
 
 
 int main()
@@ -39,6 +40,8 @@ int main()
 		.WithVertexInput(vertexInputDescription())
 		.WithPrimitiveTopology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
 		.WithViewportSize(Core::Math::Vec2i(1920, 1080))
+		.WithPushConstantRange(VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float), 0)
+		.WithPushConstantRange(VK_SHADER_STAGE_FRAGMENT_BIT, 3 * sizeof(float), 16 * sizeof(float))
 		.Build();
 	Swapchain swapchain = device.Create<Swapchain, const Surface&>(surface, Core::Math::Vec2i(1920, 1080));
 	Queue queue = device.Create<Queue>();
@@ -73,10 +76,16 @@ int main()
 		}
 
 
+		Core::Math::Mat4f MVPMatrix;
+		Core::Math::Vec3f Color(1.0f, 0.5f, 0.5f);
+
+
 		commandBuffer.Begin(false);
 		commandBuffer.BeginRenderPass(pipeline, framebuffer);
 		commandBuffer.BindPipeline(pipeline);
 		commandBuffer.BindVertexBuffer(0, buffer);
+		commandBuffer.PushConstants(pipeline, VK_SHADER_STAGE_VERTEX_BIT, Core::IO::DynamicByteBuffer(MVPMatrix), 0);
+		commandBuffer.PushConstants(pipeline, VK_SHADER_STAGE_FRAGMENT_BIT, Core::IO::DynamicByteBuffer(Color), 64);
 		commandBuffer.Draw(6);
 		commandBuffer.EndRenderPass();
 		commandBuffer.CopyToSwapchain(swapchain, framebuffer.GetColorAttachment(0));
