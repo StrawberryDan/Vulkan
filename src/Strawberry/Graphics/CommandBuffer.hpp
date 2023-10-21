@@ -51,6 +51,9 @@ namespace Strawberry::Graphics
 		void Draw(uint32_t vertexCount, uint32_t instanceCount = 1, uint32_t vertexOffset = 0, uint32_t instanceOffset = 0);
 
 
+		void ImageMemoryBarrier(const Image& image, VkImageLayout targetLayout);
+
+
 	private:
 		VkCommandBuffer mCommandBuffer;
 		VkCommandPool mCommandPool;

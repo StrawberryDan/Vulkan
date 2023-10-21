@@ -113,7 +113,36 @@ namespace Strawberry::Graphics
 	}
 
 
-	void CommandBuffer::BeginRenderPass(ImageView& colorAttachment)
+	void CommandBuffer::ImageMemoryBarrier(const Image& image, VkImageLayout targetLayout)
+	{
+		VkImageMemoryBarrier imageMemoryBarrier{
+			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+			.pNext = nullptr,
+			.srcAccessMask = VK_ACCESS_NONE,
+			.dstAccessMask = VK_ACCESS_NONE,
+			.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+			.newLayout = targetLayout,
+			.srcQueueFamilyIndex = mQueueFamilyIndex,
+			.dstQueueFamilyIndex = mQueueFamilyIndex,
+			.image = image.mImage,
+			.subresourceRange{
+				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.baseMipLevel = 0,
+				.levelCount = 1,
+				.baseArrayLayer = 0,
+				.layerCount = 1,
+			}
+		};
+		vkCmdPipelineBarrier(mCommandBuffer,
+							 VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
+							 VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
+							 0,
+							 0, nullptr, 0, nullptr, 1,
+							 &imageMemoryBarrier);
+	}
+
+
+	void CommandBuffer::BeginRenderPass(const Pipeline& pipeline, const Framebuffer& framebuffer)
 	{
 		VkRenderingAttachmentInfo colorAttachmentInfo{
 			.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,

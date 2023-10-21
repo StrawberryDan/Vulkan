@@ -21,6 +21,7 @@ namespace Strawberry::Graphics
 	class Image
 	{
 		friend class ImageView;
+		friend class CommandBuffer;
 
 
 	public:
