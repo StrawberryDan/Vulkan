@@ -18,6 +18,7 @@ namespace Strawberry::Graphics
 				 uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling, VkImageLayout initialLayout)
 		: mImage(nullptr)
 		  , mDevice(device.mDevice)
+		  , mSize(static_cast<int>(extent), 0, 0)
 	{
 		VkImageCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
@@ -45,6 +46,7 @@ namespace Strawberry::Graphics
 				 uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling, VkImageLayout initialLayout)
 		: mImage(nullptr)
 		  , mDevice(device.mDevice)
+		  , mSize(extent)
 	{
 		VkImageCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
@@ -70,7 +72,8 @@ namespace Strawberry::Graphics
 
 		VkMemoryRequirements memoryRequirements;
 		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
-		mMemory = device.Create<DeviceMemory>(memoryRequirements.size, memoryRequirements.memoryTypeBits);
+		mMemory = device.Create<DeviceMemory>(memoryRequirements.size, memoryRequirements.memoryTypeBits,
+											  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.mDeviceMemory, 0), VK_SUCCESS);
 	}
 
@@ -78,7 +81,8 @@ namespace Strawberry::Graphics
 	Image::Image(const Device& device, Core::Math::Vec3i extent, VkFormat format, VkImageUsageFlags usage,
 				 uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling, VkImageLayout initialLayout)
 		: mImage(nullptr)
-		, mDevice(device.mDevice)
+		  , mDevice(device.mDevice)
+		  , mSize(extent)
 	{
 		VkImageCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
@@ -86,7 +90,8 @@ namespace Strawberry::Graphics
 			.flags = 0,
 			.imageType = VK_IMAGE_TYPE_3D,
 			.format = format,
-			.extent = VkExtent3D{static_cast<uint32_t>(extent[0]), static_cast<uint32_t>(extent[1]), static_cast<uint32_t>(extent[2])},
+			.extent = VkExtent3D{static_cast<uint32_t>(extent[0]), static_cast<uint32_t>(extent[1]),
+								 static_cast<uint32_t>(extent[2])},
 			.mipLevels = mipLevels,
 			.arrayLayers = arrayLayers,
 			.samples = VK_SAMPLE_COUNT_1_BIT,
@@ -104,7 +109,11 @@ namespace Strawberry::Graphics
 
 	Image::Image(Image&& rhs) noexcept
 		: mImage(std::exchange(rhs.mImage, nullptr))
-		  , mDevice(std::exchange(rhs.mDevice, nullptr)) {}
+		  , mDevice(std::exchange(rhs.mDevice, nullptr))
+		  , mSize(std::exchange(rhs.mSize, Core::Math::Vec3i()))
+	{
+
+	}
 
 
 	Image& Image::operator=(Image&& rhs) noexcept

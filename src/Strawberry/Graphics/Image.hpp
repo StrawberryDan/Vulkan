@@ -66,5 +66,6 @@ namespace Strawberry::Graphics
 		VkImage mImage;
 		DeviceMemory mMemory;
 		VkDevice mDevice;
+		Core::Math::Vec3i mSize;
 	};
 }
