@@ -8,9 +8,11 @@
 #include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/Types/Optional.hpp"
 // Standard Library
+#include <algorithm>
 #include <utility>
 #include <vector>
 #include <numeric>
+#include <cstring>
 
 
 //======================================================================================================================
@@ -34,7 +36,8 @@ namespace Strawberry::Graphics
 			return 0;
 		};
 
-		std::sort(candidates.begin(), candidates.end(), [&](uint32_t a, uint32_t b) { return score(a) > score(b); });
+		std::sort(candidates.begin(), candidates.end(), [&](uint32_t a, uint32_t b)
+		{ return score(a) > score(b); });
 
 		return candidates.empty() ? Core::NullOpt : Core::Optional(candidates[0]);
 	}
@@ -71,8 +74,10 @@ namespace Strawberry::Graphics
 
 		std::vector<Core::Optional<uint32_t>> selectedQueueFamily;
 		std::transform(candidates.begin(), candidates.end(), std::back_inserter(selectedQueueFamily),
-					   [&](uint32_t x) { return SelectQueueFamily(queueFamilyProperties[x]); });
-		std::erase_if(candidates, [&](uint32_t x) { return !selectedQueueFamily[x].HasValue(); });
+					   [&](uint32_t x)
+					   { return SelectQueueFamily(queueFamilyProperties[x]); });
+		std::erase_if(candidates, [&](uint32_t x)
+		{ return !selectedQueueFamily[x].HasValue(); });
 		if (candidates.empty()) return {};
 
 		auto score = [&](uint32_t x)
@@ -96,8 +101,7 @@ namespace Strawberry::Graphics
 
 
 	Device::Device(const Instance& instance)
-		: mDevice{}
-		  , mInstance(instance.mInstance)
+			: mDevice{}, mInstance(instance.mInstance)
 	{
 		// Enumerate Physical Devices
 		uint32_t physicalDeviceCount = 0;
@@ -116,12 +120,12 @@ namespace Strawberry::Graphics
 		// Describes Queues
 		std::vector<VkDeviceQueueCreateInfo> queues;
 		queues.push_back(VkDeviceQueueCreateInfo{
-			.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = 0,
-			.queueFamilyIndex = queueFamilyIndex,
-			.queueCount = queueCount,
-			.pQueuePriorities = priorities.data()
+				.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+				.pNext = nullptr,
+				.flags = 0,
+				.queueFamilyIndex = queueFamilyIndex,
+				.queueCount = queueCount,
+				.pQueuePriorities = priorities.data()
 		});
 
 		// Select Layers
@@ -129,10 +133,10 @@ namespace Strawberry::Graphics
 
 		// Select Extensions
 		std::vector<const char*> extensions
-			{
-				"VK_KHR_dynamic_rendering",
-				"VK_KHR_swapchain"
-			};
+				{
+						"VK_KHR_dynamic_rendering",
+						"VK_KHR_swapchain"
+				};
 		// Select Features
 		VkPhysicalDeviceFeatures features{};
 
@@ -141,11 +145,13 @@ namespace Strawberry::Graphics
 		uint32_t extensionPropertyCount = 0;
 		vkEnumerateDeviceExtensionProperties(mPhysicalDevice, nullptr, &extensionPropertyCount, nullptr);
 		std::vector<VkExtensionProperties> extensionProperties(extensionPropertyCount);
-		vkEnumerateDeviceExtensionProperties(mPhysicalDevice, nullptr, &extensionPropertyCount, extensionProperties.data());
+		vkEnumerateDeviceExtensionProperties(mPhysicalDevice, nullptr, &extensionPropertyCount,
+											 extensionProperties.data());
 
 
 		// Add portability subset if available
-		if (std::any_of(extensionProperties.begin(), extensionProperties.end(), [] (VkExtensionProperties x) {
+		if (std::any_of(extensionProperties.begin(), extensionProperties.end(), [](VkExtensionProperties x)
+		{
 			return strcmp(x.extensionName, "VK_KHR_portability_subset") == 0;
 		}))
 		{
@@ -162,18 +168,18 @@ namespace Strawberry::Graphics
 
 		// Populate info struct
 		VkDeviceCreateInfo createInfo
-			{
-				.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-				.pNext = &Features1_3,
-				.flags = 0,
-				.queueCreateInfoCount = static_cast<uint32_t>(queues.size()),
-				.pQueueCreateInfos = queues.data(),
-				.enabledLayerCount = static_cast<uint32_t>(layers.size()),
-				.ppEnabledLayerNames = layers.data(),
-				.enabledExtensionCount = static_cast<uint32_t>(extensions.size()),
-				.ppEnabledExtensionNames = extensions.data(),
-				.pEnabledFeatures = &features
-			};
+				{
+						.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+						.pNext = &Features1_3,
+						.flags = 0,
+						.queueCreateInfoCount = static_cast<uint32_t>(queues.size()),
+						.pQueueCreateInfos = queues.data(),
+						.enabledLayerCount = static_cast<uint32_t>(layers.size()),
+						.ppEnabledLayerNames = layers.data(),
+						.enabledExtensionCount = static_cast<uint32_t>(extensions.size()),
+						.ppEnabledExtensionNames = extensions.data(),
+						.pEnabledFeatures = &features
+				};
 
 		// Create Device
 		Core::AssertEQ(vkCreateDevice(mPhysicalDevice, &createInfo, nullptr, &mDevice), VK_SUCCESS);
@@ -181,8 +187,12 @@ namespace Strawberry::Graphics
 
 
 	Device::Device(Device&& rhs) noexcept
-		: mPhysicalDevice(std::exchange(rhs.mPhysicalDevice, nullptr))
-		  , mDevice(std::exchange(rhs.mDevice, nullptr)) {}
+			: mPhysicalDevice(std::exchange(rhs.mPhysicalDevice, nullptr)),
+			  mDevice(std::exchange(rhs.mDevice, nullptr)),
+			  mInstance(std::exchange(rhs.mInstance, nullptr))
+			  , mQueueFamilyIndex(std::exchange(rhs.mQueueFamilyIndex, 0))
+	{
+	}
 
 
 	Device& Device::operator=(Device&& rhs) noexcept

@@ -7,6 +7,7 @@
 #include "Strawberry/Core/Assert.hpp"
 // Standard Library
 #include <memory>
+#include <cstring>
 
 
 //======================================================================================================================

@@ -14,6 +14,7 @@
 #include "GLFW/glfw3.h"
 #include "Surface.hpp"
 // Standard Library
+#include <atomic>
 #include <string>
 #include <map>
 #include <deque>

@@ -38,7 +38,7 @@ namespace Strawberry::Graphics
 		explicit Device(const Instance& instance);
 		Device(const Device& rhs) = delete;
 		Device& operator=(const Device& rhs) = delete;
-		Device(Device&& rhs) noexcept ;
+		Device(Device&& rhs) noexcept;
 		Device& operator=(Device&& rhs) noexcept ;
 		~Device();
 
@@ -48,9 +48,9 @@ namespace Strawberry::Graphics
 
 
 	private:
-		VkInstance mInstance;
+		VkInstance mInstance{};
 		VkPhysicalDevice mPhysicalDevice;
 		VkDevice mDevice;
-		uint32_t mQueueFamilyIndex;
+		uint32_t mQueueFamilyIndex{};
 	};
 }

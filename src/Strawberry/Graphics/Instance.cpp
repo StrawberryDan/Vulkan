@@ -7,7 +7,10 @@
 // GLFW3
 #include <GLFW/glfw3.h>
 // Standard Library
+#include <algorithm>
 #include <memory>
+#include <vector>
+#include <cstring>
 
 
 //======================================================================================================================
@@ -40,7 +43,7 @@ namespace Strawberry::Graphics
 
 		for (int i = 0; i < glfwExtensionCount; i++)
 		{
-			if (std::find(extensions.begin(), extensions.end(), glfwExtensions[i]) == extensions.end())
+			if (!std::any_of(extensions.begin(), extensions.end(),[&](const char* x) { return std::strcmp(x, glfwExtensions[i]) == 0; } ))
 			{
 				extensions.push_back(glfwExtensions[i]);
 			}
