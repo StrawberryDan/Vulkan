@@ -59,6 +59,8 @@ add_library(StrawberryGraphics
 		src/Strawberry/Graphics/ShaderModule.hpp
 		src/Strawberry/Graphics/Framebuffer.cpp
 		src/Strawberry/Graphics/Framebuffer.hpp
+		src/Strawberry/Graphics/Fence.cpp
+		src/Strawberry/Graphics/Fence.hpp
 )
 target_link_libraries(StrawberryGraphics PUBLIC StrawberryCore glfw Vulkan::Vulkan)
 target_include_directories(StrawberryGraphics PUBLIC src)
