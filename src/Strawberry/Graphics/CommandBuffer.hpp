@@ -4,8 +4,11 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
+#include "ImageView.hpp"
 // Vulkan
 #include <vulkan/vulkan.h>
+// Strawberry Core
+#include "Strawberry/Core/Math/Vector.hpp"
 
 
 //======================================================================================================================
@@ -14,6 +17,8 @@
 namespace Strawberry::Graphics
 {
 	class CommandPool;
+	class Buffer;
+	class Pipeline;
 
 
 	class CommandBuffer
@@ -33,6 +38,17 @@ namespace Strawberry::Graphics
 		void Begin(bool oneTimeSubmit);
 		void End();
 		void Reset();
+
+
+		void BindPipeline(const Pipeline& pipeline);
+
+
+		void BeginRenderPass(Strawberry::Graphics::ImageView& colorAttachment);
+		void EndRenderPass();
+
+
+		void BindVertexBuffer(uint32_t binding, Buffer& buffer);
+		void Draw(uint32_t vertexCount, uint32_t instanceCount = 1, uint32_t vertexOffset = 0, uint32_t instanceOffset = 0);
 
 
 	private:

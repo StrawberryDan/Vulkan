@@ -3,10 +3,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 #include "CommandBuffer.hpp"
 #include "CommandPool.hpp"
+#include "Buffer.hpp"
+#include "ImageView.hpp"
+#include "Pipeline.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Assert.hpp"
+#include "ImageView.hpp"
 // Standard Library
 #include <memory>
+#include <Strawberry/Core/Math/Vector.hpp>
 
 
 //======================================================================================================================
@@ -81,4 +86,67 @@ namespace Strawberry::Graphics
 	{
 		Core::AssertEQ(vkResetCommandBuffer(mCommandBuffer, 0), VK_SUCCESS);
 	}
+
+
+	void CommandBuffer::BindPipeline(const Pipeline& pipeline)
+	{
+		vkCmdBindPipeline(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.mPipeline);
+	}
+
+
+	void CommandBuffer::BindVertexBuffer(uint32_t binding, Buffer& buffer)
+	{
+		VkDeviceSize offset = 0;
+		vkCmdBindVertexBuffers(mCommandBuffer, binding, 1, &buffer.mBuffer, &offset);
+	}
+
+
+	void
+	CommandBuffer::Draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t vertexOffset, uint32_t instanceOffset)
+	{
+		vkCmdDraw(mCommandBuffer, vertexCount, instanceCount, vertexOffset, instanceOffset);
+	}
+
+
+	void CommandBuffer::BeginRenderPass(ImageView& colorAttachment)
+	{
+		VkRenderingAttachmentInfo colorAttachmentInfo{
+			.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
+			.pNext = nullptr,
+			.imageView = colorAttachment.mImageView,
+			.imageLayout = VK_IMAGE_LAYOUT_GENERAL,
+			.resolveMode = VK_RESOLVE_MODE_NONE,
+			.resolveImageView = VK_NULL_HANDLE,
+			.resolveImageLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+			.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+			.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+			.clearValue{.color{.uint32{0, 0, 0, 0}}}
+		};
+
+		VkRenderingInfo renderingInfo{
+			.sType = VK_STRUCTURE_TYPE_RENDERING_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.renderArea{
+				.offset {0, 0},
+				.extent = {static_cast<uint32_t>(colorAttachment.mSize[0]), static_cast<uint32_t>(colorAttachment.mSize[1])},
+			},
+			.layerCount = 1,
+			.viewMask = 0,
+			.colorAttachmentCount = 1,
+			.pColorAttachments = &colorAttachmentInfo,
+			.pDepthAttachment = nullptr,
+			.pStencilAttachment = nullptr,
+		};
+
+		vkCmdBeginRendering(mCommandBuffer, &renderingInfo);
+	}
+
+
+	void CommandBuffer::EndRenderPass()
+	{
+		vkCmdEndRendering(mCommandBuffer);
+	}
+
+
 }
