@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics
 {
-	DeviceMemory::DeviceMemory(const Device& device, uint32_t size, VkMemoryPropertyFlags flags)
+	DeviceMemory::DeviceMemory(const Device& device, uint32_t size, uint32_t typeMask, VkMemoryPropertyFlags properties)
 		: mDevice(device.mDevice)
 	{
 		VkPhysicalDeviceMemoryProperties memoryProperties;
@@ -23,7 +23,9 @@ namespace Strawberry::Graphics
 		Core::Optional<uint32_t> memoryTypeIndex;
 		for (int i = 0; i < memoryProperties.memoryTypeCount; i++)
 		{
-			if (flags & (1 << i))
+			const bool validType = typeMask & (1 << i);
+			const bool propertiesAvailable = (properties & memoryProperties.memoryTypes[i].propertyFlags) == properties;
+			if (validType && propertiesAvailable)
 			{
 				memoryTypeIndex = i;
 				break;
