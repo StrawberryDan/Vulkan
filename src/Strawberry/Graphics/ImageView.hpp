@@ -4,6 +4,8 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
+// Strawberry Core
+#include "Strawberry/Core/Math/Vector.hpp"
 // Vulkan
 #include <vulkan/vulkan.h>
 
@@ -18,6 +20,9 @@ namespace Strawberry::Graphics
 
 	class ImageView
 	{
+		friend class CommandBuffer;
+
+
 	public:
 		ImageView(const Image& image,
 				  VkImageViewType viewType,
@@ -43,5 +48,6 @@ namespace Strawberry::Graphics
 	private:
 		VkImageView mImageView;
 		VkDevice mDevice;
+		Core::Math::Vec3i mSize;
 	};
 }

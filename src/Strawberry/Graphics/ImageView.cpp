@@ -18,6 +18,7 @@ namespace Strawberry::Graphics
 						 VkComponentMapping componentMapping, VkImageSubresourceRange subresourceRange)
 		: mImageView(nullptr)
 		, mDevice(image.mDevice)
+		, mSize(image.mSize)
 	{
 		VkImageViewCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
@@ -37,6 +38,7 @@ namespace Strawberry::Graphics
 	ImageView::ImageView(ImageView&& rhs) noexcept
 		: mImageView(std::exchange(rhs.mImageView, nullptr))
 		, mDevice(std::exchange(rhs.mDevice, nullptr))
+		, mSize(std::exchange(rhs.mSize, Core::Math::Vec3i()))
 	{
 
 	}
