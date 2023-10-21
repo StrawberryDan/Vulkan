@@ -24,7 +24,7 @@ int main()
 	auto vertexInputDescription = []() -> VertexInputDescription
 	{
 		VertexInputDescription description;
-		description.AddBinding(3 * 4)
+		description.AddBinding(3 * sizeof(float))
 			.WithAttribute(0, VK_FORMAT_R32G32B32_SFLOAT, 0);
 		return description;
 	};
@@ -41,12 +41,10 @@ int main()
 		.WithPrimitiveTopology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
 		.WithViewportSize(Core::Math::Vec2i(1920, 1080))
 		.Build();
-	Swapchain swapchain = device.Create<Swapchain, const Surface&>(surface, Core::Math::Vec2i{1920, 1080});
+	Swapchain swapchain = device.Create<Swapchain, const Surface&>(surface, Core::Math::Vec2i(1920, 1080));
 	Queue queue = device.Create<Queue>();
 	CommandPool commandPool = device.Create<CommandPool>(true);
 	CommandBuffer commandBuffer = commandPool.Create<CommandBuffer>();
-	Image image = device.Create<Image>(Core::Math::Vec2i(1920, 1080), VK_FORMAT_R32G32B32A32_SFLOAT,
-									   VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
 
 
 	Buffer buffer = device.Create<Buffer>(3 * sizeof(float) * 3, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
@@ -56,12 +54,11 @@ int main()
 	verticies.Push<Core::Math::Vec3f>(Core::Math::Vec3f(0.0f, 1.0f, 0.0f));
 	buffer.SetData(verticies);
 
-	Framebuffer framebuffer = pipeline.Create<Framebuffer>(window.GetSize());
+	Framebuffer framebuffer = pipeline.Create<Framebuffer>();
 
 
 	while (!window.CloseRequested())
 	{
-		window.SwapBuffers();
 		Window::PollInput();
 
 		while (auto event = window.NextEvent())
@@ -80,8 +77,14 @@ int main()
 		commandBuffer.BindVertexBuffer(0, buffer);
 		commandBuffer.Draw(3);
 		commandBuffer.EndRenderPass();
+		commandBuffer.CopyToSwapchain(swapchain, framebuffer.GetColorAttachment(0));
+		commandBuffer.ImageMemoryBarrier(swapchain.GetNextImage(), VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 		commandBuffer.End();
 		queue.Submit(commandBuffer);
+
+
+		swapchain.Present(queue);
+		window.SwapBuffers();
 	}
 
 	return 0;

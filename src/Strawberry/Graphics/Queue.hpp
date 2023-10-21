@@ -19,6 +19,9 @@ namespace Strawberry::Graphics
 
 	class Queue
 	{
+		friend class Swapchain;
+
+
 	public:
 		explicit Queue(const Device& device);
 		Queue(const Queue& rhs) = delete;
