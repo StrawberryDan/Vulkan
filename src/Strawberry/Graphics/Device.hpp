@@ -4,6 +4,8 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
+// Strawberry Core
+#include "Strawberry/Core/Types/ReflexivePointer.hpp"
 // Vulkan
 #include <vulkan/vulkan.h>
 // Standard Library
@@ -22,6 +24,7 @@ namespace Strawberry::Graphics
 
 
 	class Device
+		: public Core::EnableReflexivePointer<Device>
 	{
 		friend class Pipeline;
 		friend class Swapchain;
@@ -34,6 +37,8 @@ namespace Strawberry::Graphics
 		friend class Image;
 		friend class ShaderModule;
 		friend class Framebuffer;
+		friend class Fence;
+
 
 	public:
 		explicit Device(const Instance& instance);
