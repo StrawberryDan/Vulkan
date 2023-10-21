@@ -8,11 +8,14 @@
 #include "Image.hpp"
 #include "Pipeline.hpp"
 #include "Framebuffer.hpp"
+#include "Fence.hpp"
+#include "Device.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
 // Standard Library
 #include <memory>
+#include <vector>
 
 
 //======================================================================================================================
@@ -21,12 +24,12 @@
 namespace Strawberry::Graphics
 {
 	CommandBuffer::CommandBuffer(const CommandPool& commandPool)
-		: mCommandBuffer{}
+		: mCommandBuffer {}
 		  , mDevice(commandPool.mDevice)
 		  , mCommandPool(commandPool.mCommandPool)
 		  , mQueueFamilyIndex(commandPool.mQueueFamilyIndex)
 	{
-		VkCommandBufferAllocateInfo allocateInfo{
+		VkCommandBufferAllocateInfo allocateInfo {
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
 			.pNext = nullptr,
 			.commandPool = mCommandPool,
@@ -71,7 +74,7 @@ namespace Strawberry::Graphics
 
 	void CommandBuffer::Begin(bool oneTimeSubmit)
 	{
-		VkCommandBufferBeginInfo beginInfo{
+		VkCommandBufferBeginInfo beginInfo {
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
 			.pNext = nullptr,
 			.flags = oneTimeSubmit ? VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT : VkCommandBufferUsageFlags(0),
@@ -116,7 +119,13 @@ namespace Strawberry::Graphics
 
 	void CommandBuffer::ImageMemoryBarrier(const Image& image, VkImageAspectFlagBits aspect, VkImageLayout targetLayout)
 	{
-		VkImageMemoryBarrier imageMemoryBarrier{
+		ImageMemoryBarrier(image.mImage, aspect, targetLayout);
+	}
+
+
+	void CommandBuffer::ImageMemoryBarrier(VkImage image, VkImageAspectFlagBits aspect, VkImageLayout targetLayout)
+	{
+		VkImageMemoryBarrier imageMemoryBarrier {
 			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
 			.pNext = nullptr,
 			.srcAccessMask = VK_ACCESS_NONE,
@@ -125,7 +134,7 @@ namespace Strawberry::Graphics
 			.newLayout = targetLayout,
 			.srcQueueFamilyIndex = mQueueFamilyIndex,
 			.dstQueueFamilyIndex = mQueueFamilyIndex,
-			.image = image.mImage,
+			.image = image,
 			.subresourceRange{
 				.aspectMask = aspect,
 				.baseMipLevel = 0,
@@ -143,6 +152,39 @@ namespace Strawberry::Graphics
 	}
 
 
+	void CommandBuffer::CopyToSwapchain(Swapchain& swapchain, const Image& image)
+	{
+		ImageMemoryBarrier(image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+		ImageMemoryBarrier(swapchain.GetNextImage(), VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+
+		VkImageBlit region {
+			.srcSubresource {
+				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.mipLevel = 0,
+				.baseArrayLayer = 0,
+				.layerCount = 1,
+			},
+			.srcOffsets{
+				{.x = 0, .y = 0, .z = 0},
+				{.x = image.mSize[0], .y = image.mSize[1], .z = 1},
+			},
+			.dstSubresource {
+				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.mipLevel = 0,
+				.baseArrayLayer = 0,
+				.layerCount = 1,
+			},
+			.dstOffsets{
+				{.x = 0, .y = 0, .z = 0},
+				{.x = swapchain.GetSize()[0], .y = swapchain.GetSize()[1], .z = 1},
+			}
+		};
+		vkCmdBlitImage(mCommandBuffer, image.mImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, swapchain.GetNextImage(),
+					   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region, VK_FILTER_NEAREST);
+	}
+
+
 	void CommandBuffer::BeginRenderPass(const Pipeline& pipeline, Framebuffer& framebuffer)
 	{
 		for (int i = 0; i < framebuffer.GetColorAttachmentCount(); i++)
@@ -152,10 +194,10 @@ namespace Strawberry::Graphics
 		ImageMemoryBarrier(framebuffer.GetDepthAttachment(), VK_IMAGE_ASPECT_DEPTH_BIT, VK_IMAGE_LAYOUT_GENERAL);
 		ImageMemoryBarrier(framebuffer.GetStencilAttachment(), VK_IMAGE_ASPECT_STENCIL_BIT, VK_IMAGE_LAYOUT_GENERAL);
 
-		VkClearValue clearValue{
-			.color {.uint32{0, 0, 0, 0}}
+		VkClearValue clearValue {
+			.color {.float32{0.0, 0, 0, 1.0}}
 		};
-		VkRenderPassBeginInfo beginInfo{
+		VkRenderPassBeginInfo beginInfo {
 			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 			.pNext = nullptr,
 			.renderPass = pipeline.mRenderPass,

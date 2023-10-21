@@ -9,6 +9,7 @@
 #include <vulkan/vulkan.h>
 // Strawberry Core
 #include "Strawberry/Core/Math/Vector.hpp"
+#include "Swapchain.hpp"
 
 
 //======================================================================================================================
@@ -53,6 +54,10 @@ namespace Strawberry::Graphics
 
 
 		void ImageMemoryBarrier(const Image& image, VkImageAspectFlagBits aspect, VkImageLayout targetLayout);
+		void ImageMemoryBarrier(VkImage image, VkImageAspectFlagBits aspect, VkImageLayout targetLayout);
+
+
+		void CopyToSwapchain(Swapchain& swapchain, const Image& image);
 
 
 	private:
