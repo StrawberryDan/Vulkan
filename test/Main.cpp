@@ -48,11 +48,11 @@ int main()
 
 
 	Buffer buffer = device.Create<Buffer>(3 * sizeof(float) * 3, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
-	Core::IO::DynamicByteBuffer verticies;
-	verticies.Push<Core::Math::Vec3f>(Core::Math::Vec3f(0.0f, 0.0f, 0.0f));
-	verticies.Push<Core::Math::Vec3f>(Core::Math::Vec3f(1.0f, 0.0f, 0.0f));
-	verticies.Push<Core::Math::Vec3f>(Core::Math::Vec3f(0.0f, 1.0f, 0.0f));
-	buffer.SetData(verticies);
+	Core::IO::DynamicByteBuffer vertices;
+	vertices.Push<Core::Math::Vec3f>(Core::Math::Vec3f(0.0f, 0.0f, 0.0f));
+	vertices.Push<Core::Math::Vec3f>(Core::Math::Vec3f(1.0f, 0.0f, 0.0f));
+	vertices.Push<Core::Math::Vec3f>(Core::Math::Vec3f(0.0f, 1.0f, 0.0f));
+	buffer.SetData(vertices);
 
 	Framebuffer framebuffer = pipeline.Create<Framebuffer>();
 
