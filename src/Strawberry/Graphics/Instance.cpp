@@ -22,7 +22,7 @@ namespace Strawberry::Graphics
 	{
 		VkApplicationInfo applicationInfo{};
 		applicationInfo.pNext = nullptr;
-		applicationInfo.apiVersion = VK_MAKE_VERSION(1, 3, 268);
+		applicationInfo.apiVersion = VK_MAKE_VERSION(1, 2, 269);
 		applicationInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
 		applicationInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
 		applicationInfo.pApplicationName = "StrawberryGraphics";

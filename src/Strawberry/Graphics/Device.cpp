@@ -159,18 +159,11 @@ namespace Strawberry::Graphics
 		}
 
 
-		// Enable Dynamic Rendering
-		VkPhysicalDeviceVulkan13Features Features1_3{};
-		Features1_3.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
-		Features1_3.pNext = nullptr;
-		Features1_3.dynamicRendering = true;
-
-
 		// Populate info struct
 		VkDeviceCreateInfo createInfo
 				{
 						.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-						.pNext = &Features1_3,
+						.pNext = nullptr,
 						.flags = 0,
 						.queueCreateInfoCount = static_cast<uint32_t>(queues.size()),
 						.pQueueCreateInfos = queues.data(),

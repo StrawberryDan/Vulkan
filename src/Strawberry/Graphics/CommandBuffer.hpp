@@ -19,6 +19,7 @@ namespace Strawberry::Graphics
 	class CommandPool;
 	class Buffer;
 	class Pipeline;
+	class Framebuffer;
 
 
 	class CommandBuffer
@@ -43,7 +44,7 @@ namespace Strawberry::Graphics
 		void BindPipeline(const Pipeline& pipeline);
 
 
-		void BeginRenderPass(Strawberry::Graphics::ImageView& colorAttachment);
+		void BeginRenderPass(const Pipeline& pipeline, const Framebuffer& framebuffer);
 		void EndRenderPass();
 
 

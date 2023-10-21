@@ -88,6 +88,7 @@ namespace Strawberry::Graphics
 	{
 		friend class Builder;
 		friend class CommandBuffer;
+		friend class Framebuffer;
 
 
 	public:

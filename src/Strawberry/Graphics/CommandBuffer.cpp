@@ -9,6 +9,7 @@
 // Strawberry Core
 #include "Strawberry/Core/Assert.hpp"
 #include "ImageView.hpp"
+#include "Framebuffer.hpp"
 // Standard Library
 #include <memory>
 #include <Strawberry/Core/Math/Vector.hpp>
@@ -144,42 +145,26 @@ namespace Strawberry::Graphics
 
 	void CommandBuffer::BeginRenderPass(const Pipeline& pipeline, const Framebuffer& framebuffer)
 	{
-		VkRenderingAttachmentInfo colorAttachmentInfo{
-			.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
-			.pNext = nullptr,
-			.imageView = colorAttachment.mImageView,
-			.imageLayout = VK_IMAGE_LAYOUT_GENERAL,
-			.resolveMode = VK_RESOLVE_MODE_NONE,
-			.resolveImageView = VK_NULL_HANDLE,
-			.resolveImageLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-			.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-			.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-			.clearValue{.color{.uint32{0, 0, 0, 0}}}
+		VkClearValue clearValue{
+			.color {.uint32{0, 0, 0, 0}}
 		};
-
-		VkRenderingInfo renderingInfo{
-			.sType = VK_STRUCTURE_TYPE_RENDERING_INFO,
+		VkRenderPassBeginInfo beginInfo{
+			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 			.pNext = nullptr,
-			.flags = 0,
-			.renderArea{
-				.offset {0, 0},
-				.extent = {static_cast<uint32_t>(colorAttachment.mSize[0]), static_cast<uint32_t>(colorAttachment.mSize[1])},
-			},
-			.layerCount = 1,
-			.viewMask = 0,
-			.colorAttachmentCount = 1,
-			.pColorAttachments = &colorAttachmentInfo,
-			.pDepthAttachment = nullptr,
-			.pStencilAttachment = nullptr,
+			.renderPass = pipeline.mRenderPass,
+			.framebuffer = framebuffer.mFramebuffer,
+			.renderArea{.offset{0, 0}, .extent{static_cast<uint32_t>(framebuffer.mSize[0]),
+											   static_cast<uint32_t>(framebuffer.mSize[1])}},
+			.clearValueCount = 1,
+			.pClearValues = &clearValue,
 		};
-
-		vkCmdBeginRendering(mCommandBuffer, &renderingInfo);
+		vkCmdBeginRenderPass(mCommandBuffer, &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
 	}
 
 
 	void CommandBuffer::EndRenderPass()
 	{
-		vkCmdEndRendering(mCommandBuffer);
+		vkCmdEndRenderPass(mCommandBuffer);
 	}
 
 

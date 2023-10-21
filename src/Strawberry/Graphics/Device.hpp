@@ -33,6 +33,7 @@ namespace Strawberry::Graphics
 		friend class DeviceMemory;
 		friend class Image;
 		friend class ShaderModule;
+		friend class Framebuffer;
 
 	public:
 		explicit Device(const Instance& instance);
@@ -43,7 +44,7 @@ namespace Strawberry::Graphics
 		~Device();
 
 
-		template <std::movable T, typename... Args> requires (std::constructible_from<T, const Device&, Args...>)
+		template <std::movable T, typename... Args>
 		T Create(Args... args) const { return T(*this, std::forward<Args>(args)...); }
 
 
