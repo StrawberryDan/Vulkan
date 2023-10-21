@@ -129,9 +129,9 @@ namespace Strawberry::Graphics
 				case VK_SUCCESS:
 				case VK_SUBOPTIMAL_KHR:
 					Core::Assert(result == VK_SUCCESS || result == VK_SUBOPTIMAL_KHR);
-				mNextImageIndex.Invalidate();
-				mNextImage.Invalidate();
-				break;
+					mNextImageIndex.Invalidate();
+					mNextImage.Invalidate();
+					break;
 				default:
 					Core::Unreachable();
 			}
