@@ -217,4 +217,8 @@ namespace Strawberry::Graphics
 	}
 
 
+	void CommandBuffer::PushConstants(const Pipeline& pipeline, VkShaderStageFlags stage, const Core::IO::DynamicByteBuffer& bytes, uint32_t offset)
+	{
+		vkCmdPushConstants(mCommandBuffer, pipeline.mPipelineLayout, stage, offset, bytes.Size(), bytes.Data());
+	}
 }

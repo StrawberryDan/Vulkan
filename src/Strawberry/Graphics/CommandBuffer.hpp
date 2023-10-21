@@ -5,11 +5,13 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 #include "ImageView.hpp"
+#include "Swapchain.hpp"
 // Vulkan
 #include <vulkan/vulkan.h>
 // Strawberry Core
 #include "Strawberry/Core/Math/Vector.hpp"
-#include "Swapchain.hpp"
+#include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
+
 
 
 //======================================================================================================================
@@ -47,6 +49,9 @@ namespace Strawberry::Graphics
 
 		void BeginRenderPass(const Pipeline& pipeline, Framebuffer& framebuffer);
 		void EndRenderPass();
+
+
+		void PushConstants(const Pipeline& pipeline, VkShaderStageFlags stage, const Core::IO::DynamicByteBuffer& bytes, uint32_t offset);
 
 
 		void BindVertexBuffer(uint32_t binding, Buffer& buffer);
