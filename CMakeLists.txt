@@ -10,6 +10,7 @@ add_custom_target(
 		Shaders
 		COMMAND glslc ${CMAKE_CURRENT_SOURCE_DIR}/data/Shaders/Mesh.vert -o ${CMAKE_CURRENT_SOURCE_DIR}/data/Shaders/Mesh.vert.spirv
 		COMMAND glslc ${CMAKE_CURRENT_SOURCE_DIR}/data/Shaders/SolidColor.frag -o ${CMAKE_CURRENT_SOURCE_DIR}/data/Shaders/SolidColor.frag.spirv
+		COMMAND glslc ${CMAKE_CURRENT_SOURCE_DIR}/data/Shaders/Texture.frag -o ${CMAKE_CURRENT_SOURCE_DIR}/data/Shaders/Texture.frag.spirv
 )
 
 FetchContent_Declare(GLFW
