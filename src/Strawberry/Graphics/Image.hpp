@@ -5,9 +5,11 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 #include "DeviceMemory.hpp"
+// Strawberry Core
+#include "Strawberry/Core/Math/Vector.hpp"
 // Vulkan
 #include <vulkan/vulkan.h>
-#include <Strawberry/Core/Math/Vector.hpp>
+
 
 
 //======================================================================================================================
