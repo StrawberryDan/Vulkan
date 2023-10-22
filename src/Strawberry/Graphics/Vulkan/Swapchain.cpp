@@ -22,9 +22,21 @@ namespace Strawberry::Graphics::Vulkan
 	{
 		uint32_t formatCount = 0;
 		vkGetPhysicalDeviceSurfaceFormatsKHR(device.mPhysicalDevice, surface.mSurface, &formatCount, nullptr);
-		std::vector<VkSurfaceFormatKHR> formats(formatCount);
-		vkGetPhysicalDeviceSurfaceFormatsKHR(device.mPhysicalDevice, surface.mSurface, &formatCount, formats.data());
-		mFormat = formats[0];
+		std::vector<VkSurfaceFormatKHR> deviceFormats(formatCount);;
+		vkGetPhysicalDeviceSurfaceFormatsKHR(device.mPhysicalDevice, surface.mSurface, &formatCount,
+											 deviceFormats.data());
+
+		std::erase_if(deviceFormats, [&](const VkSurfaceFormatKHR& x) -> bool
+		{
+			const bool colorspace = x.colorSpace == VK_COLORSPACE_SRGB_NONLINEAR_KHR;
+			const bool format = x.format == VK_FORMAT_B8G8R8A8_SRGB;
+			return !(format && colorspace);
+		});
+
+		std::sort(deviceFormats.begin(), deviceFormats.end(),
+				  [](const VkSurfaceFormatKHR& a, const VkSurfaceFormatKHR& b) { return a.format > b.format; });
+
+		mFormat = deviceFormats.at(0);
 
 		VkSwapchainCreateInfoKHR createInfo
 			{
@@ -34,7 +46,7 @@ namespace Strawberry::Graphics::Vulkan
 				.surface = surface.mSurface,
 				.minImageCount = 2,
 				.imageFormat = mFormat.format,
-				.imageColorSpace = formats[0].colorSpace,
+				.imageColorSpace = deviceFormats[0].colorSpace,
 				.imageExtent = VkExtent2D {.width = static_cast<uint32_t>(mSize[0]), .height = static_cast<uint32_t>(mSize[1])},
 				.imageArrayLayers = 1,
 				.imageUsage = VK_IMAGE_USAGE_TRANSFER_DST_BIT,
@@ -129,9 +141,9 @@ namespace Strawberry::Graphics::Vulkan
 				case VK_SUCCESS:
 				case VK_SUBOPTIMAL_KHR:
 					Core::Assert(result == VK_SUCCESS || result == VK_SUBOPTIMAL_KHR);
-					mNextImageIndex.Invalidate();
-					mNextImage.Invalidate();
-					break;
+				mNextImageIndex.Invalidate();
+				mNextImage.Invalidate();
+				break;
 				default:
 					Core::Unreachable();
 			}
