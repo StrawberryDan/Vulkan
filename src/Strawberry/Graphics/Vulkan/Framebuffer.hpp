@@ -10,6 +10,7 @@
 #include <vulkan/vulkan.h>
 // Strawberry Core
 #include "Strawberry/Core/Math/Vector.hpp"
+#include "Strawberry/Core/Types/ReflexivePointer.hpp"
 // Standard Library
 #include <vector>
 
@@ -20,7 +21,7 @@
 namespace Strawberry::Graphics::Vulkan
 {
 	class Device;
-	class Pipeline;
+	class RenderPass;
 	class ImageView;
 
 
@@ -30,7 +31,7 @@ namespace Strawberry::Graphics::Vulkan
 
 
 	public:
-		Framebuffer(const Pipeline& view);
+		Framebuffer(const RenderPass& mRenderPass, Core::Math::Vec2i size);
 		Framebuffer(const Framebuffer& rhs) = delete;
 		Framebuffer& operator=(const Framebuffer& rhs) = delete;
 		Framebuffer(Framebuffer&& rhs) noexcept;
@@ -45,15 +46,15 @@ namespace Strawberry::Graphics::Vulkan
 
 
 	private:
-		Image CreateDepthImage(const Pipeline& pipeline);
+		Image CreateDepthImage();
 		ImageView CreateDepthImageView();
-		Image CreateStencilImage(const Pipeline& pipeline);
+		Image CreateStencilImage();
 		ImageView CreateStencilImageView();
 
 
 	private:
 		VkFramebuffer mFramebuffer;
-		const Device* mDevice;
+		Core::ReflexivePointer<RenderPass> mRenderPass;
 		Core::Math::Vec2i mSize;
 
 

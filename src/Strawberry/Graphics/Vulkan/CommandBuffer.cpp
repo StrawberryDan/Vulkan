@@ -214,7 +214,7 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
-	void CommandBuffer::BeginRenderPass(const Pipeline& pipeline, Framebuffer& framebuffer)
+	void CommandBuffer::BeginRenderPass(const RenderPass& renderPass, Framebuffer& framebuffer)
 	{
 		for (int i = 0; i < framebuffer.GetColorAttachmentCount(); i++)
 		{
@@ -223,18 +223,16 @@ namespace Strawberry::Graphics::Vulkan
 		ImageMemoryBarrier(framebuffer.GetDepthAttachment(), VK_IMAGE_ASPECT_DEPTH_BIT, VK_IMAGE_LAYOUT_GENERAL);
 		ImageMemoryBarrier(framebuffer.GetStencilAttachment(), VK_IMAGE_ASPECT_STENCIL_BIT, VK_IMAGE_LAYOUT_GENERAL);
 
-		VkClearValue clearValue {
-			.color {.float32{0.0, 0, 0, 1.0}}
-		};
+
 		VkRenderPassBeginInfo beginInfo {
 			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 			.pNext = nullptr,
-			.renderPass = pipeline.mRenderPass->mRenderPass,
+			.renderPass = renderPass.mRenderPass,
 			.framebuffer = framebuffer.mFramebuffer,
 			.renderArea{.offset{0, 0}, .extent{static_cast<uint32_t>(framebuffer.mSize[0]),
 											   static_cast<uint32_t>(framebuffer.mSize[1])}},
-			.clearValueCount = 1,
-			.pClearValues = &clearValue,
+			.clearValueCount = static_cast<uint32_t>(renderPass.mClearColors.size()),
+			.pClearValues = renderPass.mClearColors.data(),
 		};
 		vkCmdBeginRenderPass(mCommandBuffer, &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
 	}

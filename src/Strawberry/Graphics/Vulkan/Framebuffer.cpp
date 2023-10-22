@@ -18,18 +18,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics::Vulkan
 {
-	Framebuffer::Framebuffer(const Pipeline& pipeline)
-		: mDevice(pipeline.mRenderPass->mDevice)
-		  , mSize(pipeline.mViewportSize)
-		  , mDepthAttachment(CreateDepthImage(pipeline))
+	Framebuffer::Framebuffer(const RenderPass& renderPass, Core::Math::Vec2i size)
+		: mRenderPass(renderPass)
+		  , mSize(size)
+		  , mDepthAttachment(CreateDepthImage())
 		  , mDepthAttachmentView(CreateDepthImageView())
-		  , mStencilAttachment(CreateStencilImage(pipeline))
+		  , mStencilAttachment(CreateStencilImage())
 		  , mStencilAttachmentView(CreateStencilImageView())
 	{
-		constexpr int COLOR_ATTACHMENT_COUNT = 1;
+		const auto COLOR_ATTACHMENT_COUNT = mRenderPass->mColorAttachmentFormats.size();
 		for (int i = 0; i < COLOR_ATTACHMENT_COUNT; i++)
 		{
-			mColorAttachments.emplace_back(pipeline.mRenderPass->mDevice->Create<Image>(mSize, VK_FORMAT_R32G32B32A32_SFLOAT,
+			mColorAttachments.emplace_back(mRenderPass->mDevice->Create<Image>(mSize, renderPass.mColorAttachmentFormats[i],
 																		   VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT));
 			mColorAttachmentViews.emplace_back(
 				mColorAttachments.back().Create<ImageView::Builder>()
@@ -48,20 +48,20 @@ namespace Strawberry::Graphics::Vulkan
 		VkFramebufferCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
 			.pNext = nullptr,
-			.renderPass = pipeline.mRenderPass->mRenderPass,
+			.renderPass = mRenderPass->mRenderPass,
 			.attachmentCount = static_cast<uint32_t>(attachments.size()),
 			.pAttachments = attachments.data(),
 			.width = static_cast<uint32_t>(mSize[0]),
 			.height = static_cast<uint32_t>(mSize[1]),
 			.layers = 1,
 		};
-		Core::AssertEQ(vkCreateFramebuffer(mDevice->mDevice, &createInfo, nullptr, &mFramebuffer), VK_SUCCESS);
+		Core::AssertEQ(vkCreateFramebuffer(mRenderPass->mDevice->mDevice, &createInfo, nullptr, &mFramebuffer), VK_SUCCESS);
 	}
 
 
 	Framebuffer::Framebuffer(Framebuffer&& rhs) noexcept
 		: mFramebuffer(std::exchange(rhs.mFramebuffer, nullptr))
-		  , mDevice(std::exchange(rhs.mDevice, nullptr))
+		  , mRenderPass(std::move(rhs.mRenderPass))
 		  , mSize(std::exchange(rhs.mSize, Core::Math::Vec2i()))
 		  , mColorAttachments(std::move(rhs.mColorAttachments))
 		  , mColorAttachmentViews(std::move(rhs.mColorAttachmentViews))
@@ -90,7 +90,7 @@ namespace Strawberry::Graphics::Vulkan
 	{
 		if (mFramebuffer)
 		{
-			vkDestroyFramebuffer(mDevice->mDevice, mFramebuffer, nullptr);
+			vkDestroyFramebuffer(mRenderPass->mDevice->mDevice, mFramebuffer, nullptr);
 		}
 	}
 
@@ -119,9 +119,9 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
-	Image Framebuffer::CreateDepthImage(const Pipeline& pipeline)
+	Image Framebuffer::CreateDepthImage()
 	{
-		return pipeline.mRenderPass->mDevice->Create<Image>(mSize, VK_FORMAT_D32_SFLOAT,
+		return mRenderPass->mDevice->Create<Image>(mSize, VK_FORMAT_D32_SFLOAT,
 											   VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
 
 	}
@@ -142,9 +142,9 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
-	Image Framebuffer::CreateStencilImage(const Pipeline& pipeline)
+	Image Framebuffer::CreateStencilImage()
 	{
-		return pipeline.mRenderPass->mDevice->Create<Image>(mSize, VK_FORMAT_S8_UINT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
+		return mRenderPass->mDevice->Create<Image>(mSize, VK_FORMAT_S8_UINT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
 	}
 
 

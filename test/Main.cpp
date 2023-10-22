@@ -38,6 +38,8 @@ int main()
 	Device device = instance.Create<Device>();
 	Surface surface = window.Create<Surface, const Device&>(device);
 	RenderPass renderPass = device.Create<RenderPass::Builder>()
+	    .WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE)
+		.WithSubpass(SubpassDescription().WithColorAttachment(0))
 	    .Build();
 	Pipeline pipeline = renderPass.Create<Pipeline::Builder>()
 		.WithShaderStage(VK_SHADER_STAGE_VERTEX_BIT, device.Create<ShaderModule>("data/Shaders/Mesh.vert.spirv"))
@@ -69,7 +71,7 @@ int main()
 	buffer.SetData(vertices);
 
 
-	Framebuffer framebuffer = pipeline.Create<Framebuffer>();
+	Framebuffer framebuffer = renderPass.Create<Framebuffer>(Core::Math::Vec2i(1920, 1080));
 
 
 	auto [size, channels, bytes] = Core::IO::DynamicByteBuffer::FromImage("data/dio.png").Unwrap();
@@ -115,7 +117,7 @@ int main()
 
 
 		commandBuffer.Begin(true);
-		commandBuffer.BeginRenderPass(pipeline, framebuffer);
+		commandBuffer.BeginRenderPass(renderPass, framebuffer);
 		commandBuffer.BindPipeline(pipeline);
 		commandBuffer.BindVertexBuffer(0, buffer);
 		commandBuffer.BindDescriptorSet(pipeline, 0);

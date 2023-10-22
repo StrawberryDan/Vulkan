@@ -25,6 +25,7 @@ namespace Strawberry::Graphics::Vulkan
 	class Buffer;
 	class Pipeline;
 	class Framebuffer;
+	class RenderPass;
 
 
 	class CommandBuffer
@@ -49,7 +50,7 @@ namespace Strawberry::Graphics::Vulkan
 		void BindPipeline(const Pipeline& pipeline);
 
 
-		void BeginRenderPass(const Pipeline& pipeline, Framebuffer& framebuffer);
+		void BeginRenderPass(const RenderPass& pipeline, Framebuffer& framebuffer);
 		void EndRenderPass();
 
 
