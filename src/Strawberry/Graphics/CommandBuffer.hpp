@@ -11,6 +11,8 @@
 // Strawberry Core
 #include "Strawberry/Core/Math/Vector.hpp"
 #include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
+// Standard Library
+#include <vector>
 
 
 
@@ -62,7 +64,11 @@ namespace Strawberry::Graphics
 		void ImageMemoryBarrier(VkImage image, VkImageAspectFlagBits aspect, VkImageLayout targetLayout);
 
 
-		void CopyToSwapchain(Swapchain& swapchain, const Image& image);
+		void CopyImageToSwapchain(const Image& image, Swapchain& swapchain);
+		void CopyBufferToImage(const Buffer& buffer, Image& image, VkFormat format);
+
+
+		void BindDescriptorSet(const Pipeline& pipeline, uint32_t set);
 
 
 	private:

@@ -152,7 +152,7 @@ namespace Strawberry::Graphics
 	}
 
 
-	void CommandBuffer::CopyToSwapchain(Swapchain& swapchain, const Image& image)
+	void CommandBuffer::CopyImageToSwapchain(const Image& image, Swapchain& swapchain)
 	{
 		ImageMemoryBarrier(image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 		ImageMemoryBarrier(swapchain.GetNextImage(), VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
@@ -182,6 +182,34 @@ namespace Strawberry::Graphics
 		};
 		vkCmdBlitImage(mCommandBuffer, image.mImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, swapchain.GetNextImage(),
 					   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region, VK_FILTER_NEAREST);
+	}
+
+
+	void CommandBuffer::CopyBufferToImage(const Buffer& buffer, Image& image, VkFormat format)
+	{
+		ImageMemoryBarrier(image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+		VkImageSubresourceLayers subresource {
+			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+			.mipLevel = 0,
+			.baseArrayLayer = 0,
+			.layerCount = 1,
+		};
+		VkBufferImageCopy region {
+			.bufferOffset = 0,
+			.bufferRowLength = static_cast<uint32_t>(image.mSize[0]),
+			.bufferImageHeight = static_cast<uint32_t>(image.mSize[1]),
+			.imageSubresource = subresource,
+			.imageOffset{.x = 0, .y = 0, .z = 0},
+			.imageExtent{.width = static_cast<uint32_t>(image.mSize[0]), .height = static_cast<uint32_t>(image.mSize[1]), .depth = 1}
+		};
+		vkCmdCopyBufferToImage(mCommandBuffer, buffer.mBuffer, image.mImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+	}
+
+
+	void CommandBuffer::BindDescriptorSet(const Pipeline& pipeline, uint32_t set)
+	{
+		vkCmdBindDescriptorSets(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.mPipelineLayout, set, 1, &pipeline.mDescriptorSets.at(set), 0, nullptr);
 	}
 
 
