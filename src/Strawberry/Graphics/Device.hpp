@@ -38,6 +38,7 @@ namespace Strawberry::Graphics
 		friend class ShaderModule;
 		friend class Framebuffer;
 		friend class Fence;
+		friend class Sampler;
 
 
 	public:
