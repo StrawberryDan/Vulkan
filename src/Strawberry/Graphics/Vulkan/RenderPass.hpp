@@ -8,9 +8,6 @@
 #include "Strawberry/Core/Types/ReflexivePointer.hpp"
 // Vulkan
 #include <vulkan/vulkan.h>
-// Standard Library
-#include <concepts>
-#include <vector>
 
 
 //======================================================================================================================
@@ -18,37 +15,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics::Vulkan
 {
-	class Instance;
-
-	class Pipeline;
+	class Device;
 
 
-	class Device
-		: public Core::EnableReflexivePointer<Device>
+	class RenderPass
+		: public Core::EnableReflexivePointer<RenderPass>
 	{
+		friend class CommandBuffer;
 		friend class Pipeline;
-		friend class Swapchain;
-		friend class Surface;
-		friend class Queue;
-		friend class CommandPool;
-		friend class Buffer;
-		friend class BufferView;
-		friend class DeviceMemory;
-		friend class Image;
-		friend class ShaderModule;
 		friend class Framebuffer;
-		friend class Fence;
-		friend class Sampler;
-		friend class RenderPass;
 
 
 	public:
-		explicit Device(const Instance& instance);
-		Device(const Device& rhs) = delete;
-		Device& operator=(const Device& rhs) = delete;
-		Device(Device&& rhs) noexcept;
-		Device& operator=(Device&& rhs) noexcept ;
-		~Device();
+		RenderPass(const Device& device);
+		RenderPass(const RenderPass& rhs) = delete;
+		RenderPass& operator=(const RenderPass& rhs) = delete;
+		RenderPass(RenderPass&& rhs) noexcept;
+		RenderPass& operator=(RenderPass&& rhs) noexcept;
+		~RenderPass();
 
 
 		template <std::movable T, typename... Args>
@@ -56,9 +40,7 @@ namespace Strawberry::Graphics::Vulkan
 
 
 	private:
-		VkInstance mInstance{};
-		VkPhysicalDevice mPhysicalDevice;
-		VkDevice mDevice;
-		uint32_t mQueueFamilyIndex{};
+		VkRenderPass mRenderPass;
+		Core::ReflexivePointer<Device> mDevice;
 	};
-}
+} // Vulkan

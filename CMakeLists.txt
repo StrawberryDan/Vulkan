@@ -64,6 +64,8 @@ add_library(StrawberryGraphics
 		src/Strawberry/Graphics/Vulkan/Fence.hpp
 		src/Strawberry/Graphics/Vulkan/Sampler.cpp
 		src/Strawberry/Graphics/Vulkan/Sampler.hpp
+		src/Strawberry/Graphics/Vulkan/RenderPass.cpp
+		src/Strawberry/Graphics/Vulkan/RenderPass.hpp
 )
 target_link_libraries(StrawberryGraphics PUBLIC StrawberryCore glfw Vulkan::Vulkan)
 target_include_directories(StrawberryGraphics PUBLIC src)

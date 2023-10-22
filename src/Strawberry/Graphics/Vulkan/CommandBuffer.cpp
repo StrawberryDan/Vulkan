@@ -10,6 +10,7 @@
 #include "Framebuffer.hpp"
 #include "Fence.hpp"
 #include "Device.hpp"
+#include "RenderPass.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
@@ -228,7 +229,7 @@ namespace Strawberry::Graphics::Vulkan
 		VkRenderPassBeginInfo beginInfo {
 			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 			.pNext = nullptr,
-			.renderPass = pipeline.mRenderPass,
+			.renderPass = pipeline.mRenderPass->mRenderPass,
 			.framebuffer = framebuffer.mFramebuffer,
 			.renderArea{.offset{0, 0}, .extent{static_cast<uint32_t>(framebuffer.mSize[0]),
 											   static_cast<uint32_t>(framebuffer.mSize[1])}},

@@ -5,6 +5,7 @@
 #include "ShaderModule.hpp"
 #include "Sampler.hpp"
 #include "ImageView.hpp"
+#include "RenderPass.hpp"
 // Strawberry Graphics
 #include "Device.hpp"
 // Strawberry Core
@@ -21,8 +22,7 @@ namespace Strawberry::Graphics::Vulkan
 {
 	Pipeline::Pipeline(Pipeline&& rhs) noexcept
 		: mPipeline(std::exchange(rhs.mPipeline, nullptr))
-		  , mDevice(std::exchange(rhs.mDevice, nullptr))
-		  , mRenderPass(std::exchange(rhs.mRenderPass, nullptr))
+		  , mRenderPass(std::move(rhs.mRenderPass))
 		  , mPipelineLayout(std::exchange(rhs.mPipelineLayout, nullptr))
 		  , mViewportSize(std::exchange(rhs.mViewportSize, {}))
 		  , mDescriptorSets(std::move(rhs.mDescriptorSets))
@@ -49,18 +49,17 @@ namespace Strawberry::Graphics::Vulkan
 	{
 		if (mPipeline)
 		{
-			vkDestroyPipelineLayout(mDevice->mDevice, mPipelineLayout, nullptr);
-			vkDestroyRenderPass(mDevice->mDevice, mRenderPass, nullptr);
+			vkDestroyPipelineLayout(mRenderPass->mDevice->mDevice, mPipelineLayout, nullptr);
 			for (VkDescriptorSetLayout layout: mDescriptorSetLayouts)
-				vkDestroyDescriptorSetLayout(mDevice->mDevice, layout, nullptr);
-			vkDestroyDescriptorPool(mDevice->mDevice, mDescriptorPool, nullptr);
-			vkDestroyPipeline(mDevice->mDevice, mPipeline, nullptr);
+				vkDestroyDescriptorSetLayout(mRenderPass->mDevice->mDevice, layout, nullptr);
+			vkDestroyDescriptorPool(mRenderPass->mDevice->mDevice, mDescriptorPool, nullptr);
+			vkDestroyPipeline(mRenderPass->mDevice->mDevice, mPipeline, nullptr);
 		}
 	}
 
 
-	Pipeline::Builder::Builder(const Device& device)
-		: mDevice(&device)
+	Pipeline::Builder::Builder(const RenderPass& renderPass)
+		: mRenderPass(renderPass)
 		  , mStages()
 	{
 
@@ -119,7 +118,7 @@ namespace Strawberry::Graphics::Vulkan
 			.bindingCount = static_cast<uint32_t>(descriptorSetLayout.mBindings.size()),
 			.pBindings = descriptorSetLayout.mBindings.data()
 		};
-		Core::AssertEQ(vkCreateDescriptorSetLayout(mDevice->mDevice, &createInfo, nullptr, &layout), VK_SUCCESS);
+		Core::AssertEQ(vkCreateDescriptorSetLayout(mRenderPass->mDevice->mDevice, &createInfo, nullptr, &layout), VK_SUCCESS);
 		mDescriptorSetLayouts.emplace_back(layout);
 
 
@@ -156,14 +155,14 @@ namespace Strawberry::Graphics::Vulkan
 			.pBufferInfo = nullptr,
 			.pTexelBufferView = nullptr,
 		};
-		vkUpdateDescriptorSets(mDevice->mDevice, 1, &write, 0, nullptr);
+		vkUpdateDescriptorSets(mRenderPass->mDevice->mDevice, 1, &write, 0, nullptr);
 	}
 
 
 	Pipeline Pipeline::Builder::Build() const
 	{
 		Pipeline pipeline;
-		pipeline.mDevice = mDevice;
+		pipeline.mRenderPass = mRenderPass;
 		pipeline.mViewportSize = mViewportSize.Value();
 		pipeline.mDescriptorSetLayouts = mDescriptorSetLayouts;
 
@@ -332,7 +331,7 @@ namespace Strawberry::Graphics::Vulkan
 			.pushConstantRangeCount = static_cast<uint32_t>(mPushConstantRanges.size()),
 			.pPushConstantRanges = mPushConstantRanges.data(),
 		};
-		Core::AssertEQ(vkCreatePipelineLayout(mDevice->mDevice, &layoutCreateInfo, nullptr, &pipeline.mPipelineLayout), VK_SUCCESS);
+		Core::AssertEQ(vkCreatePipelineLayout(mRenderPass->mDevice->mDevice, &layoutCreateInfo, nullptr, &pipeline.mPipelineLayout), VK_SUCCESS);
 
 
 		// Create Descriptor Pool
@@ -345,7 +344,7 @@ namespace Strawberry::Graphics::Vulkan
 			.pPoolSizes = mDescriptorPoolSizes.data(),
 		};
 		Core::AssertEQ(
-			vkCreateDescriptorPool(mDevice->mDevice, &descriptorPoolCreateInfo, nullptr, &pipeline.mDescriptorPool),
+			vkCreateDescriptorPool(mRenderPass->mDevice->mDevice, &descriptorPoolCreateInfo, nullptr, &pipeline.mDescriptorPool),
 			VK_SUCCESS);
 
 
@@ -358,50 +357,7 @@ namespace Strawberry::Graphics::Vulkan
 			.pSetLayouts = mDescriptorSetLayouts.data(),
 		};
 		pipeline.mDescriptorSets = std::vector<VkDescriptorSet>(mDescriptorSetLayouts.size(), nullptr);
-		Core::AssertEQ(vkAllocateDescriptorSets(mDevice->mDevice, &descriptorSetAllocateInfo, pipeline.mDescriptorSets.data()), VK_SUCCESS);
-
-
-		// Render Pass
-		VkAttachmentDescription attachment {
-			.flags = 0,
-			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
-			.samples = VK_SAMPLE_COUNT_1_BIT,
-			.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-			.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-			.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-			.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-			.initialLayout = VK_IMAGE_LAYOUT_GENERAL,
-			.finalLayout = VK_IMAGE_LAYOUT_GENERAL,
-		};
-		VkAttachmentReference colorAttachment {
-			.attachment = 0,
-			.layout = VK_IMAGE_LAYOUT_GENERAL,
-		};
-		VkSubpassDescription subpass {
-			.flags = 0,
-			.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
-			.inputAttachmentCount = 0,
-			.pInputAttachments = nullptr,
-			.colorAttachmentCount = 1,
-			.pColorAttachments = &colorAttachment,
-			.pResolveAttachments = nullptr,
-			.pDepthStencilAttachment = nullptr,
-			.preserveAttachmentCount = 0,
-			.pPreserveAttachments = nullptr,
-		};
-		VkRenderPassCreateInfo renderPassCreateInfo {
-			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = 0,
-			.attachmentCount = 1,
-			.pAttachments = &attachment,
-			.subpassCount = 1,
-			.pSubpasses = &subpass,
-			.dependencyCount = 0,
-			.pDependencies = nullptr,
-		};
-		Core::AssertEQ(vkCreateRenderPass(mDevice->mDevice, &renderPassCreateInfo, nullptr, &pipeline.mRenderPass),
-					   VK_SUCCESS);
+		Core::AssertEQ(vkAllocateDescriptorSets(mRenderPass->mDevice->mDevice, &descriptorSetAllocateInfo, pipeline.mDescriptorSets.data()), VK_SUCCESS);
 
 
 		// Create the Pipeline
@@ -422,13 +378,13 @@ namespace Strawberry::Graphics::Vulkan
 				.pColorBlendState = &colorBlendState,
 				.pDynamicState = &dynamicState,
 				.layout = pipeline.mPipelineLayout,
-				.renderPass = pipeline.mRenderPass,
+				.renderPass = mRenderPass->mRenderPass,
 				.subpass = mSubpass,
 				.basePipelineHandle = nullptr,
 				.basePipelineIndex = 0,
 			}
 		};
-		Core::AssertEQ(vkCreateGraphicsPipelines(mDevice->mDevice,
+		Core::AssertEQ(vkCreateGraphicsPipelines(mRenderPass->mDevice->mDevice,
 												 nullptr,
 												 createInfos.size(),
 												 createInfos.data(),

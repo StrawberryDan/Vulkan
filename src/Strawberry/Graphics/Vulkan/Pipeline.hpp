@@ -9,6 +9,7 @@
 #include <vulkan/vulkan.h>
 // Strawberry Core
 #include "Strawberry/Core/Math/Vector.hpp"
+#include "Strawberry/Core/Types/ReflexivePointer.hpp"
 #include "Strawberry/Core/Types/Optional.hpp"
 // Standard Library
 #include <map>
@@ -23,6 +24,7 @@ namespace Strawberry::Graphics::Vulkan
 	class Device;
 	class Sampler;
 	class ImageView;
+	class RenderPass;
 
 
 	class VertexInputDescription
@@ -131,15 +133,13 @@ namespace Strawberry::Graphics::Vulkan
 
 
 	private:
-		// Handle to owning device
-		const Device* mDevice = nullptr;
+		// Our RenderPass
+		Core::ReflexivePointer<RenderPass> mRenderPass;
 
 		// Handle to pipeline
 		VkPipeline mPipeline = nullptr;
 		// Handle to pipeline layout
 		VkPipelineLayout mPipelineLayout = nullptr;
-		// Handle to our renderpass
-		VkRenderPass mRenderPass = nullptr;
 		// The size of the viewport to render to
 		Core::Math::Vec2i mViewportSize;
 		// Our descriptor sets
@@ -154,7 +154,7 @@ namespace Strawberry::Graphics::Vulkan
 	class Pipeline::Builder
 	{
 	public:
-		explicit Builder(const Device& device);
+		explicit Builder(const RenderPass& renderPass);
 
 
 		Builder& WithShaderStage(VkShaderStageFlagBits stage, ShaderModule shader);
@@ -179,7 +179,7 @@ namespace Strawberry::Graphics::Vulkan
 
 
 	private:
-		const Device* mDevice;
+		Core::ReflexivePointer<RenderPass> mRenderPass;
 
 		std::map<VkShaderStageFlagBits, ShaderModule> mStages;
 

@@ -5,6 +5,7 @@
 #include "Device.hpp"
 #include "Pipeline.hpp"
 #include "ImageView.hpp"
+#include "RenderPass.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Assert.hpp"
 // Standard Library
@@ -18,7 +19,7 @@
 namespace Strawberry::Graphics::Vulkan
 {
 	Framebuffer::Framebuffer(const Pipeline& pipeline)
-		: mDevice(pipeline.mDevice)
+		: mDevice(pipeline.mRenderPass->mDevice)
 		  , mSize(pipeline.mViewportSize)
 		  , mDepthAttachment(CreateDepthImage(pipeline))
 		  , mDepthAttachmentView(CreateDepthImageView())
@@ -28,7 +29,7 @@ namespace Strawberry::Graphics::Vulkan
 		constexpr int COLOR_ATTACHMENT_COUNT = 1;
 		for (int i = 0; i < COLOR_ATTACHMENT_COUNT; i++)
 		{
-			mColorAttachments.emplace_back(pipeline.mDevice->Create<Image>(mSize, VK_FORMAT_R32G32B32A32_SFLOAT,
+			mColorAttachments.emplace_back(pipeline.mRenderPass->mDevice->Create<Image>(mSize, VK_FORMAT_R32G32B32A32_SFLOAT,
 																		   VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT));
 			mColorAttachmentViews.emplace_back(
 				mColorAttachments.back().Create<ImageView::Builder>()
@@ -47,7 +48,7 @@ namespace Strawberry::Graphics::Vulkan
 		VkFramebufferCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
 			.pNext = nullptr,
-			.renderPass = pipeline.mRenderPass,
+			.renderPass = pipeline.mRenderPass->mRenderPass,
 			.attachmentCount = static_cast<uint32_t>(attachments.size()),
 			.pAttachments = attachments.data(),
 			.width = static_cast<uint32_t>(mSize[0]),
@@ -120,7 +121,7 @@ namespace Strawberry::Graphics::Vulkan
 
 	Image Framebuffer::CreateDepthImage(const Pipeline& pipeline)
 	{
-		return pipeline.mDevice->Create<Image>(mSize, VK_FORMAT_D32_SFLOAT,
+		return pipeline.mRenderPass->mDevice->Create<Image>(mSize, VK_FORMAT_D32_SFLOAT,
 											   VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
 
 	}
@@ -143,7 +144,7 @@ namespace Strawberry::Graphics::Vulkan
 
 	Image Framebuffer::CreateStencilImage(const Pipeline& pipeline)
 	{
-		return pipeline.mDevice->Create<Image>(mSize, VK_FORMAT_S8_UINT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
+		return pipeline.mRenderPass->mDevice->Create<Image>(mSize, VK_FORMAT_S8_UINT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
 	}
 
 
