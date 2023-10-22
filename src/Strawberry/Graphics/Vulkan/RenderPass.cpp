@@ -15,6 +15,51 @@ namespace Strawberry::Graphics::Vulkan
 	RenderPass::RenderPass(const Device& device)
 		: mDevice(device)
 	{
+
+	}
+
+
+	RenderPass::RenderPass(RenderPass&& rhs) noexcept
+		: mRenderPass(std::exchange(rhs.mRenderPass, nullptr))
+		, mDevice(std::move(rhs.mDevice))
+	{
+
+	}
+
+
+	RenderPass& RenderPass::operator=(RenderPass&& rhs) noexcept
+	{
+		if (this != &rhs)
+		{
+		    std::destroy_at(this);
+		    std::construct_at(this, std::move(rhs));
+		}
+
+		return *this;
+	}
+
+
+	RenderPass::~RenderPass()
+	{
+		if (mRenderPass)
+		{
+			vkDestroyRenderPass(mDevice->mDevice, mRenderPass, nullptr);
+		}
+	}
+
+
+	RenderPass::Builder::Builder(const Device& device)
+		: mDevice(device)
+	{
+
+	}
+
+
+	RenderPass RenderPass::Builder::Build()
+	{
+		RenderPass renderPass(*mDevice);
+
+
 		// Render Pass
 		VkAttachmentDescription attachment {
 			.flags = 0,
@@ -54,36 +99,10 @@ namespace Strawberry::Graphics::Vulkan
 			.dependencyCount = 0,
 			.pDependencies = nullptr,
 		};
-		Core::AssertEQ(vkCreateRenderPass(mDevice->mDevice, &renderPassCreateInfo, nullptr, &mRenderPass),
+		Core::AssertEQ(vkCreateRenderPass(mDevice->mDevice, &renderPassCreateInfo, nullptr, &renderPass.mRenderPass),
 					   VK_SUCCESS);
-	}
 
 
-	RenderPass::RenderPass(RenderPass&& rhs) noexcept
-		: mRenderPass(std::exchange(rhs.mRenderPass, nullptr))
-		, mDevice(std::move(rhs.mDevice))
-	{
-
-	}
-
-
-	RenderPass& RenderPass::operator=(RenderPass&& rhs) noexcept
-	{
-		if (this != &rhs)
-		{
-		    std::destroy_at(this);
-		    std::construct_at(this, std::move(rhs));
-		}
-
-		return *this;
-	}
-
-
-	RenderPass::~RenderPass()
-	{
-		if (mRenderPass)
-		{
-			vkDestroyRenderPass(mDevice->mDevice, mRenderPass, nullptr);
-		}
+		return renderPass;
 	}
 }

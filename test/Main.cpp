@@ -37,7 +37,8 @@ int main()
 	Instance instance;
 	Device device = instance.Create<Device>();
 	Surface surface = window.Create<Surface, const Device&>(device);
-	RenderPass renderPass = device.Create<RenderPass>();
+	RenderPass renderPass = device.Create<RenderPass::Builder>()
+	    .Build();
 	Pipeline pipeline = renderPass.Create<Pipeline::Builder>()
 		.WithShaderStage(VK_SHADER_STAGE_VERTEX_BIT, device.Create<ShaderModule>("data/Shaders/Mesh.vert.spirv"))
 		.WithShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT,

@@ -27,7 +27,10 @@ namespace Strawberry::Graphics::Vulkan
 
 
 	public:
-		RenderPass(const Device& device);
+		class Builder;
+
+
+	public:
 		RenderPass(const RenderPass& rhs) = delete;
 		RenderPass& operator=(const RenderPass& rhs) = delete;
 		RenderPass(RenderPass&& rhs) noexcept;
@@ -39,8 +42,26 @@ namespace Strawberry::Graphics::Vulkan
 		T Create(Args... args) const { return T(*this, std::forward<Args>(args)...); }
 
 
+	protected:
+		RenderPass(const Device& device);
+
+
 	private:
 		VkRenderPass mRenderPass;
+		Core::ReflexivePointer<Device> mDevice;
+	};
+
+
+	class RenderPass::Builder
+	{
+	public:
+		Builder(const Device& device);
+
+
+		[[nodiscard]] RenderPass Build();
+
+
+	private:
 		Core::ReflexivePointer<Device> mDevice;
 	};
 } // Vulkan
