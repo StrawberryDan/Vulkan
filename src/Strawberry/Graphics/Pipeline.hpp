@@ -21,6 +21,8 @@
 namespace Strawberry::Graphics
 {
 	class Device;
+	class Sampler;
+	class ImageView;
 
 
 	class VertexInputDescription
@@ -84,6 +86,20 @@ namespace Strawberry::Graphics
 	};
 
 
+	class DescriptorSetLayout
+	{
+		friend class Pipeline;
+
+
+	public:
+		DescriptorSetLayout& WithBinding(VkDescriptorType type, uint32_t count, VkShaderStageFlags stage);
+
+
+	private:
+		std::vector<VkDescriptorSetLayoutBinding> mBindings;
+	};
+
+
 	class Pipeline
 	{
 		friend class Builder;
@@ -107,16 +123,31 @@ namespace Strawberry::Graphics
 		T Create(Args... args) const { return T(*this, std::forward<Args>(args)...); }
 
 
+		void SetUniformTexture(const Sampler& sampler, const ImageView& image, VkImageLayout layout, uint32_t set, uint32_t binding, uint32_t arrayElement = 0);
+
+
 	private:
 		Pipeline() = default;
 
 
 	private:
-		VkPipeline mPipeline = nullptr;
-		VkPipelineLayout mPipelineLayout = nullptr;
+		// Handle to owning device
 		const Device* mDevice = nullptr;
+
+		// Handle to pipeline
+		VkPipeline mPipeline = nullptr;
+		// Handle to pipeline layout
+		VkPipelineLayout mPipelineLayout = nullptr;
+		// Handle to our renderpass
 		VkRenderPass mRenderPass = nullptr;
+		// The size of the viewport to render to
 		Core::Math::Vec2i mViewportSize;
+		// Our descriptor sets
+		std::vector<VkDescriptorSet> mDescriptorSets;
+		// Our descriptor set layouts
+		std::vector<VkDescriptorSetLayout> mDescriptorSetLayouts;
+		// The pool from which we allocate descriptor sets
+		VkDescriptorPool mDescriptorPool;
 	};
 
 
@@ -139,6 +170,9 @@ namespace Strawberry::Graphics
 
 
 		Builder& WithPushConstantRange(VkShaderStageFlags stage, uint32_t size, uint32_t offset);
+
+
+		Builder& WithDescriptorSetLayout(const DescriptorSetLayout& descriptorSetLayout);
 
 
 		[[nodiscard]] Pipeline Build() const;
@@ -168,5 +202,9 @@ namespace Strawberry::Graphics
 		uint32_t mSubpass = 0;
 
 		std::vector<VkPushConstantRange> mPushConstantRanges;
+
+		std::vector<VkDescriptorSetLayout> mDescriptorSetLayouts;
+
+		std::vector<VkDescriptorPoolSize> mDescriptorPoolSizes;
 	};
 }

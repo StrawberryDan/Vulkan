@@ -3,6 +3,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 #include "Pipeline.hpp"
 #include "ShaderModule.hpp"
+#include "Sampler.hpp"
+#include "ImageView.hpp"
 // Strawberry Graphics
 #include "Strawberry/Graphics/Device.hpp"
 // Strawberry Core
@@ -23,7 +25,12 @@ namespace Strawberry::Graphics
 		  , mRenderPass(std::exchange(rhs.mRenderPass, nullptr))
 		  , mPipelineLayout(std::exchange(rhs.mPipelineLayout, nullptr))
 		  , mViewportSize(std::exchange(rhs.mViewportSize, {}))
-	  {}
+		  , mDescriptorSets(std::move(rhs.mDescriptorSets))
+		  , mDescriptorSetLayouts(std::move(rhs.mDescriptorSetLayouts))
+		  , mDescriptorPool(std::exchange(rhs.mDescriptorPool, nullptr))
+	{
+
+	}
 
 
 	Pipeline& Pipeline::operator=(Pipeline&& rhs) noexcept
@@ -43,8 +50,11 @@ namespace Strawberry::Graphics
 		if (mPipeline)
 		{
 			vkDestroyPipelineLayout(mDevice->mDevice, mPipelineLayout, nullptr);
-			vkDestroyPipeline(mDevice->mDevice, mPipeline, nullptr);
 			vkDestroyRenderPass(mDevice->mDevice, mRenderPass, nullptr);
+			for (VkDescriptorSetLayout layout: mDescriptorSetLayouts)
+				vkDestroyDescriptorSetLayout(mDevice->mDevice, layout, nullptr);
+			vkDestroyDescriptorPool(mDevice->mDevice, mDescriptorPool, nullptr);
+			vkDestroyPipeline(mDevice->mDevice, mPipeline, nullptr);
 		}
 	}
 
@@ -90,7 +100,7 @@ namespace Strawberry::Graphics
 	Pipeline::Builder&
 	Pipeline::Builder::WithPushConstantRange(VkShaderStageFlags stage, uint32_t size, uint32_t offset)
 	{
-		mPushConstantRanges.emplace_back(VkPushConstantRange{
+		mPushConstantRanges.emplace_back(VkPushConstantRange {
 			.stageFlags = stage,
 			.offset = offset,
 			.size = size,
@@ -99,18 +109,70 @@ namespace Strawberry::Graphics
 	}
 
 
+	Pipeline::Builder& Pipeline::Builder::WithDescriptorSetLayout(const DescriptorSetLayout& descriptorSetLayout)
+	{
+		VkDescriptorSetLayout layout;
+		VkDescriptorSetLayoutCreateInfo createInfo {
+			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.bindingCount = static_cast<uint32_t>(descriptorSetLayout.mBindings.size()),
+			.pBindings = descriptorSetLayout.mBindings.data()
+		};
+		Core::AssertEQ(vkCreateDescriptorSetLayout(mDevice->mDevice, &createInfo, nullptr, &layout), VK_SUCCESS);
+		mDescriptorSetLayouts.emplace_back(layout);
+
+
+		for (auto layoutBinding: descriptorSetLayout.mBindings)
+		{
+			mDescriptorPoolSizes.emplace_back(VkDescriptorPoolSize {
+				.type = layoutBinding.descriptorType,
+				.descriptorCount = layoutBinding.descriptorCount
+			});
+		}
+
+
+		return *this;
+	}
+
+
+	void Pipeline::SetUniformTexture(const Sampler& sampler, const ImageView& image, VkImageLayout layout, uint32_t set, uint32_t binding,
+									 uint32_t arrayElement)
+	{
+		VkDescriptorImageInfo imageInfo {
+			.sampler = sampler.mSampler,
+			.imageView = image.mImageView,
+			.imageLayout = layout,
+		};
+		VkWriteDescriptorSet write {
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.pNext = nullptr,
+			.dstSet = mDescriptorSets[set],
+			.dstBinding = binding,
+			.dstArrayElement = arrayElement,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.pImageInfo = &imageInfo,
+			.pBufferInfo = nullptr,
+			.pTexelBufferView = nullptr,
+		};
+		vkUpdateDescriptorSets(mDevice->mDevice, 1, &write, 0, nullptr);
+	}
+
+
 	Pipeline Pipeline::Builder::Build() const
 	{
 		Pipeline pipeline;
 		pipeline.mDevice = mDevice;
 		pipeline.mViewportSize = mViewportSize.Value();
+		pipeline.mDescriptorSetLayouts = mDescriptorSetLayouts;
 
 
 		// Create Shader Stages
 		std::vector<VkPipelineShaderStageCreateInfo> stages;
 		for (auto& [stage, shader]: mStages)
 		{
-			stages.emplace_back(VkPipelineShaderStageCreateInfo{
+			stages.emplace_back(VkPipelineShaderStageCreateInfo {
 				.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
 				.pNext = nullptr,
 				.flags = 0,
@@ -125,7 +187,7 @@ namespace Strawberry::Graphics
 		// Get Vertex Input State Info
 		auto bindings = mVertexInputDescription->GetBindingDescriptions();
 		auto attributes = mVertexInputDescription->GetAttributeDescriptions();
-		VkPipelineVertexInputStateCreateInfo vertexInputState{
+		VkPipelineVertexInputStateCreateInfo vertexInputState {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -137,7 +199,7 @@ namespace Strawberry::Graphics
 
 
 		// Input Assembly
-		VkPipelineInputAssemblyStateCreateInfo inputAssembly{
+		VkPipelineInputAssemblyStateCreateInfo inputAssembly {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -147,7 +209,7 @@ namespace Strawberry::Graphics
 
 
 		// Tessellation State
-		VkPipelineTessellationStateCreateInfo tessellationState{
+		VkPipelineTessellationStateCreateInfo tessellationState {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_TESSELLATION_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -156,18 +218,18 @@ namespace Strawberry::Graphics
 
 
 		// Viewport State
-		VkViewport viewPort{
+		VkViewport viewPort {
 			.x = 0.0, .y = 0.0,
 			.width = static_cast<float>(mViewportSize.Value()[0]), .height = static_cast<float>(mViewportSize.Value()[1]),
 			.minDepth = 0.0,
 			.maxDepth = 1.0,
 		};
-		VkRect2D scissorRegion{
+		VkRect2D scissorRegion {
 			.offset = {0, 0},
 			.extent = {static_cast<uint32_t>(mViewportSize.Value()[0]),
 					   static_cast<uint32_t>(mViewportSize.Value()[1])},
 		};
-		VkPipelineViewportStateCreateInfo viewPortState{
+		VkPipelineViewportStateCreateInfo viewPortState {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -179,7 +241,7 @@ namespace Strawberry::Graphics
 
 
 		// Rasterization State
-		VkPipelineRasterizationStateCreateInfo rasterizationState{
+		VkPipelineRasterizationStateCreateInfo rasterizationState {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
 			.pNext = 0,
 			.flags = 0,
@@ -197,7 +259,7 @@ namespace Strawberry::Graphics
 
 
 		// Multisampling State
-		VkPipelineMultisampleStateCreateInfo multisampleState{
+		VkPipelineMultisampleStateCreateInfo multisampleState {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -211,7 +273,7 @@ namespace Strawberry::Graphics
 
 
 		// Depth Stencil State
-		VkPipelineDepthStencilStateCreateInfo depthStencilState{
+		VkPipelineDepthStencilStateCreateInfo depthStencilState {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -227,7 +289,7 @@ namespace Strawberry::Graphics
 
 
 		// Color Blending State
-		VkPipelineColorBlendAttachmentState colorBlendAttachementState{
+		VkPipelineColorBlendAttachmentState colorBlendAttachementState {
 			.blendEnable = VK_FALSE,
 			.srcColorBlendFactor = VK_BLEND_FACTOR_ONE,
 			.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO,
@@ -238,7 +300,7 @@ namespace Strawberry::Graphics
 			.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
 							  VK_COLOR_COMPONENT_A_BIT,
 		};
-		VkPipelineColorBlendStateCreateInfo colorBlendState{
+		VkPipelineColorBlendStateCreateInfo colorBlendState {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -251,7 +313,7 @@ namespace Strawberry::Graphics
 
 
 		// Dynamic State
-		VkPipelineDynamicStateCreateInfo dynamicState{
+		VkPipelineDynamicStateCreateInfo dynamicState {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -260,22 +322,47 @@ namespace Strawberry::Graphics
 		};
 
 
-		VkPipelineLayoutCreateInfo layoutCreateInfo{
+		// Pipeline layout
+		VkPipelineLayoutCreateInfo layoutCreateInfo {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
-			.setLayoutCount = 0,
-			.pSetLayouts = nullptr,
+			.setLayoutCount = static_cast<uint32_t>(mDescriptorSetLayouts.size()),
+			.pSetLayouts = mDescriptorSetLayouts.data(),
 			.pushConstantRangeCount = static_cast<uint32_t>(mPushConstantRanges.size()),
 			.pPushConstantRanges = mPushConstantRanges.data(),
 		};
-		VkPipelineLayout layout;
-		Core::AssertEQ(vkCreatePipelineLayout(mDevice->mDevice, &layoutCreateInfo, nullptr, &layout), VK_SUCCESS);
-		pipeline.mPipelineLayout = layout;
+		Core::AssertEQ(vkCreatePipelineLayout(mDevice->mDevice, &layoutCreateInfo, nullptr, &pipeline.mPipelineLayout), VK_SUCCESS);
+
+
+		// Create Descriptor Pool
+		VkDescriptorPoolCreateInfo descriptorPoolCreateInfo {
+			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.maxSets = 1,
+			.poolSizeCount = static_cast<uint32_t>(mDescriptorPoolSizes.size()),
+			.pPoolSizes = mDescriptorPoolSizes.data(),
+		};
+		Core::AssertEQ(
+			vkCreateDescriptorPool(mDevice->mDevice, &descriptorPoolCreateInfo, nullptr, &pipeline.mDescriptorPool),
+			VK_SUCCESS);
+
+
+		// Create Descriptor Sets
+		VkDescriptorSetAllocateInfo descriptorSetAllocateInfo {
+			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+			.pNext = nullptr,
+			.descriptorPool = pipeline.mDescriptorPool,
+			.descriptorSetCount = static_cast<uint32_t>(mDescriptorSetLayouts.size()),
+			.pSetLayouts = mDescriptorSetLayouts.data(),
+		};
+		pipeline.mDescriptorSets = std::vector<VkDescriptorSet>(mDescriptorSetLayouts.size(), nullptr);
+		Core::AssertEQ(vkAllocateDescriptorSets(mDevice->mDevice, &descriptorSetAllocateInfo, pipeline.mDescriptorSets.data()), VK_SUCCESS);
 
 
 		// Render Pass
-		VkAttachmentDescription attachment{
+		VkAttachmentDescription attachment {
 			.flags = 0,
 			.format = VK_FORMAT_R32G32B32A32_SFLOAT,
 			.samples = VK_SAMPLE_COUNT_1_BIT,
@@ -290,7 +377,7 @@ namespace Strawberry::Graphics
 			.attachment = 0,
 			.layout = VK_IMAGE_LAYOUT_GENERAL,
 		};
-		VkSubpassDescription subpass{
+		VkSubpassDescription subpass {
 			.flags = 0,
 			.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
 			.inputAttachmentCount = 0,
@@ -302,7 +389,7 @@ namespace Strawberry::Graphics
 			.preserveAttachmentCount = 0,
 			.pPreserveAttachments = nullptr,
 		};
-		VkRenderPassCreateInfo renderPassCreateInfo{
+		VkRenderPassCreateInfo renderPassCreateInfo {
 			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -318,8 +405,8 @@ namespace Strawberry::Graphics
 
 
 		// Create the Pipeline
-		std::vector<VkGraphicsPipelineCreateInfo> createInfos{
-			VkGraphicsPipelineCreateInfo{
+		std::vector<VkGraphicsPipelineCreateInfo> createInfos {
+			VkGraphicsPipelineCreateInfo {
 				.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
 				.pNext = nullptr,
 				.flags = 0,
@@ -334,7 +421,7 @@ namespace Strawberry::Graphics
 				.pDepthStencilState = &depthStencilState,
 				.pColorBlendState = &colorBlendState,
 				.pDynamicState = &dynamicState,
-				.layout = layout,
+				.layout = pipeline.mPipelineLayout,
 				.renderPass = pipeline.mRenderPass,
 				.subpass = mSubpass,
 				.basePipelineHandle = nullptr,
@@ -394,7 +481,7 @@ namespace Strawberry::Graphics
 		for (uint32_t bindingIndex = 0; bindingIndex < Size(); bindingIndex++)
 		{
 			const auto& binding = mBindings[bindingIndex];
-			bindings.emplace_back(VkVertexInputBindingDescription{
+			bindings.emplace_back(VkVertexInputBindingDescription {
 				.binding = bindingIndex,
 				.stride = binding.mStride,
 				.inputRate = binding.mInputRate
@@ -413,7 +500,7 @@ namespace Strawberry::Graphics
 			for (uint32_t attributeIndex = 0; attributeIndex < binding.mAttributes.size(); attributeIndex++)
 			{
 				const auto& attribute = binding.mAttributes[attributeIndex];
-				attributes.emplace_back(VkVertexInputAttributeDescription{
+				attributes.emplace_back(VkVertexInputAttributeDescription {
 					.location = attribute.mLocation,
 					.binding = bindingIndex,
 					.format = attribute.mFormat,
@@ -422,5 +509,19 @@ namespace Strawberry::Graphics
 			}
 		}
 		return attributes;
+	}
+
+
+	DescriptorSetLayout&
+	DescriptorSetLayout::WithBinding(VkDescriptorType type, uint32_t count, VkShaderStageFlags stage)
+	{
+		mBindings.emplace_back(VkDescriptorSetLayoutBinding {
+			.binding = static_cast<uint32_t>(mBindings.size()),
+			.descriptorType = type,
+			.descriptorCount = count,
+			.stageFlags = stage,
+			.pImmutableSamplers = nullptr,
+		});
+		return *this;
 	}
 }
