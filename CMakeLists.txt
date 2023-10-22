@@ -25,45 +25,45 @@ endif()
 
 
 add_library(StrawberryGraphics
-		src/Strawberry/Graphics/Instance.cpp
-		src/Strawberry/Graphics/Instance.hpp
+		src/Strawberry/Graphics/Vulkan/Instance.cpp
+		src/Strawberry/Graphics/Vulkan/Instance.hpp
 		src/Strawberry/Graphics/Window.hpp
 		src/Strawberry/Graphics/Window.cpp
 		src/Strawberry/Graphics/Event.hpp
 		src/Strawberry/Graphics/Input/Key.hpp
 		src/Strawberry/Graphics/Input/Key.cpp
-		src/Strawberry/Graphics/Device.cpp
-		src/Strawberry/Graphics/Device.hpp
-		src/Strawberry/Graphics/Pipeline.cpp
-		src/Strawberry/Graphics/Pipeline.hpp
-		src/Strawberry/Graphics/Surface.cpp
-		src/Strawberry/Graphics/Surface.hpp
-		src/Strawberry/Graphics/Swapchain.cpp
-		src/Strawberry/Graphics/Swapchain.hpp
-		src/Strawberry/Graphics/Queue.cpp
-		src/Strawberry/Graphics/Queue.hpp
-		src/Strawberry/Graphics/CommandPool.cpp
-		src/Strawberry/Graphics/CommandPool.hpp
-		src/Strawberry/Graphics/CommandBuffer.cpp
-		src/Strawberry/Graphics/CommandBuffer.hpp
-		src/Strawberry/Graphics/Buffer.cpp
-		src/Strawberry/Graphics/Buffer.hpp
-		src/Strawberry/Graphics/BufferView.cpp
-		src/Strawberry/Graphics/BufferView.hpp
-		src/Strawberry/Graphics/DeviceMemory.cpp
-		src/Strawberry/Graphics/DeviceMemory.hpp
-		src/Strawberry/Graphics/Image.cpp
-		src/Strawberry/Graphics/Image.hpp
-		src/Strawberry/Graphics/ImageView.cpp
-		src/Strawberry/Graphics/ImageView.hpp
-		src/Strawberry/Graphics/ShaderModule.cpp
-		src/Strawberry/Graphics/ShaderModule.hpp
-		src/Strawberry/Graphics/Framebuffer.cpp
-		src/Strawberry/Graphics/Framebuffer.hpp
-		src/Strawberry/Graphics/Fence.cpp
-		src/Strawberry/Graphics/Fence.hpp
-		src/Strawberry/Graphics/Sampler.cpp
-		src/Strawberry/Graphics/Sampler.hpp
+		src/Strawberry/Graphics/Vulkan/Device.cpp
+		src/Strawberry/Graphics/Vulkan/Device.hpp
+		src/Strawberry/Graphics/Vulkan/Pipeline.cpp
+		src/Strawberry/Graphics/Vulkan/Pipeline.hpp
+		src/Strawberry/Graphics/Vulkan/Surface.cpp
+		src/Strawberry/Graphics/Vulkan/Surface.hpp
+		src/Strawberry/Graphics/Vulkan/Swapchain.cpp
+		src/Strawberry/Graphics/Vulkan/Swapchain.hpp
+		src/Strawberry/Graphics/Vulkan/Queue.cpp
+		src/Strawberry/Graphics/Vulkan/Queue.hpp
+		src/Strawberry/Graphics/Vulkan/CommandPool.cpp
+		src/Strawberry/Graphics/Vulkan/CommandPool.hpp
+		src/Strawberry/Graphics/Vulkan/CommandBuffer.cpp
+		src/Strawberry/Graphics/Vulkan/CommandBuffer.hpp
+		src/Strawberry/Graphics/Vulkan/Buffer.cpp
+		src/Strawberry/Graphics/Vulkan/Buffer.hpp
+		src/Strawberry/Graphics/Vulkan/BufferView.cpp
+		src/Strawberry/Graphics/Vulkan/BufferView.hpp
+		src/Strawberry/Graphics/Vulkan/DeviceMemory.cpp
+		src/Strawberry/Graphics/Vulkan/DeviceMemory.hpp
+		src/Strawberry/Graphics/Vulkan/Image.cpp
+		src/Strawberry/Graphics/Vulkan/Image.hpp
+		src/Strawberry/Graphics/Vulkan/ImageView.cpp
+		src/Strawberry/Graphics/Vulkan/ImageView.hpp
+		src/Strawberry/Graphics/Vulkan/ShaderModule.cpp
+		src/Strawberry/Graphics/Vulkan/ShaderModule.hpp
+		src/Strawberry/Graphics/Vulkan/Framebuffer.cpp
+		src/Strawberry/Graphics/Vulkan/Framebuffer.hpp
+		src/Strawberry/Graphics/Vulkan/Fence.cpp
+		src/Strawberry/Graphics/Vulkan/Fence.hpp
+		src/Strawberry/Graphics/Vulkan/Sampler.cpp
+		src/Strawberry/Graphics/Vulkan/Sampler.hpp
 )
 target_link_libraries(StrawberryGraphics PUBLIC StrawberryCore glfw Vulkan::Vulkan)
 target_include_directories(StrawberryGraphics PUBLIC src)

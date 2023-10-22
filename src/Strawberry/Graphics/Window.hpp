@@ -12,7 +12,7 @@
 #include "Strawberry/Core/Sync/Mutex.hpp"
 // GLFW 3
 #include "GLFW/glfw3.h"
-#include "Surface.hpp"
+#include "Strawberry/Graphics/Vulkan/Surface.hpp"
 // Standard Library
 #include <atomic>
 #include <string>
@@ -28,7 +28,7 @@ namespace Strawberry::Graphics::Window
 
 	class Window
 	{
-		friend class Graphics::Surface;
+		friend class Graphics::Vulkan::Surface;
 
 
 	private:

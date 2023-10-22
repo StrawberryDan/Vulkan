@@ -1,27 +1,28 @@
 
 #include "Strawberry/Core/UTF.hpp"
-#include "Strawberry/Graphics/Instance.hpp"
+#include "Strawberry/Graphics/Vulkan/Instance.hpp"
 #include "Strawberry/Graphics/Window.hpp"
-#include "Strawberry/Graphics/Device.hpp"
-#include "Strawberry/Graphics/Pipeline.hpp"
-#include "Strawberry/Graphics/Swapchain.hpp"
-#include "Strawberry/Graphics/Queue.hpp"
-#include "Strawberry/Graphics/CommandPool.hpp"
-#include "Strawberry/Graphics/CommandBuffer.hpp"
-#include "Strawberry/Graphics/Buffer.hpp"
-#include "Strawberry/Graphics/BufferView.hpp"
-#include "Strawberry/Graphics/Image.hpp"
-#include "Strawberry/Graphics/ShaderModule.hpp"
-#include "Strawberry/Graphics/Framebuffer.hpp"
+#include "Strawberry/Graphics/Vulkan/Device.hpp"
+#include "Strawberry/Graphics/Vulkan/Pipeline.hpp"
+#include "Strawberry/Graphics/Vulkan/Swapchain.hpp"
+#include "Strawberry/Graphics/Vulkan/Queue.hpp"
+#include "Strawberry/Graphics/Vulkan/CommandPool.hpp"
+#include "Strawberry/Graphics/Vulkan/CommandBuffer.hpp"
+#include "Strawberry/Graphics/Vulkan/Buffer.hpp"
+#include "Strawberry/Graphics/Vulkan/BufferView.hpp"
+#include "Strawberry/Graphics/Vulkan/Image.hpp"
+#include "Strawberry/Graphics/Vulkan/ShaderModule.hpp"
+#include "Strawberry/Graphics/Vulkan/Framebuffer.hpp"
 #include "Strawberry/Core/Math/Matrix.hpp"
 #include "Strawberry/Core/Timing/Clock.hpp"
-#include "Strawberry/Graphics/Sampler.hpp"
+#include "Strawberry/Graphics/Vulkan/Sampler.hpp"
 
 
 int main()
 {
 	using namespace Strawberry;
 	using namespace Graphics;
+	using namespace Vulkan;
 
 	auto vertexInputDescription = []() -> VertexInputDescription
 	{

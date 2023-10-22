@@ -2,7 +2,7 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 #include "Window.hpp"
-#include "Instance.hpp"
+#include "Strawberry/Graphics/Vulkan/Instance.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Assert.hpp"
 // GLFW3
