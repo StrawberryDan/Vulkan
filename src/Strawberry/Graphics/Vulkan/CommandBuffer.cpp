@@ -11,6 +11,7 @@
 #include "Fence.hpp"
 #include "Device.hpp"
 #include "RenderPass.hpp"
+#include "Queue.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
@@ -26,33 +27,31 @@ namespace Strawberry::Graphics::Vulkan
 {
 	CommandBuffer::CommandBuffer(const CommandPool& commandPool)
 		: mCommandBuffer {}
-		  , mDevice(commandPool.mDevice)
-		  , mCommandPool(commandPool.mCommandPool)
-		  , mQueueFamilyIndex(commandPool.mQueueFamilyIndex)
+		, mCommandPool(commandPool)
+		, mQueueFamilyIndex(mCommandPool->GetQueue()->GetFamilyIndex())
 	{
 		VkCommandBufferAllocateInfo allocateInfo {
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
 			.pNext = nullptr,
-			.commandPool = mCommandPool,
+			.commandPool = mCommandPool->mCommandPool,
 			.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
 			.commandBufferCount = 1,
 		};
 
-		Core::Assert(vkAllocateCommandBuffers(mDevice, &allocateInfo, &mCommandBuffer) == VK_SUCCESS);
+		Core::Assert(vkAllocateCommandBuffers(mCommandPool->GetQueue()->GetDevice()->mDevice, &allocateInfo, &mCommandBuffer) == VK_SUCCESS);
 	}
 
 
 	CommandBuffer::CommandBuffer(CommandBuffer&& rhs) noexcept
 		: mCommandBuffer(std::exchange(rhs.mCommandBuffer, nullptr))
-		  , mCommandPool(std::exchange(rhs.mCommandPool, nullptr))
-		  , mDevice(std::exchange(rhs.mDevice, nullptr))
+		  , mCommandPool(std::move(rhs.mCommandPool))
 		  , mQueueFamilyIndex(std::exchange(rhs.mQueueFamilyIndex, 0))
 	{
 
 	}
 
 
-	CommandBuffer& CommandBuffer::operator=(CommandBuffer&& rhs)
+	CommandBuffer& CommandBuffer::operator=(CommandBuffer&& rhs) noexcept
 	{
 		if (this != &rhs)
 		{
@@ -68,8 +67,14 @@ namespace Strawberry::Graphics::Vulkan
 	{
 		if (mCommandBuffer)
 		{
-			vkFreeCommandBuffers(mDevice, mCommandPool, 1, &mCommandBuffer);
+			vkFreeCommandBuffers(mCommandPool->GetQueue()->GetDevice()->mDevice, mCommandPool->mCommandPool, 1, &mCommandBuffer);
 		}
+	}
+
+
+	Core::ReflexivePointer<CommandPool> CommandBuffer::GetCommandPool() const
+	{
+		return mCommandPool;
 	}
 
 

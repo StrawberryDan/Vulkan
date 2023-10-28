@@ -38,8 +38,11 @@ namespace Strawberry::Graphics::Vulkan
 		CommandBuffer(const CommandBuffer& rhs) = delete;
 		CommandBuffer& operator=(const CommandBuffer& rhs) = delete;
 		CommandBuffer(CommandBuffer&& rhs) noexcept ;
-		CommandBuffer& operator=(CommandBuffer&& rhs);
+		CommandBuffer& operator=(CommandBuffer&& rhs) noexcept ;
 		~CommandBuffer();
+
+
+		Core::ReflexivePointer<CommandPool> GetCommandPool() const;
 
 
 		void Begin(bool oneTimeSubmit);
@@ -50,7 +53,7 @@ namespace Strawberry::Graphics::Vulkan
 		void BindPipeline(const Pipeline& pipeline);
 
 
-		void BeginRenderPass(const RenderPass& pipeline, Framebuffer& framebuffer);
+		void BeginRenderPass(const RenderPass& renderPass, Framebuffer& framebuffer);
 		void EndRenderPass();
 
 
@@ -74,8 +77,7 @@ namespace Strawberry::Graphics::Vulkan
 
 	private:
 		VkCommandBuffer mCommandBuffer;
-		VkCommandPool mCommandPool;
-		VkDevice mDevice;
+		Core::ReflexivePointer<CommandPool> mCommandPool;
 		uint32_t mQueueFamilyIndex;
 	};
 }
