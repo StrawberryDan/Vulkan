@@ -30,6 +30,7 @@ namespace Strawberry::Graphics::Vulkan
 		friend class Swapchain;
 		friend class Surface;
 		friend class Queue;
+		friend class CommandBuffer;
 		friend class CommandPool;
 		friend class Buffer;
 		friend class BufferView;
