@@ -10,6 +10,8 @@
 #include "Strawberry/Core/Math/Vector.hpp"
 // Vulkan
 #include <vulkan/vulkan.h>
+// Standard Library
+#include <vector>
 
 
 //======================================================================================================================
