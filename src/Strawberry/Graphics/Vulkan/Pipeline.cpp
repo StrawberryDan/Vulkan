@@ -349,15 +349,19 @@ namespace Strawberry::Graphics::Vulkan
 
 
 		// Create Descriptor Sets
-		VkDescriptorSetAllocateInfo descriptorSetAllocateInfo {
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-			.pNext = nullptr,
-			.descriptorPool = pipeline.mDescriptorPool,
-			.descriptorSetCount = static_cast<uint32_t>(mDescriptorSetLayouts.size()),
-			.pSetLayouts = mDescriptorSetLayouts.data(),
-		};
-		pipeline.mDescriptorSets = std::vector<VkDescriptorSet>(mDescriptorSetLayouts.size(), nullptr);
-		Core::AssertEQ(vkAllocateDescriptorSets(mRenderPass->mDevice->mDevice, &descriptorSetAllocateInfo, pipeline.mDescriptorSets.data()), VK_SUCCESS);
+		if (!mDescriptorSetLayouts.empty())
+		{
+			VkDescriptorSetAllocateInfo descriptorSetAllocateInfo {
+				.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+				.pNext = nullptr,
+				.descriptorPool = pipeline.mDescriptorPool,
+				.descriptorSetCount = static_cast<uint32_t>(mDescriptorSetLayouts.size()),
+				.pSetLayouts = mDescriptorSetLayouts.data(),
+			};
+			pipeline.mDescriptorSets = std::vector<VkDescriptorSet>(mDescriptorSetLayouts.size(), nullptr);
+			Core::AssertEQ(vkAllocateDescriptorSets(mRenderPass->mDevice->mDevice, &descriptorSetAllocateInfo,
+													pipeline.mDescriptorSets.data()), VK_SUCCESS);
+		}
 
 
 		// Create the Pipeline
