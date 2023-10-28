@@ -16,24 +16,19 @@
 namespace Strawberry::Graphics::Vulkan
 {
 	Queue::Queue(const Device& device)
-		: mDevice(device.mDevice)
+		: mFamilyIndex(device.mQueueFamilyIndex)
+		, mDevice(device)
+		, mSubmissionFence(device)
+
 	{
-		vkGetDeviceQueue(mDevice, device.mQueueFamilyIndex, 0, &mQueue);
-
-
-		VkFenceCreateInfo fenceCreateInfo {
-			.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = 0
-		};
-		Core::AssertEQ(vkCreateFence(mDevice, &fenceCreateInfo, nullptr, &mSubmissionFence), VK_SUCCESS);
+		vkGetDeviceQueue(mDevice->mDevice, mFamilyIndex, 0, &mQueue);
 	}
 
 
 	Queue::Queue(Queue&& rhs) noexcept
 		: mQueue(std::exchange(rhs.mQueue, nullptr))
-		, mSubmissionFence(std::exchange(rhs.mSubmissionFence, nullptr))
-		, mDevice(std::exchange(rhs.mDevice, nullptr))
+		, mDevice(std::move(rhs.mDevice))
+		, mSubmissionFence(std::move(rhs.mSubmissionFence))
 	{}
 
 
@@ -49,13 +44,7 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
-	Queue::~Queue()
-	{
-		if (mQueue)
-		{
-			vkDestroyFence(mDevice, mSubmissionFence, nullptr);
-		}
-	}
+	Queue::~Queue() = default;
 
 
 	void Queue::Submit(const CommandBuffer& commandBuffer)
@@ -71,9 +60,21 @@ namespace Strawberry::Graphics::Vulkan
 			.signalSemaphoreCount = 0,
 			.pSignalSemaphores = nullptr,
 		};
-		Core::AssertEQ(vkQueueSubmit(mQueue, 1, &submitInfo, mSubmissionFence), VK_SUCCESS);
+		Core::AssertEQ(vkQueueSubmit(mQueue, 1, &submitInfo, mSubmissionFence.mFence), VK_SUCCESS);
 
-		vkWaitForFences(mDevice, 1, &mSubmissionFence, VK_TRUE, std::numeric_limits<uint64_t>::max());
-		vkResetFences(mDevice, 1, &mSubmissionFence);
+		mSubmissionFence.Wait();
+		mSubmissionFence.Reset();
+	}
+
+
+	Core::ReflexivePointer<Device> Queue::GetDevice() const
+	{
+		return mDevice;
+	}
+
+
+	uint32_t Queue::GetFamilyIndex() const
+	{
+		return mFamilyIndex;
 	}
 }

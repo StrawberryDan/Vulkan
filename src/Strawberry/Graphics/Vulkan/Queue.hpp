@@ -4,8 +4,11 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
+#include "Fence.hpp"
 // Vulkan
 #include <vulkan/vulkan.h>
+// Strawberry Core
+#include <Strawberry/Core/Types/ReflexivePointer.hpp>
 
 
 //======================================================================================================================
@@ -18,6 +21,7 @@ namespace Strawberry::Graphics::Vulkan
 
 
 	class Queue
+		: public Core::EnableReflexivePointer<Queue>
 	{
 		friend class Swapchain;
 
@@ -31,12 +35,23 @@ namespace Strawberry::Graphics::Vulkan
 		~Queue();
 
 
+		template <std::movable T, typename... Args>
+		T Create(Args... args) const { return T(*this, std::forward<Args>(args)...); }
+
+
 		void Submit(const CommandBuffer& commandBuffer);
+
+
+		Core::ReflexivePointer<Device> GetDevice() const;
+
+
+		uint32_t GetFamilyIndex() const;
 
 
 	private:
 		VkQueue mQueue;
-		VkFence mSubmissionFence;
-		VkDevice mDevice;
+		uint32_t mFamilyIndex;
+		Core::ReflexivePointer<Device> mDevice;
+		Fence mSubmissionFence;
 	};
 }
