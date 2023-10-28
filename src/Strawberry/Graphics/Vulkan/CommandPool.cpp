@@ -3,6 +3,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 #include "CommandPool.hpp"
 #include "Device.hpp"
+#include "Queue.hpp"
 // Strawberry Core
 #include <Strawberry/Core/Assert.hpp>
 // Standard Library
@@ -14,25 +15,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics::Vulkan
 {
-	CommandPool::CommandPool(const Device& device, bool resetBit)
-		: mDevice(device.mDevice)
-		, mQueueFamilyIndex(device.mQueueFamilyIndex)
+	CommandPool::CommandPool(const Queue& queue, bool resetBit)
+		: mQueue(queue)
 	{
 		VkCommandPoolCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = resetBit ? VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT : VkCommandPoolCreateFlags(0),
-			.queueFamilyIndex = device.mQueueFamilyIndex
 		};
 
-		Core::Assert(vkCreateCommandPool(device.mDevice, &createInfo, nullptr, &mCommandPool) == VK_SUCCESS);
+		Core::Assert(vkCreateCommandPool(mQueue->GetDevice()->mDevice, &createInfo, nullptr, &mCommandPool) == VK_SUCCESS);
 	}
 
 
 	CommandPool::CommandPool(CommandPool&& rhs) noexcept
 		: mCommandPool(std::exchange(rhs.mCommandPool, nullptr))
-		  , mDevice(std::exchange(rhs.mDevice, nullptr))
-		  , mQueueFamilyIndex(std::exchange(rhs.mQueueFamilyIndex, 0))
+		, mQueue(std::move(rhs.mQueue))
 	  {
 
 	  }
@@ -54,7 +52,13 @@ namespace Strawberry::Graphics::Vulkan
 	{
 		if (mCommandPool)
 		{
-			vkDestroyCommandPool(mDevice, mCommandPool, nullptr);
+			vkDestroyCommandPool(mQueue->GetDevice()->mDevice, mCommandPool, nullptr);
 		}
+	}
+
+
+	Core::ReflexivePointer<Queue> CommandPool::GetQueue() const
+	{
+		return mQueue;
 	}
 }

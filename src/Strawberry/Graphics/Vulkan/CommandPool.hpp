@@ -4,6 +4,8 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
+// Strawberry Core
+#include <Strawberry/Core/Types/ReflexivePointer.hpp>
 // Vulkan
 #include <vulkan/vulkan.h>
 // Standard Library
@@ -16,21 +18,25 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics::Vulkan
 {
-	class Device;
+	class Queue;
 
 
 	class CommandPool
+		: public Core::EnableReflexivePointer<CommandPool>
 	{
 		friend class CommandBuffer;
 
 
 	public:
-		explicit CommandPool(const Device& device, bool resetBit);
+		CommandPool(const Queue& queue, bool resetBit);
 		CommandPool(const CommandPool& rhs) = delete;
 		CommandPool& operator=(const CommandPool& rhs) = delete;
 		CommandPool(CommandPool&& rhs) noexcept ;
 		CommandPool& operator=(CommandPool&& rhs);
 		~CommandPool();
+
+
+		Core::ReflexivePointer<Queue> GetQueue() const;
 
 
 		template<std::movable T, typename... Args>
@@ -40,7 +46,6 @@ namespace Strawberry::Graphics::Vulkan
 
 	private:
 		VkCommandPool mCommandPool;
-		VkDevice mDevice;
-		uint32_t mQueueFamilyIndex;
+		Core::ReflexivePointer<Queue> mQueue;
 	};
 }
