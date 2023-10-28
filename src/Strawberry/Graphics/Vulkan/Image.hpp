@@ -65,6 +65,9 @@ namespace Strawberry::Graphics::Vulkan
 		T Create(Args... args) const { return T(*this, std::forward<Args>(args)...); }
 
 
+		Core::Math::Vec3i GetSize() const;
+
+
 	private:
 		VkImage mImage;
 		DeviceMemory mMemory;

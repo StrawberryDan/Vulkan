@@ -143,4 +143,10 @@ namespace Strawberry::Graphics::Vulkan
 			vkDestroyImage(mDevice, mImage, nullptr);
 		}
 	}
+
+
+	Core::Math::Vec3i Image::GetSize() const
+	{
+		return mSize;
+	}
 }
