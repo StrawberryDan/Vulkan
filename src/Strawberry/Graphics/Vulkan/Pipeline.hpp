@@ -183,7 +183,7 @@ namespace Strawberry::Graphics::Vulkan
 
 		std::map<VkShaderStageFlagBits, ShaderModule> mStages;
 
-		Core::Optional<VertexInputDescription> mVertexInputDescription;
+		VertexInputDescription mVertexInputDescription;
 
 		Core::Optional<VkPrimitiveTopology> mPrimitiveTopology;
 

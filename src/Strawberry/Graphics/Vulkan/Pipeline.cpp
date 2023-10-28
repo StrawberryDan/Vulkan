@@ -184,8 +184,8 @@ namespace Strawberry::Graphics::Vulkan
 
 
 		// Get Vertex Input State Info
-		auto bindings = mVertexInputDescription->GetBindingDescriptions();
-		auto attributes = mVertexInputDescription->GetAttributeDescriptions();
+		auto bindings = mVertexInputDescription.GetBindingDescriptions();
+		auto attributes = mVertexInputDescription.GetAttributeDescriptions();
 		VkPipelineVertexInputStateCreateInfo vertexInputState {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
 			.pNext = nullptr,
