@@ -75,6 +75,8 @@ target_include_directories(StrawberryGraphics PUBLIC src)
 target_compile_definitions(StrawberryGraphics PUBLIC GLFW_INCLUDE_VULKAN)
 set_target_properties(StrawberryGraphics PROPERTIES CXX_STANDARD 20)
 add_dependencies(StrawberryGraphics Shaders)
+add_target_shader(StrawberryGraphics src/Strawberry/Graphics/2D/Sprite.vert src/Strawberry/Graphics/2D/Sprite.vert.bin)
+add_target_shader(StrawberryGraphics src/Strawberry/Graphics/2D/Sprite.frag src/Strawberry/Graphics/2D/Sprite.frag.bin)
 
 
 add_executable(StrawberryGraphics_Test test/Main.cpp)
