@@ -49,14 +49,14 @@ namespace Strawberry::Graphics::Vulkan
 		// Get Device Properties
 		std::vector<VkPhysicalDeviceProperties> properties;
 		std::transform(physicalDevices.begin(), physicalDevices.end(), std::back_inserter(properties),
-					   [](auto x)
-					   {
-						   VkPhysicalDeviceProperties properties;
-						   vkGetPhysicalDeviceProperties(x, &properties);
-						   return properties;
-					   });
+			[](auto x)
+			{
+			   VkPhysicalDeviceProperties properties;
+			   vkGetPhysicalDeviceProperties(x, &properties);
+			   return properties;
+			});
 
-		// Get Queue Family Properties
+		// Get Queue Family Properties Function
 		auto getQueueFamilyProperties = [](VkPhysicalDevice device)
 		{
 			uint32_t count = 0;
@@ -65,35 +65,39 @@ namespace Strawberry::Graphics::Vulkan
 			vkGetPhysicalDeviceQueueFamilyProperties(device, &count, familyProperties.data());
 			return familyProperties;
 		};
+
+		// Get the queue family properties of each physical device.
 		std::vector<std::vector<VkQueueFamilyProperties>> queueFamilyProperties;
 		std::transform(physicalDevices.begin(), physicalDevices.end(), std::back_inserter(queueFamilyProperties),
 					   getQueueFamilyProperties);
 
+		// Create a set of candidates, indexes into the physicalDevices list
 		std::vector<uint32_t> candidates(physicalDevices.size(), 0);
 		std::iota(candidates.begin(), candidates.end(), 0);
 
+
+		// Get an applicable queue family from each device
 		std::vector<Core::Optional<uint32_t>> selectedQueueFamily;
 		std::transform(candidates.begin(), candidates.end(), std::back_inserter(selectedQueueFamily),
-					   [&](uint32_t x)
-					   { return SelectQueueFamily(queueFamilyProperties[x]); });
-		std::erase_if(candidates, [&](uint32_t x)
-		{ return !selectedQueueFamily[x].HasValue(); });
+			[&](uint32_t x) { return SelectQueueFamily(queueFamilyProperties[x]); });
+		// Erase candidates with no eligible queue families
+		std::erase_if(candidates, [&](uint32_t x) { return !selectedQueueFamily[x].HasValue(); });
 		if (candidates.empty()) return {};
 
+		// Device Scoring Function
 		auto score = [&](uint32_t x)
 		{
 			uint32_t score = 0;
-
 			if (properties[x].deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) score += 1000;
-
 			return score;
 		};
 
+		// Device sorting function. Best device comes first
 		auto sort = [&](uint32_t a, uint32_t b)
 		{
 			return score(a) > score(b);
 		};
-
+		// Sort Devices by score
 		std::sort(candidates.begin(), candidates.end(), sort);
 
 		return std::make_tuple(physicalDevices[candidates[0]], selectedQueueFamily[candidates[0]].Value(), uint32_t(1));
@@ -183,9 +187,7 @@ namespace Strawberry::Graphics::Vulkan
 			: mPhysicalDevice(std::exchange(rhs.mPhysicalDevice, nullptr)),
 			  mDevice(std::exchange(rhs.mDevice, nullptr)),
 			  mInstance(std::exchange(rhs.mInstance, nullptr))
-			  , mQueueFamilyIndex(std::exchange(rhs.mQueueFamilyIndex, 0))
-	{
-	}
+	{}
 
 
 	Device& Device::operator=(Device&& rhs) noexcept
