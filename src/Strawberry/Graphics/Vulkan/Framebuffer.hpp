@@ -26,6 +26,7 @@ namespace Strawberry::Graphics::Vulkan
 
 
 	class Framebuffer
+		: public Core::EnableReflexivePointer<Framebuffer>
 	{
 		friend class CommandBuffer;
 
@@ -37,6 +38,9 @@ namespace Strawberry::Graphics::Vulkan
 		Framebuffer(Framebuffer&& rhs) noexcept;
 		Framebuffer& operator=(Framebuffer&& rhs) noexcept;
 		~Framebuffer();
+
+
+		Core::ReflexivePointer<RenderPass> GetRenderPass() const;
 
 
 		uint32_t GetColorAttachmentCount() const;

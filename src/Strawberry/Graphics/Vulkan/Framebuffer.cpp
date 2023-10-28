@@ -95,6 +95,12 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
+	Core::ReflexivePointer<RenderPass> Framebuffer::GetRenderPass() const
+	{
+		return mRenderPass;
+	}
+
+
 	uint32_t Framebuffer::GetColorAttachmentCount() const
 	{
 		return mColorAttachments.size();
