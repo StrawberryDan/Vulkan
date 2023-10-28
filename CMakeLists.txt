@@ -3,6 +3,9 @@ project(StrawberryGraphics)
 include(FetchContent)
 
 
+include(share/Shaders.cmake)
+
+
 find_package(Vulkan REQUIRED)
 
 
