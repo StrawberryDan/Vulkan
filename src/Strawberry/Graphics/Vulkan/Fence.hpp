@@ -20,6 +20,7 @@ namespace Strawberry::Graphics::Vulkan
 	{
 		friend class Swapchain;
 		friend class CommandBuffer;
+		friend class Queue;
 
 
 	public:
