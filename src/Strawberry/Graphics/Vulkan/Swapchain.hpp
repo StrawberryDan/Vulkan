@@ -4,6 +4,7 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
+#include "CommandPool.hpp"
 #include "Fence.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Math/Vector.hpp"
@@ -36,7 +37,7 @@ namespace Strawberry::Graphics::Vulkan
 
 
 	public:
-		explicit Swapchain(const Device& device, const Surface& surface, Core::Math::Vec2i extents);
+		explicit Swapchain(const Queue& queue, const Surface& surface, Core::Math::Vec2i extents);
 		Swapchain(const Swapchain& rhs) = delete;
 		Swapchain& operator=(const Swapchain& rhs) = delete;
 		Swapchain(Swapchain&& rhs) noexcept;
@@ -52,7 +53,7 @@ namespace Strawberry::Graphics::Vulkan
 		VkImage GetNextImage();
 
 
-		void Present(const Queue& queue);
+		void Present(Framebuffer& framebuffer);
 
 
 	protected:
@@ -63,10 +64,12 @@ namespace Strawberry::Graphics::Vulkan
 	private:
 		VkSwapchainKHR mSwapchain;
 
+		Core::ReflexivePointer<Queue> mQueue;
+
+		CommandPool mCommandPool;
+
 		Core::Math::Vec2i mSize;
 		VkSurfaceFormatKHR mFormat;
-
-		Core::ReflexivePointer<Device> mDevice;
 
 		Fence mNextImageFence;
 

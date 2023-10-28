@@ -5,7 +5,10 @@
 #include "Strawberry/Graphics/Window.hpp"
 #include "Device.hpp"
 #include "Queue.hpp"
+#include "CommandBuffer.hpp"
+#include "Framebuffer.hpp"
 // Standard Library
+#include <algorithm>
 #include <memory>
 
 //======================================================================================================================
@@ -13,17 +16,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics::Vulkan
 {
-	Swapchain::Swapchain(const Device& device, const Surface& surface, Core::Math::Vec2i extents)
-		: mDevice(device)
-		  , mSize(extents)
-		  , mNextImageFence(device.Create<Fence>())
-		  , mNextImageIndex([this]() { return CalculateNextImageIndex(); })
-		  , mNextImage([this]() { return CalculateNextImage(); })
+	Swapchain::Swapchain(const Queue& queue, const Surface& surface, Core::Math::Vec2i extents)
+		: mQueue(queue)
+		, mCommandPool(mQueue->Create<CommandPool>(false))
+		, mSize(extents)
+		, mNextImageFence(queue.GetDevice()->Create<Fence>())
+		, mNextImageIndex([this]() { return CalculateNextImageIndex(); })
+		, mNextImage([this]() { return CalculateNextImage(); })
 	{
 		uint32_t formatCount = 0;
-		vkGetPhysicalDeviceSurfaceFormatsKHR(device.mPhysicalDevice, surface.mSurface, &formatCount, nullptr);
+		vkGetPhysicalDeviceSurfaceFormatsKHR(mQueue->GetDevice()->mPhysicalDevice, surface.mSurface, &formatCount, nullptr);
 		std::vector<VkSurfaceFormatKHR> deviceFormats(formatCount);;
-		vkGetPhysicalDeviceSurfaceFormatsKHR(device.mPhysicalDevice, surface.mSurface, &formatCount,
+		vkGetPhysicalDeviceSurfaceFormatsKHR(mQueue->GetDevice()->mPhysicalDevice, surface.mSurface, &formatCount,
 											 deviceFormats.data());
 
 		std::erase_if(deviceFormats, [&](const VkSurfaceFormatKHR& x) -> bool
@@ -60,13 +64,14 @@ namespace Strawberry::Graphics::Vulkan
 				.oldSwapchain = VK_NULL_HANDLE,
 			};
 
-		Core::AssertEQ(vkCreateSwapchainKHR(mDevice->mDevice, &createInfo, nullptr, &mSwapchain), VK_SUCCESS);
+		Core::AssertEQ(vkCreateSwapchainKHR(queue.GetDevice()->mDevice, &createInfo, nullptr, &mSwapchain), VK_SUCCESS);
 	}
 
 
 	Swapchain::Swapchain(Swapchain&& rhs) noexcept
 		: mSwapchain(std::exchange(rhs.mSwapchain, nullptr))
-		  , mDevice(std::move(rhs.mDevice))
+		  , mQueue(std::move(rhs.mQueue))
+		  , mCommandPool(std::move(rhs.mCommandPool))
 		  , mNextImageFence(std::move(rhs.mNextImageFence))
 		  , mSize(std::exchange(rhs.mSize, {}))
 		  , mFormat(std::exchange(rhs.mFormat, VkSurfaceFormatKHR {}))
@@ -90,7 +95,7 @@ namespace Strawberry::Graphics::Vulkan
 	{
 		if (mSwapchain)
 		{
-			vkDestroySwapchainKHR(mDevice->mDevice, mSwapchain, nullptr);
+			vkDestroySwapchainKHR(mQueue->GetDevice()->mDevice, mSwapchain, nullptr);
 		}
 	}
 
@@ -119,8 +124,21 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
-	void Swapchain::Present(const Queue& queue)
+	void Swapchain::Present(Framebuffer& framebuffer)
 	{
+		CommandBuffer buffer = mCommandPool.Create<CommandBuffer>();
+		buffer.Begin(true);
+
+		for (int i = 0; i < framebuffer.GetColorAttachmentCount(); i++)
+		{
+			buffer.CopyImageToSwapchain(framebuffer.GetColorAttachment(i), *this);
+		}
+
+		buffer.ImageMemoryBarrier(GetNextImage(), VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+		buffer.End();
+		mQueue->Submit(buffer);
+
+
 		VkResult result;
 		uint32_t imageIndex = GetNextImageIndex();
 		VkPresentInfoKHR presentInfo {
@@ -135,15 +153,15 @@ namespace Strawberry::Graphics::Vulkan
 		};
 
 
-		switch (vkQueuePresentKHR(queue.mQueue, &presentInfo))
+		switch (vkQueuePresentKHR(mQueue->mQueue, &presentInfo))
 		{
 			{
 				case VK_SUCCESS:
 				case VK_SUBOPTIMAL_KHR:
 					Core::Assert(result == VK_SUCCESS || result == VK_SUBOPTIMAL_KHR);
-				mNextImageIndex.Invalidate();
-				mNextImage.Invalidate();
-				break;
+					mNextImageIndex.Invalidate();
+					mNextImage.Invalidate();
+					break;
 				default:
 					Core::Unreachable();
 			}
@@ -153,9 +171,9 @@ namespace Strawberry::Graphics::Vulkan
 
 	uint32_t Swapchain::CalculateNextImageIndex()
 	{
-		Fence nextImageFence = mDevice->Create<Fence>();
+		Fence nextImageFence = mQueue->GetDevice()->Create<Fence>();
 		uint32_t imageIndex;
-		switch (vkAcquireNextImageKHR(mDevice->mDevice, mSwapchain, UINT64_MAX, VK_NULL_HANDLE, nextImageFence.mFence,
+		switch (vkAcquireNextImageKHR(mQueue->GetDevice()->mDevice, mSwapchain, UINT64_MAX, VK_NULL_HANDLE, nextImageFence.mFence,
 									  &imageIndex))
 		{
 			case VK_SUCCESS:
@@ -172,9 +190,9 @@ namespace Strawberry::Graphics::Vulkan
 	VkImage Swapchain::CalculateNextImage()
 	{
 		uint32_t imageCount;
-		Core::AssertEQ(vkGetSwapchainImagesKHR(mDevice->mDevice, mSwapchain, &imageCount, nullptr), VK_SUCCESS);
+		Core::AssertEQ(vkGetSwapchainImagesKHR(mQueue->GetDevice()->mDevice, mSwapchain, &imageCount, nullptr), VK_SUCCESS);
 		std::vector<VkImage> images(imageCount);
-		Core::AssertEQ(vkGetSwapchainImagesKHR(mDevice->mDevice, mSwapchain, &imageCount, images.data()), VK_SUCCESS);
+		Core::AssertEQ(vkGetSwapchainImagesKHR(mQueue->GetDevice()->mDevice, mSwapchain, &imageCount, images.data()), VK_SUCCESS);
 		return images[GetNextImageIndex()];
 	}
 }
