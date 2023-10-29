@@ -141,7 +141,7 @@ namespace Strawberry::Graphics::Vulkan
 		// Handle to pipeline layout
 		VkPipelineLayout mPipelineLayout = nullptr;
 		// The size of the viewport to render to
-		Core::Math::Vec2i mViewportSize;
+		VkViewport mViewport;
 		// Our descriptor sets
 		std::vector<VkDescriptorSet> mDescriptorSets;
 		// Our descriptor set layouts
@@ -166,7 +166,10 @@ namespace Strawberry::Graphics::Vulkan
 		Builder& WithPrimitiveTopology(VkPrimitiveTopology topology);
 
 
-		Builder& WithViewportSize(Core::Math::Vec2i size);
+		Pipeline::Builder& WithViewport(Core::Math::Vec2f offset, Core::Math::Vec2f size);
+
+
+		Builder& WithCullMode(VkCullModeFlags cullModeFlags);
 
 
 		Builder& WithPushConstantRange(VkShaderStageFlags stage, uint32_t size, uint32_t offset);
@@ -187,13 +190,13 @@ namespace Strawberry::Graphics::Vulkan
 
 		Core::Optional<VkPrimitiveTopology> mPrimitiveTopology;
 
-		Core::Optional<Core::Math::Vec2i> mViewportSize;
+		Core::Optional<VkViewport> mViewport;
 
 		VkBool32 mDepthClampEnabled = VK_FALSE;
 
 		VkPolygonMode mPolygonMode = VK_POLYGON_MODE_FILL;
 
-		VkCullModeFlagBits mCullingMode = VK_CULL_MODE_BACK_BIT;
+		VkCullModeFlags mCullingMode = VK_CULL_MODE_NONE;
 
 		VkFrontFace mFrontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 

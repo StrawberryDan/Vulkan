@@ -24,7 +24,7 @@ namespace Strawberry::Graphics::Vulkan
 		: mPipeline(std::exchange(rhs.mPipeline, nullptr))
 		  , mRenderPass(std::move(rhs.mRenderPass))
 		  , mPipelineLayout(std::exchange(rhs.mPipelineLayout, nullptr))
-		  , mViewportSize(std::exchange(rhs.mViewportSize, {}))
+		  , mViewport(std::exchange(rhs.mViewport, {}))
 		  , mDescriptorSets(std::move(rhs.mDescriptorSets))
 		  , mDescriptorSetLayouts(std::move(rhs.mDescriptorSetLayouts))
 		  , mDescriptorPool(std::exchange(rhs.mDescriptorPool, nullptr))
@@ -89,9 +89,22 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
-	Pipeline::Builder& Pipeline::Builder::WithViewportSize(Core::Math::Vec2i size)
+	Pipeline::Builder& Pipeline::Builder::WithViewport(Core::Math::Vec2f offset, Core::Math::Vec2f size)
 	{
-		mViewportSize = size;
+		mViewport = VkViewport {
+			.x = offset[0],
+			.y = offset[1],
+			.width = size[0],
+			.height = size[1],
+			.maxDepth = 1.0,
+		};
+		return *this;
+	}
+
+
+	Pipeline::Builder& Pipeline::Builder::WithCullMode(VkCullModeFlags cullModeFlags)
+	{
+		mCullingMode = cullModeFlags;
 		return *this;
 	}
 
@@ -163,7 +176,7 @@ namespace Strawberry::Graphics::Vulkan
 	{
 		Pipeline pipeline;
 		pipeline.mRenderPass = mRenderPass;
-		pipeline.mViewportSize = mViewportSize.Value();
+		pipeline.mViewport = mViewport.Value();
 		pipeline.mDescriptorSetLayouts = mDescriptorSetLayouts;
 
 
@@ -217,23 +230,17 @@ namespace Strawberry::Graphics::Vulkan
 
 
 		// Viewport State
-		VkViewport viewPort {
-			.x = 0.0, .y = 0.0,
-			.width = static_cast<float>(mViewportSize.Value()[0]), .height = static_cast<float>(mViewportSize.Value()[1]),
-			.minDepth = 0.0,
-			.maxDepth = 1.0,
-		};
 		VkRect2D scissorRegion {
 			.offset = {0, 0},
-			.extent = {static_cast<uint32_t>(mViewportSize.Value()[0]),
-					   static_cast<uint32_t>(mViewportSize.Value()[1])},
+			.extent = {static_cast<uint32_t>(std::ceilf(mViewport->width)),
+					   static_cast<uint32_t>(std::ceilf(mViewport->height))},
 		};
 		VkPipelineViewportStateCreateInfo viewPortState {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
 			.viewportCount = 1,
-			.pViewports = &viewPort,
+			.pViewports = mViewport.AsPtr().Unwrap(),
 			.scissorCount = 1,
 			.pScissors = &scissorRegion,
 		};
