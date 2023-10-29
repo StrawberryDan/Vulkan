@@ -5,6 +5,7 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 #include "ShaderModule.hpp"
+#include "Strawberry/Graphics/Vulkan/Buffer.hpp"
 // Vulkan
 #include <vulkan/vulkan.h>
 // Strawberry Core
@@ -123,6 +124,10 @@ namespace Strawberry::Graphics::Vulkan
 
 		template <std::movable T, typename... Args>
 		T Create(Args... args) const { return T(*this, std::forward<Args>(args)...); }
+
+
+		void SetUniformBuffer(const Vulkan::Buffer& buffer, uint32_t set, uint32_t binding,
+							  uint32_t arrayElement = 0);
 
 
 		void SetUniformTexture(const Sampler& sampler, const ImageView& image, VkImageLayout layout, uint32_t set, uint32_t binding, uint32_t arrayElement = 0);

@@ -148,6 +148,29 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
+	void Pipeline::SetUniformBuffer(const Vulkan::Buffer& buffer, uint32_t set, uint32_t binding, uint32_t arrayElement)
+	{
+		VkDescriptorBufferInfo bufferInfo {
+			.buffer = buffer.mBuffer,
+			.offset = 0,
+			.range = buffer.GetSize()
+		};
+		VkWriteDescriptorSet write {
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.pNext = nullptr,
+			.dstSet = mDescriptorSets[set],
+			.dstBinding = binding,
+			.dstArrayElement = arrayElement,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.pImageInfo = nullptr,
+			.pBufferInfo = &bufferInfo,
+			.pTexelBufferView = nullptr,
+		};
+		vkUpdateDescriptorSets(mRenderPass->mDevice->mDevice, 1, &write, 0, nullptr);
+	}
+
+
 	void Pipeline::SetUniformTexture(const Sampler& sampler, const ImageView& image, VkImageLayout layout, uint32_t set, uint32_t binding,
 									 uint32_t arrayElement)
 	{
