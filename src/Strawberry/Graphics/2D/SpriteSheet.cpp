@@ -17,7 +17,7 @@ namespace Strawberry::Graphics
 	Core::Optional<SpriteSheet>
 	SpriteSheet::FromFile(Vulkan::Device& device,
 						  Vulkan::Queue& queue,
-						  Core::Math::Vec2i spriteSize,
+						  Core::Math::Vec2u spriteCount,
 						  const std::filesystem::path& filepath)
 	{
 		// Read file
@@ -46,11 +46,11 @@ namespace Strawberry::Graphics
 
 
 		// Return sprite sheet
-		return SpriteSheet(queue, std::move(image), spriteSize);
+		return SpriteSheet(queue, std::move(image), spriteCount);
 	}
 
 
-	SpriteSheet::SpriteSheet(const Vulkan::Queue& queue, Vulkan::Image image, Core::Math::Vec2i spriteSize)
+	SpriteSheet::SpriteSheet(const Vulkan::Queue& queue, Vulkan::Image image, Core::Math::Vec2u spriteCount)
 		 : mDevice(queue.GetDevice())
 		 , mQueue(queue)
 		 , mCommandPool(mQueue->Create<Vulkan::CommandPool>(false))
@@ -59,7 +59,25 @@ namespace Strawberry::Graphics
 		     .WithFormat(VK_FORMAT_R8G8B8A8_SRGB)
 			 .WithType(VK_IMAGE_VIEW_TYPE_2D)
 		     .Build())
-		 , mSpriteSize(std::move(spriteSize))
+		 , mSpriteCount(spriteCount)
 
 	{}
+
+
+	Core::Math::Vec2u SpriteSheet::GetSize() const
+	{
+		return mImage.GetSize().AsType<unsigned int>().AsSize<2>();
+	}
+
+
+	Core::Math::Vec2u SpriteSheet::GetSpriteCount() const
+	{
+		return mSpriteCount;
+	}
+
+
+	Core::Math::Vec2u SpriteSheet::GetSpriteSize() const
+	{
+		return {mImage.GetSize()[0] / mSpriteCount[0], mImage.GetSize()[1] / mSpriteCount[1]};
+	}
 }

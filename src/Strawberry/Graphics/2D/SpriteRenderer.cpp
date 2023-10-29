@@ -56,7 +56,7 @@ namespace Strawberry::Graphics
 	{
 		Core::Math::Mat4f cameraMatrix = Core::Math::Translate<float>(-1.0, -1.0, 0.0) * Core::Math::Scale<float>(2.0 / mViewportSize[0], 2.0 / mViewportSize[1], 1.0);
 		mCameraBuffer.SetData(Core::IO::DynamicByteBuffer(cameraMatrix));
-		Core::Math::Vec2f spriteSize = sprite.mSpriteSheet->mSpriteSize.AsType<float>();
+		Core::Math::Vec2f spriteSize = sprite.mSpriteSheet->GetSpriteSize().AsType<float>();
 		mSpriteSheetBuffer.SetData(Core::IO::DynamicByteBuffer(spriteSize));
 		mPipeline.SetUniformBuffer(mCameraBuffer, 0, 0);
 		mPipeline.SetUniformBuffer(mSpriteSheetBuffer, 0, 1);

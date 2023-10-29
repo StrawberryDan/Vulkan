@@ -28,12 +28,19 @@ namespace Strawberry::Graphics
 
 	public:
 		static Core::Optional<SpriteSheet>
-		FromFile(Vulkan::Device& device, Vulkan::Queue& queue, Core::Math::Vec2i spriteSize,
+		FromFile(Vulkan::Device& device, Vulkan::Queue& queue, Core::Math::Vec2u spriteCount,
 				 const std::filesystem::path& filepath);
 
 
 	public:
-		SpriteSheet(const Vulkan::Queue& queue, Vulkan::Image image, Core::Math::Vec2i spriteSize);
+		SpriteSheet(const Vulkan::Queue& queue, Vulkan::Image image, Core::Math::Vec2u spriteCount);
+
+
+		Core::Math::Vec2u GetSize() const;
+
+		Core::Math::Vec2u GetSpriteCount() const;
+
+		Core::Math::Vec2u GetSpriteSize() const;
 
 
 		template <std::movable T, typename... Args>
@@ -48,6 +55,6 @@ namespace Strawberry::Graphics
 
 		Vulkan::Image mImage;
 		Vulkan::ImageView mImageView;
-		Core::Math::Vec2i mSpriteSize;
+		Core::Math::Vec2u mSpriteCount;
 	};
 }

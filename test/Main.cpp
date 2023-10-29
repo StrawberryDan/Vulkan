@@ -152,18 +152,23 @@ void SpriteRendering()
 	Queue queue = device.Create<Queue>();
 	Swapchain swapchain = queue.Create<Swapchain, const Surface&>(surface, window.GetSize());
 
-	Framebuffer framebuffer = renderPass.Create<Framebuffer>(Core::Math::Vec2i(1920, 1080));
+	Framebuffer framebuffer = renderPass.Create<Framebuffer>(Core::Math::Vec2i(1920 / 16, 1080 / 16));
 
 	SpriteRenderer renderer(queue, {1920, 1080});
-	SpriteSheet spriteSheet = SpriteSheet::FromFile(device, queue, {500, 500}, "data/dio.png").Unwrap();
+	SpriteSheet spriteSheet = SpriteSheet::FromFile(device, queue, {4, 4}, "data/dio.png").Unwrap();
 	Sprite sprite = spriteSheet.Create<Sprite>();
-	sprite.SetSpriteCoords({1, 1});
-	sprite.GetTransform().SetSize({1920 - 100, 1080 - 100});
-	sprite.GetTransform().SetPosition({100, 100});
+	sprite.GetTransform().SetSize(framebuffer.GetColorAttachment(0).GetSize().AsType<float>().AsSize<2>());
 
 	while (!window.CloseRequested())
 	{
 		Window::PollInput();
+		while (auto event = window.NextEvent())
+		{
+			if (event->IsType<Window::Events::Key>() && event->Value<Window::Events::Key>()->action == Input::KeyAction::Release)
+			{
+				sprite.SetSpriteIndex(sprite.GetSpriteIndex() + 1);
+			}
+		}
 
 		renderer.Draw(framebuffer, sprite);
 

@@ -49,4 +49,20 @@ namespace Strawberry::Graphics
 	{
 		return mSpriteSheet;
 	}
+
+
+	uint32_t Sprite::GetSpriteIndex() const
+	{
+		return mSpriteCoords[0] + mSpriteSheet->GetSpriteCount()[0] * mSpriteCoords[1];
+	}
+
+
+	void Sprite::SetSpriteIndex(uint32_t index)
+	{
+		index = index % (mSpriteSheet->GetSpriteCount()[0] * mSpriteSheet->GetSpriteCount()[1]);
+		mSpriteCoords = {
+			index % mSpriteSheet->GetSpriteCount()[0],
+			index / mSpriteSheet->GetSpriteCount()[1]
+		};
+	}
 }
