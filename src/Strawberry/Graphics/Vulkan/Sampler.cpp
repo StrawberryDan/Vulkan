@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics::Vulkan
 {
-	Sampler::Sampler(const Device& device, VkFilter magFilter, VkFilter minFilter)
+	Sampler::Sampler(const Device& device, VkFilter magFilter, VkFilter minFilter, bool normaliseCoords)
 		: mDevice(device)
 	{
 		VkSamplerCreateInfo createInfo {
@@ -24,9 +24,9 @@ namespace Strawberry::Graphics::Vulkan
 			.magFilter = magFilter,
 			.minFilter = minFilter,
 			.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST,
-			.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT,
-			.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT,
-			.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+			.addressModeU = normaliseCoords ? VK_SAMPLER_ADDRESS_MODE_REPEAT : VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER,
+			.addressModeV = normaliseCoords ? VK_SAMPLER_ADDRESS_MODE_REPEAT : VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER,
+			.addressModeW = normaliseCoords ? VK_SAMPLER_ADDRESS_MODE_REPEAT : VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER,
 			.mipLodBias = 0.0,
 			.anisotropyEnable = VK_FALSE,
 			.maxAnisotropy = 0.0,
@@ -35,7 +35,7 @@ namespace Strawberry::Graphics::Vulkan
 			.minLod = 0.0,
 			.maxLod = 0.0,
 			.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_BLACK,
-			.unnormalizedCoordinates = VK_FALSE,
+			.unnormalizedCoordinates = normaliseCoords ? VK_FALSE : VK_TRUE,
 		};
 		Core::AssertEQ(vkCreateSampler(mDevice->mDevice, &createInfo, nullptr, &mSampler), VK_SUCCESS);
 	}
