@@ -1,5 +1,15 @@
 #version 460
 
+layout (set=0, binding=0) uniform CameraBuffer
+{
+    mat4 viewMatrix;
+};
+
+layout (push_constant) uniform Contants
+{
+    mat4 modelMatrix;
+};
+
 vec2 positions[] = {
     vec2(0.0, 0.0),
     vec2(1.0, 0.0),
@@ -11,5 +21,5 @@ vec2 positions[] = {
 };
 
 void main() {
-    gl_Position = vec4(positions[gl_VertexIndex].x, -positions[gl_VertexIndex].y, 0.0, 1.0);
+    gl_Position = viewMatrix * modelMatrix * vec4(positions[gl_VertexIndex].xy, 0.0, 1.0);
 }
