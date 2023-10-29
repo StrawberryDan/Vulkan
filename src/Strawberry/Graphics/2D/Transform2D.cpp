@@ -11,6 +11,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics
 {
+	const Core::Math::Vec2f& Transform2D::GetPosition() const
+	{
+		return mPosition;
+	}
+
+
+	const Core::Math::Vec2f& Transform2D::GetSize() const
+	{
+		return mSize;
+	}
+
+
+	void Transform2D::SetPosition(const Core::Math::Vec2f position)
+	{
+		mPosition = position;
+	}
+
+
 	void Transform2D::SetSize(const Core::Math::Vec2f& size)
 	{
 		mSize = size;
