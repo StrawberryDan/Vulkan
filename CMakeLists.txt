@@ -69,6 +69,14 @@ add_library(StrawberryGraphics
 		src/Strawberry/Graphics/Vulkan/Sampler.hpp
 		src/Strawberry/Graphics/Vulkan/RenderPass.cpp
 		src/Strawberry/Graphics/Vulkan/RenderPass.hpp
+		src/Strawberry/Graphics/2D/Sprite.cpp
+		src/Strawberry/Graphics/2D/Sprite.hpp
+		src/Strawberry/Graphics/2D/Transform2D.cpp
+		src/Strawberry/Graphics/2D/Transform2D.hpp
+		src/Strawberry/Graphics/2D/SpriteSheet.cpp
+		src/Strawberry/Graphics/2D/SpriteSheet.hpp
+		src/Strawberry/Graphics/2D/SpriteRenderer.cpp
+		src/Strawberry/Graphics/2D/SpriteRenderer.hpp
 )
 target_link_libraries(StrawberryGraphics PUBLIC StrawberryCore glfw Vulkan::Vulkan)
 target_include_directories(StrawberryGraphics PUBLIC src)
