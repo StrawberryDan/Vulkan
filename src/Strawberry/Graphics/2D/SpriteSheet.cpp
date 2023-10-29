@@ -15,10 +15,10 @@
 namespace Strawberry::Graphics
 {
 	Core::Optional<SpriteSheet>
-	SpriteSheet::LoadFromFile(Vulkan::Device& device,
-							  Vulkan::Queue& queue,
-							  Core::Math::Vec2i spriteSize,
-							  const std::filesystem::path& filepath)
+	SpriteSheet::FromFile(Vulkan::Device& device,
+						  Vulkan::Queue& queue,
+						  Core::Math::Vec2i spriteSize,
+						  const std::filesystem::path& filepath)
 	{
 		// Read file
 		auto fileContents = Core::IO::DynamicByteBuffer::FromImage(filepath);
@@ -32,8 +32,8 @@ namespace Strawberry::Graphics
 		imageBuffer.SetData(bytes);
 
 
-		Vulkan::CommandPool commandPool = queue.Create<Vulkan::CommandPool>(true);
-		Vulkan::CommandBuffer commandBuffer = commandPool.Create<Vulkan::CommandBuffer>();
+		auto commandPool = queue.Create<Vulkan::CommandPool>(true);
+		auto commandBuffer = commandPool.Create<Vulkan::CommandBuffer>();
 
 
 		commandBuffer.Begin(true);

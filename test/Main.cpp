@@ -155,7 +155,7 @@ void SpriteRendering()
 	Framebuffer framebuffer = renderPass.Create<Framebuffer>(Core::Math::Vec2i(1920, 1080));
 
 	SpriteRenderer renderer(queue, {1920, 1080});
-	SpriteSheet spriteSheet = SpriteSheet::LoadFromFile(device, queue, {100, 100}, "data/dio.png").Unwrap();
+	SpriteSheet spriteSheet = SpriteSheet::FromFile(device, queue, {100, 100}, "data/dio.png").Unwrap();
 	Sprite sprite = spriteSheet.Create<Sprite>();
 	sprite.GetTransform().SetSize({1920 - 100, 1080 - 100});
 	sprite.GetTransform().SetPosition({100, 100});
