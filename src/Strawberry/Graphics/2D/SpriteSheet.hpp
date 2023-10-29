@@ -23,6 +23,9 @@ namespace Strawberry::Graphics
 	class SpriteSheet
 			: public Core::EnableReflexivePointer<SpriteSheet>
 	{
+		friend class SpriteRenderer;
+
+
 	public:
 		static Core::Optional<SpriteSheet>
 		LoadFromFile(Vulkan::Device& device, Vulkan::Queue& queue, Core::Math::Vec2i spriteSize,

@@ -21,6 +21,9 @@ namespace Strawberry::Graphics
 
 	class Sprite
 	{
+		friend class SpriteRenderer;
+
+
 	public:
 		Sprite(const SpriteSheet& spriteSheet);
 

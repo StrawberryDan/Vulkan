@@ -6,6 +6,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Strawberry Graphics
 #include "Sprite.hpp"
+#include "Strawberry/Graphics/Vulkan/Sampler.hpp"
 #include "Strawberry/Graphics/Vulkan/CommandBuffer.hpp"
 #include "Strawberry/Graphics/Vulkan/CommandPool.hpp"
 #include "Strawberry/Graphics/Vulkan/Framebuffer.hpp"
@@ -24,12 +25,10 @@ namespace Strawberry::Graphics
 	class SpriteRenderer
 	{
 	public:
-		SpriteRenderer(const Vulkan::Queue& queue, Core::Math::Vec2f viewportSize);
+		SpriteRenderer(const Vulkan::Queue& queue, Core::Math::Vec2f viewportSize, VkFilter minFilter = VK_FILTER_NEAREST, VkFilter magFilter = VK_FILTER_NEAREST);
 
 
-		void BeginRenderPass(Vulkan::Framebuffer& renderPass);
-		void EndRenderPass();
-		void Draw(const Sprite& sprite);
+		void Draw(Vulkan::Framebuffer& framebuffer, const Sprite& sprite);
 
 
 	protected:
@@ -39,14 +38,17 @@ namespace Strawberry::Graphics
 	private:
 		Core::ReflexivePointer<Vulkan::Queue> mQueue;
 		Core::Math::Vec2f mViewportSize;
-		Vulkan::Buffer mCameraBuffer;
+
 
 		Vulkan::RenderPass mRenderPass;
 		Vulkan::Pipeline mPipeline;
 		Vulkan::CommandPool mCommandPool;
+		Vulkan::CommandBuffer mCommandBuffer;
 
-		Core::Optional<Vulkan::CommandBuffer> mRenderPassBuffer;
-		std::set<Core::ReflexivePointer<Sprite>> mSprites;
 
+		Vulkan::Buffer mCameraBuffer;
+		VkFilter mMinFilter;
+		VkFilter mMagFilter;
+		Vulkan::Sampler mSampler;
 	};
 }

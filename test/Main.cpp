@@ -164,9 +164,7 @@ void SpriteRendering()
 	{
 		Window::PollInput();
 
-		renderer.BeginRenderPass(framebuffer);
-		renderer.Draw(sprite);
-		renderer.EndRenderPass();
+		renderer.Draw(framebuffer, sprite);
 
 		swapchain.Present(framebuffer);
 
