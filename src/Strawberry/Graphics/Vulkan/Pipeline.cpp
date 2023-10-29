@@ -369,7 +369,7 @@ namespace Strawberry::Graphics::Vulkan
 			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
-			.maxSets = 1,
+			.maxSets = static_cast<uint32_t>(mDescriptorSetLayouts.size()),
 			.poolSizeCount = static_cast<uint32_t>(mDescriptorPoolSizes.size()),
 			.pPoolSizes = mDescriptorPoolSizes.data(),
 		};
