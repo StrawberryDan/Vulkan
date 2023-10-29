@@ -29,15 +29,17 @@ namespace Strawberry::Graphics
 
 
 		Transform2D& GetTransform();
-		const Transform2D& GetTransform() const;
+		[[nodiscard]] const Transform2D& GetTransform() const;
+		[[nodiscard]] const Core::ReflexivePointer<SpriteSheet>& GetSpriteSheet() const;
 		void SetSpriteSheet(const SpriteSheet& spriteSheet);
-		void SetSpriteSheetIndex(const uint32_t index);
+		[[nodiscard]] const Core::Math::Vec2u& GetSpriteCoords() const;
+		void SetSpriteCoords(const Core::Math::Vec2u& spriteCoords);
 
 
 	private:
 		Core::ReflexivePointer<SpriteSheet> mSpriteSheet;
 
 		Transform2D mTransform;
-		uint32_t mSpriteSheetIndex = 0;
+		Core::Math::Vec2u mSpriteCoords;
 	};
 } // Graphics

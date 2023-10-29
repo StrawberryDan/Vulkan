@@ -33,8 +33,20 @@ namespace Strawberry::Graphics
 	}
 
 
-	void Sprite::SetSpriteSheetIndex(const uint32_t index)
+	const Core::Math::Vec2u& Sprite::GetSpriteCoords() const
 	{
-		mSpriteSheetIndex = index;
+		return mSpriteCoords;
+	}
+
+
+	void Sprite::SetSpriteCoords(const Core::Math::Vec2u& spriteCoords)
+	{
+		mSpriteCoords = spriteCoords;
+	}
+
+
+	const Core::ReflexivePointer<SpriteSheet>& Sprite::GetSpriteSheet() const
+	{
+		return mSpriteSheet;
 	}
 }
