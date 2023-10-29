@@ -5,6 +5,7 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 // Strawberry Graphics
+#include "Sprite.hpp"
 #include "Strawberry/Graphics/Vulkan/CommandBuffer.hpp"
 #include "Strawberry/Graphics/Vulkan/CommandPool.hpp"
 #include "Strawberry/Graphics/Vulkan/Framebuffer.hpp"
@@ -20,9 +21,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics
 {
-	class Sprite;
-
-
 	class SpriteRenderer
 	{
 	public:
@@ -41,6 +39,7 @@ namespace Strawberry::Graphics
 	private:
 		Core::ReflexivePointer<Vulkan::Queue> mQueue;
 		Core::Math::Vec2f mViewportSize;
+		Vulkan::Buffer mCameraBuffer;
 
 		Vulkan::RenderPass mRenderPass;
 		Vulkan::Pipeline mPipeline;
