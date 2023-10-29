@@ -158,6 +158,7 @@ void SpriteRendering()
 	SpriteSheet spriteSheet = SpriteSheet::LoadFromFile(device, queue, {100, 100}, "data/dio.png").Unwrap();
 	Sprite sprite = spriteSheet.Create<Sprite>();
 	sprite.GetTransform().SetSize({1920 - 100, 1080 - 100});
+	sprite.GetTransform().SetPosition({100, 100});
 
 	while (!window.CloseRequested())
 	{
@@ -176,7 +177,7 @@ void SpriteRendering()
 
 int main()
 {
-//	BasicRendering();
+	BasicRendering();
 	SpriteRendering();
 	return 0;
 }
