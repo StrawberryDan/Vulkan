@@ -12,6 +12,7 @@
 #include "Strawberry/Core/Assert.hpp"
 // Standard Library
 #include <bit>
+#include <cmath>
 #include <utility>
 
 
@@ -255,8 +256,8 @@ namespace Strawberry::Graphics::Vulkan
 		// Viewport State
 		VkRect2D scissorRegion {
 			.offset = {0, 0},
-			.extent = {static_cast<uint32_t>(std::ceilf(mViewport->width)),
-					   static_cast<uint32_t>(std::ceilf(mViewport->height))},
+			.extent = {static_cast<uint32_t>(std::ceil(mViewport->width)),
+					   static_cast<uint32_t>(std::ceil(mViewport->height))},
 		};
 		VkPipelineViewportStateCreateInfo viewPortState {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,

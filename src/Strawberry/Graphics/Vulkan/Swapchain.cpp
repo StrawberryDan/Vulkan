@@ -153,7 +153,8 @@ namespace Strawberry::Graphics::Vulkan
 		};
 
 
-		switch (vkQueuePresentKHR(mQueue->mQueue, &presentInfo))
+		result = vkQueuePresentKHR(mQueue->mQueue, &presentInfo);
+		switch (result)
 		{
 			{
 				case VK_SUCCESS:

@@ -112,9 +112,9 @@ void BasicRendering()
 
 
 		Core::Math::Mat4f MVPMatrix;
-		Core::Math::Vec3f Color((std::sinf(*clock) + 1.0f) / 2.0f,
-								(std::cosf(0.25 * *clock) + 1.0f) / 2.0f,
-								(std::cosf(0.5 * *clock) + 1.0f) / 2.0f);
+		Core::Math::Vec3f Color((std::sin(*clock) + 1.0f) / 2.0f,
+								(std::cos(0.25 * *clock) + 1.0f) / 2.0f,
+								(std::cos(0.5 * *clock) + 1.0f) / 2.0f);
 
 
 		pipeline.SetUniformTexture(sampler, textureView, VK_IMAGE_LAYOUT_GENERAL, 0, 0);
@@ -181,7 +181,7 @@ void SpriteRendering()
 
 int main()
 {
-	BasicRendering();
+	// BasicRendering();
 	SpriteRendering();
 	return 0;
 }

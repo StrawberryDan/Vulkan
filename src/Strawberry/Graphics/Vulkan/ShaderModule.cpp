@@ -2,7 +2,7 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 #include "ShaderModule.hpp"
-#include "Device.cpp"
+#include "Device.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
