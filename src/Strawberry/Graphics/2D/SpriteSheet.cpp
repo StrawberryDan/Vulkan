@@ -33,8 +33,7 @@ namespace Strawberry::Graphics
 
 
 		// Create command buffer
-		auto commandPool = queue.Create<Vulkan::CommandPool>(true);
-		auto commandBuffer = commandPool.Create<Vulkan::CommandBuffer>();
+		auto commandBuffer = queue.Create<Vulkan::CommandBuffer>();
 
 
 		// Copy image data

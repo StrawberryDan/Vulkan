@@ -19,9 +19,10 @@ namespace Strawberry::Graphics::Vulkan
 		: mFamilyIndex(device.mQueueFamilyIndex)
 		, mDevice(device)
 		, mSubmissionFence(device)
-
 	{
 		vkGetDeviceQueue(mDevice->mDevice, mFamilyIndex, 0, &mQueue);
+
+		mCommandPool.Construct<const Queue&>(*this, true);
 	}
 
 
@@ -29,7 +30,9 @@ namespace Strawberry::Graphics::Vulkan
 		: mQueue(std::exchange(rhs.mQueue, nullptr))
 		, mDevice(std::move(rhs.mDevice))
 		, mSubmissionFence(std::move(rhs.mSubmissionFence))
-	{}
+	{
+		mCommandPool.Construct(std::move(rhs.mCommandPool.Get()));
+	}
 
 
 	Queue& Queue::operator=(Queue&& rhs)
@@ -44,7 +47,10 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
-	Queue::~Queue() = default;
+	Queue::~Queue()
+	{
+		mCommandPool.Destruct();
+	}
 
 
 	void Queue::Submit(const CommandBuffer& commandBuffer)

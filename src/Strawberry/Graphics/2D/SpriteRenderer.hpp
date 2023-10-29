@@ -42,7 +42,6 @@ namespace Strawberry::Graphics
 
 		Vulkan::RenderPass mRenderPass;
 		Vulkan::Pipeline mPipeline;
-		Vulkan::CommandPool mCommandPool;
 		Vulkan::CommandBuffer mCommandBuffer;
 
 

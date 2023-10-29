@@ -5,10 +5,12 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 #include "Fence.hpp"
+#include "CommandPool.hpp"
 // Vulkan
 #include <vulkan/vulkan.h>
 // Strawberry Core
 #include <Strawberry/Core/Types/ReflexivePointer.hpp>
+#include <Strawberry/Core/Types/Uninitialised.hpp>
 
 
 //======================================================================================================================
@@ -24,6 +26,7 @@ namespace Strawberry::Graphics::Vulkan
 		: public Core::EnableReflexivePointer<Queue>
 	{
 		friend class Swapchain;
+		friend class CommandBuffer;
 
 
 	public:
@@ -53,5 +56,6 @@ namespace Strawberry::Graphics::Vulkan
 		uint32_t mFamilyIndex;
 		Core::ReflexivePointer<Device> mDevice;
 		Fence mSubmissionFence;
+		Core::Uninitialised<CommandPool> mCommandPool;
 	};
 }

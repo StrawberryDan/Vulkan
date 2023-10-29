@@ -34,6 +34,7 @@ namespace Strawberry::Graphics::Vulkan
 
 
 	public:
+		explicit CommandBuffer(const Queue& queue);
 		explicit CommandBuffer(const CommandPool& commandPool);
 		CommandBuffer(const CommandBuffer& rhs) = delete;
 		CommandBuffer& operator=(const CommandBuffer& rhs) = delete;
