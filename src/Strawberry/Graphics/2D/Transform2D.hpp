@@ -21,8 +21,8 @@ namespace Strawberry::Graphics
 	class Transform2D
 	{
 	public:
-		const Core::Math::Vec2f& GetPosition() const;
-		const Core::Math::Vec2f& GetSize() const;
+		[[nodiscard]] const Core::Math::Vec2f& GetPosition() const;
+		[[nodiscard]] const Core::Math::Vec2f& GetSize() const;
 
 
 		void SetPosition(const Core::Math::Vec2f position);
