@@ -44,6 +44,7 @@ namespace Strawberry::Graphics
 
 
 		Vulkan::Image mImage;
+		Vulkan::ImageView mImageView;
 		Core::Math::Vec2i mSpriteSize;
 	};
 }
