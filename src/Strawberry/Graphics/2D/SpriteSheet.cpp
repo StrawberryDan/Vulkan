@@ -32,10 +32,12 @@ namespace Strawberry::Graphics
 		imageBuffer.SetData(bytes);
 
 
+		// Create command buffer
 		auto commandPool = queue.Create<Vulkan::CommandPool>(true);
 		auto commandBuffer = commandPool.Create<Vulkan::CommandBuffer>();
 
 
+		// Copy image data
 		commandBuffer.Begin(true);
 		commandBuffer.CopyBufferToImage(imageBuffer, image, VK_FORMAT_R8G8B8A8_SRGB);
 		commandBuffer.ImageMemoryBarrier(image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_GENERAL);
