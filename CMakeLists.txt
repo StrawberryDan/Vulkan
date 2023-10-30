@@ -80,7 +80,7 @@ add_target_shader(StrawberryGraphics src/Strawberry/Graphics/2D/Sprite.frag src/
 
 
 add_executable(StrawberryGraphics_Test test/Main.cpp)
-target_link_libraries(StrawberryGraphics_Test PRIVATE StrawberryGraphics)
+target_link_libraries(StrawberryGraphics_Test PRIVATE StrawberryGraphics -static)
 set_target_properties(StrawberryGraphics_Test PROPERTIES CXX_STANDARD 20)
 add_target_shader(StrawberryGraphics_Test test/Mesh.vert test/Mesh.vert.bin)
 add_target_shader(StrawberryGraphics_Test test/SolidColor.frag test/SolidColor.frag.bin)
