@@ -11,6 +11,8 @@ def compile_shader(glslc_executable, source, header):
     command = f"{glslc_executable} {source} -o {binary_file.name}"
     print(command)
     glsl = subprocess.run(command, shell=True)
+    if glsl.returncode != 0:
+        sys.exit(glsl.returncode)
 
     program = binary_file.read()
     print(program)
