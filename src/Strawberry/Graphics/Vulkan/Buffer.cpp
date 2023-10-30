@@ -69,9 +69,11 @@ namespace Strawberry::Graphics::Vulkan
 
 	void Buffer::SetData(const Core::IO::DynamicByteBuffer& bytes)
 	{
+		Core::AssertEQ(bytes.Size(), GetSize());
+
 		if (!mMappedDataPtr)
 		{
-			Core::AssertEQ(vkMapMemory(mDevice, mMemory.mDeviceMemory, 0, mSize, 0, &mMappedDataPtr), VK_SUCCESS);
+			Core::AssertEQ(vkMapMemory(mDevice, mMemory.mDeviceMemory, 0, mMemory.mSize, 0, &mMappedDataPtr), VK_SUCCESS);
 			Core::AssertNEQ(mMappedDataPtr, nullptr);
 		}
 		std::memcpy(mMappedDataPtr, bytes.Data(), GetSize());
@@ -81,7 +83,7 @@ namespace Strawberry::Graphics::Vulkan
 			.pNext = nullptr,
 			.memory = mMemory.mDeviceMemory,
 			.offset = 0,
-			.size = mSize,
+			.size = mMemory.GetSize(),
 		};
 		Core::AssertEQ(vkFlushMappedMemoryRanges(mDevice, 1, &range), VK_SUCCESS);
 	}
