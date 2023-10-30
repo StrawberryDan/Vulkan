@@ -4,6 +4,7 @@
 #include "Instance.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Assert.hpp"
+#include "Strawberry/Core/IO/Logging.hpp"
 // GLFW3
 #include "GLFW/glfw3.h"
 // Standard Library
@@ -18,6 +19,34 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics::Vulkan
 {
+	static VkBool32 DebuggingCallback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
+	                                  VkDebugUtilsMessageTypeFlagsEXT type,
+								      const VkDebugUtilsMessengerCallbackDataEXT* callbackData,
+								      void* userData)
+	{
+		switch (severity)
+		{
+			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
+				Core::Logging::Debug(callbackData->pMessage);
+				break;
+			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
+				Core::Logging::Info(callbackData->pMessage);
+				break;
+			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
+				Core::Logging::Warning(callbackData->pMessage);
+				break;
+			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
+				Core::Logging::Error(callbackData->pMessage);
+				Core::DebugBreak();
+				break;
+			default:
+				Core::Unreachable();
+		}
+
+		return true;
+	}
+
+
 	Instance::Instance()
 	{
 		VkApplicationInfo applicationInfo{};
@@ -31,6 +60,7 @@ namespace Strawberry::Graphics::Vulkan
 
 		std::vector<const char*> extensions =
 		{
+			VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
 #if __APPLE__
 			VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME,
 #endif
@@ -54,20 +84,39 @@ namespace Strawberry::Graphics::Vulkan
 			"VK_LAYER_KHRONOS_validation"
 		};
 
-		VkInstanceCreateInfo createInfo{};
-		createInfo.pNext = nullptr;
-		createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 
+		VkDebugUtilsMessengerCreateInfoEXT messengerCreateInfo {
+			.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+			.pNext = nullptr,
+			.flags = 0,
+			.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT
+							 | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT
+							 | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
+							 | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+			.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
+				| VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
+				| VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT
+				| VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT,
+			.pfnUserCallback = DebuggingCallback,
+			.pUserData = nullptr,
+		};
+
+
+		VkInstanceCreateInfo createInfo{
+			.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
+			.pNext = &messengerCreateInfo,
 #if __APPLE__
-		createInfo.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+			.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR,
 #else
-		createInfo.flags = 0;
+			.flags = 0,
 #endif
-		createInfo.pApplicationInfo = &applicationInfo;
-		createInfo.enabledExtensionCount = extensions.size();
-		createInfo.ppEnabledExtensionNames = extensions.data();
-		createInfo.enabledLayerCount = layers.size();
-		createInfo.ppEnabledLayerNames = layers.data();
+			.pApplicationInfo = &applicationInfo,
+			.enabledLayerCount = static_cast<uint32_t>(layers.size()),
+			.ppEnabledLayerNames = layers.data(),
+			.enabledExtensionCount = static_cast<uint32_t>(extensions.size()),
+			.ppEnabledExtensionNames = extensions.data(),
+		};
+
 
 		VkResult result = vkCreateInstance(&createInfo, nullptr, &mInstance);
 		Core::Assert(result == VK_SUCCESS);
