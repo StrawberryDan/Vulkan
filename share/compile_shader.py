@@ -6,9 +6,11 @@ import tempfile
 
 
 def compile_shader(glslc_executable, source, header):
-    print(glslc_executable, source, header)
     binary_file = tempfile.NamedTemporaryFile(delete=False)
-    glsl = subprocess.run([glslc_executable, source, "-o", binary_file.name], shell=True)
+
+    command = f"{glslc_executable} {source} -o {binary_file.name}"
+    print(command)
+    glsl = subprocess.run(command, shell=True)
 
     program = binary_file.read()
     print(program)
