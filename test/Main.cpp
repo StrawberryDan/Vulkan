@@ -29,6 +29,21 @@ using namespace Vulkan;
 
 void BasicRendering()
 {
+	uint8_t meshVertexShader[] =
+	{
+		#include "Mesh.vert.bin"
+	};
+
+	uint8_t solidColorFragShader[] =
+	{
+		#include "SolidColor.frag.bin"
+	};
+
+	uint8_t textureFragShader[] =
+	{
+		#include "Texture.frag.bin"
+	};
+
 	auto vertexInputDescription = []() -> VertexInputDescription
 	{
 		VertexInputDescription description;
@@ -46,9 +61,9 @@ void BasicRendering()
 		.WithSubpass(SubpassDescription().WithColorAttachment(0))
 		.Build();
 	Pipeline pipeline = renderPass.Create<Pipeline::Builder>()
-		.WithShaderStage(VK_SHADER_STAGE_VERTEX_BIT, device.Create<ShaderModule>("data/Shaders/Mesh.vert.spirv"))
+		.WithShaderStage(VK_SHADER_STAGE_VERTEX_BIT, device.Create<ShaderModule>(Core::IO::DynamicByteBuffer(meshVertexShader, sizeof(meshVertexShader))))
 		.WithShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT,
-						 device.Create<ShaderModule>("data/Shaders/Texture.frag.spirv"))
+						 device.Create<ShaderModule>(Core::IO::DynamicByteBuffer(textureFragShader, sizeof(textureFragShader))))
 		.WithVertexInput(vertexInputDescription())
 		.WithPrimitiveTopology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
 		.WithViewport({0, 0}, {1920, 1080})
@@ -181,7 +196,7 @@ void SpriteRendering()
 
 int main()
 {
-	// BasicRendering();
+	BasicRendering();
 	SpriteRendering();
 	return 0;
 }

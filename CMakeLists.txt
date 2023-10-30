@@ -9,13 +9,6 @@ include(share/Shaders.cmake)
 find_package(Vulkan REQUIRED)
 
 
-add_custom_target(
-		Shaders
-		COMMAND glslc ${CMAKE_CURRENT_SOURCE_DIR}/data/Shaders/Mesh.vert -o ${CMAKE_CURRENT_SOURCE_DIR}/data/Shaders/Mesh.vert.spirv
-		COMMAND glslc ${CMAKE_CURRENT_SOURCE_DIR}/data/Shaders/SolidColor.frag -o ${CMAKE_CURRENT_SOURCE_DIR}/data/Shaders/SolidColor.frag.spirv
-		COMMAND glslc ${CMAKE_CURRENT_SOURCE_DIR}/data/Shaders/Texture.frag -o ${CMAKE_CURRENT_SOURCE_DIR}/data/Shaders/Texture.frag.spirv
-)
-
 FetchContent_Declare(GLFW
 	GIT_REPOSITORY "https://github.com/glfw/glfw.git"
 	GIT_TAG "3.3.8")
@@ -82,7 +75,6 @@ target_link_libraries(StrawberryGraphics PUBLIC StrawberryCore glfw Vulkan::Vulk
 target_include_directories(StrawberryGraphics PUBLIC src)
 target_compile_definitions(StrawberryGraphics PUBLIC GLFW_INCLUDE_VULKAN)
 set_target_properties(StrawberryGraphics PROPERTIES CXX_STANDARD 20)
-add_dependencies(StrawberryGraphics Shaders)
 add_target_shader(StrawberryGraphics src/Strawberry/Graphics/2D/Sprite.vert src/Strawberry/Graphics/2D/Sprite.vert.bin)
 add_target_shader(StrawberryGraphics src/Strawberry/Graphics/2D/Sprite.frag src/Strawberry/Graphics/2D/Sprite.frag.bin)
 
@@ -90,3 +82,6 @@ add_target_shader(StrawberryGraphics src/Strawberry/Graphics/2D/Sprite.frag src/
 add_executable(StrawberryGraphics_Test test/Main.cpp)
 target_link_libraries(StrawberryGraphics_Test PRIVATE StrawberryGraphics)
 set_target_properties(StrawberryGraphics_Test PROPERTIES CXX_STANDARD 20)
+add_target_shader(StrawberryGraphics_Test test/Mesh.vert test/Mesh.vert.bin)
+add_target_shader(StrawberryGraphics_Test test/SolidColor.frag test/SolidColor.frag.bin)
+add_target_shader(StrawberryGraphics_Test test/Texture.frag test/Texture.frag.bin)
