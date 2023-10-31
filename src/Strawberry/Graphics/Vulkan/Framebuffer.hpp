@@ -65,6 +65,7 @@ namespace Strawberry::Graphics::Vulkan
 		std::vector<Image> mColorAttachments;
 		std::vector<ImageView> mColorAttachmentViews;
 
+
 		Image mDepthAttachment;
 		ImageView mDepthAttachmentView;
 		Image mStencilAttachment;
