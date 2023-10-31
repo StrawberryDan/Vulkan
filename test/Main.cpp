@@ -54,8 +54,8 @@ void BasicRendering()
 
 	Window::Window window("StrawberryGraphics Test", Core::Math::Vec2i(1920, 1080));
 	Instance instance;
-	Device device = instance.Create<Device>();
-	Surface surface = window.Create<Surface, const Device&>(device);
+	auto device = instance.Create<Device>();
+	auto surface = window.Create<Surface, const Device&>(device);
 	RenderPass renderPass = device.Create<RenderPass::Builder>()
 		.WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE)
 		.WithSubpass(SubpassDescription().WithColorAttachment(0))
@@ -73,13 +73,13 @@ void BasicRendering()
 			DescriptorSetLayout()
 				.WithBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT))
 		.Build();
-	Queue queue = device.Create<Queue>(	);
-	Swapchain swapchain = queue.Create<Swapchain, const Surface&>(surface, Core::Math::Vec2i(1920, 1080));
-	CommandPool commandPool = queue.Create<CommandPool>(true);
-	CommandBuffer commandBuffer = commandPool.Create<CommandBuffer>();
+	auto queue = device.Create<Queue>();
+	auto swapchain = queue.Create<Swapchain, const Surface&>(surface, Core::Math::Vec2i(1920, 1080));
+	auto commandPool = queue.Create<CommandPool>(true);
+	auto commandBuffer = commandPool.Create<CommandBuffer>();
 
 
-	Buffer buffer = device.Create<Buffer>(6 * sizeof(float) * 3, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+	auto buffer = device.Create<Buffer>(6 * sizeof(float) * 3, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 	Core::IO::DynamicByteBuffer vertices;
 	vertices.Push<Core::Math::Vec3f>(Core::Math::Vec3f(0.0f, 0.0f, 0.0f));
 	vertices.Push<Core::Math::Vec3f>(Core::Math::Vec3f(1.0f, 0.0f, 0.0f));
@@ -90,13 +90,13 @@ void BasicRendering()
 	buffer.SetData(vertices);
 
 
-	Framebuffer framebuffer = renderPass.Create<Framebuffer>(Core::Math::Vec2i(1920, 1080));
+	auto framebuffer = renderPass.Create<Framebuffer>(Core::Math::Vec2i(1920, 1080));
 
 
 	auto [size, channels, bytes] = Core::IO::DynamicByteBuffer::FromImage("data/dio.png").Unwrap();
-	Buffer textureBuffer = device.Create<Buffer>(bytes.Size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+	auto textureBuffer = device.Create<Buffer>(bytes.Size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
 	textureBuffer.SetData(bytes);
-	Image texture = device.Create<Image>(size, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
+	auto texture = device.Create<Image>(size, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
 	commandBuffer.Begin(true);
 	commandBuffer.CopyBufferToImage(textureBuffer, texture, VK_FORMAT_R8G8B8A8_SRGB);
 	commandBuffer.ImageMemoryBarrier(texture, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_GENERAL);
@@ -106,7 +106,7 @@ void BasicRendering()
 		.WithType(VK_IMAGE_VIEW_TYPE_2D)
 		.WithFormat(VK_FORMAT_R8G8B8A8_SRGB)
 		.Build();
-	Sampler sampler = device.Create<Sampler>(VK_FILTER_NEAREST, VK_FILTER_NEAREST);
+	auto sampler = device.Create<Sampler>(VK_FILTER_NEAREST, VK_FILTER_NEAREST);
 
 
 	Core::Clock clock;
@@ -158,20 +158,20 @@ void SpriteRendering()
 {
 	Window::Window window("StrawberryGraphics Test", Core::Math::Vec2i(1920, 1080));
 	Instance instance;
-	Device device = instance.Create<Device>();
-	Surface surface = window.Create<Surface, const Device&>(device);
+	auto device = instance.Create<Device>();
+	auto surface = window.Create<Surface, const Device&>(device);
 	RenderPass renderPass = device.Create<RenderPass::Builder>()
 		.WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE)
 		.WithSubpass(SubpassDescription().WithColorAttachment(0))
 		.Build();
-	Queue queue = device.Create<Queue>();
-	Swapchain swapchain = queue.Create<Swapchain, const Surface&>(surface, window.GetSize());
+	auto queue = device.Create<Queue>();
+	auto swapchain = queue.Create<Swapchain, const Surface&>(surface, window.GetSize());
 
-	Framebuffer framebuffer = renderPass.Create<Framebuffer>(Core::Math::Vec2i(1920 / 16, 1080 / 16));
+	auto framebuffer = renderPass.Create<Framebuffer>(Core::Math::Vec2i(1920 / 16, 1080 / 16));
 
-	SpriteRenderer renderer(queue, {1920, 1080});
-	SpriteSheet spriteSheet = SpriteSheet::FromFile(device, queue, {4, 4}, "data/dio.png").Unwrap();
-	Sprite sprite = spriteSheet.Create<Sprite>();
+	auto renderer = queue.Create<SpriteRenderer>(Core::Math::Vec2f(1920, 1080));
+	auto spriteSheet = SpriteSheet::FromFile(device, queue, {4, 4}, "data/dio.png").Unwrap();
+	auto sprite = spriteSheet.Create<Sprite>();
 	sprite.GetTransform().SetSize(framebuffer.GetColorAttachment(0).GetSize().AsType<float>().AsSize<2>());
 
 	while (!window.CloseRequested())

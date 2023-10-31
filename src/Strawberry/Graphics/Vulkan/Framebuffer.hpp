@@ -40,10 +40,10 @@ namespace Strawberry::Graphics::Vulkan
 		~Framebuffer();
 
 
-		Core::ReflexivePointer<RenderPass> GetRenderPass() const;
+		[[nodiscard]] Core::ReflexivePointer<RenderPass> GetRenderPass() const;
 
 
-		uint32_t GetColorAttachmentCount() const;
+		[[nodiscard]] uint32_t GetColorAttachmentCount() const;
 		Image& GetColorAttachment(uint32_t index);
 		Image& GetDepthAttachment();
 		Image& GetStencilAttachment();
