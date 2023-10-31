@@ -5,8 +5,6 @@
 #include "Device.hpp"
 // Standard Library
 #include "Strawberry/Core/Assert.hpp"
-// Standard Library
-#include <memory>
 
 
 //======================================================================================================================
@@ -15,7 +13,8 @@
 namespace Strawberry::Graphics::Vulkan
 {
 	Fence::Fence(const Device& device)
-		: mDevice(device.mDevice)
+		: mFence(nullptr)
+		, mDevice(device.mDevice)
 	{
 		VkFenceCreateInfo createInfo {
 			.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
