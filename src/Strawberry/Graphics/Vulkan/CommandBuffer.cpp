@@ -202,9 +202,11 @@ namespace Strawberry::Graphics::Vulkan
 
 	void CommandBuffer::CopyBufferToImage(const Buffer& buffer, Image& image, VkFormat format)
 	{
+		// Clear and put into DST_OPTIMAL
 		ImageMemoryBarrier(image, VK_IMAGE_ASPECT_COLOR_BIT,
 		                   VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
+		// Setup copy
 		VkImageSubresourceLayers subresource {
 			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
 			.mipLevel = 0,
@@ -220,6 +222,10 @@ namespace Strawberry::Graphics::Vulkan
 			.imageExtent{.width = static_cast<uint32_t>(image.mSize[0]), .height = static_cast<uint32_t>(image.mSize[1]), .depth = 1}
 		};
 		vkCmdCopyBufferToImage(mCommandBuffer, buffer.mBuffer, image.mImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+
+		// Set into general layout
+		ImageMemoryBarrier(image, VK_IMAGE_ASPECT_COLOR_BIT,
+		                   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_GENERAL);
 	}
 
 
