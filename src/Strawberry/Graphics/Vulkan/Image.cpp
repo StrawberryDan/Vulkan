@@ -17,8 +17,9 @@ namespace Strawberry::Graphics::Vulkan
 	Image::Image(const Device& device, uint32_t extent, VkFormat format, VkImageUsageFlags usage,
 				 uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling, VkImageLayout initialLayout)
 		: mImage(nullptr)
-		  , mDevice(device.mDevice)
-		  , mSize(static_cast<int>(extent), 0, 0)
+		, mDevice(device.mDevice)
+		, mSize(static_cast<int>(extent), 0, 0)
+		, mLastRecordedLayout(initialLayout)
 	{
 		VkImageCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
@@ -45,8 +46,9 @@ namespace Strawberry::Graphics::Vulkan
 	Image::Image(const Device& device, Core::Math::Vec2i extent, VkFormat format, VkImageUsageFlags usage,
 				 uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling, VkImageLayout initialLayout)
 		: mImage(nullptr)
-		  , mDevice(device.mDevice)
-		  , mSize(extent)
+		, mDevice(device.mDevice)
+		, mSize(extent)
+		, mLastRecordedLayout(initialLayout)
 	{
 		VkImageCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
@@ -81,8 +83,9 @@ namespace Strawberry::Graphics::Vulkan
 	Image::Image(const Device& device, Core::Math::Vec3i extent, VkFormat format, VkImageUsageFlags usage,
 				 uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling, VkImageLayout initialLayout)
 		: mImage(nullptr)
-		  , mDevice(device.mDevice)
-		  , mSize(extent)
+		, mDevice(device.mDevice)
+		, mSize(extent)
+		, mLastRecordedLayout(initialLayout)
 	{
 		VkImageCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
@@ -117,8 +120,9 @@ namespace Strawberry::Graphics::Vulkan
 	Image::Image(Image&& rhs) noexcept
 		: mImage(std::exchange(rhs.mImage, nullptr))
 		, mMemory(std::move(rhs.mMemory))
-		  , mDevice(std::exchange(rhs.mDevice, nullptr))
-		  , mSize(std::exchange(rhs.mSize, Core::Math::Vec3i()))
+		, mDevice(std::exchange(rhs.mDevice, nullptr))
+		, mSize(std::exchange(rhs.mSize, Core::Math::Vec3i()))
+		, mLastRecordedLayout(std::exchange(rhs.mLastRecordedLayout, VK_IMAGE_LAYOUT_UNDEFINED))
 	{
 
 	}

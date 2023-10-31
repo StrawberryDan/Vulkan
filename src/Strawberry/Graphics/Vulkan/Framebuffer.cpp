@@ -107,19 +107,19 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
-	const Image& Framebuffer::GetColorAttachment(uint32_t index)
+	Image& Framebuffer::GetColorAttachment(uint32_t index)
 	{
 		return mColorAttachments[index];
 	}
 
 
-	const Image& Framebuffer::GetDepthAttachment()
+	Image& Framebuffer::GetDepthAttachment()
 	{
 		return mDepthAttachment;
 	}
 
 
-	const Image& Framebuffer::GetStencilAttachment()
+	Image& Framebuffer::GetStencilAttachment()
 	{
 		return mStencilAttachment;
 	}

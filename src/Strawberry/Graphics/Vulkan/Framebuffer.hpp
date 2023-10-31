@@ -44,9 +44,9 @@ namespace Strawberry::Graphics::Vulkan
 
 
 		uint32_t GetColorAttachmentCount() const;
-		const Image& GetColorAttachment(uint32_t index);
-		const Image& GetDepthAttachment();
-		const Image& GetStencilAttachment();
+		Image& GetColorAttachment(uint32_t index);
+		Image& GetDepthAttachment();
+		Image& GetStencilAttachment();
 
 
 	private:

@@ -73,5 +73,6 @@ namespace Strawberry::Graphics::Vulkan
 		DeviceMemory mMemory;
 		VkDevice mDevice;
 		Core::Math::Vec3i mSize;
+		VkImageLayout mLastRecordedLayout;
 	};
 }
