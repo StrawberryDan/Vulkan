@@ -128,20 +128,22 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
-	void CommandBuffer::ImageMemoryBarrier(const Image& image, VkImageAspectFlagBits aspect, VkImageLayout targetLayout)
+	void CommandBuffer::ImageMemoryBarrier(const Image& image, VkImageAspectFlagBits aspect, VkImageLayout oldLayout,
+	                                       VkImageLayout targetLayout)
 	{
-		ImageMemoryBarrier(image.mImage, aspect, targetLayout);
+		ImageMemoryBarrier(image.mImage, aspect, oldLayout, targetLayout);
 	}
 
 
-	void CommandBuffer::ImageMemoryBarrier(VkImage image, VkImageAspectFlagBits aspect, VkImageLayout targetLayout)
+	void CommandBuffer::ImageMemoryBarrier(VkImage image, VkImageAspectFlagBits aspect, VkImageLayout oldLayout,
+	                                       VkImageLayout targetLayout)
 	{
 		VkImageMemoryBarrier imageMemoryBarrier {
 			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
 			.pNext = nullptr,
 			.srcAccessMask = VK_ACCESS_NONE,
 			.dstAccessMask = VK_ACCESS_NONE,
-			.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+			.oldLayout = oldLayout,
 			.newLayout = targetLayout,
 			.srcQueueFamilyIndex = mQueueFamilyIndex,
 			.dstQueueFamilyIndex = mQueueFamilyIndex,
@@ -165,8 +167,10 @@ namespace Strawberry::Graphics::Vulkan
 
 	void CommandBuffer::CopyImageToSwapchain(const Image& image, Swapchain& swapchain)
 	{
-		ImageMemoryBarrier(image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
-		ImageMemoryBarrier(swapchain.GetNextImage(), VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+		ImageMemoryBarrier(image, VK_IMAGE_ASPECT_COLOR_BIT,
+		                   VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+		ImageMemoryBarrier(swapchain.GetNextImage(), VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_UNDEFINED,
+		                   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 
 		VkImageBlit region {
@@ -198,7 +202,8 @@ namespace Strawberry::Graphics::Vulkan
 
 	void CommandBuffer::CopyBufferToImage(const Buffer& buffer, Image& image, VkFormat format)
 	{
-		ImageMemoryBarrier(image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+		ImageMemoryBarrier(image, VK_IMAGE_ASPECT_COLOR_BIT,
+		                   VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 		VkImageSubresourceLayers subresource {
 			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
@@ -228,10 +233,13 @@ namespace Strawberry::Graphics::Vulkan
 	{
 		for (int i = 0; i < framebuffer.GetColorAttachmentCount(); i++)
 		{
-			ImageMemoryBarrier(framebuffer.GetColorAttachment(i), VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_GENERAL);
+			ImageMemoryBarrier(framebuffer.GetColorAttachment(i), VK_IMAGE_ASPECT_COLOR_BIT,
+			                   VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
 		}
-		ImageMemoryBarrier(framebuffer.GetDepthAttachment(), VK_IMAGE_ASPECT_DEPTH_BIT, VK_IMAGE_LAYOUT_GENERAL);
-		ImageMemoryBarrier(framebuffer.GetStencilAttachment(), VK_IMAGE_ASPECT_STENCIL_BIT, VK_IMAGE_LAYOUT_GENERAL);
+		ImageMemoryBarrier(framebuffer.GetDepthAttachment(), VK_IMAGE_ASPECT_DEPTH_BIT,
+		                   VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
+		ImageMemoryBarrier(framebuffer.GetStencilAttachment(), VK_IMAGE_ASPECT_STENCIL_BIT,
+		                   VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
 
 
 		VkRenderPassBeginInfo beginInfo {
