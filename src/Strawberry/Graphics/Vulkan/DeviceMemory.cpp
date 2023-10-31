@@ -16,6 +16,7 @@ namespace Strawberry::Graphics::Vulkan
 {
 	DeviceMemory::DeviceMemory(const Device& device, uint32_t size, uint32_t typeMask, VkMemoryPropertyFlags properties)
 		: mDevice(device.mDevice)
+		, mSize(size)
 	{
 		VkPhysicalDeviceMemoryProperties memoryProperties;
 		vkGetPhysicalDeviceMemoryProperties(device.mPhysicalDevice, &memoryProperties);
@@ -47,6 +48,7 @@ namespace Strawberry::Graphics::Vulkan
 
 	DeviceMemory::DeviceMemory(DeviceMemory&& rhs)
 		: mDeviceMemory(std::exchange(rhs.mDeviceMemory, nullptr))
+		, mSize(std::exchange(rhs.mSize, 0))
 		, mDevice(std::exchange(rhs.mDevice, nullptr))
 	{}
 
@@ -69,5 +71,11 @@ namespace Strawberry::Graphics::Vulkan
 		{
 			vkFreeMemory(mDevice, mDeviceMemory, nullptr);
 		}
+	}
+
+
+	uint64_t DeviceMemory::GetSize() const
+	{
+		return mSize;
 	}
 }

@@ -73,7 +73,7 @@ namespace Strawberry::Graphics::Vulkan
 
 		if (!mMappedDataPtr)
 		{
-			Core::AssertEQ(vkMapMemory(mDevice, mMemory.mDeviceMemory, 0, mMemory.mSize, 0, &mMappedDataPtr), VK_SUCCESS);
+			Core::AssertEQ(vkMapMemory(mDevice, mMemory.mDeviceMemory, 0, mMemory.GetSize(), 0, &mMappedDataPtr), VK_SUCCESS);
 			Core::AssertNEQ(mMappedDataPtr, nullptr);
 		}
 		std::memcpy(mMappedDataPtr, bytes.Data(), GetSize());

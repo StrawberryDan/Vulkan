@@ -32,8 +32,12 @@ namespace Strawberry::Graphics::Vulkan
 		~DeviceMemory();
 
 
+		uint64_t GetSize() const;
+
+
 	private:
 		VkDeviceMemory mDeviceMemory = nullptr;
+		uint64_t mSize;
 		VkDevice mDevice = nullptr;
 	};
 }
