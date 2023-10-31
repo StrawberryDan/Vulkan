@@ -17,7 +17,7 @@ function(add_target_shader TARGET SOURCE DESTINATION)
 	)
 
 	add_custom_target(${SHADER_TARGET_NAME}
-			DEPENDS ${DESTINATION}
+			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${SOURCE}
 	)
 
 	add_dependencies(${TARGET} ${SHADER_TARGET_NAME})
