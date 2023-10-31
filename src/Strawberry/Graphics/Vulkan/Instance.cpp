@@ -19,10 +19,46 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics::Vulkan
 {
-	static VkBool32 DebuggingCallback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
-	                                  VkDebugUtilsMessageTypeFlagsEXT type,
-								      const VkDebugUtilsMessengerCallbackDataEXT* callbackData,
-								      void* userData)
+	static PFN_vkCreateDebugReportCallbackEXT vkCreateDebugReportCallbackEXT = nullptr;
+	static PFN_vkDestroyDebugReportCallbackEXT vkDestroyDebugReportCallbackEXT = nullptr;
+
+	static VkBool32 DebugReportCallback(VkDebugReportFlagsEXT flags,
+										VkDebugReportObjectTypeEXT objectType,
+										uint64_t object,
+										size_t location,
+										int32_t messageCode,
+										const char* pLayerPrefix,
+										const char* pMessage,
+										void* pUserData)
+	{
+		switch (flags)
+		{
+			case VK_DEBUG_REPORT_DEBUG_BIT_EXT:
+			case VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT:
+				Core::Logging::Debug(pMessage);
+				break;
+			case VK_DEBUG_REPORT_INFORMATION_BIT_EXT:
+				Core::Logging::Info(pMessage);
+				break;
+			case VK_DEBUG_REPORT_WARNING_BIT_EXT:
+				Core::Logging::Warning(pMessage);
+				break;
+			case VK_DEBUG_REPORT_ERROR_BIT_EXT:
+				Core::Logging::Error(pMessage);
+				Core::DebugBreak();
+				break;
+			default:
+				Core::Unreachable();
+		}
+
+		return true;
+	}
+
+
+	static VkBool32 DebugUtilsCallback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
+									   VkDebugUtilsMessageTypeFlagsEXT type,
+									   const VkDebugUtilsMessengerCallbackDataEXT* callbackData,
+									   void* userData)
 	{
 		switch (severity)
 		{
@@ -61,6 +97,7 @@ namespace Strawberry::Graphics::Vulkan
 		std::vector<const char*> extensions =
 		{
 			VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
+			VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
 #if __APPLE__
 			VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME,
 #endif
@@ -85,9 +122,15 @@ namespace Strawberry::Graphics::Vulkan
 		};
 
 
+		VkDebugReportCallbackCreateInfoEXT callbackCreateInfo {
+			.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT,
+			.pNext= nullptr,
+			.pfnCallback = DebugReportCallback,
+			.pUserData = nullptr,
+		};
 		VkDebugUtilsMessengerCreateInfoEXT messengerCreateInfo {
 			.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-			.pNext = nullptr,
+			.pNext = &callbackCreateInfo,
 			.flags = 0,
 			.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT
 							 | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT
@@ -97,7 +140,7 @@ namespace Strawberry::Graphics::Vulkan
 				| VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
 				| VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT
 				| VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT,
-			.pfnUserCallback = DebuggingCallback,
+			.pfnUserCallback = DebugUtilsCallback,
 			.pUserData = nullptr,
 		};
 
@@ -120,11 +163,19 @@ namespace Strawberry::Graphics::Vulkan
 
 		VkResult result = vkCreateInstance(&createInfo, nullptr, &mInstance);
 		Core::Assert(result == VK_SUCCESS);
+
+		vkCreateDebugReportCallbackEXT = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(vkGetInstanceProcAddr(mInstance, "vkCreateDebugReportCallbackEXT"));
+		vkDestroyDebugReportCallbackEXT = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(mInstance, "vkDestroyDebugReportCallbackEXT"));
+
+		Core::AssertEQ(
+				vkCreateDebugReportCallbackEXT(mInstance, &callbackCreateInfo, nullptr, &mDebugReportCallback),
+				VK_SUCCESS);
 	}
 
 
 	Instance::~Instance()
 	{
+		vkDestroyDebugReportCallbackEXT(mInstance, mDebugReportCallback, nullptr);
 		vkDestroyInstance(mInstance, nullptr);
 	}
 

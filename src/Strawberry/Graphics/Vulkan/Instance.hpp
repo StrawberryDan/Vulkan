@@ -37,7 +37,10 @@ namespace Strawberry::Graphics::Vulkan
 
 		template <std::movable T, typename... Args> requires (std::constructible_from<T, const Instance&, Args...>)
 		T Create(Args... args) const { return T(*this, std::forward<Args>(args)...); }
+
+
 	private:
 		VkInstance mInstance = {};
+		VkDebugReportCallbackEXT mDebugReportCallback;
 	};
 }
