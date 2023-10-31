@@ -36,7 +36,7 @@ namespace Strawberry::Graphics::Vulkan
 		Instance& operator=(Instance&&) noexcept ;
 
 		template <std::movable T, typename... Args> requires (std::constructible_from<T, const Instance&, Args...>)
-		T Create(Args... args) const { return T(*this, std::forward<Args>(args)...); }
+		T Create(const Args&... args) const { return T(*this, std::forward<const Args&>(args)...); }
 
 
 	private:

@@ -55,7 +55,7 @@ void BasicRendering()
 	Window::Window window("StrawberryGraphics Test", Core::Math::Vec2i(1920, 1080));
 	Instance instance;
 	auto device = instance.Create<Device>();
-	auto surface = window.Create<Surface, const Device&>(device);
+	auto surface = window.Create<Surface>(device);
 	RenderPass renderPass = device.Create<RenderPass::Builder>()
 		.WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE)
 		.WithSubpass(SubpassDescription().WithColorAttachment(0))
@@ -74,7 +74,7 @@ void BasicRendering()
 				.WithBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT))
 		.Build();
 	auto queue = device.Create<Queue>();
-	auto swapchain = queue.Create<Swapchain, const Surface&>(surface, Core::Math::Vec2i(1920, 1080));
+	auto swapchain = queue.Create<Swapchain>(surface, Core::Math::Vec2i(1920, 1080));
 	auto commandPool = queue.Create<CommandPool>(true);
 	auto commandBuffer = commandPool.Create<CommandBuffer>();
 
@@ -159,13 +159,13 @@ void SpriteRendering()
 	Window::Window window("StrawberryGraphics Test", Core::Math::Vec2i(1920, 1080));
 	Instance instance;
 	auto device = instance.Create<Device>();
-	auto surface = window.Create<Surface, const Device&>(device);
+	auto surface = window.Create<Surface>(device);
 	RenderPass renderPass = device.Create<RenderPass::Builder>()
 		.WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE)
 		.WithSubpass(SubpassDescription().WithColorAttachment(0))
 		.Build();
 	auto queue = device.Create<Queue>();
-	auto swapchain = queue.Create<Swapchain, const Surface&>(surface, window.GetSize());
+	auto swapchain = queue.Create<Swapchain>(surface, window.GetSize());
 
 	auto framebuffer = renderPass.Create<Framebuffer>(Core::Math::Vec2i(1920 / 16, 1080 / 16));
 

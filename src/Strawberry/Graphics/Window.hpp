@@ -60,10 +60,7 @@ namespace Strawberry::Graphics::Window
 		Core::Math::Vec2i GetSize() const;
 
 		template <std::movable T, typename... Args> requires (std::constructible_from<T, const Window&, Args...>)
-		T Create(Args... args)
-		{
-			return T(*this, std::forward<const Args&>(args)...);
-		}
+		T Create(const Args&... args) { return T(*this, std::forward<const Args&>(args)...); }
 
 
 	private:

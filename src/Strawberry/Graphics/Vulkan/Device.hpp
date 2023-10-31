@@ -53,7 +53,7 @@ namespace Strawberry::Graphics::Vulkan
 
 
 		template <std::movable T, typename... Args>
-		T Create(Args... args) const { return T(*this, std::forward<Args>(args)...); }
+		T Create(const Args&... args) const { return T(*this, std::forward<const Args&>(args)...); }
 
 
 	private:
