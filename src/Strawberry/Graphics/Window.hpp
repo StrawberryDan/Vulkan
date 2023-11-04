@@ -58,7 +58,7 @@ namespace Strawberry::Graphics::Window
 
 		void SwapBuffers();
 
-		Core::Math::Vec2i GetSize() const;
+		[[nodiscard]] Core::Math::Vec2i GetSize() const;
 
 		template <std::movable T, typename... Args> requires (std::constructible_from<T, const Window&, Args...>)
 		T Create(const Args&... args) { return T(*this, std::forward<const Args&>(args)...); }
