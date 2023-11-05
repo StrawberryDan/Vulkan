@@ -78,9 +78,13 @@ set_target_properties(StrawberryGraphics PROPERTIES CXX_STANDARD 20)
 add_target_shader(StrawberryGraphics src/Strawberry/Graphics/2D/Sprite.vert src/Strawberry/Graphics/2D/Sprite.vert.bin)
 add_target_shader(StrawberryGraphics src/Strawberry/Graphics/2D/Sprite.frag src/Strawberry/Graphics/2D/Sprite.frag.bin)
 
+if (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
+	target_link_options(StrawberryGraphics PRIVATE "-static")
+endif()
+
 
 add_executable(StrawberryGraphics_Test test/Main.cpp)
-target_link_libraries(StrawberryGraphics_Test PRIVATE StrawberryGraphics -static)
+target_link_libraries(StrawberryGraphics_Test PRIVATE StrawberryGraphics)
 set_target_properties(StrawberryGraphics_Test PROPERTIES CXX_STANDARD 20)
 add_target_shader(StrawberryGraphics_Test test/Mesh.vert test/Mesh.vert.bin)
 add_target_shader(StrawberryGraphics_Test test/SolidColor.frag test/SolidColor.frag.bin)
