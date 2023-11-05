@@ -41,6 +41,7 @@ namespace Strawberry::Graphics::Vulkan
 		friend class Fence;
 		friend class Sampler;
 		friend class RenderPass;
+		friend class ShaderModule;
 
 
 	public:
