@@ -49,6 +49,12 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
+	Core::ReflexivePointer<Device> RenderPass::GetDevice() const
+	{
+		return mDevice;
+	}
+
+
 	SubpassDescription& SubpassDescription::WithInputAttachment(uint32_t index)
 	{
 		mInputAttachments.emplace_back(VkAttachmentReference {

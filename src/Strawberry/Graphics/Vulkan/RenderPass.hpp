@@ -26,11 +26,7 @@ namespace Strawberry::Graphics::Vulkan
 		: public Core::EnableReflexivePointer<RenderPass>
 	{
 		friend class CommandBuffer;
-
-
 		friend class Pipeline;
-
-
 		friend class Framebuffer;
 
 
@@ -48,6 +44,9 @@ namespace Strawberry::Graphics::Vulkan
 
 		template<std::movable T, typename... Args>
 		T Create(const Args&... args) const { return T(*this, std::forward<const Args&>(args)...); }
+
+
+		Core::ReflexivePointer<Device> GetDevice() const;
 
 
 	protected:
