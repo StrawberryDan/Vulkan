@@ -8,7 +8,7 @@
 #include "Strawberry/Graphics/Vulkan/CommandPool.hpp"
 #include "Strawberry/Graphics/Vulkan/Device.hpp"
 #include "Strawberry/Graphics/Vulkan/RenderPass.hpp"
-#include "Strawberry/Graphics/Vulkan/ShaderModule.hpp"
+#include "Strawberry/Graphics/Vulkan/Shader.hpp"
 // Strawberry Core
 #include <Strawberry/Core/Math/Transformations.hpp>
 
@@ -83,10 +83,10 @@ namespace Strawberry::Graphics
 
 	Vulkan::Pipeline SpriteRenderer::CreatePipeline()
 	{
-		auto vertexShader = Vulkan::ShaderModule::Compile(*mQueue->GetDevice(),
-												 Core::IO::DynamicByteBuffer(vertexShaderCode, sizeof(vertexShaderCode))).Unwrap();
-		auto fragmentShader = Vulkan::ShaderModule::Compile(*mQueue->GetDevice(),
-												 Core::IO::DynamicByteBuffer(fragmentShaderCode, sizeof(fragmentShaderCode))).Unwrap();
+		auto vertexShader = Vulkan::Shader::Compile(*mQueue->GetDevice(),
+													Core::IO::DynamicByteBuffer(vertexShaderCode, sizeof(vertexShaderCode))).Unwrap();
+		auto fragmentShader = Vulkan::Shader::Compile(*mQueue->GetDevice(),
+													  Core::IO::DynamicByteBuffer(fragmentShaderCode, sizeof(fragmentShaderCode))).Unwrap();
 
 		return mRenderPass.Create<Vulkan::Pipeline::Builder>()
 			.WithViewport({0, 0}, mViewportSize)

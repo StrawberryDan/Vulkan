@@ -2,7 +2,7 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 #include "Pipeline.hpp"
-#include "ShaderModule.hpp"
+#include "Shader.hpp"
 #include "Sampler.hpp"
 #include "ImageView.hpp"
 #include "RenderPass.hpp"
@@ -67,7 +67,7 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
-	Pipeline::Builder& Pipeline::Builder::WithShaderStage(VkShaderStageFlagBits stage, ShaderModule shader)
+	Pipeline::Builder& Pipeline::Builder::WithShaderStage(VkShaderStageFlagBits stage, Shader shader)
 	{
 		Core::Assert(!mStages.contains(stage));
 		Core::Assert(std::has_single_bit(std::underlying_type_t<VkShaderStageFlagBits>(stage)));

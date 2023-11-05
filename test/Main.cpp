@@ -11,7 +11,7 @@
 #include "Strawberry/Graphics/Vulkan/Buffer.hpp"
 #include "Strawberry/Graphics/Vulkan/BufferView.hpp"
 #include "Strawberry/Graphics/Vulkan/Image.hpp"
-#include "Strawberry/Graphics/Vulkan/ShaderModule.hpp"
+#include "Strawberry/Graphics/Vulkan/Shader.hpp"
 #include "Strawberry/Graphics/Vulkan/Framebuffer.hpp"
 #include "Strawberry/Core/Math/Matrix.hpp"
 #include "Strawberry/Core/Timing/Clock.hpp"
@@ -60,8 +60,8 @@ void BasicRendering()
 		.WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE)
 		.WithSubpass(SubpassDescription().WithColorAttachment(0))
 		.Build();
-	auto vertexShader = ShaderModule::Compile(device, Core::IO::DynamicByteBuffer(meshVertexShader, sizeof(meshVertexShader))).Unwrap();
-	auto fragmentShader = ShaderModule::Compile(device, Core::IO::DynamicByteBuffer(textureFragShader, sizeof(textureFragShader))).Unwrap();
+	auto vertexShader = Shader::Compile(device, Core::IO::DynamicByteBuffer(meshVertexShader, sizeof(meshVertexShader))).Unwrap();
+	auto fragmentShader = Shader::Compile(device, Core::IO::DynamicByteBuffer(textureFragShader, sizeof(textureFragShader))).Unwrap();
 	Pipeline pipeline = renderPass.Create<Pipeline::Builder>()
 		.WithShaderStage(VK_SHADER_STAGE_VERTEX_BIT, std::move(vertexShader))
 		.WithShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT, std::move(fragmentShader))

@@ -36,12 +36,12 @@ namespace Strawberry::Graphics::Vulkan
 		friend class BufferView;
 		friend class DeviceMemory;
 		friend class Image;
-		friend class ShaderModule;
+		friend class Shader;
 		friend class Framebuffer;
 		friend class Fence;
 		friend class Sampler;
 		friend class RenderPass;
-		friend class ShaderModule;
+		friend class Shader;
 
 
 	public:

@@ -1,7 +1,7 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
-#include "ShaderModule.hpp"
+#include "Shader.hpp"
 #include "Device.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Assert.hpp"
@@ -16,7 +16,7 @@
 namespace Strawberry::Graphics::Vulkan
 {
 
-	Core::Optional<ShaderModule> ShaderModule::Compile(const Device& device, const std::filesystem::path& file)
+	Core::Optional<Shader> Shader::Compile(const Device& device, const std::filesystem::path& file)
 	{
 		if (auto bytes = Core::IO::DynamicByteBuffer::FromFile(file))
 		{
@@ -27,7 +27,7 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
-	Core::Optional<ShaderModule> ShaderModule::Compile(const Device& device, const Core::IO::DynamicByteBuffer& bytes)
+	Core::Optional<Shader> Shader::Compile(const Device& device, const Core::IO::DynamicByteBuffer& bytes)
 	{
 		VkShaderModuleCreateInfo createInfo {
 				.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
@@ -41,7 +41,7 @@ namespace Strawberry::Graphics::Vulkan
 
 		if (auto result = vkCreateShaderModule(device.mDevice, &createInfo, nullptr, &shaderModule); result == VK_SUCCESS)
 		{
-			return ShaderModule(device, shaderModule);
+			return Shader(device, shaderModule);
 		}
 		else
 		{
@@ -50,7 +50,7 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
-	ShaderModule::ShaderModule(ShaderModule&& rhs) noexcept
+	Shader::Shader(Shader&& rhs) noexcept
 		: mShaderModule(std::exchange(rhs.mShaderModule, nullptr))
 		, mDevice(std::exchange(rhs.mDevice, nullptr))
 	{
@@ -58,7 +58,7 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
-	ShaderModule& ShaderModule::operator=(ShaderModule&& rhs) noexcept
+	Shader& Shader::operator=(Shader&& rhs) noexcept
 	{
 		if (this != &rhs)
 		{
@@ -70,7 +70,7 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
-	ShaderModule::~ShaderModule()
+	Shader::~Shader()
 	{
 		if (mShaderModule)
 		{
@@ -79,7 +79,7 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
-	ShaderModule::ShaderModule(const Device& device, VkShaderModule module)
+	Shader::Shader(const Device& device, VkShaderModule module)
 		: mShaderModule(module)
 		, mDevice(device)
 	{}

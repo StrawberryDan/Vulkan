@@ -4,7 +4,7 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
-#include "ShaderModule.hpp"
+#include "Shader.hpp"
 #include "Strawberry/Graphics/Vulkan/Buffer.hpp"
 // Vulkan
 #include <vulkan/vulkan.h>
@@ -162,7 +162,7 @@ namespace Strawberry::Graphics::Vulkan
 		explicit Builder(const RenderPass& renderPass);
 
 
-		Builder& WithShaderStage(VkShaderStageFlagBits stage, ShaderModule shader);
+		Builder& WithShaderStage(VkShaderStageFlagBits stage, Shader shader);
 
 
 		Builder& WithVertexInput(VertexInputDescription description);
@@ -189,7 +189,7 @@ namespace Strawberry::Graphics::Vulkan
 	private:
 		Core::ReflexivePointer<RenderPass> mRenderPass;
 
-		std::map<VkShaderStageFlagBits, ShaderModule> mStages;
+		std::map<VkShaderStageFlagBits, Shader> mStages;
 
 		VertexInputDescription mVertexInputDescription;
 

@@ -52,8 +52,8 @@ add_library(StrawberryGraphics
 		src/Strawberry/Graphics/Vulkan/Image.hpp
 		src/Strawberry/Graphics/Vulkan/ImageView.cpp
 		src/Strawberry/Graphics/Vulkan/ImageView.hpp
-		src/Strawberry/Graphics/Vulkan/ShaderModule.cpp
-		src/Strawberry/Graphics/Vulkan/ShaderModule.hpp
+        src/Strawberry/Graphics/Vulkan/Shader.cpp
+        src/Strawberry/Graphics/Vulkan/Shader.hpp
 		src/Strawberry/Graphics/Vulkan/Framebuffer.cpp
 		src/Strawberry/Graphics/Vulkan/Framebuffer.hpp
 		src/Strawberry/Graphics/Vulkan/Fence.cpp

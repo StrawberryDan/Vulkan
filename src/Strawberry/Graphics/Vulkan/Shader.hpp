@@ -22,25 +22,25 @@ namespace Strawberry::Graphics::Vulkan
 	class Device;
 
 
-	class ShaderModule
+	class Shader
 	{
 		friend class Pipeline;
 
 
 	public:
-		static Core::Optional<ShaderModule> Compile(const Device& device, const std::filesystem::path& file);
-		static Core::Optional<ShaderModule> Compile(const Device& device, const Core::IO::DynamicByteBuffer& bytes);
+		static Core::Optional<Shader> Compile(const Device& device, const std::filesystem::path& file);
+		static Core::Optional<Shader> Compile(const Device& device, const Core::IO::DynamicByteBuffer& bytes);
 
 
-		ShaderModule(const ShaderModule& rhs) = delete;
-		ShaderModule& operator=(const ShaderModule& rhs) = delete;
-		ShaderModule(ShaderModule&& rhs) noexcept;
-		ShaderModule& operator=(ShaderModule&& rhs) noexcept;
-		~ShaderModule();
+		Shader(const Shader& rhs) = delete;
+		Shader& operator=(const Shader& rhs) = delete;
+		Shader(Shader&& rhs) noexcept;
+		Shader& operator=(Shader&& rhs) noexcept;
+		~Shader();
 
 
 	protected:
-		ShaderModule(const Device& device, VkShaderModule module);
+		Shader(const Device& device, VkShaderModule module);
 
 
 	private:
