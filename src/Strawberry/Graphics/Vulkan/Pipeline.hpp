@@ -28,6 +28,59 @@ namespace Strawberry::Graphics::Vulkan
 	class RenderPass;
 
 
+	class Pipeline
+	{
+		friend class Builder;
+		friend class CommandBuffer;
+		friend class Framebuffer;
+
+
+	public:
+		class Builder;
+
+
+	public:
+		Pipeline(const Pipeline& rhs) = delete;
+		Pipeline& operator=(const Pipeline& rhs) = delete;
+		Pipeline(Pipeline&& rhs) noexcept;
+		Pipeline& operator=(Pipeline&& rhs) noexcept;
+		~Pipeline();
+
+
+		template <std::movable T, typename... Args>
+		T Create(const Args&... args) const { return T(*this, std::forward<const Args&>(args)...); }
+
+
+		void SetUniformBuffer(const Vulkan::Buffer& buffer, uint32_t set, uint32_t binding,
+							  uint32_t arrayElement = 0);
+
+
+		void SetUniformTexture(const Sampler& sampler, const ImageView& image, VkImageLayout layout, uint32_t set, uint32_t binding, uint32_t arrayElement = 0);
+
+
+	private:
+		Pipeline() = default;
+
+
+	private:
+		// Our RenderPass
+		Core::ReflexivePointer<RenderPass> mRenderPass;
+
+		// Handle to pipeline
+		VkPipeline mPipeline = nullptr;
+		// Handle to pipeline layout
+		VkPipelineLayout mPipelineLayout = nullptr;
+		// The size of the viewport to render to
+		VkViewport mViewport;
+		// Our descriptor sets
+		std::vector<VkDescriptorSet> mDescriptorSets;
+		// Our descriptor set layouts
+		std::vector<VkDescriptorSetLayout> mDescriptorSetLayouts;
+		// The pool from which we allocate descriptor sets
+		VkDescriptorPool mDescriptorPool;
+	};
+
+
 	class VertexInputDescription
 	{
 	private:
@@ -100,59 +153,6 @@ namespace Strawberry::Graphics::Vulkan
 
 	private:
 		std::vector<VkDescriptorSetLayoutBinding> mBindings;
-	};
-
-
-	class Pipeline
-	{
-		friend class Builder;
-		friend class CommandBuffer;
-		friend class Framebuffer;
-
-
-	public:
-		class Builder;
-
-
-	public:
-		Pipeline(const Pipeline& rhs) = delete;
-		Pipeline& operator=(const Pipeline& rhs) = delete;
-		Pipeline(Pipeline&& rhs) noexcept;
-		Pipeline& operator=(Pipeline&& rhs) noexcept;
-		~Pipeline();
-
-
-		template <std::movable T, typename... Args>
-		T Create(const Args&... args) const { return T(*this, std::forward<const Args&>(args)...); }
-
-
-		void SetUniformBuffer(const Vulkan::Buffer& buffer, uint32_t set, uint32_t binding,
-							  uint32_t arrayElement = 0);
-
-
-		void SetUniformTexture(const Sampler& sampler, const ImageView& image, VkImageLayout layout, uint32_t set, uint32_t binding, uint32_t arrayElement = 0);
-
-
-	private:
-		Pipeline() = default;
-
-
-	private:
-		// Our RenderPass
-		Core::ReflexivePointer<RenderPass> mRenderPass;
-
-		// Handle to pipeline
-		VkPipeline mPipeline = nullptr;
-		// Handle to pipeline layout
-		VkPipelineLayout mPipelineLayout = nullptr;
-		// The size of the viewport to render to
-		VkViewport mViewport;
-		// Our descriptor sets
-		std::vector<VkDescriptorSet> mDescriptorSets;
-		// Our descriptor set layouts
-		std::vector<VkDescriptorSetLayout> mDescriptorSetLayouts;
-		// The pool from which we allocate descriptor sets
-		VkDescriptorPool mDescriptorPool;
 	};
 
 
