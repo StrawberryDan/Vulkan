@@ -43,6 +43,9 @@ namespace Strawberry::Graphics::Vulkan
 		[[nodiscard]] Core::ReflexivePointer<RenderPass> GetRenderPass() const;
 
 
+		[[nodiscard]] Core::Math::Vec2u GetSize() const;
+
+
 		[[nodiscard]] uint32_t GetColorAttachmentCount() const;
 		Image& GetColorAttachment(uint32_t index);
 		Image& GetDepthAttachment();

@@ -100,6 +100,12 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
+	Core::Math::Vec2u Framebuffer::GetSize() const
+	{
+		return mSize;
+	}
+
+
 	uint32_t Framebuffer::GetColorAttachmentCount() const
 	{
 		return mColorAttachments.size();
