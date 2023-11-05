@@ -60,9 +60,11 @@ void BasicRendering()
 		.WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE)
 		.WithSubpass(SubpassDescription().WithColorAttachment(0))
 		.Build();
+	auto vertexShader = ShaderModule::Compile(device, Core::IO::DynamicByteBuffer(meshVertexShader, sizeof(meshVertexShader))).Unwrap();
+	auto fragmentShader = ShaderModule::Compile(device, Core::IO::DynamicByteBuffer(textureFragShader, sizeof(textureFragShader))).Unwrap();
 	Pipeline pipeline = renderPass.Create<Pipeline::Builder>()
-		.WithShaderStage(VK_SHADER_STAGE_VERTEX_BIT, ShaderModule::Compile(device, Core::IO::DynamicByteBuffer(meshVertexShader, sizeof(meshVertexShader))).Unwrap())
-		.WithShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT, ShaderModule::Compile(device, Core::IO::DynamicByteBuffer(textureFragShader, sizeof(textureFragShader))).Unwrap())
+		.WithShaderStage(VK_SHADER_STAGE_VERTEX_BIT, std::move(vertexShader))
+		.WithShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT, std::move(fragmentShader))
 		.WithVertexInput(vertexInputDescription())
 		.WithPrimitiveTopology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
 		.WithViewport({0, 0}, {1920, 1080})
