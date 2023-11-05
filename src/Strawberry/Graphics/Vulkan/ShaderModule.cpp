@@ -15,23 +15,38 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics::Vulkan
 {
-	ShaderModule::ShaderModule(const Device& device, const std::filesystem::path& spirvFile)
-		: ShaderModule(device, Core::IO::DynamicByteBuffer::FromFile(spirvFile).Unwrap())
-	{}
+
+	Core::Optional<ShaderModule> ShaderModule::Compile(const Device& device, const std::filesystem::path& file)
+	{
+		if (auto bytes = Core::IO::DynamicByteBuffer::FromFile(file))
+		{
+			return Compile(device, bytes.Unwrap());
+		}
+
+		return Core::NullOpt;
+	}
 
 
-	ShaderModule::ShaderModule(const Device& device, const Core::IO::DynamicByteBuffer& bytes)
-		: mDevice(device.mDevice)
+	Core::Optional<ShaderModule> ShaderModule::Compile(const Device& device, const Core::IO::DynamicByteBuffer& bytes)
 	{
 		VkShaderModuleCreateInfo createInfo {
-			.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = 0,
-			.codeSize = bytes.Size(),
-			.pCode = reinterpret_cast<const uint32_t*>(bytes.Data()),
+				.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+				.pNext = nullptr,
+				.flags = 0,
+				.codeSize = bytes.Size(),
+				.pCode = reinterpret_cast<const uint32_t*>(bytes.Data()),
 		};
 
-		Core::AssertEQ(vkCreateShaderModule(mDevice, &createInfo, nullptr, &mShaderModule), VK_SUCCESS);
+		VkShaderModule shaderModule = VK_NULL_HANDLE;
+
+		if (auto result = vkCreateShaderModule(device.mDevice, &createInfo, nullptr, &shaderModule); result == VK_SUCCESS)
+		{
+			return ShaderModule(device, shaderModule);
+		}
+		else
+		{
+			return Core::NullOpt;
+		}
 	}
 
 
@@ -59,7 +74,12 @@ namespace Strawberry::Graphics::Vulkan
 	{
 		if (mShaderModule)
 		{
-			vkDestroyShaderModule(mDevice, mShaderModule, nullptr);
+			vkDestroyShaderModule(mDevice->mDevice, mShaderModule, nullptr);
 		}
+	}
+
+
+	ShaderModule::ShaderModule(const Device& device, VkShaderModule module)
+	{
 	}
 }

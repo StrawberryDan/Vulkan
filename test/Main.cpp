@@ -61,9 +61,8 @@ void BasicRendering()
 		.WithSubpass(SubpassDescription().WithColorAttachment(0))
 		.Build();
 	Pipeline pipeline = renderPass.Create<Pipeline::Builder>()
-		.WithShaderStage(VK_SHADER_STAGE_VERTEX_BIT, device.Create<ShaderModule>(Core::IO::DynamicByteBuffer(meshVertexShader, sizeof(meshVertexShader))))
-		.WithShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT,
-						 device.Create<ShaderModule>(Core::IO::DynamicByteBuffer(textureFragShader, sizeof(textureFragShader))))
+		.WithShaderStage(VK_SHADER_STAGE_VERTEX_BIT, ShaderModule::Compile(device, Core::IO::DynamicByteBuffer(meshVertexShader, sizeof(meshVertexShader))).Unwrap())
+		.WithShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT, ShaderModule::Compile(device, Core::IO::DynamicByteBuffer(textureFragShader, sizeof(textureFragShader))).Unwrap())
 		.WithVertexInput(vertexInputDescription())
 		.WithPrimitiveTopology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
 		.WithViewport({0, 0}, {1920, 1080})
@@ -90,7 +89,7 @@ void BasicRendering()
 	buffer.SetData(vertices);
 
 
-	auto framebuffer = renderPass.Create<Framebuffer>(Core::Math::Vec2i(1920, 1080));
+	auto framebuffer = renderPass.Create<Framebuffer>(Core::Math::Vec2u(1920, 1080));
 
 
 	auto [size, channels, bytes] = Core::IO::DynamicByteBuffer::FromImage("data/dio.png").Unwrap();
@@ -167,7 +166,7 @@ void SpriteRendering()
 	auto queue = device.Create<Queue>();
 	auto swapchain = queue.Create<Swapchain>(surface, window.GetSize());
 
-	auto framebuffer = renderPass.Create<Framebuffer>(Core::Math::Vec2i(1920 / 16, 1080 / 16));
+	auto framebuffer = renderPass.Create<Framebuffer>(Core::Math::Vec2u(1920 / 16, 1080 / 16));
 
 	auto renderer = queue.Create<SpriteRenderer>(Core::Math::Vec2f(1920, 1080));
 	auto spriteSheet = SpriteSheet::FromFile(device, queue, {4, 4}, "data/dio.png").Unwrap();

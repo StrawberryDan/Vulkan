@@ -6,6 +6,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Strawberry Core
 #include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
+#include "Strawberry/Core/Types/ReflexivePointer.hpp"
 // Vulkan
 #include <vulkan/vulkan.h>
 #include <Strawberry/Core/IO/DynamicByteBuffer.hpp>
@@ -27,8 +28,10 @@ namespace Strawberry::Graphics::Vulkan
 
 
 	public:
-		ShaderModule(const Device& device, const std::filesystem::path& spirvFile);
-		ShaderModule(const Device& device, const Core::IO::DynamicByteBuffer& bytes);
+		static Core::Optional<ShaderModule> Compile(const Device& device, const std::filesystem::path& file);
+		static Core::Optional<ShaderModule> Compile(const Device& device, const Core::IO::DynamicByteBuffer& bytes);
+
+
 		ShaderModule(const ShaderModule& rhs) = delete;
 		ShaderModule& operator=(const ShaderModule& rhs) = delete;
 		ShaderModule(ShaderModule&& rhs) noexcept;
@@ -36,8 +39,12 @@ namespace Strawberry::Graphics::Vulkan
 		~ShaderModule();
 
 
+	protected:
+		ShaderModule(const Device& device, VkShaderModule module);
+
+
 	private:
 		VkShaderModule mShaderModule;
-		VkDevice mDevice;
+		Core::ReflexivePointer<Device> mDevice;
 	};
 }
