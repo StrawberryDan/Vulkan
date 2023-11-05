@@ -67,6 +67,7 @@ namespace Strawberry::Graphics
 		mCommandBuffer.BindPipeline(mPipeline);
 		mCommandBuffer.BindDescriptorSet(mPipeline, 0);
 		mCommandBuffer.BindDescriptorSet(mPipeline, 1);
+		mCommandBuffer.ImageMemoryBarrier(sprite.mSpriteSheet->mImage, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_GENERAL);
 		mCommandBuffer.BeginRenderPass(*framebuffer.GetRenderPass(), framebuffer);
 
 
