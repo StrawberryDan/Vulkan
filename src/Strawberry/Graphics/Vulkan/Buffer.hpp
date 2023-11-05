@@ -30,6 +30,7 @@ namespace Strawberry::Graphics::Vulkan
 
 	public:
 		Buffer(const Device& device, uint64_t size, VkBufferUsageFlags usage);
+		Buffer(const Device& device, const Core::IO::DynamicByteBuffer& bytes, VkBufferUsageFlags usage);
 		Buffer(const Buffer& rhs) = delete;
 		Buffer& operator=(const Buffer& rhs) = delete;
 		Buffer(Buffer&& rhs) noexcept;

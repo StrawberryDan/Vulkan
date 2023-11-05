@@ -40,6 +40,13 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
+	Buffer::Buffer(const Device& device, const Core::IO::DynamicByteBuffer& bytes, VkBufferUsageFlags usage)
+		: Buffer(device, bytes.Size(), usage)
+	{
+		SetData(bytes);
+	}
+
+
 	Buffer::Buffer(Buffer&& rhs) noexcept
 		: mBuffer(std::exchange(rhs.mBuffer, nullptr))
 		, mMemory(std::move(rhs.mMemory))
