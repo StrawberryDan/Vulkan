@@ -80,6 +80,7 @@ namespace Strawberry::Graphics::Vulkan
 
 
 	ShaderModule::ShaderModule(const Device& device, VkShaderModule module)
-	{
-	}
+		: mShaderModule(module)
+		, mDevice(device)
+	{}
 }
