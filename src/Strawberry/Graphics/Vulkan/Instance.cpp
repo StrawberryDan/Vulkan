@@ -19,9 +19,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics::Vulkan
 {
-	static PFN_vkCreateDebugReportCallbackEXT vkCreateDebugReportCallbackEXT = nullptr;
-	static PFN_vkDestroyDebugReportCallbackEXT vkDestroyDebugReportCallbackEXT = nullptr;
-
 	static VkBool32 DebugReportCallback(VkDebugReportFlagsEXT flags,
 										VkDebugReportObjectTypeEXT objectType,
 										uint64_t object,
@@ -166,6 +163,12 @@ namespace Strawberry::Graphics::Vulkan
 
 		vkCreateDebugReportCallbackEXT = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(vkGetInstanceProcAddr(mInstance, "vkCreateDebugReportCallbackEXT"));
 		vkDestroyDebugReportCallbackEXT = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(mInstance, "vkDestroyDebugReportCallbackEXT"));
+		vkCreateDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(mInstance, "vkCreateDebugUtilsMessengerEXT"));
+		vkDestroyDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(mInstance, "vkDestroyDebugUtilsMessengerEXT"));
+
+		messengerCreateInfo.pNext = nullptr;
+		Core::AssertEQ(vkCreateDebugUtilsMessengerEXT(mInstance, &messengerCreateInfo, nullptr, &mDebugUtilsCallback),
+					   VK_SUCCESS);
 
 		Core::AssertEQ(
 				vkCreateDebugReportCallbackEXT(mInstance, &callbackCreateInfo, nullptr, &mDebugReportCallback),
@@ -175,8 +178,12 @@ namespace Strawberry::Graphics::Vulkan
 
 	Instance::~Instance()
 	{
-		vkDestroyDebugReportCallbackEXT(mInstance, mDebugReportCallback, nullptr);
-		vkDestroyInstance(mInstance, nullptr);
+		if (mInstance)
+		{
+			vkDestroyDebugUtilsMessengerEXT(mInstance, mDebugUtilsCallback, nullptr);
+			vkDestroyDebugReportCallbackEXT(mInstance, mDebugReportCallback, nullptr);
+			vkDestroyInstance(mInstance, nullptr);
+		}
 	}
 
 

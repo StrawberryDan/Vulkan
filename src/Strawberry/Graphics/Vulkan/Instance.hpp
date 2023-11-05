@@ -42,5 +42,12 @@ namespace Strawberry::Graphics::Vulkan
 	private:
 		VkInstance mInstance = {};
 		VkDebugReportCallbackEXT mDebugReportCallback;
+		VkDebugUtilsMessengerEXT mDebugUtilsCallback;
+
+
+		PFN_vkCreateDebugReportCallbackEXT vkCreateDebugReportCallbackEXT = nullptr;
+		PFN_vkDestroyDebugReportCallbackEXT vkDestroyDebugReportCallbackEXT = nullptr;
+		PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessengerEXT = nullptr;
+		PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessengerEXT = nullptr;
 	};
 }
