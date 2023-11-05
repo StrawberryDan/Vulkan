@@ -43,7 +43,7 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
-	Image::Image(const Device& device, Core::Math::Vec2i extent, VkFormat format, VkImageUsageFlags usage,
+	Image::Image(const Device& device, Core::Math::Vec2u extent, VkFormat format, VkImageUsageFlags usage,
 				 uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling, VkImageLayout initialLayout)
 		: mImage(nullptr)
 		, mDevice(device.mDevice)
@@ -80,7 +80,7 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
-	Image::Image(const Device& device, Core::Math::Vec3i extent, VkFormat format, VkImageUsageFlags usage,
+	Image::Image(const Device& device, Core::Math::Vec3u extent, VkFormat format, VkImageUsageFlags usage,
 				 uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling, VkImageLayout initialLayout)
 		: mImage(nullptr)
 		, mDevice(device.mDevice)
@@ -121,7 +121,7 @@ namespace Strawberry::Graphics::Vulkan
 		: mImage(std::exchange(rhs.mImage, nullptr))
 		, mMemory(std::move(rhs.mMemory))
 		, mDevice(std::exchange(rhs.mDevice, nullptr))
-		, mSize(std::exchange(rhs.mSize, Core::Math::Vec3i()))
+		, mSize(std::exchange(rhs.mSize, Core::Math::Vec3u()))
 		, mLastRecordedLayout(std::exchange(rhs.mLastRecordedLayout, VK_IMAGE_LAYOUT_UNDEFINED))
 	{
 
@@ -149,7 +149,7 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
-	Core::Math::Vec3i Image::GetSize() const
+	Core::Math::Vec3u Image::GetSize() const
 	{
 		return mSize;
 	}

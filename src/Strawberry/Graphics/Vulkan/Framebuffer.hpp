@@ -32,7 +32,7 @@ namespace Strawberry::Graphics::Vulkan
 
 
 	public:
-		Framebuffer(const RenderPass& mRenderPass, Core::Math::Vec2i size);
+		Framebuffer(const RenderPass& mRenderPass, Core::Math::Vec2u size);
 		Framebuffer(const Framebuffer& rhs) = delete;
 		Framebuffer& operator=(const Framebuffer& rhs) = delete;
 		Framebuffer(Framebuffer&& rhs) noexcept;
@@ -59,7 +59,7 @@ namespace Strawberry::Graphics::Vulkan
 	private:
 		VkFramebuffer mFramebuffer;
 		Core::ReflexivePointer<RenderPass> mRenderPass;
-		Core::Math::Vec2i mSize;
+		Core::Math::Vec2u mSize;
 
 
 		std::vector<Image> mColorAttachments;

@@ -37,7 +37,7 @@ namespace Strawberry::Graphics::Vulkan
 			  VkImageLayout initialLayout = VK_IMAGE_LAYOUT_UNDEFINED);
 
 		Image(const Device& device,
-			  Core::Math::Vec2i extent,
+			  Core::Math::Vec2u extent,
 			  VkFormat format,
 			  VkImageUsageFlags usage,
 			  uint32_t mipLevels = 1,
@@ -46,7 +46,7 @@ namespace Strawberry::Graphics::Vulkan
 			  VkImageLayout initialLayout = VK_IMAGE_LAYOUT_UNDEFINED);
 
 		Image(const Device& device,
-			  Core::Math::Vec3i extent,
+			  Core::Math::Vec3u extent,
 			  VkFormat format,
 			  VkImageUsageFlags usage,
 			  uint32_t mipLevels = 1,
@@ -65,14 +65,14 @@ namespace Strawberry::Graphics::Vulkan
 		T Create(const Args&... args) const { return T(*this, std::forward<const Args&>(args)...); }
 
 
-		Core::Math::Vec3i GetSize() const;
+		Core::Math::Vec3u GetSize() const;
 
 
 	private:
 		VkImage mImage;
 		DeviceMemory mMemory;
 		VkDevice mDevice;
-		Core::Math::Vec3i mSize;
+		Core::Math::Vec3u mSize;
 		VkImageLayout mLastRecordedLayout;
 	};
 }

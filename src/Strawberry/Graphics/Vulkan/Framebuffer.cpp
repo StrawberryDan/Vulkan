@@ -17,7 +17,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics::Vulkan
 {
-	Framebuffer::Framebuffer(const RenderPass& renderPass, Core::Math::Vec2i size)
+	Framebuffer::Framebuffer(const RenderPass& renderPass, Core::Math::Vec2u size)
 		: mRenderPass(renderPass)
 		  , mSize(size)
 		  , mDepthAttachment(CreateDepthImage())
