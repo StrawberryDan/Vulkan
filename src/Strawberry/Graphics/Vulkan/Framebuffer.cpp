@@ -61,7 +61,7 @@ namespace Strawberry::Graphics::Vulkan
 	Framebuffer::Framebuffer(Framebuffer&& rhs) noexcept
 		: mFramebuffer(std::exchange(rhs.mFramebuffer, nullptr))
 		  , mRenderPass(std::move(rhs.mRenderPass))
-		  , mSize(std::exchange(rhs.mSize, Core::Math::Vec2i()))
+		  , mSize(std::exchange(rhs.mSize, Core::Math::Vec2u()))
 		  , mColorAttachments(std::move(rhs.mColorAttachments))
 		  , mColorAttachmentViews(std::move(rhs.mColorAttachmentViews))
 		  , mDepthAttachment(std::move(rhs.mDepthAttachment))
