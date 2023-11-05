@@ -181,7 +181,7 @@ namespace Strawberry::Graphics::Vulkan
 			},
 			.srcOffsets{
 				{.x = 0, .y = 0, .z = 0},
-				{.x = image.mSize[0], .y = image.mSize[1], .z = 1},
+				{.x = static_cast<int32_t>(image.mSize[0]), .y = static_cast<int32_t>(image.mSize[1]), .z = 1},
 			},
 			.dstSubresource {
 				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
