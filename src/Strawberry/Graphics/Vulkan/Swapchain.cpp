@@ -124,6 +124,39 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
+	void Swapchain::Present()
+	{
+		VkResult result;
+		uint32_t imageIndex = GetNextImageIndex();
+		VkPresentInfoKHR presentInfo {
+				.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+				.pNext = nullptr,
+				.waitSemaphoreCount = 0,
+				.pWaitSemaphores = nullptr,
+				.swapchainCount = 1,
+				.pSwapchains = &mSwapchain,
+				.pImageIndices = &imageIndex,
+				.pResults = &result,
+		};
+
+
+		result = vkQueuePresentKHR(mQueue->mQueue, &presentInfo);
+		switch (result)
+		{
+			{
+				case VK_SUCCESS:
+				case VK_SUBOPTIMAL_KHR:
+					Core::Assert(result == VK_SUCCESS || result == VK_SUBOPTIMAL_KHR);
+				mNextImageIndex.Invalidate();
+				mNextImage.Invalidate();
+				break;
+				default:
+					Core::Unreachable();
+			}
+		}
+	}
+
+
 	void Swapchain::Present(Framebuffer& framebuffer)
 	{
 		CommandBuffer buffer = mCommandPool.Create<CommandBuffer>();
@@ -140,34 +173,7 @@ namespace Strawberry::Graphics::Vulkan
 		mQueue->Submit(buffer);
 
 
-		VkResult result;
-		uint32_t imageIndex = GetNextImageIndex();
-		VkPresentInfoKHR presentInfo {
-			.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-			.pNext = nullptr,
-			.waitSemaphoreCount = 0,
-			.pWaitSemaphores = nullptr,
-			.swapchainCount = 1,
-			.pSwapchains = &mSwapchain,
-			.pImageIndices = &imageIndex,
-			.pResults = &result,
-		};
-
-
-		result = vkQueuePresentKHR(mQueue->mQueue, &presentInfo);
-		switch (result)
-		{
-			{
-				case VK_SUCCESS:
-				case VK_SUBOPTIMAL_KHR:
-					Core::Assert(result == VK_SUCCESS || result == VK_SUBOPTIMAL_KHR);
-					mNextImageIndex.Invalidate();
-					mNextImage.Invalidate();
-					break;
-				default:
-					Core::Unreachable();
-			}
-		}
+		Present();
 	}
 
 

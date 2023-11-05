@@ -53,6 +53,7 @@ namespace Strawberry::Graphics::Vulkan
 		VkImage GetNextImage();
 
 
+		void Present();
 		void Present(Framebuffer& framebuffer);
 
 
