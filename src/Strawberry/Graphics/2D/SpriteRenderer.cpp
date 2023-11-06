@@ -60,9 +60,9 @@ namespace Strawberry::Graphics
 		mCameraBuffer.SetData(Core::IO::DynamicByteBuffer(cameraMatrix));
 		Core::Math::Vec2f spriteSize = sprite.mSpriteSheet->GetSpriteSize().AsType<float>();
 		mSpriteSheetBuffer.SetData(Core::IO::DynamicByteBuffer(spriteSize));
-		mVertexDescriptorSet.SetUniformBuffer(mCameraBuffer, 0, 0);
-		mVertexDescriptorSet.SetUniformBuffer(mSpriteSheetBuffer, 0, 1);
-		mFragmentDescriptorSet.SetUniformTexture(mSampler, sprite.mSpriteSheet->mImageView, VK_IMAGE_LAYOUT_GENERAL, 1, 0);
+		mVertexDescriptorSet.SetUniformBuffer(mCameraBuffer, 0);
+		mVertexDescriptorSet.SetUniformBuffer(mSpriteSheetBuffer, 1);
+		mFragmentDescriptorSet.SetUniformTexture(mSampler, sprite.mSpriteSheet->mImageView, VK_IMAGE_LAYOUT_GENERAL, 0);
 
 
 		mCommandBuffer.Begin(true);
