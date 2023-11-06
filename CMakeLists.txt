@@ -10,6 +10,7 @@ find_package(Vulkan REQUIRED)
 
 
 FetchContent_Declare(GLFW
+	EXCLUDE_FROM_ALL
 	GIT_REPOSITORY "https://github.com/glfw/glfw.git"
 	GIT_TAG "3.3.8")
 FetchContent_MakeAvailable(GLFW)
