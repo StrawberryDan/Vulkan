@@ -111,6 +111,7 @@ void BasicRendering()
 
 
 	Core::Clock clock;
+	Graphics::Vulkan::DescriptorSet textureDescriptorSet = pipeline.AllocateDescriptorSet(0);
 
 
 	while (!window.CloseRequested())
@@ -133,14 +134,14 @@ void BasicRendering()
 								(std::cos(0.5 * *clock) + 1.0f) / 2.0f);
 
 
-		pipeline.SetUniformTexture(sampler, textureView, VK_IMAGE_LAYOUT_GENERAL, 0, 0);
+		textureDescriptorSet.SetUniformTexture(sampler, textureView, VK_IMAGE_LAYOUT_GENERAL, 0);
 
 
 		commandBuffer.Begin(true);
 		commandBuffer.BeginRenderPass(renderPass, framebuffer);
 		commandBuffer.BindPipeline(pipeline);
 		commandBuffer.BindVertexBuffer(0, buffer);
-		commandBuffer.BindDescriptorSet(pipeline, 0);
+		commandBuffer.BindDescriptorSet(pipeline, 0, textureDescriptorSet);
 		commandBuffer.PushConstants(pipeline, VK_SHADER_STAGE_VERTEX_BIT, Core::IO::DynamicByteBuffer(MVPMatrix), 0);
 		commandBuffer.PushConstants(pipeline, VK_SHADER_STAGE_FRAGMENT_BIT, Core::IO::DynamicByteBuffer(Color), 64);
 		commandBuffer.Draw(6);
