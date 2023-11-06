@@ -26,9 +26,8 @@ namespace Strawberry::Graphics::Vulkan
 		  , mRenderPass(std::move(rhs.mRenderPass))
 		  , mPipelineLayout(std::exchange(rhs.mPipelineLayout, nullptr))
 		  , mViewport(std::exchange(rhs.mViewport, {}))
-		  , mDescriptorSets(std::move(rhs.mDescriptorSets))
-		  , mDescriptorSetLayouts(std::move(rhs.mDescriptorSetLayouts))
 		  , mDescriptorPool(std::move(rhs.mDescriptorPool))
+		  , mDescriptorSetLayouts(std::move(rhs.mDescriptorSetLayouts))
 	{
 
 	}
@@ -149,16 +148,9 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
-	void Pipeline::SetUniformBuffer(const Vulkan::Buffer& buffer, uint32_t set, uint32_t binding, uint32_t arrayElement)
+	DescriptorSet Pipeline::AllocateDescriptorSet(size_t layoutIndex) const
 	{
-		mDescriptorSets[set].SetUniformBuffer(buffer, binding, arrayElement);
-	}
-
-
-	void Pipeline::SetUniformTexture(const Sampler& sampler, const ImageView& image, VkImageLayout layout, uint32_t set, uint32_t binding,
-									 uint32_t arrayElement)
-	{
-		mDescriptorSets[set].SetUniformTexture(sampler, image, layout, binding, arrayElement);
+		return mDescriptorPool.Create<DescriptorSet>(mDescriptorSetLayouts[layoutIndex]);
 	}
 
 
@@ -338,13 +330,6 @@ namespace Strawberry::Graphics::Vulkan
 			.pPushConstantRanges = mPushConstantRanges.data(),
 		};
 		Core::AssertEQ(vkCreatePipelineLayout(mRenderPass->mDevice->mDevice, &layoutCreateInfo, nullptr, &pipeline.mPipelineLayout), VK_SUCCESS);
-
-
-		// Create Descriptor Sets
-		for (const auto& descriptorSetLayout : mDescriptorSetLayouts)
-		{
-			pipeline.mDescriptorSets.emplace_back(pipeline.mDescriptorPool, descriptorSetLayout);
-		}
 
 
 		// Create the Pipeline

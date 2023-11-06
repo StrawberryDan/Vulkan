@@ -15,11 +15,12 @@ namespace Strawberry::Graphics::Vulkan
 	DescriptorPool::DescriptorPool(const Device& device, VkDescriptorPoolCreateFlags flags, uint32_t maxSets, std::vector<VkDescriptorPoolSize> poolSizes)
 		: mDescriptorPool(VK_NULL_HANDLE)
 		, mDevice(device)
+		, mFlags(flags)
 	{
 		VkDescriptorPoolCreateInfo createInfo {
 			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 			.pNext = nullptr,
-			.flags = 0,
+			.flags = flags,
 			.maxSets = maxSets,
 			.poolSizeCount = static_cast<uint32_t>(poolSizes.size()),
 			.pPoolSizes = poolSizes.data(),
@@ -33,6 +34,7 @@ namespace Strawberry::Graphics::Vulkan
 	DescriptorPool::DescriptorPool(DescriptorPool&& rhs) noexcept
 		: mDescriptorPool(std::exchange(rhs.mDescriptorPool, VK_NULL_HANDLE))
 		, mDevice(std::move(rhs.mDevice))
+		, mFlags(std::exchange(rhs.mFlags, 0))
 	{}
 
 

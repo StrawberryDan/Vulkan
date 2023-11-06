@@ -56,7 +56,7 @@ namespace Strawberry::Graphics::Vulkan
 
 	DescriptorSet::~DescriptorSet()
 	{
-		if (mDescriptorSet && mDescriptorPool)
+		if (mDescriptorSet && mDescriptorPool && mDescriptorPool->mFlags & VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT)
 		{
 			vkFreeDescriptorSets(mDescriptorPool->GetDevice()->mDevice, mDescriptorPool->mDescriptorPool, 1, &mDescriptorSet);
 		}

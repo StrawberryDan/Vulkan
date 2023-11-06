@@ -45,8 +45,12 @@ namespace Strawberry::Graphics
 		Vulkan::CommandBuffer mCommandBuffer;
 
 
+		Vulkan::DescriptorSet mVertexDescriptorSet;
 		Vulkan::Buffer mCameraBuffer;
 		Vulkan::Buffer mSpriteSheetBuffer;
+
+
+		Vulkan::DescriptorSet mFragmentDescriptorSet;
 		VkFilter mMinFilter;
 		VkFilter mMagFilter;
 		Vulkan::Sampler mSampler;

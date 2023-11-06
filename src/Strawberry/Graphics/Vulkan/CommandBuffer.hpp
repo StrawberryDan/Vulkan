@@ -26,6 +26,7 @@ namespace Strawberry::Graphics::Vulkan
 	class Pipeline;
 	class Framebuffer;
 	class RenderPass;
+	class DescriptorSet;
 
 
 	class CommandBuffer
@@ -71,10 +72,10 @@ namespace Strawberry::Graphics::Vulkan
 
 
 		void CopyImageToSwapchain(Image& image, Swapchain& swapchain);
-		void CopyBufferToImage(const Buffer& buffer, Image& image, VkFormat format);
+		void CopyBufferToImage(const Buffer& buffer, Image& image);
 
 
-		void BindDescriptorSet(const Pipeline& pipeline, uint32_t set);
+		void BindDescriptorSet(const Pipeline& pipeline, uint32_t set, const DescriptorSet& descriptorSet);
 
 
 	private:

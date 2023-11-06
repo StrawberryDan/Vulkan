@@ -46,5 +46,6 @@ namespace Strawberry::Graphics::Vulkan
 	private:
 		VkDescriptorPool mDescriptorPool;
 		Core::ReflexivePointer<Device> mDevice;
+		VkDescriptorPoolCreateFlags mFlags;
 	};
 }

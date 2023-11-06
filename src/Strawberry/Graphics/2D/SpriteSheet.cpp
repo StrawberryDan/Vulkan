@@ -38,7 +38,7 @@ namespace Strawberry::Graphics
 
 		// Copy image data
 		commandBuffer.Begin(true);
-		commandBuffer.CopyBufferToImage(imageBuffer, image, VK_FORMAT_R8G8B8A8_SRGB);
+		commandBuffer.CopyBufferToImage(imageBuffer, image);
 		commandBuffer.End();
 		queue.Submit(commandBuffer);
 

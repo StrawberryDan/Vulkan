@@ -53,10 +53,7 @@ namespace Strawberry::Graphics::Vulkan
 		T Create(const Args&... args) const { return T(*this, std::forward<const Args&>(args)...); }
 
 
-		void SetUniformBuffer(const Vulkan::Buffer& buffer, uint32_t set, uint32_t binding, uint32_t arrayElement = 0);
-
-
-		void SetUniformTexture(const Sampler& sampler, const ImageView& image, VkImageLayout layout, uint32_t set, uint32_t binding, uint32_t arrayElement = 0);
+		DescriptorSet AllocateDescriptorSet(size_t layoutIndex) const;
 
 
 	private:
@@ -73,12 +70,10 @@ namespace Strawberry::Graphics::Vulkan
 		VkPipelineLayout mPipelineLayout = nullptr;
 		// The size of the viewport to render to
 		VkViewport mViewport;
-		// Our descriptor sets
-		std::vector<DescriptorSet> mDescriptorSets;
-		// Our descriptor set layouts
-		std::vector<VkDescriptorSetLayout> mDescriptorSetLayouts;
 		// The pool from which we allocate descriptor sets
 		DescriptorPool mDescriptorPool;
+		// Our descriptor set layouts
+		std::vector<VkDescriptorSetLayout> mDescriptorSetLayouts;
 	};
 
 

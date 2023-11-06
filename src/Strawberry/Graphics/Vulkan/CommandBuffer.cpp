@@ -4,7 +4,6 @@
 #include "CommandBuffer.hpp"
 #include "CommandPool.hpp"
 #include "Buffer.hpp"
-#include "ImageView.hpp"
 #include "Image.hpp"
 #include "Pipeline.hpp"
 #include "Framebuffer.hpp"
@@ -12,6 +11,7 @@
 #include "Device.hpp"
 #include "RenderPass.hpp"
 #include "Queue.hpp"
+#include "DescriptorSet.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
@@ -199,7 +199,7 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
-	void CommandBuffer::CopyBufferToImage(const Buffer& buffer, Image& image, VkFormat format)
+	void CommandBuffer::CopyBufferToImage(const Buffer& buffer, Image& image)
 	{
 		// Clear and put into DST_OPTIMAL
 		ImageMemoryBarrier(image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
@@ -223,9 +223,9 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
-	void CommandBuffer::BindDescriptorSet(const Pipeline& pipeline, uint32_t set)
+	void CommandBuffer::BindDescriptorSet(const Pipeline& pipeline, uint32_t set, const DescriptorSet& descriptorSet)
 	{
-		vkCmdBindDescriptorSets(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.mPipelineLayout, set, 1, &pipeline.mDescriptorSets.at(set).mDescriptorSet, 0, nullptr);
+		vkCmdBindDescriptorSets(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.mPipelineLayout, set, 1, &descriptorSet.mDescriptorSet, 0, nullptr);
 	}
 
 

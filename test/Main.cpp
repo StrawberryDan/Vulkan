@@ -99,7 +99,7 @@ void BasicRendering()
 	textureBuffer.SetData(bytes);
 	auto texture = device.Create<Image>(size, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
 	commandBuffer.Begin(true);
-	commandBuffer.CopyBufferToImage(textureBuffer, texture, VK_FORMAT_R8G8B8A8_SRGB);
+	commandBuffer.CopyBufferToImage(textureBuffer, texture);
 	commandBuffer.ImageMemoryBarrier(texture, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_GENERAL);
 	commandBuffer.End();
 	queue.Submit(commandBuffer);
