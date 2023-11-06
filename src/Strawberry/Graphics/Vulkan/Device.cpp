@@ -105,7 +105,8 @@ namespace Strawberry::Graphics::Vulkan
 
 
 	Device::Device(const Instance& instance)
-			: mDevice{}, mInstance(instance.mInstance)
+			: mDevice{}
+			, mInstance(instance.mInstance)
 	{
 		// Enumerate Physical Devices
 		uint32_t physicalDeviceCount = 0;
