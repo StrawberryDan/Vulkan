@@ -225,7 +225,7 @@ namespace Strawberry::Graphics::Vulkan
 
 	void CommandBuffer::BindDescriptorSet(const Pipeline& pipeline, uint32_t set)
 	{
-		vkCmdBindDescriptorSets(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.mPipelineLayout, set, 1, &pipeline.mDescriptorSets.at(set), 0, nullptr);
+		vkCmdBindDescriptorSets(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.mPipelineLayout, set, 1, &pipeline.mDescriptorSets.at(set).mDescriptorSet, 0, nullptr);
 	}
 
 

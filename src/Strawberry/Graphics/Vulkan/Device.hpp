@@ -42,6 +42,8 @@ namespace Strawberry::Graphics::Vulkan
 		friend class Sampler;
 		friend class RenderPass;
 		friend class Shader;
+		friend class DescriptorSet;
+		friend class DescriptorPool;
 
 
 	public:

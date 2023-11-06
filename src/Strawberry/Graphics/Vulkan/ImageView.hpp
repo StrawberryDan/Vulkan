@@ -25,6 +25,7 @@ namespace Strawberry::Graphics::Vulkan
 		friend class CommandBuffer;
 		friend class Framebuffer;
 		friend class Pipeline;
+		friend class DescriptorSet;
 
 
 	public:

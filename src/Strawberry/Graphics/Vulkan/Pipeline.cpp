@@ -28,7 +28,7 @@ namespace Strawberry::Graphics::Vulkan
 		  , mViewport(std::exchange(rhs.mViewport, {}))
 		  , mDescriptorSets(std::move(rhs.mDescriptorSets))
 		  , mDescriptorSetLayouts(std::move(rhs.mDescriptorSetLayouts))
-		  , mDescriptorPool(std::exchange(rhs.mDescriptorPool, nullptr))
+		  , mDescriptorPool(std::move(rhs.mDescriptorPool))
 	{
 
 	}
@@ -51,9 +51,9 @@ namespace Strawberry::Graphics::Vulkan
 		if (mPipeline)
 		{
 			vkDestroyPipelineLayout(mRenderPass->mDevice->mDevice, mPipelineLayout, nullptr);
+			std::destroy_at(&mDescriptorPool);
 			for (VkDescriptorSetLayout layout: mDescriptorSetLayouts)
 				vkDestroyDescriptorSetLayout(mRenderPass->mDevice->mDevice, layout, nullptr);
-			vkDestroyDescriptorPool(mRenderPass->mDevice->mDevice, mDescriptorPool, nullptr);
 			vkDestroyPipeline(mRenderPass->mDevice->mDevice, mPipeline, nullptr);
 		}
 	}
@@ -151,59 +151,26 @@ namespace Strawberry::Graphics::Vulkan
 
 	void Pipeline::SetUniformBuffer(const Vulkan::Buffer& buffer, uint32_t set, uint32_t binding, uint32_t arrayElement)
 	{
-		VkDescriptorBufferInfo bufferInfo {
-			.buffer = buffer.mBuffer,
-			.offset = 0,
-			.range = buffer.GetSize()
-		};
-		VkWriteDescriptorSet write {
-			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-			.pNext = nullptr,
-			.dstSet = mDescriptorSets[set],
-			.dstBinding = binding,
-			.dstArrayElement = arrayElement,
-			.descriptorCount = 1,
-			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-			.pImageInfo = nullptr,
-			.pBufferInfo = &bufferInfo,
-			.pTexelBufferView = nullptr,
-		};
-		vkUpdateDescriptorSets(mRenderPass->mDevice->mDevice, 1, &write, 0, nullptr);
+		mDescriptorSets[set].SetUniformBuffer(buffer, binding, arrayElement);
 	}
 
 
 	void Pipeline::SetUniformTexture(const Sampler& sampler, const ImageView& image, VkImageLayout layout, uint32_t set, uint32_t binding,
 									 uint32_t arrayElement)
 	{
-		VkDescriptorImageInfo imageInfo {
-			.sampler = sampler.mSampler,
-			.imageView = image.mImageView,
-			.imageLayout = layout,
-		};
-		VkWriteDescriptorSet write {
-			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-			.pNext = nullptr,
-			.dstSet = mDescriptorSets[set],
-			.dstBinding = binding,
-			.dstArrayElement = arrayElement,
-			.descriptorCount = 1,
-			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.pImageInfo = &imageInfo,
-			.pBufferInfo = nullptr,
-			.pTexelBufferView = nullptr,
-		};
-		vkUpdateDescriptorSets(mRenderPass->mDevice->mDevice, 1, &write, 0, nullptr);
+		mDescriptorSets[set].SetUniformTexture(sampler, image, layout, binding, arrayElement);
+	}
+
+
+	Pipeline::Pipeline(DescriptorPool descriptorPool)
+		: mDescriptorPool(std::move(descriptorPool))
+	{
+
 	}
 
 
 	Pipeline Pipeline::Builder::Build() const
 	{
-		Pipeline pipeline;
-		pipeline.mRenderPass = mRenderPass;
-		pipeline.mViewport = mViewport.Value();
-		pipeline.mDescriptorSetLayouts = mDescriptorSetLayouts;
-
-
 		// Create Shader Stages
 		std::vector<VkPipelineShaderStageCreateInfo> stages;
 		for (auto& [stage, shader]: mStages)
@@ -352,6 +319,14 @@ namespace Strawberry::Graphics::Vulkan
 		};
 
 
+		// Create Descriptor pool and actual Pipeline Object
+		DescriptorPool descriptorPool(*mRenderPass->GetDevice(), 0, mDescriptorSetLayouts.size(), mDescriptorPoolSizes);
+		Pipeline pipeline(std::move(descriptorPool));
+		pipeline.mRenderPass = mRenderPass;
+		pipeline.mViewport = mViewport.Value();
+		pipeline.mDescriptorSetLayouts = mDescriptorSetLayouts;
+
+
 		// Pipeline layout
 		VkPipelineLayoutCreateInfo layoutCreateInfo {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
@@ -365,33 +340,10 @@ namespace Strawberry::Graphics::Vulkan
 		Core::AssertEQ(vkCreatePipelineLayout(mRenderPass->mDevice->mDevice, &layoutCreateInfo, nullptr, &pipeline.mPipelineLayout), VK_SUCCESS);
 
 
-		// Create Descriptor Pool
-		VkDescriptorPoolCreateInfo descriptorPoolCreateInfo {
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = 0,
-			.maxSets = static_cast<uint32_t>(mDescriptorSetLayouts.size()),
-			.poolSizeCount = static_cast<uint32_t>(mDescriptorPoolSizes.size()),
-			.pPoolSizes = mDescriptorPoolSizes.data(),
-		};
-		Core::AssertEQ(
-			vkCreateDescriptorPool(mRenderPass->mDevice->mDevice, &descriptorPoolCreateInfo, nullptr, &pipeline.mDescriptorPool),
-			VK_SUCCESS);
-
-
 		// Create Descriptor Sets
-		if (!mDescriptorSetLayouts.empty())
+		for (const auto& descriptorSetLayout : mDescriptorSetLayouts)
 		{
-			VkDescriptorSetAllocateInfo descriptorSetAllocateInfo {
-				.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-				.pNext = nullptr,
-				.descriptorPool = pipeline.mDescriptorPool,
-				.descriptorSetCount = static_cast<uint32_t>(mDescriptorSetLayouts.size()),
-				.pSetLayouts = mDescriptorSetLayouts.data(),
-			};
-			pipeline.mDescriptorSets = std::vector<VkDescriptorSet>(mDescriptorSetLayouts.size(), nullptr);
-			Core::AssertEQ(vkAllocateDescriptorSets(mRenderPass->mDevice->mDevice, &descriptorSetAllocateInfo,
-													pipeline.mDescriptorSets.data()), VK_SUCCESS);
+			pipeline.mDescriptorSets.emplace_back(pipeline.mDescriptorPool, descriptorSetLayout);
 		}
 
 

@@ -21,6 +21,7 @@ namespace Strawberry::Graphics::Vulkan
 	class Sampler
 	{
 		friend class Pipeline;
+		friend class DescriptorSet;
 
 
 	public:

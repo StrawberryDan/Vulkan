@@ -70,6 +70,10 @@ add_library(StrawberryGraphics
 		src/Strawberry/Graphics/2D/SpriteSheet.hpp
 		src/Strawberry/Graphics/2D/SpriteRenderer.cpp
 		src/Strawberry/Graphics/2D/SpriteRenderer.hpp
+		src/Strawberry/Graphics/Vulkan/DescriptorSet.cpp
+		src/Strawberry/Graphics/Vulkan/DescriptorSet.hpp
+		src/Strawberry/Graphics/Vulkan/DescriptorPool.cpp
+		src/Strawberry/Graphics/Vulkan/DescriptorPool.hpp
 )
 target_link_libraries(StrawberryGraphics PUBLIC StrawberryCore glfw Vulkan::Vulkan)
 target_include_directories(StrawberryGraphics PUBLIC src)

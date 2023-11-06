@@ -6,6 +6,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 #include "Shader.hpp"
 #include "Strawberry/Graphics/Vulkan/Buffer.hpp"
+#include "DescriptorPool.hpp"
+#include "DescriptorSet.hpp"
 // Vulkan
 #include <vulkan/vulkan.h>
 // Strawberry Core
@@ -51,15 +53,14 @@ namespace Strawberry::Graphics::Vulkan
 		T Create(const Args&... args) const { return T(*this, std::forward<const Args&>(args)...); }
 
 
-		void SetUniformBuffer(const Vulkan::Buffer& buffer, uint32_t set, uint32_t binding,
-							  uint32_t arrayElement = 0);
+		void SetUniformBuffer(const Vulkan::Buffer& buffer, uint32_t set, uint32_t binding, uint32_t arrayElement = 0);
 
 
 		void SetUniformTexture(const Sampler& sampler, const ImageView& image, VkImageLayout layout, uint32_t set, uint32_t binding, uint32_t arrayElement = 0);
 
 
 	private:
-		Pipeline() = default;
+		Pipeline(DescriptorPool descriptorPool);
 
 
 	private:
@@ -73,11 +74,11 @@ namespace Strawberry::Graphics::Vulkan
 		// The size of the viewport to render to
 		VkViewport mViewport;
 		// Our descriptor sets
-		std::vector<VkDescriptorSet> mDescriptorSets;
+		std::vector<DescriptorSet> mDescriptorSets;
 		// Our descriptor set layouts
 		std::vector<VkDescriptorSetLayout> mDescriptorSetLayouts;
 		// The pool from which we allocate descriptor sets
-		VkDescriptorPool mDescriptorPool;
+		DescriptorPool mDescriptorPool;
 	};
 
 
