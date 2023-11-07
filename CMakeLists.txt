@@ -88,10 +88,10 @@ target_link_libraries(StrawberryGraphics PUBLIC StrawberryCore glfw Vulkan::Vulk
 target_include_directories(StrawberryGraphics PUBLIC src)
 target_compile_definitions(StrawberryGraphics PUBLIC GLFW_INCLUDE_VULKAN)
 set_target_properties(StrawberryGraphics PROPERTIES CXX_STANDARD 20)
-add_target_shader(StrawberryGraphics src/Strawberry/Graphics/2D/Sprite.vert src/Strawberry/Graphics/2D/Sprite.vert.bin)
-add_target_shader(StrawberryGraphics src/Strawberry/Graphics/2D/Sprite.frag src/Strawberry/Graphics/2D/Sprite.frag.bin)
 add_target_shader(StrawberryGraphics ${CMAKE_CURRENT_SOURCE_DIR}/src/Strawberry/Graphics/2D/Sprite.vert ${CMAKE_CURRENT_SOURCE_DIR}/src/Strawberry/Graphics/2D/Sprite.vert.bin)
 add_target_shader(StrawberryGraphics ${CMAKE_CURRENT_SOURCE_DIR}/src/Strawberry/Graphics/2D/Sprite.frag ${CMAKE_CURRENT_SOURCE_DIR}/src/Strawberry/Graphics/2D/Sprite.frag.bin)
+add_target_shader(StrawberryGraphics ${CMAKE_CURRENT_SOURCE_DIR}/src/Strawberry/Graphics/Text/Text.vert ${CMAKE_CURRENT_SOURCE_DIR}/src/Strawberry/Graphics/Text/Text.vert.bin)
+add_target_shader(StrawberryGraphics ${CMAKE_CURRENT_SOURCE_DIR}/src/Strawberry/Graphics/Text/Text.frag ${CMAKE_CURRENT_SOURCE_DIR}/src/Strawberry/Graphics/Text/Text.frag.bin)
 
 if (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
 	target_link_options(StrawberryGraphics PRIVATE "-static")
