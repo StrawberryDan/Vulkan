@@ -223,6 +223,23 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
+	void CommandBuffer::ClearColorImage(Image& image, Core::Math::Vec4f clearColor)
+	{
+		VkClearColorValue vulkanClearColor {
+			.float32{clearColor[0], clearColor[1], clearColor[2], clearColor[3]}
+		};
+
+		VkImageSubresourceRange range {
+			VK_IMAGE_ASPECT_COLOR_BIT,
+			0, 1,
+			0, 1
+		};
+
+		ImageMemoryBarrier(image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_GENERAL);
+		vkCmdClearColorImage(mCommandBuffer, image.mImage, VK_IMAGE_LAYOUT_GENERAL, &vulkanClearColor, 1, &range);
+	}
+
+
 	void CommandBuffer::BindDescriptorSet(const Pipeline& pipeline, uint32_t set, const DescriptorSet& descriptorSet)
 	{
 		vkCmdBindDescriptorSets(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.mPipelineLayout, set, 1, &descriptorSet.mDescriptorSet, 0, nullptr);

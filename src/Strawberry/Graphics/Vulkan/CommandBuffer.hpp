@@ -73,6 +73,7 @@ namespace Strawberry::Graphics::Vulkan
 
 		void CopyImageToSwapchain(Image& image, Swapchain& swapchain);
 		void CopyBufferToImage(const Buffer& buffer, Image& image);
+		void ClearColorImage(Image& image, Core::Math::Vec4f clearColor = {0.0f, 0.0f, 0.0f, 1.0f});
 
 
 		void BindDescriptorSet(const Pipeline& pipeline, uint32_t set, const DescriptorSet& descriptorSet);
