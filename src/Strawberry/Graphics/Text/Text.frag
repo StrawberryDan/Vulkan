@@ -1,7 +1,14 @@
 #version 450
 
+
+layout(set = 0,binding = 2) uniform sampler2D mSampler;
+
+
+layout(location = 0) in vec2 texCoords;
+
+
 layout(location=0) out vec4 fragColor;
 
 void main() {
-    fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    fragColor = texture(mSampler, texCoords);
 }

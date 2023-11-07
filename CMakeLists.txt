@@ -83,6 +83,8 @@ add_library(StrawberryGraphics
 		src/Strawberry/Graphics/Vulkan/DescriptorPool.hpp
 		src/Strawberry/Graphics/Text/FontFace.cpp
 		src/Strawberry/Graphics/Text/FontFace.hpp
+		src/Strawberry/Graphics/Text/TextRenderer.cpp
+		src/Strawberry/Graphics/Text/TextRenderer.hpp
 )
 target_link_libraries(StrawberryGraphics PUBLIC StrawberryCore glfw Vulkan::Vulkan freetype)
 target_include_directories(StrawberryGraphics PUBLIC src)
