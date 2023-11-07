@@ -29,7 +29,7 @@ namespace Strawberry::Graphics::Vulkan
 		for (int i = 0; i < COLOR_ATTACHMENT_COUNT; i++)
 		{
 			mColorAttachments.emplace_back(mRenderPass->mDevice->Create<Image>(mSize, renderPass.mColorAttachmentFormats[i],
-																		   VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT));
+																		   VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT));
 			mColorAttachmentViews.emplace_back(
 				mColorAttachments.back().Create<ImageView::Builder>()
 					.WithType(VK_IMAGE_VIEW_TYPE_2D)
