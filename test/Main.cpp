@@ -252,8 +252,8 @@ void TextRendering()
 
 int main()
 {
-//	BasicRendering();
-//	SpriteRendering();
+	BasicRendering();
+	SpriteRendering();
 	TextRendering();
 	return 0;
 }
