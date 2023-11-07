@@ -9,6 +9,12 @@ include(share/Shaders.cmake)
 find_package(Vulkan REQUIRED)
 
 
+FetchContent_Declare(FREETYPE
+	GIT_REPOSITORY "https://gitlab.freedesktop.org/freetype/freetype.git"
+)
+FetchContent_MakeAvailable(FREETYPE)
+
+
 FetchContent_Declare(GLFW
 	EXCLUDE_FROM_ALL
 	GIT_REPOSITORY "https://github.com/glfw/glfw.git"
@@ -75,8 +81,10 @@ add_library(StrawberryGraphics
 		src/Strawberry/Graphics/Vulkan/DescriptorSet.hpp
 		src/Strawberry/Graphics/Vulkan/DescriptorPool.cpp
 		src/Strawberry/Graphics/Vulkan/DescriptorPool.hpp
+		src/Strawberry/Graphics/Text/FontFace.cpp
+		src/Strawberry/Graphics/Text/FontFace.hpp
 )
-target_link_libraries(StrawberryGraphics PUBLIC StrawberryCore glfw Vulkan::Vulkan)
+target_link_libraries(StrawberryGraphics PUBLIC StrawberryCore glfw Vulkan::Vulkan freetype)
 target_include_directories(StrawberryGraphics PUBLIC src)
 target_compile_definitions(StrawberryGraphics PUBLIC GLFW_INCLUDE_VULKAN)
 set_target_properties(StrawberryGraphics PROPERTIES CXX_STANDARD 20)

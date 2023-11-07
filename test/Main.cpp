@@ -1,4 +1,5 @@
 
+#include <Strawberry/Graphics/Text/FontFace.hpp>
 #include "Strawberry/Core/UTF.hpp"
 #include "Strawberry/Graphics/Vulkan/Instance.hpp"
 #include "Strawberry/Graphics/Window.hpp"
@@ -158,6 +159,7 @@ void BasicRendering()
 
 void SpriteRendering()
 {
+	Graphics::FreeType::Initialise();
 	Window::Window window("StrawberryGraphics Test", Core::Math::Vec2i(1920, 1080));
 	Instance instance;
 	auto device = instance.Create<Device>();
@@ -193,12 +195,54 @@ void SpriteRendering()
 
 		window.SwapBuffers();
 	}
+
+	Graphics::FreeType::Terminate();
+}
+
+
+void TextRendering()
+{
+	Graphics::FreeType::Initialise();
+	Window::Window window("StrawberryGraphics Test", Core::Math::Vec2i(1920, 1080));
+	Instance instance;
+	auto device = instance.Create<Device>();
+	auto surface = window.Create<Surface>(device);
+	RenderPass renderPass = device.Create<RenderPass::Builder>()
+		.WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE)
+		.WithSubpass(SubpassDescription().WithColorAttachment(0))
+		.Build();
+	auto queue = device.Create<Queue>();
+	auto swapchain = queue.Create<Swapchain>(surface, window.GetSize());
+
+
+	FontFace font = FontFace::FromFile("data/Pixels.ttf").Unwrap();
+	font.SetPixelSize({32, 32});
+	auto glyph = font.GetGlyphBitmap(queue, 'a');
+
+
+	while (!window.CloseRequested())
+	{
+		Window::PollInput();
+		while (auto event = window.NextEvent())
+		{
+
+		}
+
+
+		// swapchain.Present();
+
+		window.SwapBuffers();
+	}
+
+
+	Graphics::FreeType::Terminate();
 }
 
 
 int main()
 {
-	BasicRendering();
-	SpriteRendering();
+//	BasicRendering();
+//	SpriteRendering();
+	TextRendering();
 	return 0;
 }
