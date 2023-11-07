@@ -148,15 +148,11 @@ namespace Strawberry::Graphics::Vulkan
 
 	DescriptorSet Pipeline::AllocateDescriptorSet(size_t layoutIndex) const
 	{
-		return mDescriptorPool.Create<DescriptorSet>(mDescriptorSetLayouts[layoutIndex]);
+		return mDescriptorPool->Create<DescriptorSet>(mDescriptorSetLayouts[layoutIndex]);
 	}
 
 
-	Pipeline::Pipeline(DescriptorPool descriptorPool)
-		: mDescriptorPool(std::move(descriptorPool))
-	{
-
-	}
+	Pipeline::Pipeline() = default;
 
 
 	Pipeline Pipeline::Builder::Build() const
@@ -310,8 +306,7 @@ namespace Strawberry::Graphics::Vulkan
 
 
 		// Create Descriptor pool and actual Pipeline Object
-		DescriptorPool descriptorPool(*mRenderPass->GetDevice(), 0, mDescriptorSetLayouts.size(), mDescriptorPoolSizes);
-		Pipeline pipeline(std::move(descriptorPool));
+		Pipeline pipeline;
 		pipeline.mRenderPass = mRenderPass;
 		pipeline.mViewport = mViewport.Value();
 		pipeline.mDescriptorSetLayouts = mDescriptorSetLayouts;
@@ -361,6 +356,12 @@ namespace Strawberry::Graphics::Vulkan
 												 nullptr,
 												 &pipeline.mPipeline),
 					   VK_SUCCESS);
+
+		if (!mDescriptorSetLayouts.empty())
+		{
+			DescriptorPool descriptorPool(*mRenderPass->GetDevice(), 0, mDescriptorSetLayouts.size(), mDescriptorPoolSizes);
+			pipeline.mDescriptorPool = std::move(descriptorPool);
+		}
 
 		return pipeline;
 	}

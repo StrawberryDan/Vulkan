@@ -57,7 +57,7 @@ namespace Strawberry::Graphics::Vulkan
 
 
 	private:
-		Pipeline(DescriptorPool descriptorPool);
+		Pipeline();
 
 
 	private:
@@ -71,7 +71,7 @@ namespace Strawberry::Graphics::Vulkan
 		// The size of the viewport to render to
 		VkViewport mViewport;
 		// The pool from which we allocate descriptor sets
-		DescriptorPool mDescriptorPool;
+		Core::Optional<DescriptorPool> mDescriptorPool;
 		// Our descriptor set layouts
 		std::vector<VkDescriptorSetLayout> mDescriptorSetLayouts;
 	};
