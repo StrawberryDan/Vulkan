@@ -50,7 +50,6 @@ namespace Strawberry::Graphics::Vulkan
 		if (mPipeline)
 		{
 			vkDestroyPipelineLayout(mRenderPass->mDevice->mDevice, mPipelineLayout, nullptr);
-			std::destroy_at(&mDescriptorPool);
 			for (VkDescriptorSetLayout layout: mDescriptorSetLayouts)
 				vkDestroyDescriptorSetLayout(mRenderPass->mDevice->mDevice, layout, nullptr);
 			vkDestroyPipeline(mRenderPass->mDevice->mDevice, mPipeline, nullptr);
