@@ -75,7 +75,7 @@ namespace Strawberry::Graphics
 	}
 
 
-	Vulkan::Image FontFace::GetGlyphBitmap(Vulkan::Queue& queue, char32_t c)
+	Vulkan::Image FontFace::GetGlyphBitmap(Vulkan::Queue& queue, char32_t c) const
 	{
 		auto index = FT_Get_Char_Index(mFace, c);
 		Core::AssertEQ(FT_Load_Glyph(mFace, index, FT_LOAD_DEFAULT), 0);

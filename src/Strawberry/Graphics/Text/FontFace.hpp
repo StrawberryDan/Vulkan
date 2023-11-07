@@ -42,7 +42,7 @@ namespace Strawberry::Graphics
 		~FontFace();
 
 
-		Vulkan::Image GetGlyphBitmap(Vulkan::Queue& queue, char32_t c);
+		Vulkan::Image GetGlyphBitmap(Vulkan::Queue& queue, char32_t c) const;
 
 
 		void SetPixelSize(uint32_t pixelSize);
