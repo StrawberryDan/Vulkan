@@ -83,13 +83,15 @@ namespace Strawberry::Graphics
 	}
 
 
-	Vulkan::Image FontFace::GetGlyphBitmap(Vulkan::Queue& queue, char32_t c) const
+	Core::Optional<Vulkan::Image> FontFace::GetGlyphBitmap(Vulkan::Queue& queue, char32_t c) const
 	{
 		auto index = FT_Get_Char_Index(mFace, c);
 		Core::AssertEQ(FT_Load_Glyph(mFace, index, FT_LOAD_DEFAULT), 0);
 		Core::AssertEQ(FT_Render_Glyph(mFace->glyph, FT_RENDER_MODE_NORMAL), 0);
 
 		const uint32_t pixelCount = mFace->glyph->bitmap.width * mFace->glyph->bitmap.rows;
+		if (pixelCount == 0) return Core::NullOpt;
+
 		const uint32_t bitmapLength = std::abs(mFace->glyph->bitmap.pitch) * mFace->glyph->bitmap.rows;
 		Vulkan::Buffer buffer(*queue.GetDevice(), 4 * pixelCount, VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
 		Core::IO::DynamicByteBuffer glyphBytes = Core::IO::DynamicByteBuffer::WithCapacity(4 * pixelCount);

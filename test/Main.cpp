@@ -217,7 +217,7 @@ void TextRendering()
 
 
 	FontFace font = FontFace::FromFile("data/Pixels.ttf").Unwrap();
-	font.SetPixelSize(160);
+	font.SetPixelSize(500);
 	TextRenderer renderer(queue, {1920, 1080});
 
 	while (!window.CloseRequested())
@@ -228,7 +228,7 @@ void TextRendering()
 
 		}
 
-		renderer.Draw(font, {10, 10}, "hello!");
+		renderer.Draw(font, "Gay Sex!!!", {10, 10}, {1.0f, 0.5f, 0.5f, 1.0f});
 
 		auto framebuffer = renderer.GetFramebuffer();
 		swapchain.Present(framebuffer);

@@ -28,8 +28,8 @@ namespace Strawberry::Graphics
 
 
 
-		void Draw(const FontFace& fontface, Core::Math::Vec2i position, const std::string& string);
-		void Draw(const FontFace& fontface, Core::Math::Vec2i position, const std::u32string& string);
+		void Draw(const FontFace& fontface, const std::string& string, Core::Math::Vec2i position, Core::Math::Vec4f color);
+		void Draw(const FontFace& fontface, const std::u32string& string, Core::Math::Vec2i position, Core::Math::Vec4f color);
 
 
 		void SetFramebuffer(Vulkan::Framebuffer framebuffer);
@@ -52,5 +52,6 @@ namespace Strawberry::Graphics
 		Vulkan::Buffer mPassConstantsBuffer;
 		Vulkan::Buffer mDrawConstantsBuffer;
 		Vulkan::Sampler mSampler;
+		Vulkan::Buffer mFragDrawConstantsBuffer;
 	};
 }

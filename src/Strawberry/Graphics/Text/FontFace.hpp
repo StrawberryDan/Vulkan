@@ -42,8 +42,9 @@ namespace Strawberry::Graphics
 		~FontFace();
 
 
+		Core::Math::Vec2i GetGlyphBoundingBox(char32_t c) const;
 		Core::Math::Vec2i GetGlyphAdvance(char32_t c) const;
-		Vulkan::Image GetGlyphBitmap(Vulkan::Queue& queue, char32_t c) const;
+		Core::Optional<Vulkan::Image> GetGlyphBitmap(Vulkan::Queue& queue, char32_t c) const;
 
 
 		void SetPixelSize(uint32_t pixelSize);

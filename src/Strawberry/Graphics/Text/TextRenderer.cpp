@@ -19,22 +19,24 @@ namespace Strawberry::Graphics
 		, mRenderSize(renderSize)
 		, mRenderPass(CreateRenderPass(*mQueue->GetDevice()))
 		, mPipeline(CreatePipeline(mRenderPass, renderSize))
+		, mDescriptorSet(mPipeline.AllocateDescriptorSet(0))
 		, mPassConstantsBuffer(*mQueue->GetDevice(), sizeof(Core::Math::Mat4f), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
 		, mDrawConstantsBuffer(*mQueue->GetDevice(), 4 * sizeof(float), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
 		, mSampler(*mQueue->GetDevice(), VK_FILTER_LINEAR, VK_FILTER_LINEAR)
-		, mDescriptorSet(mPipeline.AllocateDescriptorSet(0))
+		, mFragDrawConstantsBuffer(*mQueue->GetDevice(), 4 * sizeof(float), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
 	{
 
 	}
 
 
-	void TextRenderer::Draw(const FontFace& fontface, Core::Math::Vec2i position, const std::string& string)
+	void TextRenderer::Draw(const FontFace& fontface, const std::string& string, Core::Math::Vec2i position, Core::Math::Vec4f color)
 	{
-		Draw(fontface, position, Core::ToUTF32(std::u8string(string.begin(), string.end())));
+		Draw(fontface, Core::ToUTF32(std::u8string(string.begin(), string.end())), position, color);
 	}
 
 
-	void TextRenderer::Draw(const FontFace& fontface, Core::Math::Vec2i position, const std::u32string& string)
+	void TextRenderer::Draw(const FontFace& fontface, const std::u32string& string, Core::Math::Vec2i position,
+							Core::Math::Vec4f color)
 	{
 		if (!mFrameBuffer)
 		{
@@ -45,8 +47,16 @@ namespace Strawberry::Graphics
 
 		for (auto c : string)
 		{
+
+
 			auto image = fontface.GetGlyphBitmap(*mQueue, c);
-			auto imageView = Vulkan::ImageView::Builder(image)
+			if (!image)
+			{
+				position = position + fontface.GetGlyphAdvance(c);
+				continue;
+			}
+
+			auto imageView = Vulkan::ImageView::Builder(image.Value())
 				.WithType(VK_IMAGE_VIEW_TYPE_2D)
 				.WithFormat(VK_FORMAT_R8G8B8A8_SRGB)
 				.Build();
@@ -60,9 +70,13 @@ namespace Strawberry::Graphics
 			mDescriptorSet.SetUniformBuffer(mPassConstantsBuffer, 0);
 			bytes = Core::IO::DynamicByteBuffer();
 			bytes.Push(position.AsType<float>());
-			bytes.Push(image.GetSize().AsType<float>().AsSize<2>());
+			bytes.Push(image->GetSize().AsType<float>().AsSize<2>());
 			mDrawConstantsBuffer.SetData(bytes);
 			mDescriptorSet.SetUniformBuffer(mDrawConstantsBuffer, 1);
+			bytes = Core::IO::DynamicByteBuffer();
+			bytes.Push(color);
+			mFragDrawConstantsBuffer.SetData(bytes);
+			mDescriptorSet.SetUniformBuffer(mFragDrawConstantsBuffer, 3);
 
 
 			auto commandBuffer = mQueue->Create<Vulkan::CommandBuffer>();
@@ -126,7 +140,8 @@ namespace Strawberry::Graphics
 			.WithDescriptorSetLayout(Vulkan::DescriptorSetLayout()
 				.WithBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
 				.WithBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
-				.WithBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT))
+				.WithBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT)
+				.WithBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT))
 			.WithShaderStage(VK_SHADER_STAGE_VERTEX_BIT, std::move(vertexShader))
 			.WithShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT, std::move(fragmentShader))
 			.Build();
