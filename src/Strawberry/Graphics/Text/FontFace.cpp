@@ -37,12 +37,12 @@ namespace Strawberry::Graphics
 	{
 		FontFace face;
 
-		if (FT_New_Face(sFreetypeLibrary, file.string().c_str(), 0, &face.mFace) != 0)
+		Core::Assert(exists(file));
+
+		if (auto error = FT_New_Face(sFreetypeLibrary, file.string().c_str(), 0, &face.mFace); error != 0)
 		{
 			return Core::NullOpt;
 		}
-
-//		Core::AssertEQ(FT_Reference_Face(face.mFace), 0);
 
 		return face;
 	}
@@ -67,10 +67,10 @@ namespace Strawberry::Graphics
 
 	FontFace::~FontFace()
 	{
-		if (mFace)
+		if (mFace && mFace->internal)
 		{
-//			Core::AssertEQ(FT_Done_Face(mFace),
-//						   0);
+			Core::AssertEQ(FT_Done_Face(mFace),
+						   0);
 		}
 	}
 
