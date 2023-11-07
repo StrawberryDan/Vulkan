@@ -100,6 +100,7 @@ namespace Strawberry::Graphics
 		auto commandBuffer = queue.Create<Vulkan::CommandBuffer>();
 		commandBuffer.Begin(true);
 		commandBuffer.CopyBufferToImage(buffer, image);
+		commandBuffer.ImageMemoryBarrier(image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_GENERAL);
 		commandBuffer.End();
 		queue.Submit(commandBuffer);
 
