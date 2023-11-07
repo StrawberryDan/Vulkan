@@ -28,8 +28,8 @@ namespace Strawberry::Graphics
 
 
 
-		void Draw(const FontFace& fontface, const std::string& string);
-		void Draw(const FontFace& fontface, const std::u32string& string);
+		void Draw(const FontFace& fontface, Core::Math::Vec2i position, const std::string& string);
+		void Draw(const FontFace& fontface, Core::Math::Vec2i position, const std::u32string& string);
 
 
 		void SetFramebuffer(Vulkan::Framebuffer framebuffer);

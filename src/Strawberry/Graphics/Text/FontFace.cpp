@@ -75,6 +75,14 @@ namespace Strawberry::Graphics
 	}
 
 
+	Core::Math::Vec2i FontFace::GetGlyphAdvance(char32_t c) const
+	{
+		auto index = FT_Get_Char_Index(mFace, c);
+		Core::AssertEQ(FT_Load_Glyph(mFace, index, FT_LOAD_DEFAULT), 0);
+		return {mFace->glyph->advance.x / 64, mFace->glyph->advance.y / 64};
+	}
+
+
 	Vulkan::Image FontFace::GetGlyphBitmap(Vulkan::Queue& queue, char32_t c) const
 	{
 		auto index = FT_Get_Char_Index(mFace, c);

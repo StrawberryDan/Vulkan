@@ -217,7 +217,7 @@ void TextRendering()
 
 
 	FontFace font = FontFace::FromFile("data/Pixels.ttf").Unwrap();
-	font.SetPixelSize(16);
+	font.SetPixelSize(160);
 	TextRenderer renderer(queue, {1920, 1080});
 
 	while (!window.CloseRequested())
@@ -228,7 +228,7 @@ void TextRendering()
 
 		}
 
-		renderer.Draw(font, "hello!");
+		renderer.Draw(font, {10, 10}, "hello!");
 
 		auto framebuffer = renderer.GetFramebuffer();
 		swapchain.Present(framebuffer);
@@ -242,8 +242,8 @@ void TextRendering()
 
 int main()
 {
-	BasicRendering();
-	SpriteRendering();
+	// BasicRendering();
+	// SpriteRendering();
 	TextRendering();
 	return 0;
 }

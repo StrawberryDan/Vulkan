@@ -28,13 +28,13 @@ namespace Strawberry::Graphics
 	}
 
 
-	void TextRenderer::Draw(const FontFace& fontface, const std::string& string)
+	void TextRenderer::Draw(const FontFace& fontface, Core::Math::Vec2i position, const std::string& string)
 	{
-		Draw(fontface, Core::ToUTF32(std::u8string(string.begin(), string.end())));
+		Draw(fontface, position, Core::ToUTF32(std::u8string(string.begin(), string.end())));
 	}
 
 
-	void TextRenderer::Draw(const FontFace& fontface, const std::u32string& string)
+	void TextRenderer::Draw(const FontFace& fontface, Core::Math::Vec2i position, const std::u32string& string)
 	{
 		if (!mFrameBuffer)
 		{
@@ -42,7 +42,6 @@ namespace Strawberry::Graphics
 			mFrameBuffer->GetColorAttachment(0).ClearColor(*mQueue);
 		}
 
-		Core::Math::Vec2f position;
 
 		for (auto c : string)
 		{
@@ -55,12 +54,12 @@ namespace Strawberry::Graphics
 
 			Core::IO::DynamicByteBuffer bytes;
 			Core::Math::Mat4f viewMatrix = Core::Math::Translate(Core::Math::Vec3f(-1.0, -1.0, 0.0))
-			                               * Core::Math::Scale(mRenderSize.AsType<float>().WithAdditionalValues(1.0f).Map([](float x) { return 2.0f / x; }));
+			                               * Core::Math::Scale(mRenderSize.AsType<float>().Map([](float x) { return 2.0f / x; }).WithAdditionalValues(1.0f));
 			bytes.Push(viewMatrix);
 			mPassConstantsBuffer.SetData(bytes);
 			mDescriptorSet.SetUniformBuffer(mPassConstantsBuffer, 0);
 			bytes = Core::IO::DynamicByteBuffer();
-			bytes.Push(position);
+			bytes.Push(position.AsType<float>());
 			bytes.Push(image.GetSize().AsType<float>().AsSize<2>());
 			mDrawConstantsBuffer.SetData(bytes);
 			mDescriptorSet.SetUniformBuffer(mDrawConstantsBuffer, 1);
@@ -75,6 +74,8 @@ namespace Strawberry::Graphics
 			commandBuffer.EndRenderPass();
 			commandBuffer.End();
 			mQueue->Submit(commandBuffer);
+
+			position = position + fontface.GetGlyphAdvance(c);
 		}
 	}
 
@@ -120,7 +121,7 @@ namespace Strawberry::Graphics
 
 
 		return Vulkan::Pipeline::Builder(renderPass)
-			.WithPrimitiveTopology(VK_PRIMITIVE_TOPOLOGY_LINE_STRIP)
+			.WithPrimitiveTopology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP)
 			.WithViewport({0, 0}, renderSize.AsType<float>())
 			.WithDescriptorSetLayout(Vulkan::DescriptorSetLayout()
 				.WithBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
