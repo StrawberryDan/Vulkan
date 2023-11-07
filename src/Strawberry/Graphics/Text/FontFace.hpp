@@ -30,6 +30,7 @@ namespace Strawberry::Graphics
 
 
 	class FontFace
+		: public Core::EnableReflexivePointer<FontFace>
 	{
 	public:
 		static Core::Optional<FontFace> FromFile(const std::filesystem::path& file);
