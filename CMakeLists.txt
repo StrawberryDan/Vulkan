@@ -32,7 +32,7 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../Core)
 endif()
 
 
-add_library(StrawberryGraphics
+add_library(StrawberryGraphics STATIC
 		src/Strawberry/Graphics/Vulkan/Instance.cpp
 		src/Strawberry/Graphics/Vulkan/Instance.hpp
 		src/Strawberry/Graphics/Window.hpp
@@ -111,3 +111,7 @@ set_target_properties(StrawberryGraphics_Test PROPERTIES CXX_STANDARD 20)
 add_target_shader(StrawberryGraphics_Test ${CMAKE_CURRENT_SOURCE_DIR}/test/Mesh.vert       ${CMAKE_CURRENT_SOURCE_DIR}/test/Mesh.vert.bin)
 add_target_shader(StrawberryGraphics_Test ${CMAKE_CURRENT_SOURCE_DIR}/test/SolidColor.frag ${CMAKE_CURRENT_SOURCE_DIR}/test/SolidColor.frag.bin)
 add_target_shader(StrawberryGraphics_Test ${CMAKE_CURRENT_SOURCE_DIR}/test/Texture.frag    ${CMAKE_CURRENT_SOURCE_DIR}/test/Texture.frag.bin)
+
+if (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
+	target_link_options(StrawberryGraphics_Test PRIVATE "-static")
+endif()
