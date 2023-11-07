@@ -3,6 +3,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 #include "Image.hpp"
 #include "Device.hpp"
+#include "Queue.hpp"
+#include "CommandBuffer.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Assert.hpp"
 // Standard Library
@@ -152,5 +154,15 @@ namespace Strawberry::Graphics::Vulkan
 	Core::Math::Vec3u Image::GetSize() const
 	{
 		return mSize;
+	}
+
+
+	void Image::ClearColor(Queue& queue, Core::Math::Vec4f clearColor)
+	{
+		auto commandBuffer = queue.Create<CommandBuffer>();
+		commandBuffer.Begin(true);
+		commandBuffer.ClearColorImage(*this, clearColor);
+		commandBuffer.End();
+		queue.Submit(commandBuffer);
 	}
 }

@@ -18,6 +18,7 @@
 namespace Strawberry::Graphics::Vulkan
 {
 	class Device;
+	class Queue;
 
 
 	class Image
@@ -66,6 +67,9 @@ namespace Strawberry::Graphics::Vulkan
 
 
 		Core::Math::Vec3u GetSize() const;
+
+
+		void ClearColor(Queue& queue, Core::Math::Vec4f clearColor = {0.0f, 0.0f, 0.0f, 1.0f});
 
 
 	private:
