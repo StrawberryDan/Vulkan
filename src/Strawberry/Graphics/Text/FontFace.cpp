@@ -83,19 +83,19 @@ namespace Strawberry::Graphics
 
 		const uint32_t pixelCount = mFace->glyph->bitmap.width * mFace->glyph->bitmap.rows;
 		const uint32_t bitmapLength = std::abs(mFace->glyph->bitmap.pitch) * mFace->glyph->bitmap.rows;
-		Vulkan::Buffer buffer(*queue.GetDevice(), 4 * sizeof(float) * pixelCount, VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
-		Core::IO::DynamicByteBuffer glyphBytes = Core::IO::DynamicByteBuffer::WithCapacity(4 * sizeof(float) * pixelCount);
+		Vulkan::Buffer buffer(*queue.GetDevice(), 4 * pixelCount, VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+		Core::IO::DynamicByteBuffer glyphBytes = Core::IO::DynamicByteBuffer::WithCapacity(4 * pixelCount);
 		for (int i = 0; i < bitmapLength; i++)
 		{
 			auto byte = mFace->glyph->bitmap.buffer[i];
-			glyphBytes.Push(1.0f);
-			glyphBytes.Push(1.0f);
-			glyphBytes.Push(1.0f);
-			glyphBytes.Push(static_cast<float>(byte) / 255.0f);
+			glyphBytes.Push<uint8_t>(byte);
+			glyphBytes.Push<uint8_t>(byte);
+			glyphBytes.Push<uint8_t>(byte);
+			glyphBytes.Push<uint8_t>(byte);
 		}
 		buffer.SetData(glyphBytes);
 
-		Vulkan::Image image(*queue.GetDevice(), Core::Math::Vec2u(mFace->glyph->bitmap.width, mFace->glyph->bitmap.rows), VK_FORMAT_R32G32B32A32_SFLOAT, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
+		Vulkan::Image image(*queue.GetDevice(), Core::Math::Vec2u(mFace->glyph->bitmap.width, mFace->glyph->bitmap.rows), VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
 
 		auto commandBuffer = queue.Create<Vulkan::CommandBuffer>();
 		commandBuffer.Begin(true);
@@ -104,6 +104,13 @@ namespace Strawberry::Graphics
 		queue.Submit(commandBuffer);
 
 		return image;
+	}
+
+
+	void FontFace::SetPixelSize(uint32_t pixelSize)
+	{
+		Core::AssertEQ(FT_Set_Pixel_Sizes(mFace, pixelSize, 0),
+		               0);
 	}
 
 

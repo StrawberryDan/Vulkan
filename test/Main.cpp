@@ -214,26 +214,37 @@ void TextRendering()
 	auto queue = device.Create<Queue>();
 	auto swapchain = queue.Create<Swapchain>(surface, window.GetSize());
 
+	auto framebuffer = renderPass.Create<Framebuffer>(Core::Math::Vec2u(1920 / 16, 1080 / 16));
+
 
 	FontFace font = FontFace::FromFile("data/Pixels.ttf").Unwrap();
-	font.SetPixelSize({32, 32});
-	auto glyph = font.GetGlyphBitmap(queue, 'a');
+	uint32_t pixelSize = 64;
+	font.SetPixelSize(pixelSize);
 
+	auto renderer = queue.Create<SpriteRenderer>(Core::Math::Vec2f(1920, 1080));
 
 	while (!window.CloseRequested())
 	{
+		auto glyph = font.GetGlyphBitmap(queue, '$');
+		SpriteSheet spriteSheet(queue, std::move(glyph), {1, 1}); // SpriteSheet::FromFile(device, queue, {4, 4}, "data/dio.png").Unwrap();
+		auto sprite = spriteSheet.Create<Sprite>();
+		sprite.GetTransform().SetSize(framebuffer.GetColorAttachment(0).GetSize().AsType<float>().AsSize<2>());
+
 		Window::PollInput();
 		while (auto event = window.NextEvent())
 		{
-
+			if (event->IsType<Window::Events::Key>() && event->Value<Window::Events::Key>()->action == Input::KeyAction::Release)
+			{
+//				sprite.SetSpriteIndex(sprite.GetSpriteIndex() + 1);
+			}
 		}
 
+		renderer.Draw(framebuffer, sprite);
 
-		// swapchain.Present();
+		swapchain.Present(framebuffer);
 
 		window.SwapBuffers();
 	}
-
 
 	Graphics::FreeType::Terminate();
 }

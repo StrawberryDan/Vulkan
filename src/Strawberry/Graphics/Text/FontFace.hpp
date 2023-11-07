@@ -45,6 +45,7 @@ namespace Strawberry::Graphics
 		Vulkan::Image GetGlyphBitmap(Vulkan::Queue& queue, char32_t c);
 
 
+		void SetPixelSize(uint32_t pixelSize);
 		void SetPixelSize(Core::Math::Vec2u pixelSize);
 
 
