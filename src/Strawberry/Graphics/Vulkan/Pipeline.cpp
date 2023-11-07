@@ -59,7 +59,6 @@ namespace Strawberry::Graphics::Vulkan
 
 	Pipeline::Builder::Builder(const RenderPass& renderPass)
 		: mRenderPass(renderPass)
-		  , mStages()
 	{
 
 	}
