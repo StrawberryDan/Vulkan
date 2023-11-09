@@ -9,11 +9,11 @@ include(share/Shaders.cmake)
 find_package(Vulkan REQUIRED)
 
 
-set(FT_DISABLE_BROTLI ON)
-set(FT_DISABLE_BZIP2 ON)
-set(FT_DISABLE_HARFBUZZ ON)
-set(FT_DISABLE_PNG ON)
-set(FT_DISABLE_ZLIB ON)
+option(FT_DISABLE_BROTLI "" ON)
+option(FT_DISABLE_BZIP2 "" ON)
+option(FT_DISABLE_HARFBUZZ "" ON)
+option(FT_DISABLE_PNG "" ON)
+option(FT_DISABLE_ZLIB "" ON)
 FetchContent_Declare(FREETYPE
 	GIT_REPOSITORY "https://gitlab.freedesktop.org/freetype/freetype.git"
 )
