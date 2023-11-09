@@ -20,7 +20,6 @@ FetchContent_Declare(FREETYPE
 FetchContent_MakeAvailable(FREETYPE)
 
 
-set(GLFW_VULKAN_STATIC TRUE)
 FetchContent_Declare(GLFW
 	EXCLUDE_FROM_ALL
 	GIT_REPOSITORY "https://github.com/glfw/glfw.git"
