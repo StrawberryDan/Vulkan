@@ -144,6 +144,7 @@ namespace Strawberry::Graphics
 				.WithBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT))
 			.WithShaderStage(VK_SHADER_STAGE_VERTEX_BIT, std::move(vertexShader))
 			.WithShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT, std::move(fragmentShader))
+			.WithColorBlending()
 			.Build();
 	}
 }
