@@ -155,7 +155,7 @@ namespace Strawberry::Graphics::Vulkan
 	class Pipeline::Builder
 	{
 	public:
-		explicit Builder(const RenderPass& renderPass);
+		explicit Builder(const RenderPass& renderPass, uint32_t subpass = 0);
 
 
 		Builder& WithShaderStage(VkShaderStageFlagBits stage, Shader shader);
@@ -168,6 +168,15 @@ namespace Strawberry::Graphics::Vulkan
 
 
 		Pipeline::Builder& WithViewport(Core::Math::Vec2f offset, Core::Math::Vec2f size);
+
+
+		Pipeline::Builder& WithDepthClamping();
+
+
+		Pipeline::Builder& WithDepthTesting();
+
+
+		Pipeline::Builder& WithColorBlending();
 
 
 		Builder& WithCullMode(VkCullModeFlags cullModeFlags);
@@ -185,6 +194,8 @@ namespace Strawberry::Graphics::Vulkan
 	private:
 		Core::ReflexivePointer<RenderPass> mRenderPass;
 
+		uint32_t mSubpass;
+
 		std::map<VkShaderStageFlagBits, Shader> mStages;
 
 		VertexInputDescription mVertexInputDescription;
@@ -195,6 +206,10 @@ namespace Strawberry::Graphics::Vulkan
 
 		VkBool32 mDepthClampEnabled = VK_FALSE;
 
+		bool mDepthTestingEnabled = true;
+
+		bool mColorBlendingEnabled = true;
+
 		VkPolygonMode mPolygonMode = VK_POLYGON_MODE_FILL;
 
 		VkCullModeFlags mCullingMode = VK_CULL_MODE_NONE;
@@ -202,8 +217,6 @@ namespace Strawberry::Graphics::Vulkan
 		VkFrontFace mFrontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 
 		float mLineWidth = 1.0;
-
-		uint32_t mSubpass = 0;
 
 		std::vector<VkPushConstantRange> mPushConstantRanges;
 

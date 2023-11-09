@@ -57,8 +57,9 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
-	Pipeline::Builder::Builder(const RenderPass& renderPass)
+	Pipeline::Builder::Builder(const RenderPass& renderPass, uint32_t subpass)
 		: mRenderPass(renderPass)
+		, mSubpass(subpass)
 	{
 
 	}
@@ -96,6 +97,27 @@ namespace Strawberry::Graphics::Vulkan
 			.height = size[1],
 			.maxDepth = 1.0,
 		};
+		return *this;
+	}
+
+
+	Pipeline::Builder& Pipeline::Builder::WithDepthClamping()
+	{
+		mDepthClampEnabled = VK_TRUE;
+		return *this;
+	}
+
+
+	Pipeline::Builder& Pipeline::Builder::WithDepthTesting()
+	{
+		mDepthTestingEnabled = true;
+		return *this;
+	}
+
+
+	Pipeline::Builder& Pipeline::Builder::WithColorBlending()
+	{
+		mColorBlendingEnabled = true;
 		return *this;
 	}
 
@@ -260,8 +282,8 @@ namespace Strawberry::Graphics::Vulkan
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
-			.depthTestEnable = VK_FALSE,
-			.depthWriteEnable = VK_FALSE,
+			.depthTestEnable = mDepthTestingEnabled ? VK_TRUE : VK_FALSE,
+			.depthWriteEnable = mDepthTestingEnabled ? VK_TRUE : VK_FALSE,
 			.depthCompareOp = VK_COMPARE_OP_LESS,
 			.stencilTestEnable = VK_FALSE,
 			.front{},
@@ -273,9 +295,9 @@ namespace Strawberry::Graphics::Vulkan
 
 		// Color Blending State
 		VkPipelineColorBlendAttachmentState colorBlendAttachementState {
-			.blendEnable = VK_FALSE,
-			.srcColorBlendFactor = VK_BLEND_FACTOR_ONE,
-			.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO,
+			.blendEnable = mColorBlendingEnabled ? VK_TRUE : VK_FALSE,
+			.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
+			.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
 			.colorBlendOp = VK_BLEND_OP_ADD,
 			.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
 			.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
@@ -283,6 +305,7 @@ namespace Strawberry::Graphics::Vulkan
 			.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
 							  VK_COLOR_COMPONENT_A_BIT,
 		};
+
 		VkPipelineColorBlendStateCreateInfo colorBlendState {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
 			.pNext = nullptr,
