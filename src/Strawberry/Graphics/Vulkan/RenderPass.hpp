@@ -89,17 +89,17 @@ namespace Strawberry::Graphics::Vulkan
 
 
 		Builder& WithColorAttachment(VkFormat format, VkAttachmentLoadOp loadOp, VkAttachmentStoreOp storeOp,
+									 Core::Math::Vec4f clearColor = Core::Math::Vec4f(0.0f, 0.0f, 0.0f, 0.0f),
 									 VkAttachmentLoadOp stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-									 VkAttachmentStoreOp stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-									 VkClearValue clearValue = VkClearValue {.color{.float32{0.0f, 0.0f, 0.0f, 0.0f}}});
+									 VkAttachmentStoreOp stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE);
 		Builder& WithDepthAttachment(VkFormat format, VkAttachmentLoadOp loadOp, VkAttachmentStoreOp storeOp,
-									 VkAttachmentLoadOp stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-									 VkAttachmentStoreOp stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-									 VkClearValue clearValue = VkClearValue {.depthStencil{.depth=0.0f}});
+		                             float clearValue = 0.0f,
+		                             VkAttachmentLoadOp stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+		                             VkAttachmentStoreOp stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE);
 		Builder& WithStencilAttachment(VkFormat format, VkAttachmentLoadOp loadOp, VkAttachmentStoreOp storeOp,
-									   VkAttachmentLoadOp stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-									   VkAttachmentStoreOp stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-									   VkClearValue clearValue = VkClearValue {.depthStencil{.stencil= 0}});
+		                               uint32_t clearValue = 0,
+		                               VkAttachmentLoadOp stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+		                               VkAttachmentStoreOp stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE);
 
 
 		Builder& WithSubpass(const SubpassDescription& subpass);

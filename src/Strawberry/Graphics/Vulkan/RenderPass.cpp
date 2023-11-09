@@ -95,9 +95,9 @@ namespace Strawberry::Graphics::Vulkan
 	RenderPass::Builder& RenderPass::Builder::WithColorAttachment(VkFormat format,
 																  VkAttachmentLoadOp loadOp,
 																  VkAttachmentStoreOp storeOp,
+																  Core::Math::Vec4f clearColor,
 																  VkAttachmentLoadOp stencilLoadOp,
-																  VkAttachmentStoreOp stencilStoreOp,
-																  VkClearValue clearValue)
+																  VkAttachmentStoreOp stencilStoreOp)
 	{
 		mAttachments.emplace_back(VkAttachmentDescription {
 			.flags = 0,
@@ -110,17 +110,17 @@ namespace Strawberry::Graphics::Vulkan
 			.initialLayout = VK_IMAGE_LAYOUT_GENERAL,
 			.finalLayout = VK_IMAGE_LAYOUT_GENERAL,
 		});
-		mClearColors.emplace_back(clearValue);
+
+		mClearColors.emplace_back(VkClearValue{.color{.float32{clearColor[0], clearColor[1], clearColor[2], clearColor[3]}}});
+
 		return *this;
 	}
 
 
-	RenderPass::Builder& RenderPass::Builder::WithDepthAttachment(VkFormat format,
-																  VkAttachmentLoadOp loadOp,
-																  VkAttachmentStoreOp storeOp,
-																  VkAttachmentLoadOp stencilLoadOp,
-																  VkAttachmentStoreOp stencilStoreOp,
-																  VkClearValue clearValue)
+	RenderPass::Builder& RenderPass::Builder::WithDepthAttachment(VkFormat format, VkAttachmentLoadOp loadOp,
+	                                                  VkAttachmentStoreOp storeOp, float clearValue,
+	                                                  VkAttachmentLoadOp stencilLoadOp,
+	                                                  VkAttachmentStoreOp stencilStoreOp)
 	{
 		mAttachments.emplace_back(VkAttachmentDescription {
 			.flags = 0,
@@ -133,17 +133,15 @@ namespace Strawberry::Graphics::Vulkan
 			.initialLayout = VK_IMAGE_LAYOUT_GENERAL,
 			.finalLayout = VK_IMAGE_LAYOUT_GENERAL,
 		});
-		mClearColors.emplace_back(clearValue);
+		mClearColors.emplace_back(VkClearValue { .depthStencil { .depth = clearValue }});
 		return *this;
 	}
 
 
-	RenderPass::Builder& RenderPass::Builder::WithStencilAttachment(VkFormat format,
-																	VkAttachmentLoadOp loadOp,
-																	VkAttachmentStoreOp storeOp,
-																	VkAttachmentLoadOp stencilLoadOp,
-																	VkAttachmentStoreOp stencilStoreOp,
-																	VkClearValue clearValue)
+	RenderPass::Builder& RenderPass::Builder::WithStencilAttachment(VkFormat format, VkAttachmentLoadOp loadOp,
+	                                                    VkAttachmentStoreOp storeOp, uint32_t clearValue,
+	                                                    VkAttachmentLoadOp stencilLoadOp,
+	                                                    VkAttachmentStoreOp stencilStoreOp)
 	{
 		mAttachments.emplace_back(VkAttachmentDescription {
 			.flags = 0,
@@ -156,7 +154,7 @@ namespace Strawberry::Graphics::Vulkan
 			.initialLayout = VK_IMAGE_LAYOUT_GENERAL,
 			.finalLayout = VK_IMAGE_LAYOUT_GENERAL,
 		});
-		mClearColors.emplace_back(clearValue);
+		mClearColors.emplace_back(VkClearValue { .depthStencil { .stencil = clearValue } });
 		return *this;
 	}
 
