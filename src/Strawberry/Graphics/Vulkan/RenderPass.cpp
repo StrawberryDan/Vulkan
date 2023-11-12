@@ -22,7 +22,9 @@ namespace Strawberry::Graphics::Vulkan
 
 	RenderPass::RenderPass(RenderPass&& rhs) noexcept
 		: mRenderPass(std::exchange(rhs.mRenderPass, nullptr))
-		  , mDevice(std::move(rhs.mDevice))
+		, mDevice(std::move(rhs.mDevice))
+		, mColorAttachmentFormats(std::move(rhs.mColorAttachmentFormats))
+		, mClearColors(std::move(rhs.mClearColors))
 	{
 
 	}
