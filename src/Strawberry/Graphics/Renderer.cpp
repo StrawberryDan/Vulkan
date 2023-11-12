@@ -15,16 +15,16 @@ namespace Strawberry::Graphics
 	{}
 
 
-	Renderer::Renderer(Vulkan::Queue& queue, Vulkan::RenderPass& renderPass, Core::Math::Vec2u resolution)
+	Renderer::Renderer(Vulkan::Queue& queue, Vulkan::RenderPass renderPass, Core::Math::Vec2u resolution)
 		: mResolution(resolution)
 		, mQueue(queue)
-		, mRenderPass(renderPass)
+		, mRenderPass(std::move(renderPass))
 	{}
 
 
-	void Renderer::SetRenderPass(Vulkan::RenderPass& renderPass)
+	bool Renderer::FramebufferAvailable() const
 	{
-		mRenderPass = renderPass.GetReflexivePointer();
+		return mFramebuffer.HasValue();
 	}
 
 
@@ -74,6 +74,6 @@ namespace Strawberry::Graphics
 
 	Core::ReflexivePointer<Vulkan::RenderPass> Renderer::GetRenderPass()
 	{
-		return mRenderPass;
+		return mRenderPass->GetReflexivePointer();
 	}
 }

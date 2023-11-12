@@ -14,8 +14,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics
 {
-	TextRenderer::TextRenderer(Vulkan::Queue& queue, Vulkan::RenderPass& renderPass,  Core::Math::Vec2u resolution)
-		: Renderer(queue, renderPass, resolution)
+	TextRenderer::TextRenderer(Vulkan::Queue& queue,  Core::Math::Vec2u resolution)
+		: Renderer(queue, CreateRenderPass(*queue.GetDevice()), resolution)
 		, mPipeline(CreatePipeline(*GetRenderPass(), GetResolution()))
 		, mDescriptorSet(mPipeline.AllocateDescriptorSet(0))
 		, mPassConstantsBuffer(*GetQueue()->GetDevice(), sizeof(Core::Math::Mat4f), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
@@ -80,6 +80,15 @@ namespace Strawberry::Graphics
 
 			position = position + fontface.GetGlyphAdvance(c);
 		}
+	}
+
+
+	Vulkan::RenderPass TextRenderer::CreateRenderPass(Vulkan::Device& device)
+	{
+		return Vulkan::RenderPass::Builder(device)
+			.WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT, VK_ATTACHMENT_LOAD_OP_LOAD, VK_ATTACHMENT_STORE_OP_STORE)
+			.WithSubpass(Vulkan::SubpassDescription().WithColorAttachment(0))
+			.Build();
 	}
 
 

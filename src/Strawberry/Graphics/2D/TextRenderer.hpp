@@ -27,7 +27,7 @@ namespace Strawberry::Graphics
 		: public Renderer
 	{
 	public:
-		TextRenderer(Vulkan::Queue& queue, Vulkan::RenderPass& renderPass, Core::Math::Vec2u resolution);
+		TextRenderer(Vulkan::Queue& queue, Core::Math::Vec2u resolution);
 
 
 
@@ -36,6 +36,7 @@ namespace Strawberry::Graphics
 
 
 	protected:
+		Vulkan::RenderPass CreateRenderPass(Vulkan::Device& device);
 		Vulkan::Pipeline CreatePipeline(const Vulkan::RenderPass& renderPass, Core::Math::Vec2u renderSize);
 
 

@@ -230,7 +230,7 @@ void TextRendering()
 
 		renderer.Draw(font, "HELLO!!!", {10, 10}, {1.0f, 0.5f, 0.5f, 1.0f});
 
-		auto framebuffer = renderer.GetFramebuffer();
+		auto framebuffer = renderer.TakeFramebuffer();
 		swapchain.Present(framebuffer);
 
 		window.SwapBuffers();

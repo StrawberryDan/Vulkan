@@ -17,16 +17,14 @@ namespace Strawberry::Graphics
 	class Renderer
 	{
 	public:
+		bool FramebufferAvailable() const;
 		void SetFramebuffer(Vulkan::Framebuffer&& framebuffer);
 		Vulkan::Framebuffer TakeFramebuffer();
 
 
 	protected:
 		Renderer(Vulkan::Queue& queue, Core::Math::Vec2u resolution);
-		Renderer(Vulkan::Queue& queue, Vulkan::RenderPass& renderPass, Core::Math::Vec2u resolution);
-
-
-		void SetRenderPass(Vulkan::RenderPass& renderPass);
+		Renderer(Vulkan::Queue& queue, Vulkan::RenderPass renderPass, Core::Math::Vec2u resolution);
 
 
 		Vulkan::Framebuffer& GetFramebuffer();
@@ -40,7 +38,7 @@ namespace Strawberry::Graphics
 	private:
 		Core::Math::Vec2u mResolution;
 		Core::ReflexivePointer<Vulkan::Queue> mQueue;
-		Core::ReflexivePointer<Vulkan::RenderPass> mRenderPass;
+		Core::Optional<Vulkan::RenderPass> mRenderPass;
 		Core::Optional<Vulkan::Framebuffer> mFramebuffer;
 	};
 }
