@@ -38,8 +38,8 @@ namespace Strawberry::Graphics::Vulkan
 		~Queue();
 
 
-		template <std::movable T, typename... Args>
-		T Create(const Args&... args) const { return T(*this, std::forward<const Args&>(args)...); }
+		template <typename T, typename... Args>
+		T Create(Args&&... args) const { return T(*this, std::forward<Args&&>(args)...); }
 
 
 		void Submit(const CommandBuffer& commandBuffer);
