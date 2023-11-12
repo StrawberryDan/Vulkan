@@ -30,6 +30,7 @@ namespace Strawberry::Graphics
 	{
 		Core::AssertEQ(FT_Done_FreeType(sFreetypeLibrary),
 					   0);
+		sFreetypeLibrary = nullptr;
 	}
 
 
@@ -67,7 +68,7 @@ namespace Strawberry::Graphics
 
 	FontFace::~FontFace()
 	{
-		if (mFace && mFace->internal)
+		if (sFreetypeLibrary && mFace && mFace->internal)
 		{
 			Core::AssertEQ(FT_Done_Face(mFace),
 						   0);
