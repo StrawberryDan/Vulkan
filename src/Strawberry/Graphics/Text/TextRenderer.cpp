@@ -14,16 +14,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics
 {
-	TextRenderer::TextRenderer(const Vulkan::Queue& queue, Core::Math::Vec2u renderSize)
-		: mQueue(queue)
-		, mRenderSize(renderSize)
-		, mRenderPass(CreateRenderPass(*mQueue->GetDevice()))
-		, mPipeline(CreatePipeline(mRenderPass, renderSize))
+	TextRenderer::TextRenderer(Vulkan::Queue& queue, Vulkan::RenderPass& renderPass,  Core::Math::Vec2u resolution)
+		: Renderer(queue, renderPass, resolution)
+		, mPipeline(CreatePipeline(*GetRenderPass(), GetResolution()))
 		, mDescriptorSet(mPipeline.AllocateDescriptorSet(0))
-		, mPassConstantsBuffer(*mQueue->GetDevice(), sizeof(Core::Math::Mat4f), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
-		, mDrawConstantsBuffer(*mQueue->GetDevice(), 4 * sizeof(float), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
-		, mSampler(*mQueue->GetDevice(), VK_FILTER_LINEAR, VK_FILTER_LINEAR)
-		, mFragDrawConstantsBuffer(*mQueue->GetDevice(), 4 * sizeof(float), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
+		, mPassConstantsBuffer(*GetQueue()->GetDevice(), sizeof(Core::Math::Mat4f), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
+		, mDrawConstantsBuffer(*GetQueue()->GetDevice(), 4 * sizeof(float), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
+		, mSampler(*GetQueue()->GetDevice(), VK_FILTER_LINEAR, VK_FILTER_LINEAR)
+		, mFragDrawConstantsBuffer(*GetQueue()->GetDevice(), 4 * sizeof(float), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
 	{
 
 	}
@@ -38,18 +36,9 @@ namespace Strawberry::Graphics
 	void TextRenderer::Draw(const FontFace& fontface, const std::u32string& string, Core::Math::Vec2i position,
 							Core::Math::Vec4f color)
 	{
-		if (!mFrameBuffer)
-		{
-			mFrameBuffer = Vulkan::Framebuffer(mRenderPass, mRenderSize);
-			mFrameBuffer->GetColorAttachment(0).ClearColor(*mQueue);
-		}
-
-
 		for (auto c : string)
 		{
-
-
-			auto image = fontface.GetGlyphBitmap(*mQueue, c);
+			auto image = fontface.GetGlyphBitmap(*GetQueue(), c);
 			if (!image)
 			{
 				position = position + fontface.GetGlyphAdvance(c);
@@ -64,7 +53,7 @@ namespace Strawberry::Graphics
 
 			Core::IO::DynamicByteBuffer bytes;
 			Core::Math::Mat4f viewMatrix = Core::Math::Translate(Core::Math::Vec3f(-1.0, -1.0, 0.0))
-			                               * Core::Math::Scale(mRenderSize.AsType<float>().Map([](float x) { return 2.0f / x; }).WithAdditionalValues(1.0f));
+			                               * Core::Math::Scale(GetResolution().AsType<float>().Map([](float x) { return 2.0f / x; }).WithAdditionalValues(1.0f));
 			bytes.Push(viewMatrix);
 			mPassConstantsBuffer.SetData(bytes);
 			mDescriptorSet.SetUniformBuffer(mPassConstantsBuffer, 0);
@@ -79,44 +68,18 @@ namespace Strawberry::Graphics
 			mDescriptorSet.SetUniformBuffer(mFragDrawConstantsBuffer, 3);
 
 
-			auto commandBuffer = mQueue->Create<Vulkan::CommandBuffer>();
+			auto commandBuffer = GetQueue()->Create<Vulkan::CommandBuffer>();
 			commandBuffer.Begin(true);
 			commandBuffer.BindPipeline(mPipeline);
 			commandBuffer.BindDescriptorSet(mPipeline, 0, mDescriptorSet);
-			commandBuffer.BeginRenderPass(mRenderPass, mFrameBuffer.Value());
+			commandBuffer.BeginRenderPass(*GetRenderPass(), GetFramebuffer());
 			commandBuffer.Draw(4);
 			commandBuffer.EndRenderPass();
 			commandBuffer.End();
-			mQueue->Submit(commandBuffer);
+			GetQueue()->Submit(commandBuffer);
 
 			position = position + fontface.GetGlyphAdvance(c);
 		}
-	}
-
-
-	void TextRenderer::SetFramebuffer(Vulkan::Framebuffer framebuffer)
-	{
-		mFrameBuffer = std::move(framebuffer);
-	}
-
-
-	Vulkan::Framebuffer TextRenderer::GetFramebuffer()
-	{
-		if (!mFrameBuffer)
-		{
-			mFrameBuffer = Vulkan::Framebuffer(mRenderPass, mRenderSize);
-			mFrameBuffer->GetColorAttachment(0).ClearColor(*mQueue);
-		}
-		return mFrameBuffer.Unwrap();
-	}
-
-
-	Vulkan::RenderPass TextRenderer::CreateRenderPass(const Vulkan::Device& device)
-	{
-		return Vulkan::RenderPass::Builder(device)
-			.WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT, VK_ATTACHMENT_LOAD_OP_LOAD, VK_ATTACHMENT_STORE_OP_STORE)
-			.WithSubpass(Vulkan::SubpassDescription().WithColorAttachment(0))
-			.Build();
 	}
 
 
