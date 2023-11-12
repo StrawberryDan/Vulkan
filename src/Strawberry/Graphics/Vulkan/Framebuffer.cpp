@@ -19,11 +19,11 @@ namespace Strawberry::Graphics::Vulkan
 {
 	Framebuffer::Framebuffer(const RenderPass& renderPass, Core::Math::Vec2u size)
 		: mRenderPass(renderPass)
-		  , mSize(size)
-		  , mDepthAttachment(CreateDepthImage())
-		  , mDepthAttachmentView(CreateDepthImageView())
-		  , mStencilAttachment(CreateStencilImage())
-		  , mStencilAttachmentView(CreateStencilImageView())
+		, mSize(size)
+		, mDepthAttachment(CreateDepthImage())
+		, mDepthAttachmentView(CreateDepthImageView())
+		, mStencilAttachment(CreateStencilImage())
+		, mStencilAttachmentView(CreateStencilImageView())
 	{
 		const auto COLOR_ATTACHMENT_COUNT = mRenderPass->mColorAttachmentFormats.size();
 		for (int i = 0; i < COLOR_ATTACHMENT_COUNT; i++)
