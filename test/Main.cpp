@@ -1,6 +1,6 @@
 
-#include <Strawberry/Graphics/Text/FontFace.hpp>
-#include <Strawberry/Graphics/Text/TextRenderer.hpp>
+#include "Strawberry/Graphics/2D/FontFace.hpp"
+#include "Strawberry/Graphics/2D/TextRenderer.hpp"
 #include "Strawberry/Core/UTF.hpp"
 #include "Strawberry/Graphics/Vulkan/Instance.hpp"
 #include "Strawberry/Graphics/Window.hpp"

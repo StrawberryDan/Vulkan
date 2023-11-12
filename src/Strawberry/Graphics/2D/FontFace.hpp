@@ -7,10 +7,10 @@
 #include "Strawberry/Graphics/Vulkan/Image.hpp"
 #include "Strawberry/Graphics/Vulkan/Queue.hpp"
 // Strawberry Core
-#include <Strawberry/Core/Types/Optional.hpp>
-#include <Strawberry/Core/Math/Vector.hpp>
+#include "Strawberry/Core/Types/Optional.hpp"
+#include "Strawberry/Core/Math/Vector.hpp"
 // FreeType
-#include <ft2build.h>
+#include "ft2build.h"
 #include FT_FREETYPE_H
 // Standard Library
 #include <filesystem>
