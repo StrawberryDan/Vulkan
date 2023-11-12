@@ -90,6 +90,8 @@ add_library(StrawberryGraphics STATIC
 		src/Strawberry/Graphics/Text/FontFace.hpp
 		src/Strawberry/Graphics/Text/TextRenderer.cpp
 		src/Strawberry/Graphics/Text/TextRenderer.hpp
+        src/Strawberry/Graphics/Renderer.hpp
+		src/Strawberry/Graphics/Renderer.cpp
 )
 target_link_libraries(StrawberryGraphics PUBLIC StrawberryCore glfw Vulkan::Vulkan freetype)
 target_include_directories(StrawberryGraphics PUBLIC src)
