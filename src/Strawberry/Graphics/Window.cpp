@@ -46,6 +46,7 @@ namespace Strawberry::Graphics::Window
 
 	Window::Window(Window&& rhs) noexcept
 		: mHandle(std::exchange(rhs.mHandle, nullptr))
+		, mEventQueue(std::move(rhs.mEventQueue))
 	{
 		sInstanceMap.Lock()->insert_or_assign(mHandle, this);
 	}
