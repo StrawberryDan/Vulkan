@@ -67,11 +67,16 @@ namespace Strawberry::Graphics::Window
 	private:
 		static void OnKeyEvent(GLFWwindow* windowHandle, int key, int scancode, int action, int mods);
 		static void OnTextEvent(GLFWwindow* windowHandle, unsigned int codepoint);
+		static void OnMouseMove(GLFWwindow* windowHandle, double x, double y);
+		static void OnMouseButton(GLFWwindow* windowHandle, int button, int action, int mods);
 
 
 	private:
 		GLFWwindow* mHandle;
 		std::deque<Event> mEventQueue;
+
+
+		Core::Optional<Core::Math::Vec2u> mPreviousMousePosition;
 	};
 
 

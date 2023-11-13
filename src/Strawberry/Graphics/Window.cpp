@@ -39,6 +39,8 @@ namespace Strawberry::Graphics::Window
 		mHandle = glfwCreateWindow(size[0], size[1], title.c_str(), nullptr, nullptr);
 		glfwSetKeyCallback(mHandle, &Window::OnKeyEvent);
 		glfwSetCharCallback(mHandle, &Window::OnTextEvent);
+		glfwSetCursorPosCallback(mHandle, &Window::OnMouseMove);
+		glfwSetMouseButtonCallback(mHandle, &Window::OnMouseButton);
 
 		sInstanceMap.Lock()->emplace(mHandle, this);
 	}
@@ -47,6 +49,7 @@ namespace Strawberry::Graphics::Window
 	Window::Window(Window&& rhs) noexcept
 		: mHandle(std::exchange(rhs.mHandle, nullptr))
 		, mEventQueue(std::move(rhs.mEventQueue))
+		, mPreviousMousePosition(std::move(rhs.mPreviousMousePosition))
 	{
 		sInstanceMap.Lock()->insert_or_assign(mHandle, this);
 	}
@@ -162,6 +165,74 @@ namespace Strawberry::Graphics::Window
 
 		Events::Text event
 			{.codepoint = codepoint};
+
+		window->mEventQueue.emplace_back(event);
+	}
+
+
+	void Window::OnMouseMove(GLFWwindow* windowHandle, double x, double y)
+	{
+		Window* window = sInstanceMap.Lock()->at(windowHandle);
+
+		Core::Math::Vec2u newPos(x, y);
+
+		Events::MouseMove event {
+			.position{x, y},
+			.deltaPosition = window->mPreviousMousePosition
+				.Map([=](const auto& prev) { return newPos - prev; })
+				.UnwrapOr(Core::Math::Vec2u()),
+		};
+
+		window->mEventQueue.emplace_back(event);
+	}
+
+
+	void Window::OnMouseButton(GLFWwindow* windowHandle, int button, int action, int mods)
+	{
+		Window* window = sInstanceMap.Lock()->at(windowHandle);
+
+		auto GetButton = [](int code)
+		{
+			switch (code)
+			{
+				case GLFW_MOUSE_BUTTON_LEFT: return Input::MouseButton::Left;
+				case GLFW_MOUSE_BUTTON_RIGHT: return Input::MouseButton::Right;
+				case GLFW_MOUSE_BUTTON_MIDDLE: return Input::MouseButton::Middle;
+				default: Core::Unreachable();
+			}
+		};
+
+		auto GetAction = [](int action)
+		{
+			switch (action)
+			{
+				case GLFW_PRESS:
+					return Input::KeyAction::Press;
+				case GLFW_RELEASE:
+					return Input::KeyAction::Release;
+				case GLFW_REPEAT:
+					return Input::KeyAction::Repeat;
+				default:
+					Core::Unreachable();
+			}
+		};
+
+		auto GetModifier = [](int modifier)
+		{
+			Input::Modifiers result = 0;
+			if (modifier & GLFW_MOD_SHIFT) result = result | (Input::Modifiers) Input::Modifier::SHIFT;
+			if (modifier & GLFW_MOD_CONTROL) result = result | (Input::Modifiers) Input::Modifier::CTRL;
+			if (modifier & GLFW_MOD_ALT) result = result | (Input::Modifiers) Input::Modifier::ALT;
+			if (modifier & GLFW_MOD_SUPER) result = result | (Input::Modifiers) Input::Modifier::META;
+			return result;
+		};
+
+
+		Events::MouseButton event {
+			.button = GetButton(button),
+			.modifiers = GetModifier(mods),
+			.action = GetAction(action),
+		};
 
 		window->mEventQueue.emplace_back(event);
 	}

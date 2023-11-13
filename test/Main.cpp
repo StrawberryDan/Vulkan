@@ -22,6 +22,7 @@
 #include "Strawberry/Graphics/2D/SpriteRenderer.hpp"
 #include "Strawberry/Graphics/2D/Sprite.hpp"
 #include "Strawberry/Graphics/2D/SpriteSheet.hpp"
+#include "Strawberry/Core/IO/Logging.hpp"
 
 
 using namespace Strawberry;
@@ -225,7 +226,15 @@ void TextRendering()
 		Window::PollInput();
 		while (auto event = window.NextEvent())
 		{
+			if (auto mouseMove = event->Value<Graphics::Window::Events::MouseMove>())
+			{
+				Core::Logging::Info("Mouse Pos: {}, {}", mouseMove->position[0], mouseMove->position[1]);
+			}
 
+			if (auto mouseButton = event->Value<Graphics::Window::Events::MouseButton>())
+			{
+				Core::Logging::Info("Mouse Button: {}, {}", static_cast<int>(mouseButton->action), static_cast<int>(mouseButton->button));
+			}
 		}
 
 		renderer.Draw(font, "HELLO!!!", {10, 10}, {1.0f, 0.5f, 0.5f, 1.0f});

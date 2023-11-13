@@ -94,6 +94,7 @@ add_library(StrawberryGraphics STATIC
 		src/Strawberry/Graphics/Renderer.cpp
 		src/Strawberry/Graphics/2D/ImageRenderer.hpp
 		src/Strawberry/Graphics/2D/ImageRenderer.cpp
+		src/Strawberry/Graphics/Input/Mouse.hpp
 )
 target_link_libraries(StrawberryGraphics PUBLIC StrawberryCore glfw Vulkan::Vulkan freetype)
 target_include_directories(StrawberryGraphics PUBLIC src)

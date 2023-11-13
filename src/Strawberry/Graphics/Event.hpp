@@ -4,8 +4,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Strawberry Graphics
 #include "Strawberry/Graphics/Input/Key.hpp"
+#include "Strawberry/Graphics/Input/Mouse.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Types/Variant.hpp"
+#include "Strawberry/Core/Math/Vector.hpp"
+#include "Strawberry/Core/Timing/Clock.hpp"
 
 
 namespace Strawberry::Graphics::Window
@@ -24,8 +27,25 @@ namespace Strawberry::Graphics::Window
 		{
 			char32_t codepoint;
 		};
+
+		struct MouseMove
+		{
+			Core::Math::Vec2u position;
+			Core::Math::Vec2u deltaPosition;
+		};
+
+
+		struct MouseButton
+		{
+			Input::MouseButton button;
+			Input::Modifiers modifiers;
+			Input::KeyAction action;
+		};
 	}
 
 
-	using Event = Core::Variant<Events::Key, Events::Text>;
+	using Event = Core::Variant<Events::Key,
+								Events::Text,
+								Events::MouseMove,
+								Events::MouseButton>;
 }
