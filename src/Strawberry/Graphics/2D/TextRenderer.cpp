@@ -22,20 +22,25 @@ namespace Strawberry::Graphics
 		, mDrawConstantsBuffer(*GetQueue()->GetDevice(), 4 * sizeof(float), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
 		, mSampler(*GetQueue()->GetDevice(), VK_FILTER_LINEAR, VK_FILTER_LINEAR)
 		, mFragDrawConstantsBuffer(*GetQueue()->GetDevice(), 4 * sizeof(float), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
-	{
-
-	}
+	{}
 
 
-	void TextRenderer::Draw(const FontFace& fontface, const std::string& string, Core::Math::Vec2i position, Core::Math::Vec4f color)
+	void TextRenderer::Draw(const FontFace& fontface, const std::string& string, Core::Math::Vec2f position, Core::Math::Vec4f color)
 	{
 		Draw(fontface, Core::ToUTF32(std::u8string(string.begin(), string.end())), position, color);
 	}
 
 
-	void TextRenderer::Draw(const FontFace& fontface, const std::u32string& string, Core::Math::Vec2i position,
+	void TextRenderer::Draw(const FontFace& fontface, const std::u32string& string, Core::Math::Vec2f position,
 							Core::Math::Vec4f color)
 	{
+		float maxGlyphHeight = 0.0f;
+		for (auto c : string)
+		{
+			maxGlyphHeight = std::max(maxGlyphHeight, fontface.GetGlyphBoundingBox(c)[1]);
+		}
+
+
 		for (auto c : string)
 		{
 			auto image = fontface.GetGlyphBitmap(*GetQueue(), c);
@@ -51,6 +56,11 @@ namespace Strawberry::Graphics
 				.Build();
 			mDescriptorSet.SetUniformTexture(mSampler, imageView, VK_IMAGE_LAYOUT_GENERAL, 2);
 
+			Core::Math::Vec2f bearing = fontface.GetGlyphHorizontalBearing(c);
+			bearing[1] = -std::abs(bearing[1]);
+			bearing[1] += maxGlyphHeight;
+			Core::Math::Vec2f glyphOffset = bearing;
+
 			Core::IO::DynamicByteBuffer bytes;
 			Core::Math::Mat4f viewMatrix = Core::Math::Translate(Core::Math::Vec3f(-1.0, -1.0, 0.0))
 			                               * Core::Math::Scale(GetResolution().AsType<float>().Map([](float x) { return 2.0f / x; }).WithAdditionalValues(1.0f));
@@ -58,7 +68,7 @@ namespace Strawberry::Graphics
 			mPassConstantsBuffer.SetData(bytes);
 			mDescriptorSet.SetUniformBuffer(mPassConstantsBuffer, 0);
 			bytes = Core::IO::DynamicByteBuffer();
-			bytes.Push(position.AsType<float>());
+			bytes.Push(position + glyphOffset);
 			bytes.Push(image->GetSize().AsType<float>().AsSize<2>());
 			mDrawConstantsBuffer.SetData(bytes);
 			mDescriptorSet.SetUniformBuffer(mDrawConstantsBuffer, 1);
