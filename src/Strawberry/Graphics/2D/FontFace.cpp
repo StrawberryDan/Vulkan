@@ -76,11 +76,27 @@ namespace Strawberry::Graphics
 	}
 
 
-	Core::Math::Vec2i FontFace::GetGlyphAdvance(char32_t c) const
+	Core::Math::Vec2f FontFace::GetGlyphBoundingBox(char32_t c) const
 	{
 		auto index = FT_Get_Char_Index(mFace, c);
 		Core::AssertEQ(FT_Load_Glyph(mFace, index, FT_LOAD_DEFAULT), 0);
-		return {mFace->glyph->advance.x / 64, mFace->glyph->advance.y / 64};
+		return {static_cast<float>(mFace->glyph->metrics.width) / 64.0f , static_cast<float>(mFace->glyph->metrics.height) / 64.0f};
+	}
+
+
+	Core::Math::Vec2f FontFace::GetGlyphHorizontalBearing(char32_t c) const
+	{
+		auto index = FT_Get_Char_Index(mFace, c);
+		Core::AssertEQ(FT_Load_Glyph(mFace, index, FT_LOAD_DEFAULT), 0);
+		return {static_cast<float>(mFace->glyph->metrics.horiBearingX) / 64.0f , static_cast<float>(mFace->glyph->metrics.horiBearingY) / 64.0f};
+	}
+
+
+	Core::Math::Vec2f FontFace::GetGlyphAdvance(char32_t c) const
+	{
+		auto index = FT_Get_Char_Index(mFace, c);
+		Core::AssertEQ(FT_Load_Glyph(mFace, index, FT_LOAD_DEFAULT), 0);
+		return {static_cast<float>(mFace->glyph->advance.x) / 64.0f, static_cast<float>(mFace->glyph->advance.y) / 64.0f};
 	}
 
 
