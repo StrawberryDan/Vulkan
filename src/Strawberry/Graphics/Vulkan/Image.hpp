@@ -5,11 +5,15 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 #include "DeviceMemory.hpp"
+#include "Queue.hpp"
 // Strawberry Core
+#include "Strawberry/Core/Types/Optional.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
+#include "Strawberry/Core/Types/ReflexivePointer.hpp"
 // Vulkan
 #include <vulkan/vulkan.h>
-
+// Standard Library
+#include <filesystem>
 
 
 //======================================================================================================================
@@ -22,12 +26,16 @@ namespace Strawberry::Graphics::Vulkan
 
 
 	class Image
+		: public Core::EnableReflexivePointer<Image>
 	{
 		friend class ImageView;
 		friend class CommandBuffer;
 
 
 	public:
+		static Core::Optional<Image> FromFile(Queue& device, const std::filesystem::path& path);
+
+
 		Image(const Device& device,
 			  uint32_t extent,
 			  VkFormat format,
