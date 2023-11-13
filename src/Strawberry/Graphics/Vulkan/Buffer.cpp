@@ -43,6 +43,7 @@ namespace Strawberry::Graphics::Vulkan
 	Buffer::Buffer(const Device& device, const Core::IO::DynamicByteBuffer& bytes, VkBufferUsageFlags usage)
 		: Buffer(device, bytes.Size(), usage)
 	{
+		Core::Assert(usage & VK_BUFFER_USAGE_TRANSFER_DST_BIT);
 		SetData(bytes);
 	}
 
