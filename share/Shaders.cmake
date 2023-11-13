@@ -2,7 +2,7 @@ find_package(Python3 REQUIRED)
 find_package(Vulkan REQUIRED)
 
 
-function(add_target_shader TARGET SOURCE DESTINATION)
+function(add_target_shader TARGET SOURCE)
 	get_target_property(GRAPHICS_SOURCE_DIR StrawberryGraphics SOURCE_DIR)
 
 	cmake_path(GET SOURCE FILENAME SHADER_FILENAME)
@@ -10,10 +10,10 @@ function(add_target_shader TARGET SOURCE DESTINATION)
 
 
 	file(CHMOD ${GRAPHICS_SOURCE_DIR}/share PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_WRITE WORLD_EXECUTE)
-	add_custom_command(OUTPUT ${DESTINATION}
-			COMMAND ${Python3_EXECUTABLE} ${GRAPHICS_SOURCE_DIR}/share/compile_shader.py ${Vulkan_GLSLC_EXECUTABLE} ${SOURCE} ${DESTINATION}
+	add_custom_command(OUTPUT ${SOURCE}.bin
+			COMMAND ${Python3_EXECUTABLE} ${GRAPHICS_SOURCE_DIR}/share/compile_shader.py ${Vulkan_GLSLC_EXECUTABLE} ${SOURCE} ${SOURCE}.bin
 			DEPENDS ${SOURCE}
 	)
 
-	target_sources(${TARGET} PUBLIC ${DESTINATION})
+	target_sources(${TARGET} PUBLIC ${SOURCE}.bin)
 endfunction()
