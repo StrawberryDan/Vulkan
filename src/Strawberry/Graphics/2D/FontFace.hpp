@@ -12,8 +12,10 @@
 // FreeType
 #include "ft2build.h"
 #include FT_FREETYPE_H
+#include FT_GLYPH_H
 // Standard Library
 #include <filesystem>
+#include <map>
 
 
 
@@ -46,7 +48,7 @@ namespace Strawberry::Graphics
 		Core::Math::Vec2f GetGlyphBoundingBox(char32_t c) const;
 		Core::Math::Vec2f GetGlyphHorizontalBearing(char32_t c) const;
 		Core::Math::Vec2f GetGlyphAdvance(char32_t c) const;
-		Core::Optional<Vulkan::Image> GetGlyphBitmap(Vulkan::Queue& queue, char32_t c) const;
+		Core::Optional<Vulkan::Image*> GetGlyphBitmap(Vulkan::Queue& queue, char32_t c);
 
 
 		void SetPixelSize(uint32_t pixelSize);
@@ -61,5 +63,8 @@ namespace Strawberry::Graphics
 	private:
 		FT_Face mFace;
 		Core::Math::Vec2u mPixelSize = {1, 1};
+
+
+		std::map<char32_t, Graphics::Vulkan::Image> mGlyphCache;
 	};
 }

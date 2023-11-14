@@ -102,8 +102,16 @@ namespace Strawberry::Graphics
 	}
 
 
-	Core::Optional<Vulkan::Image> FontFace::GetGlyphBitmap(Vulkan::Queue& queue, char32_t c) const
+	Core::Optional<Vulkan::Image*> FontFace::GetGlyphBitmap(Vulkan::Queue& queue, char32_t c)
 	{
+		FT_Glyph* glyph;
+
+		if (mGlyphCache.contains(c))
+		{
+			return &mGlyphCache.at(c);
+		}
+
+
 		auto index = FT_Get_Char_Index(mFace, c);
 		Core::AssertEQ(FT_Load_Glyph(mFace, index, FT_LOAD_DEFAULT), 0);
 		Core::AssertEQ(FT_Render_Glyph(mFace->glyph, FT_RENDER_MODE_NORMAL), 0);
@@ -133,7 +141,9 @@ namespace Strawberry::Graphics
 		commandBuffer.End();
 		queue.Submit(commandBuffer);
 
-		return image;
+		mGlyphCache.emplace(c, std::move(image));
+
+		return &mGlyphCache.at(c);
 	}
 
 

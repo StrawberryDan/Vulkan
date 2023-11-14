@@ -31,8 +31,8 @@ namespace Strawberry::Graphics
 
 
 
-		void Draw(const FontFace& fontface, const std::string& string, Core::Math::Vec2f position, Core::Math::Vec4f color);
-		void Draw(const FontFace& fontface, const std::u32string& string, Core::Math::Vec2f position, Core::Math::Vec4f color);
+		void Draw(FontFace& fontface, const std::string& string, Core::Math::Vec2f position, Core::Math::Vec4f color);
+		void Draw(FontFace& fontface, const std::u32string& string, Core::Math::Vec2f position, Core::Math::Vec4f color);
 
 
 	protected:
