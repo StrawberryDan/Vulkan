@@ -25,13 +25,13 @@ namespace Strawberry::Graphics
 	{}
 
 
-	void TextRenderer::Draw(FontFace& fontface, const std::string& string, Core::Math::Vec2f position, Core::Math::Vec4f color)
+	void TextRenderer::Draw(const FontFace& fontface, const std::string& string, Core::Math::Vec2f position, Core::Math::Vec4f color)
 	{
 		Draw(fontface, Core::ToUTF32(std::u8string(string.begin(), string.end())), position, color);
 	}
 
 
-	void TextRenderer::Draw(FontFace& fontface, const std::u32string& string, Core::Math::Vec2f position,
+	void TextRenderer::Draw(const FontFace& fontface, const std::u32string& string, Core::Math::Vec2f position,
 							Core::Math::Vec4f color)
 	{
 		float maxGlyphHeight = 0.0f;
@@ -50,7 +50,7 @@ namespace Strawberry::Graphics
 				continue;
 			}
 
-			auto imageView = Vulkan::ImageView::Builder(*image.Value())
+			auto imageView = Vulkan::ImageView::Builder(image.Value())
 				.WithType(VK_IMAGE_VIEW_TYPE_2D)
 				.WithFormat(VK_FORMAT_R8G8B8A8_SRGB)
 				.Build();
