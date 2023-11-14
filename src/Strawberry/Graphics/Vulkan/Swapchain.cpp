@@ -167,7 +167,7 @@ namespace Strawberry::Graphics::Vulkan
 			buffer.CopyImageToSwapchain(framebuffer.GetColorAttachment(i), *this);
 		}
 
-		buffer.ImageMemoryBarrier(GetNextImage(), VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_UNDEFINED,
+		buffer.ImageMemoryBarrier(GetNextImage(), VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
 		                          VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 		buffer.End();
 		mQueue->Submit(buffer);
