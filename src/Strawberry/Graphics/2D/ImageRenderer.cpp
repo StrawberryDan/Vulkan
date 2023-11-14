@@ -35,7 +35,7 @@ namespace Strawberry::Graphics
 
 		Core::IO::DynamicByteBuffer vertexUniformBytes;
 		Core::Math::Mat4f viewMatrix = Core::Math::Translate(Core::Math::Vec3f(-1.0, -1.0, 0.0)) * Core::Math::Scale(GetResolution().AsType<float>().Map([](auto x) {return 2.0f / x;}).WithAdditionalValues(1.0f));
-		Core::Math::Mat4f modelMatrix = Core::Math::Translate(position.WithAdditionalValues(0.0f)) * Core::Math::Scale(image.GetSize().AsSize<2>().AsType<float>().WithAdditionalValues(1.0f));
+		Core::Math::Mat4f modelMatrix = Core::Math::Translate(position.WithAdditionalValues(0.0f)) * Core::Math::Scale(size.WithAdditionalValues(1.0f));
 		vertexUniformBytes.Push(viewMatrix);
 		vertexUniformBytes.Push(modelMatrix);
 		mVertexUniformBuffer.SetData(vertexUniformBytes);
