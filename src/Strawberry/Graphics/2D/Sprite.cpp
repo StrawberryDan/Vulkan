@@ -15,18 +15,6 @@ namespace Strawberry::Graphics
 	{}
 
 
-	Transform2D& Sprite::GetTransform()
-	{
-		return mTransform;
-	}
-
-
-	const Transform2D& Sprite::GetTransform() const
-	{
-		return mTransform;
-	}
-
-
 	void Sprite::SetSpriteSheet(const SpriteSheet& spriteSheet)
 	{
 		mSpriteSheet = spriteSheet.GetReflexivePointer();

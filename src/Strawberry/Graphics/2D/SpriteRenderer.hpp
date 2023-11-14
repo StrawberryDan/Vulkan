@@ -13,6 +13,7 @@
 #include "Strawberry/Graphics/Vulkan/Pipeline.hpp"
 #include "Strawberry/Graphics/Vulkan/Queue.hpp"
 #include "Strawberry/Graphics/Vulkan/RenderPass.hpp"
+#include "Strawberry/Graphics/Renderer.hpp"
 // Standard Library
 #include <set>
 
@@ -23,24 +24,21 @@
 namespace Strawberry::Graphics
 {
 	class SpriteRenderer
+		: public Renderer
 	{
 	public:
-		SpriteRenderer(const Vulkan::Queue& queue, Core::Math::Vec2f viewportSize, VkFilter minFilter = VK_FILTER_NEAREST, VkFilter magFilter = VK_FILTER_NEAREST);
+		SpriteRenderer(Vulkan::Queue& queue, Core::Math::Vec2u resolution, VkFilter minFilter = VK_FILTER_NEAREST, VkFilter magFilter = VK_FILTER_NEAREST);
 
 
-		void Draw(Vulkan::Framebuffer& framebuffer, const Sprite& sprite);
+		void Draw(const Sprite& sprite, Transform2D transform);
 
 
 	protected:
+		static Vulkan::RenderPass CreateRenderPass(Vulkan::Queue& queue);
 		Vulkan::Pipeline CreatePipeline();
 
 
 	private:
-		Core::ReflexivePointer<Vulkan::Queue> mQueue;
-		Core::Math::Vec2f mViewportSize;
-
-
-		Vulkan::RenderPass mRenderPass;
 		Vulkan::Pipeline mPipeline;
 		Vulkan::CommandBuffer mCommandBuffer;
 

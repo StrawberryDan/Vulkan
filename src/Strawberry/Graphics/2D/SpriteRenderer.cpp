@@ -33,15 +33,10 @@ static const uint8_t fragmentShaderCode[] =
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics
 {
-	SpriteRenderer::SpriteRenderer(const Vulkan::Queue& queue, Core::Math::Vec2f viewportSize, VkFilter minFilter, VkFilter magFilter)
-		: mQueue(queue)
-		, mViewportSize(viewportSize)
-		, mRenderPass(queue.GetDevice()->Create<Vulkan::RenderPass::Builder>()
-		    .WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE)
-			.WithSubpass(Vulkan::SubpassDescription().WithColorAttachment(0))
-			.Build())
+	SpriteRenderer::SpriteRenderer(Vulkan::Queue& queue, Core::Math::Vec2u resolution, VkFilter minFilter, VkFilter magFilter)
+		: Renderer(queue, CreateRenderPass(queue), resolution)
 		, mPipeline(CreatePipeline())
-		, mCommandBuffer(mQueue->Create<Vulkan::CommandBuffer>())
+		, mCommandBuffer(GetQueue()->Create<Vulkan::CommandBuffer>())
 		, mVertexDescriptorSet(mPipeline.AllocateDescriptorSet(0))
 		, mCameraBuffer(*queue.GetDevice(), 16 * sizeof(float), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
 		, mFragmentDescriptorSet(mPipeline.AllocateDescriptorSet(1))
@@ -54,10 +49,10 @@ namespace Strawberry::Graphics
 	}
 
 
-	void SpriteRenderer::Draw(Vulkan::Framebuffer& framebuffer, const Sprite& sprite)
+	void SpriteRenderer::Draw(const Sprite& sprite, Transform2D transform)
 	{
-		Core::Math::Mat4f cameraMatrix = Core::Math::Translate<float>(-1.0, -1.0, 0.0) * Core::Math::Scale<float>(2.0 / mViewportSize[0], 2.0 / mViewportSize[1], 1.0);
-		mCameraBuffer.SetData(Core::IO::DynamicByteBuffer(cameraMatrix));
+		Core::Math::Mat4f viewMatrix = Core::Math::Translate(Core::Math::Vec3f(-1.0, -1.0, 0.0)) * Core::Math::Scale(GetResolution().AsType<float>().Map([](auto x) {return 2.0f / x;}).WithAdditionalValues(1.0f));
+		mCameraBuffer.SetData(Core::IO::DynamicByteBuffer(viewMatrix));
 		Core::Math::Vec2f spriteSize = sprite.mSpriteSheet->GetSpriteSize().AsType<float>();
 		mSpriteSheetBuffer.SetData(Core::IO::DynamicByteBuffer(spriteSize));
 		mVertexDescriptorSet.SetUniformBuffer(mCameraBuffer, 0);
@@ -70,29 +65,39 @@ namespace Strawberry::Graphics
 		mCommandBuffer.BindDescriptorSet(mPipeline, 0, mVertexDescriptorSet);
 		mCommandBuffer.BindDescriptorSet(mPipeline, 1, mFragmentDescriptorSet);
 		mCommandBuffer.ImageMemoryBarrier(sprite.mSpriteSheet->mImage, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_GENERAL);
-		mCommandBuffer.BeginRenderPass(*framebuffer.GetRenderPass(), framebuffer);
+		mCommandBuffer.BeginRenderPass(*GetRenderPass(), GetFramebuffer());
 
 
-		mCommandBuffer.PushConstants(mPipeline, VK_SHADER_STAGE_VERTEX_BIT, Core::IO::DynamicByteBuffer(sprite.GetTransform().AsMatrix()), 0);
+		mCommandBuffer.PushConstants(mPipeline, VK_SHADER_STAGE_VERTEX_BIT, Core::IO::DynamicByteBuffer(transform.AsMatrix()), 0);
 		mCommandBuffer.PushConstants(mPipeline, VK_SHADER_STAGE_VERTEX_BIT, Core::IO::DynamicByteBuffer(sprite.mSpriteCoords), sizeof(Core::Math::Mat4f));
 		mCommandBuffer.Draw(6);
 
 
 		mCommandBuffer.EndRenderPass();
 		mCommandBuffer.End();
-		mQueue->Submit(mCommandBuffer);
+		GetQueue()->Submit(mCommandBuffer);
+	}
+
+
+	Vulkan::RenderPass SpriteRenderer::CreateRenderPass(Vulkan::Queue& queue)
+	{
+		// Renderpass with 1 color attachment
+		return queue.GetDevice()->Create<Vulkan::RenderPass::Builder>()
+			.WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE)
+			.WithSubpass(Vulkan::SubpassDescription().WithColorAttachment(0))
+			.Build();
 	}
 
 
 	Vulkan::Pipeline SpriteRenderer::CreatePipeline()
 	{
-		auto vertexShader = Vulkan::Shader::Compile(*mQueue->GetDevice(),
+		auto vertexShader = Vulkan::Shader::Compile(*GetQueue()->GetDevice(),
 													Core::IO::DynamicByteBuffer(vertexShaderCode, sizeof(vertexShaderCode))).Unwrap();
-		auto fragmentShader = Vulkan::Shader::Compile(*mQueue->GetDevice(),
+		auto fragmentShader = Vulkan::Shader::Compile(*GetQueue()->GetDevice(),
 													  Core::IO::DynamicByteBuffer(fragmentShaderCode, sizeof(fragmentShaderCode))).Unwrap();
 
-		return mRenderPass.Create<Vulkan::Pipeline::Builder>()
-			.WithViewport({0, 0}, mViewportSize)
+		return GetRenderPass()->Create<Vulkan::Pipeline::Builder>()
+			.WithViewport({0, 0}, GetResolution().AsType<float>())
 		    .WithPrimitiveTopology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
 			.WithPushConstantRange(VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float) + 2 * sizeof(unsigned int), 0)
 			.WithDescriptorSetLayout(Vulkan::DescriptorSetLayout()

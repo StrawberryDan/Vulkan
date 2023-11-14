@@ -173,12 +173,11 @@ void SpriteRendering()
 	auto queue = device.Create<Queue>();
 	auto swapchain = queue.Create<Swapchain>(surface, window.GetSize());
 
-	auto framebuffer = renderPass.Create<Framebuffer>(Core::Math::Vec2u(1920 / 16, 1080 / 16));
-
-	auto renderer = queue.Create<SpriteRenderer>(Core::Math::Vec2f(1920, 1080));
+	SpriteRenderer renderer(queue, {1920, 1080});
 	auto spriteSheet = SpriteSheet::FromFile(device, queue, {4, 4}, "data/dio.png").Unwrap();
 	auto sprite = spriteSheet.Create<Sprite>();
-	sprite.GetTransform().SetSize(framebuffer.GetColorAttachment(0).GetSize().AsType<float>().AsSize<2>());
+	Transform2D transform;
+	transform.SetSize({1920, 1080});
 
 	while (!window.CloseRequested())
 	{
@@ -191,8 +190,9 @@ void SpriteRendering()
 			}
 		}
 
-		renderer.Draw(framebuffer, sprite);
+		renderer.Draw(sprite, transform);
 
+		auto framebuffer = renderer.TakeFramebuffer();
 		swapchain.Present(framebuffer);
 
 		window.SwapBuffers();
@@ -251,8 +251,8 @@ void TextRendering()
 
 int main()
 {
-	// BasicRendering();
-	// SpriteRendering();
+	BasicRendering();
+	SpriteRendering();
 	TextRendering();
 	return 0;
 }
