@@ -54,6 +54,5 @@ namespace Strawberry::Graphics::Vulkan
 		VkBuffer mBuffer;
 		DeviceMemory mMemory;
 		VkDevice mDevice;
-		void* mMappedDataPtr = nullptr;
 	};
 }

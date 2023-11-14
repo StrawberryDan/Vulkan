@@ -7,6 +7,7 @@
 #include "Strawberry/Core/Types/Optional.hpp"
 // Standard Library
 #include <memory>
+#include <cstring>
 
 
 //======================================================================================================================
@@ -77,5 +78,37 @@ namespace Strawberry::Graphics::Vulkan
 	uint64_t DeviceMemory::GetSize() const
 	{
 		return mSize;
+	}
+
+
+	void DeviceMemory::SetData(const Core::IO::DynamicByteBuffer& bytes)
+	{
+		if (!mMappedDataPtr)
+		{
+			Core::AssertEQ(vkMapMemory(mDevice, mDeviceMemory, 0, GetSize(), 0, reinterpret_cast<void**>(&mMappedDataPtr)), VK_SUCCESS);
+			Core::AssertNEQ(mMappedDataPtr, nullptr);
+		}
+		std::memcpy(mMappedDataPtr, bytes.Data(), bytes.Size());
+
+		VkMappedMemoryRange range {
+				.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE,
+				.pNext = nullptr,
+				.memory = mDeviceMemory,
+				.offset = 0,
+				.size = GetSize(),
+		};
+		Core::AssertEQ(vkFlushMappedMemoryRanges(mDevice, 1, &range), VK_SUCCESS);
+	}
+
+
+	Core::IO::DynamicByteBuffer DeviceMemory::Read() const
+	{
+		return Read(GetSize());
+	}
+
+
+	Core::IO::DynamicByteBuffer DeviceMemory::Read(size_t length, size_t offset) const
+	{
+		return {mMappedDataPtr + offset, length};
 	}
 }
