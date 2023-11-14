@@ -64,6 +64,10 @@ namespace Strawberry::Graphics::Window
 		T Create(const Args&... args) { return T(*this, std::forward<const Args&>(args)...); }
 
 
+		const std::string& GetTitle() const;
+		void SetTitle(const std::string& title);
+
+
 	private:
 		static void OnKeyEvent(GLFWwindow* windowHandle, int key, int scancode, int action, int mods);
 		static void OnTextEvent(GLFWwindow* windowHandle, unsigned int codepoint);
@@ -77,6 +81,9 @@ namespace Strawberry::Graphics::Window
 
 
 		Core::Optional<Core::Math::Vec2f> mPreviousMousePosition;
+
+
+		std::string mTitle;
 	};
 
 

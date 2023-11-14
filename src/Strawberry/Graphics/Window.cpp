@@ -31,6 +31,7 @@ namespace Strawberry::Graphics::Window
 
 
 	Window::Window(const std::string& title, Core::Math::Vec2i size)
+		: mTitle(title)
 	{
 		if (sInstanceCount++ == 0) Initialise();
 
@@ -115,6 +116,19 @@ namespace Strawberry::Graphics::Window
 		Core::Math::Vec2i size;
 		glfwGetWindowSize(mHandle, &size[0], &size[1]);
 		return size;
+	}
+
+
+	const std::string& Window::GetTitle() const
+	{
+		return mTitle;
+	}
+
+
+	void Window::SetTitle(const std::string& title)
+	{
+		mTitle = title;
+		glfwSetWindowTitle(mHandle, title.c_str());
 	}
 
 
