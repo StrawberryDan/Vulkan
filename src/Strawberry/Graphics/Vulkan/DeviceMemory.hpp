@@ -35,8 +35,6 @@ namespace Strawberry::Graphics::Vulkan
 
 		uint64_t GetSize() const;
 		void SetData(const Strawberry::Core::IO::DynamicByteBuffer& bytes);
-		Core::IO::DynamicByteBuffer Read() const;
-		Core::IO::DynamicByteBuffer Read(size_t length, size_t offset = 0) const;
 
 
 	private:

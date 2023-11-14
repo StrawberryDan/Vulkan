@@ -99,16 +99,4 @@ namespace Strawberry::Graphics::Vulkan
 		};
 		Core::AssertEQ(vkFlushMappedMemoryRanges(mDevice, 1, &range), VK_SUCCESS);
 	}
-
-
-	Core::IO::DynamicByteBuffer DeviceMemory::Read() const
-	{
-		return Read(GetSize());
-	}
-
-
-	Core::IO::DynamicByteBuffer DeviceMemory::Read(size_t length, size_t offset) const
-	{
-		return {mMappedDataPtr + offset, length};
-	}
 }
