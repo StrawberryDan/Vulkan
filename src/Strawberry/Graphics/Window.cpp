@@ -174,7 +174,7 @@ namespace Strawberry::Graphics::Window
 	{
 		Window* window = sInstanceMap.Lock()->at(windowHandle);
 
-		Core::Math::Vec2u newPos(x, y);
+		Core::Math::Vec2f newPos(x, y);
 
 		Events::MouseMove event {
 			.position{x, y},
@@ -228,10 +228,15 @@ namespace Strawberry::Graphics::Window
 		};
 
 
+		Core::Math::Vec2 position;
+		glfwGetCursorPos(windowHandle, &position[0], &position[1]);
+
+
 		Events::MouseButton event {
 			.button = GetButton(button),
 			.modifiers = GetModifier(mods),
 			.action = GetAction(action),
+			.position = position.AsType<float>()
 		};
 
 		window->mEventQueue.emplace_back(event);

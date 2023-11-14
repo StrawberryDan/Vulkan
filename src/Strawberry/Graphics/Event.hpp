@@ -30,8 +30,8 @@ namespace Strawberry::Graphics::Window
 
 		struct MouseMove
 		{
-			Core::Math::Vec2u position;
-			Core::Math::Vec2u deltaPosition;
+			Core::Math::Vec2f position;
+			Core::Math::Vec2f deltaPosition;
 		};
 
 
@@ -40,6 +40,7 @@ namespace Strawberry::Graphics::Window
 			Input::MouseButton button;
 			Input::Modifiers modifiers;
 			Input::KeyAction action;
+			Core::Math::Vec2f position;
 		};
 	}
 

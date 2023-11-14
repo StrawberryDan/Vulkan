@@ -76,7 +76,7 @@ namespace Strawberry::Graphics::Window
 		std::deque<Event> mEventQueue;
 
 
-		Core::Optional<Core::Math::Vec2u> mPreviousMousePosition;
+		Core::Optional<Core::Math::Vec2f> mPreviousMousePosition;
 	};
 
 
