@@ -37,10 +37,9 @@ namespace Strawberry::Graphics
 
 
 		Core::Math::Vec2u GetSize() const;
-
 		Core::Math::Vec2u GetSpriteCount() const;
-
 		Core::Math::Vec2u GetSpriteSize() const;
+		const Vulkan::Image& GetImage() const;
 
 
 		template <std::movable T, typename... Args>

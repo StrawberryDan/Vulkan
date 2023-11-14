@@ -79,4 +79,10 @@ namespace Strawberry::Graphics
 	{
 		return {mImage.GetSize()[0] / mSpriteCount[0], mImage.GetSize()[1] / mSpriteCount[1]};
 	}
+
+
+	const Vulkan::Image& SpriteSheet::GetImage() const
+	{
+		return mImage;
+	}
 }
