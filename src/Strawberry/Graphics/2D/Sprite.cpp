@@ -50,7 +50,7 @@ namespace Strawberry::Graphics
 		index = index % (mSpriteSheet->GetSpriteCount()[0] * mSpriteSheet->GetSpriteCount()[1]);
 		mSpriteCoords = {
 			index % mSpriteSheet->GetSpriteCount()[0],
-			index / mSpriteSheet->GetSpriteCount()[1]
+			(index == 0 ? index : index - 1) / mSpriteSheet->GetSpriteCount()[1]
 		};
 	}
 }
