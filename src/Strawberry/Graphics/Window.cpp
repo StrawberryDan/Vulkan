@@ -32,12 +32,15 @@ namespace Strawberry::Graphics::Window
 
 	Window::Window(const std::string& title, Core::Math::Vec2i size)
 		: mTitle(title)
+		, mLogicalSize(size)
 	{
 		if (sInstanceCount++ == 0) Initialise();
 
 		Core::Assert(size[0] > 0 && size[1] > 0);
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+#ifdef _WIN32
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+#endif
 		mHandle = glfwCreateWindow(size[0], size[1], title.c_str(), nullptr, nullptr);
 		glfwSetKeyCallback(mHandle, &Window::OnKeyEvent);
 		glfwSetCharCallback(mHandle, &Window::OnTextEvent);
@@ -51,6 +54,7 @@ namespace Strawberry::Graphics::Window
 	Window::Window(Window&& rhs) noexcept
 		: mHandle(std::exchange(rhs.mHandle, nullptr))
 		, mEventQueue(std::move(rhs.mEventQueue))
+		, mLogicalSize(std::move(rhs.mLogicalSize))
 		, mPreviousMousePosition(std::move(rhs.mPreviousMousePosition))
 	{
 		sInstanceMap.Lock()->insert_or_assign(mHandle, this);
@@ -192,7 +196,7 @@ namespace Strawberry::Graphics::Window
 		Core::Math::Vec2f newPos(x, y);
 
 		Events::MouseMove event {
-			.position{x, y},
+			.position = window->ScaleCoordinate(Core::Math::Vec2(x, y)),
 			.deltaPosition = window->mPreviousMousePosition
 				.Map([=](const auto& prev) { return newPos - prev; })
 				.UnwrapOr(Core::Math::Vec2u()),
@@ -251,10 +255,18 @@ namespace Strawberry::Graphics::Window
 			.button = GetButton(button),
 			.modifiers = GetModifier(mods),
 			.action = GetAction(action),
-			.position = position.AsType<float>()
+			.position = window->ScaleCoordinate(position)
 		};
 
 		window->mEventQueue.emplace_back(event);
+	}
+
+
+	Core::Math::Vec2f Window::ScaleCoordinate(Core::Math::Vec2 in) const
+	{
+		auto windowSize = GetSize();
+		auto ratio = Core::Math::Vec2(static_cast<double>(mLogicalSize[0]) / windowSize[0], static_cast<double>(mLogicalSize[1]) / windowSize[1]);
+		return (in * ratio).AsType<float>();
 	}
 
 
