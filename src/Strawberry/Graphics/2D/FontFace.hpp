@@ -51,6 +51,7 @@ namespace Strawberry::Graphics
 
 		void SetPixelSize(uint32_t pixelSize);
 		void SetPixelSize(Core::Math::Vec2u pixelSize);
+		Core::Math::Vec2u GetPixelSize() const;
 
 
 	protected:
@@ -59,5 +60,6 @@ namespace Strawberry::Graphics
 
 	private:
 		FT_Face mFace;
+		Core::Math::Vec2u mPixelSize = {1, 1};
 	};
 }

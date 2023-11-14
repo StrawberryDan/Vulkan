@@ -51,7 +51,9 @@ namespace Strawberry::Graphics
 
 	FontFace::FontFace(Strawberry::Graphics::FontFace&& rhs) noexcept
 		: mFace(std::exchange(rhs.mFace, {}))
-	{}
+	{
+		SetPixelSize(GetPixelSize());
+	}
 
 
 	FontFace& FontFace::operator=(Strawberry::Graphics::FontFace&& rhs) noexcept
@@ -80,7 +82,7 @@ namespace Strawberry::Graphics
 	{
 		auto index = FT_Get_Char_Index(mFace, c);
 		Core::AssertEQ(FT_Load_Glyph(mFace, index, FT_LOAD_DEFAULT), 0);
-		return {static_cast<float>(mFace->glyph->metrics.width) / 64.0f , static_cast<float>(mFace->glyph->metrics.height) / 64.0f};
+		return Core::Math::Vec2f(static_cast<float>(mFace->glyph->metrics.width) , static_cast<float>(mFace->glyph->metrics.height)) / 64.0;
 	}
 
 
@@ -88,7 +90,7 @@ namespace Strawberry::Graphics
 	{
 		auto index = FT_Get_Char_Index(mFace, c);
 		Core::AssertEQ(FT_Load_Glyph(mFace, index, FT_LOAD_DEFAULT), 0);
-		return {static_cast<float>(mFace->glyph->metrics.horiBearingX) / 64.0f , static_cast<float>(mFace->glyph->metrics.horiBearingY) / 64.0f};
+		return Core::Math::Vec2f(static_cast<float>(mFace->glyph->metrics.horiBearingX) / 64.0f , static_cast<float>(mFace->glyph->metrics.horiBearingY) / 64.0f);
 	}
 
 
@@ -137,8 +139,7 @@ namespace Strawberry::Graphics
 
 	void FontFace::SetPixelSize(uint32_t pixelSize)
 	{
-		Core::AssertEQ(FT_Set_Pixel_Sizes(mFace, pixelSize, 0),
-		               0);
+		SetPixelSize({pixelSize, 0});
 	}
 
 
@@ -146,5 +147,12 @@ namespace Strawberry::Graphics
 	{
 		Core::AssertEQ(FT_Set_Pixel_Sizes(mFace, pixelSize[0], pixelSize[1]),
 					   0);
+		mPixelSize = pixelSize;
+	}
+
+
+	Core::Math::Vec2u FontFace::GetPixelSize() const
+	{
+		return mPixelSize;
 	}
 }
