@@ -74,6 +74,7 @@ namespace Strawberry::Graphics::Vulkan
 		T Create(const Args&... args) const { return T(*this, std::forward<const Args&>(args)...); }
 
 
+		VkFormat GetFormat() const;
 		Core::Math::Vec3u GetSize() const;
 
 
@@ -84,6 +85,7 @@ namespace Strawberry::Graphics::Vulkan
 		VkImage mImage;
 		DeviceMemory mMemory;
 		VkDevice mDevice;
+		VkFormat mFormat;
 		Core::Math::Vec3u mSize;
 		VkImageLayout mLastRecordedLayout;
 	};

@@ -43,6 +43,7 @@ namespace Strawberry::Graphics::Vulkan
 				 uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling, VkImageLayout initialLayout)
 		: mImage(nullptr)
 		, mDevice(device.mDevice)
+		, mFormat(format)
 		, mSize(static_cast<int>(extent), 0, 0)
 		, mLastRecordedLayout(initialLayout)
 	{
@@ -72,6 +73,7 @@ namespace Strawberry::Graphics::Vulkan
 				 uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling, VkImageLayout initialLayout)
 		: mImage(nullptr)
 		, mDevice(device.mDevice)
+		, mFormat(format)
 		, mSize(extent)
 		, mLastRecordedLayout(initialLayout)
 	{
@@ -109,6 +111,7 @@ namespace Strawberry::Graphics::Vulkan
 				 uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling, VkImageLayout initialLayout)
 		: mImage(nullptr)
 		, mDevice(device.mDevice)
+		, mFormat(format)
 		, mSize(extent)
 		, mLastRecordedLayout(initialLayout)
 	{
@@ -146,6 +149,7 @@ namespace Strawberry::Graphics::Vulkan
 		: mImage(std::exchange(rhs.mImage, nullptr))
 		, mMemory(std::move(rhs.mMemory))
 		, mDevice(std::exchange(rhs.mDevice, nullptr))
+		, mFormat(std::exchange(rhs.mFormat, VK_FORMAT_MAX_ENUM))
 		, mSize(std::exchange(rhs.mSize, Core::Math::Vec3u()))
 		, mLastRecordedLayout(std::exchange(rhs.mLastRecordedLayout, VK_IMAGE_LAYOUT_UNDEFINED))
 	{
@@ -171,6 +175,12 @@ namespace Strawberry::Graphics::Vulkan
 		{
 			vkDestroyImage(mDevice, mImage, nullptr);
 		}
+	}
+
+
+	VkFormat Image::GetFormat() const
+	{
+		return mFormat;
 	}
 
 
