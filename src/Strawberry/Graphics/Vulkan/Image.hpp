@@ -76,6 +76,7 @@ namespace Strawberry::Graphics::Vulkan
 
 		VkFormat GetFormat() const;
 		Core::Math::Vec3u GetSize() const;
+		Core::Math::Vector<uint8_t, 4> ReadPixel(Core::Math::Vec2u pixel) const;
 
 
 		void ClearColor(Queue& queue, Core::Math::Vec4f clearColor = {0.0f, 0.0f, 0.0f, 1.0f});
@@ -88,5 +89,8 @@ namespace Strawberry::Graphics::Vulkan
 		VkFormat mFormat;
 		Core::Math::Vec3u mSize;
 		VkImageLayout mLastRecordedLayout;
+
+
+		Core::IO::DynamicByteBuffer mBytes;
 	};
 }

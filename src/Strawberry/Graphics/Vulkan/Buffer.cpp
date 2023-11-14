@@ -78,12 +78,19 @@ namespace Strawberry::Graphics::Vulkan
 	void Buffer::SetData(const Core::IO::DynamicByteBuffer& bytes)
 	{
 		Core::AssertEQ(bytes.Size(), GetSize());
-		mMemory.SetData(bytes);
+		mBytes = bytes;
+		mMemory.SetData(GetBytes());
 	}
 
 
 	uint64_t Buffer::GetSize() const
 	{
 		return mSize;
+	}
+
+
+	Core::IO::DynamicByteBuffer Buffer::GetBytes() const
+	{
+		return mBytes;
 	}
 }

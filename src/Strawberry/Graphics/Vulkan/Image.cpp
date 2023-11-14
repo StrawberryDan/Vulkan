@@ -152,6 +152,7 @@ namespace Strawberry::Graphics::Vulkan
 		, mFormat(std::exchange(rhs.mFormat, VK_FORMAT_MAX_ENUM))
 		, mSize(std::exchange(rhs.mSize, Core::Math::Vec3u()))
 		, mLastRecordedLayout(std::exchange(rhs.mLastRecordedLayout, VK_IMAGE_LAYOUT_UNDEFINED))
+		, mBytes(std::move(rhs.mBytes))
 	{
 
 	}
@@ -187,6 +188,18 @@ namespace Strawberry::Graphics::Vulkan
 	Core::Math::Vec3u Image::GetSize() const
 	{
 		return mSize;
+	}
+
+
+	Core::Math::Vector<uint8_t, 4> Image::ReadPixel(Core::Math::Vec2u pixel) const
+	{
+		Core::AssertEQ(GetFormat(), VK_FORMAT_R8G8B8A8_SRGB);
+		Core::Assert(pixel[0] < mSize[0]);
+		Core::Assert(pixel[1] < mSize[1]);
+		Core::Assert(mSize[2] == 0);
+
+		Core::IO::DynamicByteBuffer bytes(mBytes.Data() + 4 * (pixel[0] + pixel[1] * mSize[0]), 4);
+		return {bytes[0], bytes[1], bytes[2], bytes[3]};
 	}
 
 

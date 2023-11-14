@@ -47,6 +47,7 @@ namespace Strawberry::Graphics::Vulkan
 
 
 		[[nodiscard]] uint64_t GetSize() const;
+		Core::IO::DynamicByteBuffer GetBytes() const;
 
 
 	private:
@@ -54,5 +55,7 @@ namespace Strawberry::Graphics::Vulkan
 		VkBuffer mBuffer;
 		DeviceMemory mMemory;
 		VkDevice mDevice;
+
+		Core::IO::DynamicByteBuffer mBytes;
 	};
 }
