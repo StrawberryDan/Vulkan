@@ -36,6 +36,7 @@ namespace Strawberry::Graphics::Window
 
 		Core::Assert(size[0] > 0 && size[1] > 0);
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 		mHandle = glfwCreateWindow(size[0], size[1], title.c_str(), nullptr, nullptr);
 		glfwSetKeyCallback(mHandle, &Window::OnKeyEvent);
 		glfwSetCharCallback(mHandle, &Window::OnTextEvent);
