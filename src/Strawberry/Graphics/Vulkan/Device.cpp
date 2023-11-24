@@ -210,4 +210,10 @@ namespace Strawberry::Graphics::Vulkan
 			vkDestroyDevice(mDevice, nullptr);
 		}
 	}
+
+
+	VkPhysicalDevice Device::GetPhysicalDevice() const
+	{
+		return mPhysicalDevice;
+	}
 }

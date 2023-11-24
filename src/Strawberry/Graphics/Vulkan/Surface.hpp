@@ -7,6 +7,8 @@
 // Vulkan
 #include <vulkan/vulkan.h>
 
+#include "Strawberry/Core/Types/ReflexivePointer.hpp"
+
 
 //======================================================================================================================
 //  Foreward Declarations
@@ -35,10 +37,14 @@ namespace Strawberry::Graphics::Vulkan
 		Surface& operator=(Surface&& rhs);
 		~Surface();
 
+
+		VkSurfaceCapabilitiesKHR GetCapabilities() const;
+
+
 	private:
 		VkSurfaceKHR mSurface;
 
 		VkInstance mInstance;
-		VkDevice mDevice;
+		Core::ReflexivePointer<Device> mDevice;
 	};
 }

@@ -24,6 +24,11 @@ namespace Strawberry::Graphics::Vulkan
 		, mNextImageIndex([this]() { return CalculateNextImageIndex(); })
 		, mNextImage([this]() { return CalculateNextImage(); })
 	{
+		auto surfaceCapabilities = surface.GetCapabilities();
+		mSize[0] = std::clamp<int>(mSize[0], surfaceCapabilities.minImageExtent.width, surfaceCapabilities.maxImageExtent.width);
+		mSize[1] = std::clamp<int>(mSize[1], surfaceCapabilities.minImageExtent.height, surfaceCapabilities.maxImageExtent.height);
+
+
 		uint32_t formatCount = 0;
 		vkGetPhysicalDeviceSurfaceFormatsKHR(mQueue->GetDevice()->mPhysicalDevice, surface.mSurface, &formatCount, nullptr);
 		std::vector<VkSurfaceFormatKHR> deviceFormats(formatCount);;

@@ -59,6 +59,9 @@ namespace Strawberry::Graphics::Vulkan
 		T Create(const Args&... args) const { return T(*this, std::forward<const Args&>(args)...); }
 
 
+		VkPhysicalDevice GetPhysicalDevice() const;
+
+
 	private:
 		VkInstance mInstance{};
 		VkPhysicalDevice mPhysicalDevice;

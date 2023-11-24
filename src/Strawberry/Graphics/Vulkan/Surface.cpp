@@ -14,7 +14,7 @@ namespace Strawberry::Graphics::Vulkan
 {
 	Surface::Surface(const Window::Window& window, const Device& device)
 		: mInstance(device.mInstance)
-		, mDevice(device.mDevice)
+		, mDevice(device)
 	{
 		Core::AssertEQ(glfwCreateWindowSurface(mInstance, window.mHandle, nullptr, &mSurface), GLFW_NO_ERROR);
 	}
@@ -44,5 +44,13 @@ namespace Strawberry::Graphics::Vulkan
 		{
 			vkDestroySurfaceKHR(mInstance, mSurface, nullptr);
 		}
+	}
+
+
+	VkSurfaceCapabilitiesKHR Surface::GetCapabilities() const
+	{
+		VkSurfaceCapabilitiesKHR capabilities;
+		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(mDevice->GetPhysicalDevice(), mSurface, &capabilities);
+		return capabilities;
 	}
 }
