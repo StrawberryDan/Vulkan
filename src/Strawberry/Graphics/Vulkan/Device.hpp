@@ -59,7 +59,8 @@ namespace Strawberry::Graphics::Vulkan
 		T Create(const Args&... args) const { return T(*this, std::forward<const Args&>(args)...); }
 
 
-		VkPhysicalDevice GetPhysicalDevice() const;
+		[[nodiscard]] VkPhysicalDevice GetPhysicalDevice() const;
+		VkPhysicalDeviceLimits GetPhysicalDeviceLimits() const;
 
 
 	private:

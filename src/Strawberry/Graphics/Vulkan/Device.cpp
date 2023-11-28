@@ -216,4 +216,12 @@ namespace Strawberry::Graphics::Vulkan
 	{
 		return mPhysicalDevice;
 	}
+
+
+	VkPhysicalDeviceLimits Device::GetPhysicalDeviceLimits() const
+	{
+		VkPhysicalDeviceProperties properties{};
+		vkGetPhysicalDeviceProperties(mPhysicalDevice, &properties);
+		return properties.limits;
+	}
 }
