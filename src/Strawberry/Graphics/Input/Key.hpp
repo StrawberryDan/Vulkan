@@ -106,13 +106,16 @@ namespace Strawberry::Graphics::Input
 	using Modifiers = uint8_t;
 
 
-	enum class Modifier
-		: Modifiers
+	class Modifier
 	{
-		CTRL = 1 << 0,
-		SHIFT = 1 << 1,
-		ALT = 1 << 2,
-		META = 1 << 3,
+	public:
+		enum : Modifiers
+		{
+			CTRL = 1 << 0,
+			SHIFT = 1 << 1,
+			ALT = 1 << 2,
+			META = 1 << 3,
+		};
 	};
 
 
