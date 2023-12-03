@@ -28,7 +28,7 @@ namespace Strawberry::Graphics
 
 	public:
 		static Core::Optional<SpriteSheet>
-		FromFile(Vulkan::Device& device, Vulkan::Queue& queue, Core::Math::Vec2u spriteCount,
+		FromFile(Vulkan::Queue& queue, Core::Math::Vec2u spriteCount,
 				 const std::filesystem::path& filepath);
 
 

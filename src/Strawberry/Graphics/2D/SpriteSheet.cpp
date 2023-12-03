@@ -15,8 +15,7 @@
 namespace Strawberry::Graphics
 {
 	Core::Optional<SpriteSheet>
-	SpriteSheet::FromFile(Vulkan::Device& device,
-						  Vulkan::Queue& queue,
+	SpriteSheet::FromFile(  Vulkan::Queue& queue,
 						  Core::Math::Vec2u spriteCount,
 						  const std::filesystem::path& filepath)
 	{
@@ -27,7 +26,7 @@ namespace Strawberry::Graphics
 
 		// Unpack file data
 		auto [size, channels, bytes] = fileContents.Unwrap();
-		Vulkan::Image image(device, size, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
+		Vulkan::Image image(*queue.GetDevice(), size, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
 		Vulkan::Buffer imageBuffer(*queue.GetDevice(), bytes.Size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
 		imageBuffer.SetData(bytes);
 
