@@ -49,12 +49,16 @@ namespace Strawberry::Graphics::Vulkan
 
 	Queue::~Queue()
 	{
+		Wait();
 		mCommandPool.Destruct();
 	}
 
 
-	void Queue::Submit(const CommandBuffer& commandBuffer)
+	void Queue::Submit(CommandBuffer commandBuffer)
 	{
+		Wait();
+		mCommandBuffer = std::move(commandBuffer);
+
 		VkSubmitInfo submitInfo {
 			.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
 			.pNext = nullptr,
@@ -62,14 +66,25 @@ namespace Strawberry::Graphics::Vulkan
 			.pWaitSemaphores = nullptr,
 			.pWaitDstStageMask = nullptr,
 			.commandBufferCount = 1,
-			.pCommandBuffers = &commandBuffer.mCommandBuffer,
+			.pCommandBuffers = &mCommandBuffer->mCommandBuffer,
 			.signalSemaphoreCount = 0,
 			.pSignalSemaphores = nullptr,
 		};
 		Core::AssertEQ(vkQueueSubmit(mQueue, 1, &submitInfo, mSubmissionFence.mFence), VK_SUCCESS);
 
-		mSubmissionFence.Wait();
-		mSubmissionFence.Reset();
+		mShouldWait = true;
+	}
+
+
+	void Queue::Wait()
+	{
+		if (mShouldWait)
+		{
+			mSubmissionFence.Wait();
+			mSubmissionFence.Reset();
+			mCommandBuffer.Reset();
+			mShouldWait = false;
+		}
 	}
 
 

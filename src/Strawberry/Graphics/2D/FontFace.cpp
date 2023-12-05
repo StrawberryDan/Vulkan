@@ -131,7 +131,7 @@ namespace Strawberry::Graphics
 		commandBuffer.CopyBufferToImage(buffer, image);
 		commandBuffer.ImageMemoryBarrier(image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_GENERAL);
 		commandBuffer.End();
-		queue.Submit(commandBuffer);
+		queue.Submit(std::move(commandBuffer));
 
 		return image;
 	}

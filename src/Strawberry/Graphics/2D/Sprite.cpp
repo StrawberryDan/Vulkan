@@ -29,6 +29,8 @@ namespace Strawberry::Graphics
 
 	void Sprite::SetSpriteCoords(const Core::Math::Vec2u& spriteCoords)
 	{
+		Core::Assert(spriteCoords[0] < mSpriteSheet->GetSpriteCount()[0]);
+		Core::Assert(spriteCoords[1] < mSpriteSheet->GetSpriteCount()[1]);
 		mSpriteCoords = spriteCoords;
 	}
 
@@ -48,9 +50,9 @@ namespace Strawberry::Graphics
 	void Sprite::SetSpriteIndex(uint32_t index)
 	{
 		index = index % (mSpriteSheet->GetSpriteCount()[0] * mSpriteSheet->GetSpriteCount()[1]);
-		mSpriteCoords = {
+		SetSpriteCoords({
 			index % mSpriteSheet->GetSpriteCount()[0],
-			(index == 0 ? index : index - 1) / mSpriteSheet->GetSpriteCount()[1]
-		};
+			index / mSpriteSheet->GetSpriteCount()[0]
+		});
 	}
 }

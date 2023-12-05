@@ -39,8 +39,8 @@ namespace Strawberry::Graphics
 		commandBuffer.Begin(true);
 		commandBuffer.CopyBufferToImage(imageBuffer, image);
 		commandBuffer.End();
-		queue.Submit(commandBuffer);
-
+		queue.Submit(std::move(commandBuffer));
+		queue.Wait();
 
 
 		// Return sprite sheet

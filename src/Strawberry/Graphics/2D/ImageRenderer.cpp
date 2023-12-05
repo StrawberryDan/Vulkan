@@ -58,7 +58,8 @@ namespace Strawberry::Graphics
 		commandBuffer.Draw(4);
 		commandBuffer.EndRenderPass();
 		commandBuffer.End();
-		mQueue->Submit(commandBuffer);
+		mQueue->Submit(std::move(commandBuffer));
+		mQueue->Wait();
 	}
 
 

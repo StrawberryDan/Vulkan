@@ -40,7 +40,6 @@ namespace Strawberry::Graphics
 
 	private:
 		Vulkan::Pipeline mPipeline;
-		Vulkan::CommandBuffer mCommandBuffer;
 
 
 		Vulkan::DescriptorSet mVertexDescriptorSet;

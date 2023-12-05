@@ -36,7 +36,6 @@ namespace Strawberry::Graphics
 	SpriteRenderer::SpriteRenderer(Vulkan::Queue& queue, Core::Math::Vec2u resolution, VkFilter minFilter, VkFilter magFilter)
 		: Renderer(queue, CreateRenderPass(queue), resolution)
 		, mPipeline(CreatePipeline())
-		, mCommandBuffer(GetQueue()->Create<Vulkan::CommandBuffer>())
 		, mVertexDescriptorSet(mPipeline.AllocateDescriptorSet(0))
 		, mCameraBuffer(*queue.GetDevice(), 16 * sizeof(float), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
 		, mFragmentDescriptorSet(mPipeline.AllocateDescriptorSet(1))
@@ -60,22 +59,23 @@ namespace Strawberry::Graphics
 		mFragmentDescriptorSet.SetUniformTexture(mSampler, sprite.mSpriteSheet->mImageView, VK_IMAGE_LAYOUT_GENERAL, 0);
 
 
-		mCommandBuffer.Begin(true);
-		mCommandBuffer.BindPipeline(mPipeline);
-		mCommandBuffer.BindDescriptorSet(mPipeline, 0, mVertexDescriptorSet);
-		mCommandBuffer.BindDescriptorSet(mPipeline, 1, mFragmentDescriptorSet);
-		mCommandBuffer.ImageMemoryBarrier(sprite.mSpriteSheet->mImage, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_GENERAL);
-		mCommandBuffer.BeginRenderPass(*GetRenderPass(), GetFramebuffer());
+		auto commandBuffer = GetQueue()->Create<Vulkan::CommandBuffer>();
+		commandBuffer.Begin(true);
+		commandBuffer.BindPipeline(mPipeline);
+		commandBuffer.BindDescriptorSet(mPipeline, 0, mVertexDescriptorSet);
+		commandBuffer.BindDescriptorSet(mPipeline, 1, mFragmentDescriptorSet);
+		commandBuffer.ImageMemoryBarrier(sprite.mSpriteSheet->mImage, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_GENERAL);
+		commandBuffer.BeginRenderPass(*GetRenderPass(), GetFramebuffer());
 
 
-		mCommandBuffer.PushConstants(mPipeline, VK_SHADER_STAGE_VERTEX_BIT, Core::IO::DynamicByteBuffer(transform.AsMatrix()), 0);
-		mCommandBuffer.PushConstants(mPipeline, VK_SHADER_STAGE_VERTEX_BIT, Core::IO::DynamicByteBuffer(sprite.mSpriteCoords), sizeof(Core::Math::Mat4f));
-		mCommandBuffer.Draw(6);
+		commandBuffer.PushConstants(mPipeline, VK_SHADER_STAGE_VERTEX_BIT, Core::IO::DynamicByteBuffer(transform.AsMatrix()), 0);
+		commandBuffer.PushConstants(mPipeline, VK_SHADER_STAGE_VERTEX_BIT, Core::IO::DynamicByteBuffer(sprite.mSpriteCoords), sizeof(Core::Math::Mat4f));
+		commandBuffer.Draw(6);
 
 
-		mCommandBuffer.EndRenderPass();
-		mCommandBuffer.End();
-		GetQueue()->Submit(mCommandBuffer);
+		commandBuffer.EndRenderPass();
+		commandBuffer.End();
+		GetQueue()->Submit(std::move(commandBuffer));
 	}
 
 

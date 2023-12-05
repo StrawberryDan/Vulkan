@@ -175,7 +175,8 @@ namespace Strawberry::Graphics::Vulkan
 		buffer.ImageMemoryBarrier(GetNextImage(), VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
 		                          VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 		buffer.End();
-		mQueue->Submit(buffer);
+		mQueue->Submit(std::move(buffer));
+		mQueue->Wait();
 
 
 		Present();

@@ -86,7 +86,7 @@ namespace Strawberry::Graphics
 			commandBuffer.Draw(4);
 			commandBuffer.EndRenderPass();
 			commandBuffer.End();
-			GetQueue()->Submit(commandBuffer);
+			GetQueue()->Submit(std::move(commandBuffer));
 
 			position = position + fontface.GetGlyphAdvance(c);
 		}
