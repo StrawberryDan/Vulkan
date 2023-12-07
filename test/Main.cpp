@@ -105,7 +105,8 @@ void BasicRendering()
 	commandBuffer.CopyBufferToImage(textureBuffer, texture);
 	commandBuffer.ImageMemoryBarrier(texture, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_GENERAL);
 	commandBuffer.End();
-	queue.Submit(commandBuffer);
+	queue.Submit(std::move(commandBuffer));
+	queue.Wait();
 	ImageView textureView = texture.Create<ImageView::Builder>()
 		.WithType(VK_IMAGE_VIEW_TYPE_2D)
 		.WithFormat(VK_FORMAT_R8G8B8A8_SRGB)
@@ -150,7 +151,8 @@ void BasicRendering()
 		commandBuffer.Draw(6);
 		commandBuffer.EndRenderPass();
 		commandBuffer.End();
-		queue.Submit(commandBuffer);
+		queue.Submit(std::move(commandBuffer));
+		queue.Wait();
 
 
 		swapchain.Present(framebuffer);
@@ -174,7 +176,7 @@ void SpriteRendering()
 	auto swapchain = queue.Create<Swapchain>(surface, window.GetSize());
 
 	SpriteRenderer renderer(queue, {1920, 1080});
-	auto spriteSheet = SpriteSheet::FromFile(device, queue, {4, 4}, "data/dio.png").Unwrap();
+	auto spriteSheet = SpriteSheet::FromFile(queue, {4, 4}, "data/dio.png").Unwrap();
 	auto sprite = spriteSheet.Create<Sprite>();
 	Transform2D transform;
 	transform.SetSize({1920, 1080});
