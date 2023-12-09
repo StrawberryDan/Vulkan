@@ -141,10 +141,10 @@ namespace Strawberry::Graphics::Window
 	{
 		auto [size, channels, data] = Core::IO::DynamicByteBuffer::FromImage(iconFile).Unwrap();
 
-		GLFWimage glfwImage
+		const GLFWimage glfwImage
 		{
-			.width = size[0],
-			.height = size[1],
+			.width = static_cast<int>(size[0]),
+			.height = static_cast<int>(size[1]),
 			.pixels = data.Data()
 		};
 
