@@ -7,6 +7,7 @@
 #include "Strawberry/Core/Assert.hpp"
 // GLFW3
 #include "GLFW/glfw3.h"
+#include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
 
 
 namespace Strawberry::Graphics::Window
@@ -133,6 +134,21 @@ namespace Strawberry::Graphics::Window
 	{
 		mTitle = title;
 		glfwSetWindowTitle(mHandle, title.c_str());
+	}
+
+
+	void Window::SetIcon(const std::filesystem::path& iconFile)
+	{
+		auto [size, channels, data] = Core::IO::DynamicByteBuffer::FromImage(iconFile).Unwrap();
+
+		GLFWimage glfwImage
+		{
+			.width = size[0],
+			.height = size[1],
+			.pixels = data.Data()
+		};
+
+		glfwSetWindowIcon(mHandle, 1, &glfwImage);
 	}
 
 

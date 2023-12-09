@@ -19,6 +19,7 @@
 #include <deque>
 #include <map>
 #include <string>
+#include <filesystem>
 
 
 //======================================================================================================================
@@ -66,6 +67,9 @@ namespace Strawberry::Graphics::Window
 
 		const std::string& GetTitle() const;
 		void SetTitle(const std::string& title);
+
+
+		void SetIcon(const std::filesystem::path& iconFile);
 
 
 	private:
