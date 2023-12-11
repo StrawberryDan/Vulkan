@@ -115,10 +115,13 @@ namespace Strawberry::Graphics::Vulkan
 
 		std::vector<const char*> layers
 		{
+#if !NDEBUG
 			"VK_LAYER_KHRONOS_validation"
+#endif
 		};
 
 
+#if !NDEBUG
 		VkDebugReportCallbackCreateInfoEXT callbackCreateInfo {
 			.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT,
 			.pNext= nullptr,
@@ -140,11 +143,15 @@ namespace Strawberry::Graphics::Vulkan
 			.pfnUserCallback = DebugUtilsCallback,
 			.pUserData = nullptr,
 		};
-
+#endif
 
 		VkInstanceCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
+#if NDEBUG
+			.pNext = nullptr,
+#else
 			.pNext = &messengerCreateInfo,
+#endif
 #if __APPLE__
 			.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR,
 #else
@@ -161,6 +168,7 @@ namespace Strawberry::Graphics::Vulkan
 		VkResult result = vkCreateInstance(&createInfo, nullptr, &mInstance);
 		Core::Assert(result == VK_SUCCESS);
 
+#if !NDEBUG
 		vkCreateDebugReportCallbackEXT = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(vkGetInstanceProcAddr(mInstance, "vkCreateDebugReportCallbackEXT"));
 		vkDestroyDebugReportCallbackEXT = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(mInstance, "vkDestroyDebugReportCallbackEXT"));
 		vkCreateDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(mInstance, "vkCreateDebugUtilsMessengerEXT"));
@@ -173,6 +181,7 @@ namespace Strawberry::Graphics::Vulkan
 		Core::AssertEQ(
 				vkCreateDebugReportCallbackEXT(mInstance, &callbackCreateInfo, nullptr, &mDebugReportCallback),
 				VK_SUCCESS);
+#endif
 	}
 
 
@@ -180,8 +189,10 @@ namespace Strawberry::Graphics::Vulkan
 	{
 		if (mInstance)
 		{
+#if !NDEBUG
 			vkDestroyDebugUtilsMessengerEXT(mInstance, mDebugUtilsCallback, nullptr);
 			vkDestroyDebugReportCallbackEXT(mInstance, mDebugReportCallback, nullptr);
+#endif
 			vkDestroyInstance(mInstance, nullptr);
 		}
 	}
