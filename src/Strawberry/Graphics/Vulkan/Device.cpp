@@ -207,6 +207,7 @@ namespace Strawberry::Graphics::Vulkan
 	{
 		if (mDevice)
 		{
+			Core::Assert(vkDeviceWaitIdle(mDevice) == VK_SUCCESS);
 			vkDestroyDevice(mDevice, nullptr);
 		}
 	}
