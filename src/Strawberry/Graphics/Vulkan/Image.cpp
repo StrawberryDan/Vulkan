@@ -199,7 +199,8 @@ namespace Strawberry::Graphics::Vulkan
 		Core::Assert(pixel[1] < mSize[1]);
 		Core::Assert(mSize[2] == 0);
 
-		Core::IO::DynamicByteBuffer bytes(mBytes.Data() + 4 * (pixel[0] + pixel[1] * mSize[0]), 4);
+		size_t pixelIndex = pixel[0] + pixel[1] * mSize[0];
+		Core::IO::DynamicByteBuffer bytes(mBytes.Data() + 4 * pixelIndex, 4);
 		return {bytes[0], bytes[1], bytes[2], bytes[3]};
 	}
 
