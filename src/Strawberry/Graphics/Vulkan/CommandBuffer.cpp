@@ -212,11 +212,11 @@ namespace Strawberry::Graphics::Vulkan
 		};
 		VkBufferImageCopy region {
 			.bufferOffset = 0,
-			.bufferRowLength = static_cast<uint32_t>(image.mSize[0]),
-			.bufferImageHeight = static_cast<uint32_t>(image.mSize[1]),
+			.bufferRowLength = 0,
+			.bufferImageHeight = 0,
 			.imageSubresource = subresource,
 			.imageOffset{.x = 0, .y = 0, .z = 0},
-			.imageExtent{.width = static_cast<uint32_t>(image.mSize[0]), .height = static_cast<uint32_t>(image.mSize[1]), .depth = 1}
+			.imageExtent{.width = image.mSize[0], .height = image.mSize[1], .depth = 1}
 		};
 		vkCmdCopyBufferToImage(mCommandBuffer, buffer.mBuffer, image.mImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 		image.mBytes = buffer.GetBytes();
@@ -281,6 +281,6 @@ namespace Strawberry::Graphics::Vulkan
 
 	void CommandBuffer::PushConstants(const Pipeline& pipeline, VkShaderStageFlags stage, const Core::IO::DynamicByteBuffer& bytes, uint32_t offset)
 	{
-		vkCmdPushConstants(mCommandBuffer, pipeline.mPipelineLayout, stage, offset, bytes.Size(), bytes.Data());
+		vkCmdPushConstants(mCommandBuffer, pipeline.mPipelineLayout, stage, offset, bytes.Size(), bytes.Data())
 	}
 }
