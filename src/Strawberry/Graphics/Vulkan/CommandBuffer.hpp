@@ -66,9 +66,10 @@ namespace Strawberry::Graphics::Vulkan
 		void Draw(uint32_t vertexCount, uint32_t instanceCount = 1, uint32_t vertexOffset = 0, uint32_t instanceOffset = 0);
 
 
-		void ImageMemoryBarrier(Image& image, VkImageAspectFlagBits aspect, VkImageLayout targetLayout);
+		void ImageMemoryBarrier(Image& image, VkImageAspectFlagBits aspect, VkImageLayout targetLayout,
+								VkAccessFlags srcAccessMask = VK_ACCESS_NONE, VkAccessFlags dstAccessMask = VK_ACCESS_NONE);
 		void ImageMemoryBarrier(VkImage image, VkImageAspectFlagBits aspect, VkImageLayout oldLayout,
-		                        VkImageLayout targetLayout);
+		                        VkImageLayout targetLayout, VkAccessFlags srcAccessMask = VK_ACCESS_NONE, VkAccessFlags dstAccessMask = VK_ACCESS_NONE);
 
 
 		void CopyImageToSwapchain(Image& image, Swapchain& swapchain);

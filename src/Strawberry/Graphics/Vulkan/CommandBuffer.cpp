@@ -128,7 +128,7 @@ namespace Strawberry::Graphics::Vulkan
 
 
 	void CommandBuffer::ImageMemoryBarrier(Image& image, VkImageAspectFlagBits aspect,
-	                                       VkImageLayout targetLayout)
+	                                       VkImageLayout targetLayout, VkAccessFlags srcAccessMask, VkAccessFlags dstAccessMask)
 	{
 		ImageMemoryBarrier(image.mImage, aspect, image.mLastRecordedLayout, targetLayout);
 		image.mLastRecordedLayout = targetLayout;
@@ -136,13 +136,13 @@ namespace Strawberry::Graphics::Vulkan
 
 
 	void CommandBuffer::ImageMemoryBarrier(VkImage image, VkImageAspectFlagBits aspect, VkImageLayout oldLayout,
-	                                       VkImageLayout targetLayout)
+	                                       VkImageLayout targetLayout, VkAccessFlags srcAccessMask, VkAccessFlags dstAccessMask)
 	{
 		VkImageMemoryBarrier imageMemoryBarrier {
 			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
 			.pNext = nullptr,
-			.srcAccessMask = VK_ACCESS_NONE,
-			.dstAccessMask = VK_ACCESS_NONE,
+			.srcAccessMask = srcAccessMask,
+			.dstAccessMask = dstAccessMask,
 			.oldLayout = oldLayout,
 			.newLayout = targetLayout,
 			.srcQueueFamilyIndex = mQueueFamilyIndex,
