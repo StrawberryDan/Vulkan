@@ -105,7 +105,7 @@ void BasicRendering()
 	commandBuffer.CopyBufferToImage(textureBuffer, texture);
 	commandBuffer.ImageMemoryBarrier(texture, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_GENERAL);
 	commandBuffer.End();
-	queue.Submit(std::move(commandBuffer));
+	queue.Submit(std::exchange(commandBuffer, commandPool.Create<CommandBuffer>()));
 	queue.Wait();
 	ImageView textureView = texture.Create<ImageView::Builder>()
 		.WithType(VK_IMAGE_VIEW_TYPE_2D)
@@ -151,7 +151,7 @@ void BasicRendering()
 		commandBuffer.Draw(6);
 		commandBuffer.EndRenderPass();
 		commandBuffer.End();
-		queue.Submit(std::move(commandBuffer));
+		queue.Submit(std::move(std::exchange(commandBuffer, commandPool.Create<CommandBuffer>())));
 		queue.Wait();
 
 
