@@ -6,6 +6,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Strawberry Core
 #include "Strawberry/Core/Types/ReflexivePointer.hpp"
+#include "Strawberry/Core/Types/Optional.hpp"
 // Vulkan
 #include <vulkan/vulkan.h>
 // Standard Library
@@ -59,8 +60,9 @@ namespace Strawberry::Graphics::Vulkan
 		T Create(const Args&... args) const { return T(*this, std::forward<const Args&>(args)...); }
 
 
-		[[nodiscard]] VkPhysicalDevice GetPhysicalDevice() const;
-		VkPhysicalDeviceLimits GetPhysicalDeviceLimits() const;
+		[[nodiscard]] VkPhysicalDevice  GetPhysicalDevice() const;
+		const VkPhysicalDeviceLimits&   GetPhysicalDeviceLimits() const;
+		const VkPhysicalDeviceFeatures& GetPhysicalDeviceFeatures() const;
 
 
 	private:
@@ -68,5 +70,9 @@ namespace Strawberry::Graphics::Vulkan
 		VkPhysicalDevice mPhysicalDevice;
 		VkDevice mDevice;
 		uint32_t mQueueFamilyIndex{};
+
+
+		mutable Core::Optional<VkPhysicalDeviceProperties> mPhysicalDeviceProperties;
+		mutable Core::Optional<VkPhysicalDeviceFeatures>   mPhysicalDeviceFeatures;
 	};
 }

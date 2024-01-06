@@ -219,10 +219,26 @@ namespace Strawberry::Graphics::Vulkan
 	}
 
 
-	VkPhysicalDeviceLimits Device::GetPhysicalDeviceLimits() const
+	const VkPhysicalDeviceLimits& Device::GetPhysicalDeviceLimits() const
 	{
-		VkPhysicalDeviceProperties properties{};
-		vkGetPhysicalDeviceProperties(mPhysicalDevice, &properties);
-		return properties.limits;
+		if (!mPhysicalDeviceProperties)
+		{
+			mPhysicalDeviceProperties.Emplace();
+			vkGetPhysicalDeviceProperties(mPhysicalDevice, &mPhysicalDeviceProperties.Value());
+		}
+
+		return mPhysicalDeviceProperties->limits;
+	}
+
+
+	const VkPhysicalDeviceFeatures& Device::GetPhysicalDeviceFeatures() const
+	{
+		if (!mPhysicalDeviceFeatures)
+		{
+			mPhysicalDeviceFeatures.Emplace();
+			vkGetPhysicalDeviceFeatures(mPhysicalDevice, &mPhysicalDeviceFeatures.Value());
+		}
+
+		return mPhysicalDeviceFeatures.Value();
 	}
 }
