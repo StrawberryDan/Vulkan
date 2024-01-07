@@ -45,7 +45,7 @@ namespace Strawberry::Graphics::Vulkan
 
 
 		void Submit(const CommandBuffer& commandBuffer);
-		void Wait();
+		void WaitUntilIdle();
 
 
 		Core::ReflexivePointer<Device> GetDevice() const;
@@ -62,7 +62,5 @@ namespace Strawberry::Graphics::Vulkan
 		VkQueue mQueue;
 		uint32_t mFamilyIndex;
 		Core::ReflexivePointer<Device> mDevice;
-		Fence mSubmissionFence;
-		bool mShouldWait = false;
 	};
 }

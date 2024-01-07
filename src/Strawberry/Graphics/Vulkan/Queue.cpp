@@ -18,7 +18,6 @@ namespace Strawberry::Graphics::Vulkan
 	Queue::Queue(const Device& device, uint32_t family, uint32_t index)
 		: mFamilyIndex(family)
 		, mDevice(device)
-		, mSubmissionFence(device)
 	{
 		vkGetDeviceQueue(mDevice->mDevice, mFamilyIndex, index, &mQueue);
 	}
@@ -28,8 +27,6 @@ namespace Strawberry::Graphics::Vulkan
 		: mQueue(std::exchange(rhs.mQueue, nullptr))
 		, mFamilyIndex(std::exchange(rhs.mFamilyIndex, 0))
 		, mDevice(std::move(rhs.mDevice))
-		, mSubmissionFence(std::move(rhs.mSubmissionFence))
-		, mShouldWait(std::exchange(rhs.mShouldWait, false))
 	{}
 
 
@@ -47,13 +44,16 @@ namespace Strawberry::Graphics::Vulkan
 
 	Queue::~Queue()
 	{
-		Wait();
+		if (mQueue)
+		{
+			WaitUntilIdle();
+		}
 	}
 
 
 	void Queue::Submit(const CommandBuffer& commandBuffer)
 	{
-		Wait();
+		WaitUntilIdle();
 
 		VkSubmitInfo submitInfo {
 			.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
@@ -66,20 +66,13 @@ namespace Strawberry::Graphics::Vulkan
 			.signalSemaphoreCount = 0,
 			.pSignalSemaphores = nullptr,
 		};
-		Core::AssertEQ(vkQueueSubmit(mQueue, 1, &submitInfo, mSubmissionFence.mFence), VK_SUCCESS);
-
-		mShouldWait = true;
+		Core::AssertEQ(vkQueueSubmit(mQueue, 1, &submitInfo, VK_NULL_HANDLE), VK_SUCCESS);
 	}
 
 
-	void Queue::Wait()
+	void Queue::WaitUntilIdle()
 	{
-		if (mShouldWait)
-		{
-			mSubmissionFence.Wait();
-			mSubmissionFence.Reset();
-			mShouldWait = false;
-		}
+		vkQueueWaitIdle(mQueue);
 	}
 
 

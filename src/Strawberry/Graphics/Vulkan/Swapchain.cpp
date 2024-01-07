@@ -178,7 +178,7 @@ namespace Strawberry::Graphics::Vulkan
 		                          VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 		buffer.End();
 		mQueue->Submit(std::move(buffer));
-		mQueue->Wait();
+		mQueue->WaitUntilIdle();
 
 
 		Present();

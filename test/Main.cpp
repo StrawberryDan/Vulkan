@@ -112,7 +112,7 @@ void BasicRendering()
 	commandBuffer.ImageMemoryBarrier(texture, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_GENERAL);
 	commandBuffer.End();
 	queue->Submit(commandBuffer);
-	queue->Wait();
+	queue->WaitUntilIdle();
 	ImageView textureView = texture.Create<ImageView::Builder>()
 		.WithType(VK_IMAGE_VIEW_TYPE_2D)
 		.WithFormat(VK_FORMAT_R8G8B8A8_SRGB)
@@ -158,7 +158,7 @@ void BasicRendering()
 		commandBuffer.EndRenderPass();
 		commandBuffer.End();
 		queue->Submit(commandBuffer);
-		queue->Wait();
+		queue->WaitUntilIdle();
 
 
 		swapchain.Present(framebuffer);
