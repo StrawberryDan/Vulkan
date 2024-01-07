@@ -3,7 +3,7 @@ find_package(Vulkan REQUIRED)
 
 
 function(add_target_shader TARGET SOURCE)
-	get_target_property(GRAPHICS_SOURCE_DIR StrawberryGraphics SOURCE_DIR)
+	get_target_property(GRAPHICS_SOURCE_DIR StrawberryVulkan SOURCE_DIR)
 
 	cmake_path(GET SOURCE FILENAME SHADER_FILENAME)
 	set(SHADER_TARGET_NAME ${TARGET}-${SHADER_FILENAME})

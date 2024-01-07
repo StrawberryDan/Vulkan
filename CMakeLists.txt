@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.26)
-project(StrawberryGraphics)
+project(StrawberryVulkan)
 include(FetchContent)
 
 
@@ -30,89 +30,67 @@ if (NOT TARGET StrawberryWindow AND IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../
 endif()
 
 
-add_library(StrawberryGraphics STATIC
-		src/Strawberry/Graphics/Vulkan/Instance.cpp
-		src/Strawberry/Graphics/Vulkan/Instance.hpp
-		src/Strawberry/Graphics/Vulkan/Device.cpp
-		src/Strawberry/Graphics/Vulkan/Device.hpp
-		src/Strawberry/Graphics/Vulkan/Pipeline.cpp
-		src/Strawberry/Graphics/Vulkan/Pipeline.hpp
-		src/Strawberry/Graphics/Vulkan/Surface.cpp
-		src/Strawberry/Graphics/Vulkan/Surface.hpp
-		src/Strawberry/Graphics/Vulkan/Swapchain.cpp
-		src/Strawberry/Graphics/Vulkan/Swapchain.hpp
-		src/Strawberry/Graphics/Vulkan/Queue.cpp
-		src/Strawberry/Graphics/Vulkan/Queue.hpp
-		src/Strawberry/Graphics/Vulkan/CommandPool.cpp
-		src/Strawberry/Graphics/Vulkan/CommandPool.hpp
-		src/Strawberry/Graphics/Vulkan/CommandBuffer.cpp
-		src/Strawberry/Graphics/Vulkan/CommandBuffer.hpp
-		src/Strawberry/Graphics/Vulkan/Buffer.cpp
-		src/Strawberry/Graphics/Vulkan/Buffer.hpp
-		src/Strawberry/Graphics/Vulkan/BufferView.cpp
-		src/Strawberry/Graphics/Vulkan/BufferView.hpp
-		src/Strawberry/Graphics/Vulkan/DeviceMemory.cpp
-		src/Strawberry/Graphics/Vulkan/DeviceMemory.hpp
-		src/Strawberry/Graphics/Vulkan/Image.cpp
-		src/Strawberry/Graphics/Vulkan/Image.hpp
-		src/Strawberry/Graphics/Vulkan/ImageView.cpp
-		src/Strawberry/Graphics/Vulkan/ImageView.hpp
-        src/Strawberry/Graphics/Vulkan/Shader.cpp
-        src/Strawberry/Graphics/Vulkan/Shader.hpp
-		src/Strawberry/Graphics/Vulkan/Framebuffer.cpp
-		src/Strawberry/Graphics/Vulkan/Framebuffer.hpp
-		src/Strawberry/Graphics/Vulkan/Fence.cpp
-		src/Strawberry/Graphics/Vulkan/Fence.hpp
-		src/Strawberry/Graphics/Vulkan/Sampler.cpp
-		src/Strawberry/Graphics/Vulkan/Sampler.hpp
-		src/Strawberry/Graphics/Vulkan/RenderPass.cpp
-		src/Strawberry/Graphics/Vulkan/RenderPass.hpp
-		src/Strawberry/Graphics/2D/Sprite.cpp
-		src/Strawberry/Graphics/2D/Sprite.hpp
-		src/Strawberry/Graphics/2D/Transform2D.cpp
-		src/Strawberry/Graphics/2D/Transform2D.hpp
-		src/Strawberry/Graphics/2D/SpriteSheet.cpp
-		src/Strawberry/Graphics/2D/SpriteSheet.hpp
-		src/Strawberry/Graphics/2D/SpriteRenderer.cpp
-		src/Strawberry/Graphics/2D/SpriteRenderer.hpp
-		src/Strawberry/Graphics/Vulkan/DescriptorSet.cpp
-		src/Strawberry/Graphics/Vulkan/DescriptorSet.hpp
-		src/Strawberry/Graphics/Vulkan/DescriptorPool.cpp
-		src/Strawberry/Graphics/Vulkan/DescriptorPool.hpp
-		src/Strawberry/Graphics/2D/FontFace.cpp
-		src/Strawberry/Graphics/2D/FontFace.hpp
-		src/Strawberry/Graphics/2D/TextRenderer.cpp
-		src/Strawberry/Graphics/2D/TextRenderer.hpp
-        src/Strawberry/Graphics/Renderer.hpp
-		src/Strawberry/Graphics/Renderer.cpp
-		src/Strawberry/Graphics/2D/ImageRenderer.hpp
-		src/Strawberry/Graphics/2D/ImageRenderer.cpp
-		src/Strawberry/Graphics/Vulkan/PhysicalDevice.cpp
-		src/Strawberry/Graphics/Vulkan/PhysicalDevice.hpp
+add_library(StrawberryVulkan STATIC
+		src/Strawberry/Vulkan/Buffer.cpp
+		src/Strawberry/Vulkan/Buffer.hpp
+		src/Strawberry/Vulkan/BufferView.cpp
+		src/Strawberry/Vulkan/BufferView.hpp
+		src/Strawberry/Vulkan/CommandBuffer.cpp
+		src/Strawberry/Vulkan/CommandBuffer.hpp
+		src/Strawberry/Vulkan/CommandPool.cpp
+		src/Strawberry/Vulkan/CommandPool.hpp
+		src/Strawberry/Vulkan/DescriptorPool.cpp
+		src/Strawberry/Vulkan/DescriptorPool.hpp
+		src/Strawberry/Vulkan/DescriptorSet.cpp
+		src/Strawberry/Vulkan/DescriptorSet.hpp
+		src/Strawberry/Vulkan/Device.cpp
+		src/Strawberry/Vulkan/Device.hpp
+		src/Strawberry/Vulkan/DeviceMemory.cpp
+		src/Strawberry/Vulkan/DeviceMemory.hpp
+		src/Strawberry/Vulkan/Fence.cpp
+		src/Strawberry/Vulkan/Fence.hpp
+		src/Strawberry/Vulkan/Framebuffer.cpp
+		src/Strawberry/Vulkan/Framebuffer.hpp
+		src/Strawberry/Vulkan/Image.cpp
+		src/Strawberry/Vulkan/Image.hpp
+		src/Strawberry/Vulkan/ImageView.cpp
+		src/Strawberry/Vulkan/ImageView.hpp
+		src/Strawberry/Vulkan/Instance.cpp
+		src/Strawberry/Vulkan/Instance.hpp
+		src/Strawberry/Vulkan/PhysicalDevice.cpp
+		src/Strawberry/Vulkan/PhysicalDevice.hpp
+		src/Strawberry/Vulkan/Pipeline.cpp
+		src/Strawberry/Vulkan/Pipeline.hpp
+		src/Strawberry/Vulkan/Queue.cpp
+		src/Strawberry/Vulkan/Queue.hpp
+		src/Strawberry/Vulkan/RenderPass.cpp
+		src/Strawberry/Vulkan/RenderPass.hpp
+		src/Strawberry/Vulkan/Sampler.cpp
+		src/Strawberry/Vulkan/Sampler.hpp
+		src/Strawberry/Vulkan/Shader.cpp
+		src/Strawberry/Vulkan/Shader.hpp
+		src/Strawberry/Vulkan/Surface.cpp
+		src/Strawberry/Vulkan/Surface.hpp
+		src/Strawberry/Vulkan/Swapchain.cpp
+		src/Strawberry/Vulkan/Swapchain.hpp
 )
-target_link_libraries(StrawberryGraphics PUBLIC StrawberryCore StrawberryWindow Vulkan::Vulkan freetype)
-target_include_directories(StrawberryGraphics PUBLIC src)
-target_compile_definitions(StrawberryGraphics PUBLIC GLFW_INCLUDE_VULKAN)
-set_target_properties(StrawberryGraphics PROPERTIES CXX_STANDARD 20)
-add_target_shader(StrawberryGraphics ${CMAKE_CURRENT_SOURCE_DIR}/src/Strawberry/Graphics/2D/Sprite.vert)
-add_target_shader(StrawberryGraphics ${CMAKE_CURRENT_SOURCE_DIR}/src/Strawberry/Graphics/2D/Sprite.frag)
-add_target_shader(StrawberryGraphics ${CMAKE_CURRENT_SOURCE_DIR}/src/Strawberry/Graphics/2D/Text.vert)
-add_target_shader(StrawberryGraphics ${CMAKE_CURRENT_SOURCE_DIR}/src/Strawberry/Graphics/2D/Text.frag)
-add_target_shader(StrawberryGraphics ${CMAKE_CURRENT_SOURCE_DIR}/src/Strawberry/Graphics/2D/Image.vert)
-add_target_shader(StrawberryGraphics ${CMAKE_CURRENT_SOURCE_DIR}/src/Strawberry/Graphics/2D/Image.frag)
+target_link_libraries(StrawberryVulkan PUBLIC StrawberryCore StrawberryWindow Vulkan::Vulkan freetype)
+target_include_directories(StrawberryVulkan PUBLIC src)
+target_compile_definitions(StrawberryVulkan PUBLIC GLFW_INCLUDE_VULKAN)
+set_target_properties(StrawberryVulkan PROPERTIES CXX_STANDARD 20)
 
 if (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
-	target_link_options(StrawberryGraphics PRIVATE "-static")
+	target_link_options(StrawberryVulkan PRIVATE "-static")
 endif()
 
 
-add_executable(StrawberryGraphics_Test test/Main.cpp)
-target_link_libraries(StrawberryGraphics_Test PRIVATE StrawberryGraphics)
-set_target_properties(StrawberryGraphics_Test PROPERTIES CXX_STANDARD 20)
-add_target_shader(StrawberryGraphics_Test ${CMAKE_CURRENT_SOURCE_DIR}/test/Mesh.vert)
-add_target_shader(StrawberryGraphics_Test ${CMAKE_CURRENT_SOURCE_DIR}/test/SolidColor.frag)
-add_target_shader(StrawberryGraphics_Test ${CMAKE_CURRENT_SOURCE_DIR}/test/Texture.frag)
+add_executable(StrawberryVulkanTest test/Main.cpp)
+target_link_libraries(StrawberryVulkanTest PRIVATE StrawberryVulkan)
+set_target_properties(StrawberryVulkanTest PROPERTIES CXX_STANDARD 20)
+add_target_shader(StrawberryVulkanTest ${CMAKE_CURRENT_SOURCE_DIR}/test/Mesh.vert)
+add_target_shader(StrawberryVulkanTest ${CMAKE_CURRENT_SOURCE_DIR}/test/SolidColor.frag)
+add_target_shader(StrawberryVulkanTest ${CMAKE_CURRENT_SOURCE_DIR}/test/Texture.frag)
 
 if (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
-	target_link_options(StrawberryGraphics_Test PRIVATE "-static")
+	target_link_options(StrawberryVulkanTest PRIVATE "-static")
 endif()

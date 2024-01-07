@@ -1,33 +1,26 @@
 
-#include "Strawberry/Graphics/2D/FontFace.hpp"
-#include "Strawberry/Graphics/2D/TextRenderer.hpp"
 #include "Strawberry/Core/UTF.hpp"
-#include "Strawberry/Graphics/Vulkan/Instance.hpp"
-#include "Strawberry/Graphics/Vulkan/Device.hpp"
-#include "Strawberry/Graphics/Vulkan/Pipeline.hpp"
-#include "Strawberry/Graphics/Vulkan/Swapchain.hpp"
-#include "Strawberry/Graphics/Vulkan/Queue.hpp"
-#include "Strawberry/Graphics/Vulkan/CommandPool.hpp"
-#include "Strawberry/Graphics/Vulkan/CommandBuffer.hpp"
-#include "Strawberry/Graphics/Vulkan/Buffer.hpp"
-#include "Strawberry/Graphics/Vulkan/BufferView.hpp"
-#include "Strawberry/Graphics/Vulkan/Image.hpp"
-#include "Strawberry/Graphics/Vulkan/Shader.hpp"
-#include "Strawberry/Graphics/Vulkan/Framebuffer.hpp"
+#include "../src/Strawberry/Vulkan/Instance.hpp"
+#include "../src/Strawberry/Vulkan/Device.hpp"
+#include "../src/Strawberry/Vulkan/Pipeline.hpp"
+#include "../src/Strawberry/Vulkan/Swapchain.hpp"
+#include "../src/Strawberry/Vulkan/Queue.hpp"
+#include "../src/Strawberry/Vulkan/CommandPool.hpp"
+#include "../src/Strawberry/Vulkan/CommandBuffer.hpp"
+#include "../src/Strawberry/Vulkan/Buffer.hpp"
+#include "../src/Strawberry/Vulkan/Image.hpp"
+#include "../src/Strawberry/Vulkan/Shader.hpp"
+#include "../src/Strawberry/Vulkan/Framebuffer.hpp"
 #include "Strawberry/Core/Math/Matrix.hpp"
 #include "Strawberry/Core/Timing/Clock.hpp"
-#include "Strawberry/Graphics/Vulkan/Sampler.hpp"
-#include "Strawberry/Graphics/Vulkan/RenderPass.hpp"
-#include "Strawberry/Graphics/2D/SpriteRenderer.hpp"
-#include "Strawberry/Graphics/Vulkan/Surface.hpp"
-#include "Strawberry/Graphics/2D/Sprite.hpp"
-#include "Strawberry/Graphics/2D/SpriteSheet.hpp"
+#include "../src/Strawberry/Vulkan/Sampler.hpp"
+#include "../src/Strawberry/Vulkan/RenderPass.hpp"
+#include "../src/Strawberry/Vulkan/Surface.hpp"
 #include "Strawberry/Core/IO/Logging.hpp"
 #include "Strawberry/Window/Window.hpp"
 
 
 using namespace Strawberry;
-using namespace Graphics;
 using namespace Vulkan;
 
 
@@ -121,7 +114,7 @@ void BasicRendering()
 
 
 	Core::Clock clock;
-	Graphics::Vulkan::DescriptorSet textureDescriptorSet = pipeline.AllocateDescriptorSet(0);
+	Vulkan::DescriptorSet textureDescriptorSet = pipeline.AllocateDescriptorSet(0);
 
 
 	while (!window.CloseRequested())
@@ -166,101 +159,8 @@ void BasicRendering()
 	}
 }
 
-
-// void SpriteRendering()
-// {
-// 	Graphics::FreeType::Initialise();
-// 	Window::Window window("StrawberryGraphics Test", Core::Math::Vec2i(1920, 1080));
-// 	Instance instance;
-// 	Vulkan::Device device = instance.Create<Device>();
-// 	Vulkan::Surface surface = window.Create<Surface>(device);
-// 	RenderPass renderPass = device.Create<RenderPass::Builder>()
-// 		.WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE)
-// 		.WithSubpass(SubpassDescription().WithColorAttachment(0))
-// 		.Build();
-// 	Vulkan::Queue queue = device.Create<Queue>();
-// 	Vulkan::Swapchain swapchain = queue.Create<Swapchain>(surface, window.GetSize());
-//
-// 	SpriteRenderer renderer(queue, {1920, 1080});
-// 	auto spriteSheet = SpriteSheet::FromFile(queue, {4, 4}, "data/dio.png").Unwrap();
-// 	auto sprite = spriteSheet.Create<Sprite>();
-// 	Transform2D transform;
-// 	transform.SetSize({1920, 1080});
-//
-// 	while (!window.CloseRequested())
-// 	{
-// 		Window::PollInput();
-// 		while (auto event = window.NextEvent())
-// 		{
-// 			if (event->IsType<Window::Events::Key>() && event->Value<Window::Events::Key>()->action == Input::KeyAction::Release)
-// 			{
-// 				sprite.SetSpriteIndex(sprite.GetSpriteIndex() + 1);
-// 			}
-// 		}
-//
-// 		renderer.Draw(sprite, transform);
-//
-// 		auto framebuffer = renderer.TakeFramebuffer();
-// 		swapchain.Present(framebuffer);
-//
-// 		window.SwapBuffers();
-// 	}
-//
-// 	Graphics::FreeType::Terminate();
-// }
-//
-//
-// void TextRendering()
-// {
-// 	Graphics::FreeType::Initialise();
-// 	Window::Window window("StrawberryGraphics Test", Core::Math::Vec2i(1920, 1080));
-// 	Instance instance;
-// 	Vulkan::Device device = instance.Create<Device>();
-// 	Vulkan::Surface surface = window.Create<Surface>(device);
-// 	RenderPass renderPass = device.Create<RenderPass::Builder>()
-// 		.WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE)
-// 		.WithSubpass(SubpassDescription().WithColorAttachment(0))
-// 		.Build();
-// 	Vulkan::Queue queue = device.Create<Queue>();
-// 	Vulkan::Swapchain swapchain = queue.Create<Swapchain>(surface, window.GetSize());
-//
-//
-// 	FontFace font = FontFace::FromFile("data/Pixels.ttf").Unwrap();
-// 	font.SetPixelSize(500);
-// 	TextRenderer renderer(queue, {1920, 1080});
-//
-// 	while (!window.CloseRequested())
-// 	{
-// 		Window::PollInput();
-// 		while (auto event = window.NextEvent())
-// 		{
-// 			if (auto mouseMove = event->Value<Graphics::Window::Events::MouseMove>())
-// 			{
-// 				Core::Logging::Info("Mouse Pos: {}, {}", mouseMove->position[0], mouseMove->position[1]);
-// 			}
-//
-// 			if (auto mouseButton = event->Value<Graphics::Window::Events::MouseButton>())
-// 			{
-// 				Core::Logging::Info("Mouse Button: {}, {}", static_cast<int>(mouseButton->action), static_cast<int>(mouseButton->button));
-// 			}
-// 		}
-//
-// 		renderer.Draw(font, "HELLO!!!", {10, 10}, {1.0f, 0.5f, 0.5f, 1.0f});
-//
-// 		auto framebuffer = renderer.TakeFramebuffer();
-// 		swapchain.Present(framebuffer);
-//
-// 		window.SwapBuffers();
-// 	}
-//
-// 	Graphics::FreeType::Terminate();
-// }
-
-
 int main()
 {
 	BasicRendering();
-	// SpriteRendering();
-	// TextRendering();
 	return 0;
 }
