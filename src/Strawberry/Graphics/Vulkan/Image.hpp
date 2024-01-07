@@ -33,9 +33,6 @@ namespace Strawberry::Graphics::Vulkan
 
 
 	public:
-		static Core::Optional<Image> FromFile(Queue& device, const std::filesystem::path& path);
-
-
 		Image(const Device& device,
 			  uint32_t extent,
 			  VkFormat format,
