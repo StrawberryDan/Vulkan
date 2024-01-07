@@ -53,7 +53,7 @@ namespace Strawberry::Vulkan
 		mutable Core::Optional<std::vector<PhysicalDevice>> mPhysicalDevices;
 
 
-#if !NDEBUG
+#if STRAWBERRY_DEBUG
 		VkDebugReportCallbackEXT mDebugReportCallback;
 		VkDebugUtilsMessengerEXT mDebugUtilsCallback;
 

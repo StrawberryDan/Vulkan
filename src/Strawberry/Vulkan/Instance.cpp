@@ -115,13 +115,13 @@ namespace Strawberry::Vulkan
 
 		std::vector<const char*> layers
 		{
-#if !NDEBUG
+#if STRAWBERRY_DEBUG
 			"VK_LAYER_KHRONOS_validation"
 #endif
 		};
 
 
-#if !NDEBUG
+#if STRAWBERRY_DEBUG
 		VkDebugReportCallbackCreateInfoEXT callbackCreateInfo {
 			.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT,
 			.pNext= nullptr,
@@ -147,7 +147,7 @@ namespace Strawberry::Vulkan
 
 		VkInstanceCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-#if NDEBUG
+#if STRAWBERRY_RELEASE
 			.pNext = nullptr,
 #else
 			.pNext = &messengerCreateInfo,
@@ -168,7 +168,7 @@ namespace Strawberry::Vulkan
 		VkResult result = vkCreateInstance(&createInfo, nullptr, &mInstance);
 		Core::Assert(result == VK_SUCCESS);
 
-#if !NDEBUG
+#if STRAWBERRY_DEBUG
 		vkCreateDebugReportCallbackEXT = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(vkGetInstanceProcAddr(mInstance, "vkCreateDebugReportCallbackEXT"));
 		vkDestroyDebugReportCallbackEXT = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(mInstance, "vkDestroyDebugReportCallbackEXT"));
 		vkCreateDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(mInstance, "vkCreateDebugUtilsMessengerEXT"));
@@ -189,7 +189,7 @@ namespace Strawberry::Vulkan
 	{
 		if (mInstance)
 		{
-#if !NDEBUG
+#if STRAWBERRY_DEBUG
 			vkDestroyDebugUtilsMessengerEXT(mInstance, mDebugUtilsCallback, nullptr);
 			vkDestroyDebugReportCallbackEXT(mInstance, mDebugReportCallback, nullptr);
 #endif

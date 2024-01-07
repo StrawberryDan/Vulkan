@@ -3,6 +3,13 @@ project(StrawberryVulkan)
 include(FetchContent)
 
 
+FetchContent_Declare(StrawberryConfig
+		GIT_REPOSITORY "https://github.com/StrawberryDan/Config.git"
+		GIT_TAG "main")
+FetchContent_MakeAvailable(StrawberryConfig)
+include(StrawberryConfig)
+
+
 include(share/Shaders.cmake)
 
 
