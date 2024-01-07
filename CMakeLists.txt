@@ -20,26 +20,19 @@ FetchContent_Declare(FREETYPE
 FetchContent_MakeAvailable(FREETYPE)
 
 
-FetchContent_Declare(GLFW
-	EXCLUDE_FROM_ALL
-	GIT_REPOSITORY "https://github.com/glfw/glfw.git"
-	GIT_TAG "3.3.8")
-FetchContent_MakeAvailable(GLFW)
-
-
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../Core)
+if (NOT TARGET StrawberryCore AND IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../Core)
 	add_subdirectory(../Core ${CMAKE_CURRENT_BINARY_DIR}/Core)
+endif()
+
+
+if (NOT TARGET StrawberryWindow AND IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../Window)
+	add_subdirectory(../Window ${CMAKE_CURRENT_BINARY_DIR}/Window)
 endif()
 
 
 add_library(StrawberryGraphics STATIC
 		src/Strawberry/Graphics/Vulkan/Instance.cpp
 		src/Strawberry/Graphics/Vulkan/Instance.hpp
-		src/Strawberry/Graphics/Window.hpp
-		src/Strawberry/Graphics/Window.cpp
-		src/Strawberry/Graphics/Event.hpp
-		src/Strawberry/Graphics/Input/Key.hpp
-		src/Strawberry/Graphics/Input/Key.cpp
 		src/Strawberry/Graphics/Vulkan/Device.cpp
 		src/Strawberry/Graphics/Vulkan/Device.hpp
 		src/Strawberry/Graphics/Vulkan/Pipeline.cpp
@@ -94,11 +87,10 @@ add_library(StrawberryGraphics STATIC
 		src/Strawberry/Graphics/Renderer.cpp
 		src/Strawberry/Graphics/2D/ImageRenderer.hpp
 		src/Strawberry/Graphics/2D/ImageRenderer.cpp
-		src/Strawberry/Graphics/Input/Mouse.hpp
 		src/Strawberry/Graphics/Vulkan/PhysicalDevice.cpp
 		src/Strawberry/Graphics/Vulkan/PhysicalDevice.hpp
 )
-target_link_libraries(StrawberryGraphics PUBLIC StrawberryCore glfw Vulkan::Vulkan freetype)
+target_link_libraries(StrawberryGraphics PUBLIC StrawberryCore StrawberryWindow Vulkan::Vulkan freetype)
 target_include_directories(StrawberryGraphics PUBLIC src)
 target_compile_definitions(StrawberryGraphics PUBLIC GLFW_INCLUDE_VULKAN)
 set_target_properties(StrawberryGraphics PROPERTIES CXX_STANDARD 20)

@@ -2,11 +2,13 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 #include "Swapchain.hpp"
-#include "Strawberry/Graphics/Window.hpp"
 #include "Device.hpp"
 #include "Queue.hpp"
 #include "CommandBuffer.hpp"
 #include "Framebuffer.hpp"
+#include "Surface.hpp"
+// Strawberry Window
+#include "Strawberry/Window/Window.hpp"
 // Standard Library
 #include <algorithm>
 #include <memory>

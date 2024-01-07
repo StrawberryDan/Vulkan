@@ -2,7 +2,7 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 #include "Surface.hpp"
-#include "Strawberry/Graphics/Window.hpp"
+#include "Strawberry/Window/Window.hpp"
 #include "Instance.hpp"
 #include "Device.hpp"
 

@@ -3,7 +3,6 @@
 #include "Strawberry/Graphics/2D/TextRenderer.hpp"
 #include "Strawberry/Core/UTF.hpp"
 #include "Strawberry/Graphics/Vulkan/Instance.hpp"
-#include "Strawberry/Graphics/Window.hpp"
 #include "Strawberry/Graphics/Vulkan/Device.hpp"
 #include "Strawberry/Graphics/Vulkan/Pipeline.hpp"
 #include "Strawberry/Graphics/Vulkan/Swapchain.hpp"
@@ -20,9 +19,11 @@
 #include "Strawberry/Graphics/Vulkan/Sampler.hpp"
 #include "Strawberry/Graphics/Vulkan/RenderPass.hpp"
 #include "Strawberry/Graphics/2D/SpriteRenderer.hpp"
+#include "Strawberry/Graphics/Vulkan/Surface.hpp"
 #include "Strawberry/Graphics/2D/Sprite.hpp"
 #include "Strawberry/Graphics/2D/SpriteSheet.hpp"
 #include "Strawberry/Core/IO/Logging.hpp"
+#include "Strawberry/Window/Window.hpp"
 
 
 using namespace Strawberry;
