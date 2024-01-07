@@ -25,11 +25,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics::Vulkan
 {
-	CommandBuffer::CommandBuffer(const Queue& queue)
-		: CommandBuffer(queue.mCommandPool.Get())
-	{}
-
-
 	CommandBuffer::CommandBuffer(const CommandPool& commandPool)
 		: mCommandBuffer {}
 		, mCommandPool(commandPool)

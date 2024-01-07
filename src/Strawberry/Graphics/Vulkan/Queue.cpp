@@ -15,24 +15,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics::Vulkan
 {
-	Queue::Queue(const Device& device)
-		: mFamilyIndex(device.mQueueFamilyIndex)
+	Queue::Queue(const Device& device, uint32_t family, uint32_t index)
+		: mFamilyIndex(family)
 		, mDevice(device)
 		, mSubmissionFence(device)
 	{
-		vkGetDeviceQueue(mDevice->mDevice, mFamilyIndex, 0, &mQueue);
-
-		mCommandPool.Construct<const Queue&>(*this, true);
+		vkGetDeviceQueue(mDevice->mDevice, mFamilyIndex, index, &mQueue);
 	}
 
 
 	Queue::Queue(Queue&& rhs) noexcept
 		: mQueue(std::exchange(rhs.mQueue, nullptr))
+		, mFamilyIndex(std::exchange(rhs.mFamilyIndex, 0))
 		, mDevice(std::move(rhs.mDevice))
 		, mSubmissionFence(std::move(rhs.mSubmissionFence))
-	{
-		mCommandPool.Construct(std::move(rhs.mCommandPool.Get()));
-	}
+		, mShouldWait(std::exchange(rhs.mShouldWait, false))
+	{}
 
 
 	Queue& Queue::operator=(Queue&& rhs)
@@ -50,14 +48,12 @@ namespace Strawberry::Graphics::Vulkan
 	Queue::~Queue()
 	{
 		Wait();
-		mCommandPool.Destruct();
 	}
 
 
-	void Queue::Submit(CommandBuffer commandBuffer)
+	void Queue::Submit(const CommandBuffer& commandBuffer)
 	{
 		Wait();
-		mCommandBuffer = std::move(commandBuffer);
 
 		VkSubmitInfo submitInfo {
 			.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
@@ -66,7 +62,7 @@ namespace Strawberry::Graphics::Vulkan
 			.pWaitSemaphores = nullptr,
 			.pWaitDstStageMask = nullptr,
 			.commandBufferCount = 1,
-			.pCommandBuffers = &mCommandBuffer->mCommandBuffer,
+			.pCommandBuffers = &commandBuffer.mCommandBuffer,
 			.signalSemaphoreCount = 0,
 			.pSignalSemaphores = nullptr,
 		};
@@ -82,7 +78,6 @@ namespace Strawberry::Graphics::Vulkan
 		{
 			mSubmissionFence.Wait();
 			mSubmissionFence.Reset();
-			mCommandBuffer.Reset();
 			mShouldWait = false;
 		}
 	}

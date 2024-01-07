@@ -55,11 +55,16 @@ void BasicRendering()
 		return description;
 	};
 
+
 	Window::Window window("StrawberryGraphics Test", Core::Math::Vec2i(1920, 1080));
 	Instance instance;
-	auto device = instance.Create<Device>();
-	auto surface = window.Create<Surface>(device);
-	RenderPass renderPass = device.Create<RenderPass::Builder>()
+	const PhysicalDevice& gpu = instance.GetPhysicalDevices()[0];
+	uint32_t queueFamily = gpu.SearchQueueFamilies(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT)[0];
+
+
+	Vulkan::Device device(gpu, {QueueCreateInfo{queueFamily, 1}});
+	Vulkan::Surface surface = window.Create<Surface>(device);
+	RenderPass renderPass = RenderPass::Builder(device)
 		.WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE)
 		.WithSubpass(SubpassDescription().WithColorAttachment(0))
 		.Build();
@@ -77,13 +82,13 @@ void BasicRendering()
 			DescriptorSetLayout()
 				.WithBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT))
 		.Build();
-	auto queue = device.Create<Queue>();
-	auto swapchain = queue.Create<Swapchain>(surface, Core::Math::Vec2i(1920, 1080));
-	auto commandPool = queue.Create<CommandPool>(true);
-	auto commandBuffer = commandPool.Create<CommandBuffer>();
+	auto queue = device.GetQueue(queueFamily, 0);
+	Vulkan::Swapchain swapchain = queue->Create<Swapchain>(surface, Core::Math::Vec2i(1920, 1080));
+	Vulkan::CommandPool commandPool = queue->Create<CommandPool>(true);
+	Vulkan::CommandBuffer commandBuffer = commandPool.Create<CommandBuffer>();
 
 
-	auto buffer = device.Create<Buffer>(6 * sizeof(float) * 3, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+	Buffer buffer(device, 6 * sizeof(float) * 3, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 	Core::IO::DynamicByteBuffer vertices;
 	vertices.Push<Core::Math::Vec3f>(Core::Math::Vec3f(0.0f, 0.0f, 0.0f));
 	vertices.Push<Core::Math::Vec3f>(Core::Math::Vec3f(1.0f, 0.0f, 0.0f));
@@ -98,20 +103,20 @@ void BasicRendering()
 
 
 	auto [size, channels, bytes] = Core::IO::DynamicByteBuffer::FromImage("data/dio.png").Unwrap();
-	auto textureBuffer = device.Create<Buffer>(bytes.Size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+	Buffer textureBuffer(device, bytes.Size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
 	textureBuffer.SetData(bytes);
-	auto texture = device.Create<Image>(size, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
+	Image texture(device, size, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
 	commandBuffer.Begin(true);
 	commandBuffer.CopyBufferToImage(textureBuffer, texture);
 	commandBuffer.ImageMemoryBarrier(texture, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_GENERAL);
 	commandBuffer.End();
-	queue.Submit(std::exchange(commandBuffer, commandPool.Create<CommandBuffer>()));
-	queue.Wait();
+	queue->Submit(commandBuffer);
+	queue->Wait();
 	ImageView textureView = texture.Create<ImageView::Builder>()
 		.WithType(VK_IMAGE_VIEW_TYPE_2D)
 		.WithFormat(VK_FORMAT_R8G8B8A8_SRGB)
 		.Build();
-	auto sampler = device.Create<Sampler>(VK_FILTER_NEAREST, VK_FILTER_NEAREST);
+	Sampler sampler(device, VK_FILTER_NEAREST, VK_FILTER_NEAREST);
 
 
 	Core::Clock clock;
@@ -151,8 +156,8 @@ void BasicRendering()
 		commandBuffer.Draw(6);
 		commandBuffer.EndRenderPass();
 		commandBuffer.End();
-		queue.Submit(std::move(std::exchange(commandBuffer, commandPool.Create<CommandBuffer>())));
-		queue.Wait();
+		queue->Submit(commandBuffer);
+		queue->Wait();
 
 
 		swapchain.Present(framebuffer);
@@ -161,100 +166,100 @@ void BasicRendering()
 }
 
 
-void SpriteRendering()
-{
-	Graphics::FreeType::Initialise();
-	Window::Window window("StrawberryGraphics Test", Core::Math::Vec2i(1920, 1080));
-	Instance instance;
-	auto device = instance.Create<Device>();
-	auto surface = window.Create<Surface>(device);
-	RenderPass renderPass = device.Create<RenderPass::Builder>()
-		.WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE)
-		.WithSubpass(SubpassDescription().WithColorAttachment(0))
-		.Build();
-	auto queue = device.Create<Queue>();
-	auto swapchain = queue.Create<Swapchain>(surface, window.GetSize());
-
-	SpriteRenderer renderer(queue, {1920, 1080});
-	auto spriteSheet = SpriteSheet::FromFile(queue, {4, 4}, "data/dio.png").Unwrap();
-	auto sprite = spriteSheet.Create<Sprite>();
-	Transform2D transform;
-	transform.SetSize({1920, 1080});
-
-	while (!window.CloseRequested())
-	{
-		Window::PollInput();
-		while (auto event = window.NextEvent())
-		{
-			if (event->IsType<Window::Events::Key>() && event->Value<Window::Events::Key>()->action == Input::KeyAction::Release)
-			{
-				sprite.SetSpriteIndex(sprite.GetSpriteIndex() + 1);
-			}
-		}
-
-		renderer.Draw(sprite, transform);
-
-		auto framebuffer = renderer.TakeFramebuffer();
-		swapchain.Present(framebuffer);
-
-		window.SwapBuffers();
-	}
-
-	Graphics::FreeType::Terminate();
-}
-
-
-void TextRendering()
-{
-	Graphics::FreeType::Initialise();
-	Window::Window window("StrawberryGraphics Test", Core::Math::Vec2i(1920, 1080));
-	Instance instance;
-	auto device = instance.Create<Device>();
-	auto surface = window.Create<Surface>(device);
-	RenderPass renderPass = device.Create<RenderPass::Builder>()
-		.WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE)
-		.WithSubpass(SubpassDescription().WithColorAttachment(0))
-		.Build();
-	auto queue = device.Create<Queue>();
-	auto swapchain = queue.Create<Swapchain>(surface, window.GetSize());
-
-
-	FontFace font = FontFace::FromFile("data/Pixels.ttf").Unwrap();
-	font.SetPixelSize(500);
-	TextRenderer renderer(queue, {1920, 1080});
-
-	while (!window.CloseRequested())
-	{
-		Window::PollInput();
-		while (auto event = window.NextEvent())
-		{
-			if (auto mouseMove = event->Value<Graphics::Window::Events::MouseMove>())
-			{
-				Core::Logging::Info("Mouse Pos: {}, {}", mouseMove->position[0], mouseMove->position[1]);
-			}
-
-			if (auto mouseButton = event->Value<Graphics::Window::Events::MouseButton>())
-			{
-				Core::Logging::Info("Mouse Button: {}, {}", static_cast<int>(mouseButton->action), static_cast<int>(mouseButton->button));
-			}
-		}
-
-		renderer.Draw(font, "HELLO!!!", {10, 10}, {1.0f, 0.5f, 0.5f, 1.0f});
-
-		auto framebuffer = renderer.TakeFramebuffer();
-		swapchain.Present(framebuffer);
-
-		window.SwapBuffers();
-	}
-
-	Graphics::FreeType::Terminate();
-}
+// void SpriteRendering()
+// {
+// 	Graphics::FreeType::Initialise();
+// 	Window::Window window("StrawberryGraphics Test", Core::Math::Vec2i(1920, 1080));
+// 	Instance instance;
+// 	Vulkan::Device device = instance.Create<Device>();
+// 	Vulkan::Surface surface = window.Create<Surface>(device);
+// 	RenderPass renderPass = device.Create<RenderPass::Builder>()
+// 		.WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE)
+// 		.WithSubpass(SubpassDescription().WithColorAttachment(0))
+// 		.Build();
+// 	Vulkan::Queue queue = device.Create<Queue>();
+// 	Vulkan::Swapchain swapchain = queue.Create<Swapchain>(surface, window.GetSize());
+//
+// 	SpriteRenderer renderer(queue, {1920, 1080});
+// 	auto spriteSheet = SpriteSheet::FromFile(queue, {4, 4}, "data/dio.png").Unwrap();
+// 	auto sprite = spriteSheet.Create<Sprite>();
+// 	Transform2D transform;
+// 	transform.SetSize({1920, 1080});
+//
+// 	while (!window.CloseRequested())
+// 	{
+// 		Window::PollInput();
+// 		while (auto event = window.NextEvent())
+// 		{
+// 			if (event->IsType<Window::Events::Key>() && event->Value<Window::Events::Key>()->action == Input::KeyAction::Release)
+// 			{
+// 				sprite.SetSpriteIndex(sprite.GetSpriteIndex() + 1);
+// 			}
+// 		}
+//
+// 		renderer.Draw(sprite, transform);
+//
+// 		auto framebuffer = renderer.TakeFramebuffer();
+// 		swapchain.Present(framebuffer);
+//
+// 		window.SwapBuffers();
+// 	}
+//
+// 	Graphics::FreeType::Terminate();
+// }
+//
+//
+// void TextRendering()
+// {
+// 	Graphics::FreeType::Initialise();
+// 	Window::Window window("StrawberryGraphics Test", Core::Math::Vec2i(1920, 1080));
+// 	Instance instance;
+// 	Vulkan::Device device = instance.Create<Device>();
+// 	Vulkan::Surface surface = window.Create<Surface>(device);
+// 	RenderPass renderPass = device.Create<RenderPass::Builder>()
+// 		.WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE)
+// 		.WithSubpass(SubpassDescription().WithColorAttachment(0))
+// 		.Build();
+// 	Vulkan::Queue queue = device.Create<Queue>();
+// 	Vulkan::Swapchain swapchain = queue.Create<Swapchain>(surface, window.GetSize());
+//
+//
+// 	FontFace font = FontFace::FromFile("data/Pixels.ttf").Unwrap();
+// 	font.SetPixelSize(500);
+// 	TextRenderer renderer(queue, {1920, 1080});
+//
+// 	while (!window.CloseRequested())
+// 	{
+// 		Window::PollInput();
+// 		while (auto event = window.NextEvent())
+// 		{
+// 			if (auto mouseMove = event->Value<Graphics::Window::Events::MouseMove>())
+// 			{
+// 				Core::Logging::Info("Mouse Pos: {}, {}", mouseMove->position[0], mouseMove->position[1]);
+// 			}
+//
+// 			if (auto mouseButton = event->Value<Graphics::Window::Events::MouseButton>())
+// 			{
+// 				Core::Logging::Info("Mouse Button: {}, {}", static_cast<int>(mouseButton->action), static_cast<int>(mouseButton->button));
+// 			}
+// 		}
+//
+// 		renderer.Draw(font, "HELLO!!!", {10, 10}, {1.0f, 0.5f, 0.5f, 1.0f});
+//
+// 		auto framebuffer = renderer.TakeFramebuffer();
+// 		swapchain.Present(framebuffer);
+//
+// 		window.SwapBuffers();
+// 	}
+//
+// 	Graphics::FreeType::Terminate();
+// }
 
 
 int main()
 {
 	BasicRendering();
-	SpriteRendering();
-	TextRendering();
+	// SpriteRendering();
+	// TextRendering();
 	return 0;
 }

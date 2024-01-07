@@ -44,7 +44,7 @@ namespace Strawberry::Graphics::Vulkan
 	private:
 		VkSurfaceKHR mSurface;
 
-		VkInstance mInstance;
+
 		Core::ReflexivePointer<Device> mDevice;
 	};
 }

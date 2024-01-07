@@ -13,16 +13,15 @@
 namespace Strawberry::Graphics::Vulkan
 {
 	Surface::Surface(const Window::Window& window, const Device& device)
-		: mInstance(device.mInstance)
-		, mDevice(device)
+		: mDevice(device)
 	{
-		Core::AssertEQ(glfwCreateWindowSurface(mInstance, window.mHandle, nullptr, &mSurface), GLFW_NO_ERROR);
+		Core::AssertEQ(glfwCreateWindowSurface(device.GetInstance()->mInstance, window.mHandle, nullptr, &mSurface), GLFW_NO_ERROR);
 	}
 
 
 	Surface::Surface(Surface&& rhs) noexcept
 		: mSurface(std::exchange(rhs.mSurface, nullptr))
-		, mInstance(std::exchange(rhs.mInstance, nullptr))
+		, mDevice(std::move(rhs.mDevice))
 	{}
 
 
@@ -42,7 +41,7 @@ namespace Strawberry::Graphics::Vulkan
 	{
 		if (mSurface)
 		{
-			vkDestroySurfaceKHR(mInstance, mSurface, nullptr);
+			vkDestroySurfaceKHR(mDevice->GetInstance()->mInstance, mSurface, nullptr);
 		}
 	}
 
@@ -50,7 +49,7 @@ namespace Strawberry::Graphics::Vulkan
 	VkSurfaceCapabilitiesKHR Surface::GetCapabilities() const
 	{
 		VkSurfaceCapabilitiesKHR capabilities;
-		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(mDevice->GetPhysicalDevice(), mSurface, &capabilities);
+		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(mDevice->GetPhysicalDevices()[0]->mPhysicalDevice, mSurface, &capabilities);
 		return capabilities;
 	}
 }

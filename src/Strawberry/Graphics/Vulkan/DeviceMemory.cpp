@@ -19,8 +19,7 @@ namespace Strawberry::Graphics::Vulkan
 		: mDevice(device.mDevice)
 		, mSize(size)
 	{
-		VkPhysicalDeviceMemoryProperties memoryProperties;
-		vkGetPhysicalDeviceMemoryProperties(device.mPhysicalDevice, &memoryProperties);
+		auto memoryProperties = device.GetPhysicalDevices()[0]->GetMemoryProperties();
 
 		Core::Optional<uint32_t> memoryTypeIndex;
 		for (int i = 0; i < memoryProperties.memoryTypeCount; i++)

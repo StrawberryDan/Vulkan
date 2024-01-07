@@ -4,6 +4,8 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
+#include "PhysicalDevice.hpp"
+#include "Queue.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Types/ReflexivePointer.hpp"
 #include "Strawberry/Core/Types/Optional.hpp"
@@ -12,6 +14,7 @@
 // Standard Library
 #include <concepts>
 #include <vector>
+#include <map>
 
 
 //======================================================================================================================
@@ -20,8 +23,14 @@
 namespace Strawberry::Graphics::Vulkan
 {
 	class Instance;
-
 	class Pipeline;
+
+
+	struct QueueCreateInfo
+	{
+		uint32_t familyIndex;
+		uint32_t count;
+	};
 
 
 	class Device
@@ -48,7 +57,7 @@ namespace Strawberry::Graphics::Vulkan
 
 
 	public:
-		explicit Device(const Instance& instance);
+		explicit Device(const PhysicalDevice& physicalDevice, std::vector<QueueCreateInfo> queueCreateInfo);
 		Device(const Device& rhs) = delete;
 		Device& operator=(const Device& rhs) = delete;
 		Device(Device&& rhs) noexcept;
@@ -56,23 +65,18 @@ namespace Strawberry::Graphics::Vulkan
 		~Device();
 
 
-		template <std::movable T, typename... Args>
-		T Create(const Args&... args) const { return T(*this, std::forward<const Args&>(args)...); }
+		[[nodiscard]] Core::ReflexivePointer<Instance>                           GetInstance() const;
+		[[nodiscard]] const std::vector<Core::ReflexivePointer<PhysicalDevice>>& GetPhysicalDevices() const;
 
 
-		[[nodiscard]] VkPhysicalDevice  GetPhysicalDevice() const;
-		const VkPhysicalDeviceLimits&   GetPhysicalDeviceLimits() const;
-		const VkPhysicalDeviceFeatures& GetPhysicalDeviceFeatures() const;
+		[[nodiscard]] Core::ReflexivePointer<Queue>                              GetQueue(uint32_t family, uint32_t index);
 
 
 	private:
-		VkInstance mInstance{};
-		VkPhysicalDevice mPhysicalDevice;
 		VkDevice mDevice;
-		uint32_t mQueueFamilyIndex{};
+		std::vector<Core::ReflexivePointer<PhysicalDevice>> mPhysicalDevices;
 
 
-		mutable Core::Optional<VkPhysicalDeviceProperties> mPhysicalDeviceProperties;
-		mutable Core::Optional<VkPhysicalDeviceFeatures>   mPhysicalDeviceFeatures;
+		std::map<uint32_t, std::vector<Queue>> mQueues;
 	};
 }

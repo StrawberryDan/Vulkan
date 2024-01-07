@@ -17,29 +17,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics::Vulkan
 {
-	Core::Optional<Image> Image::FromFile(Queue& queue, const std::filesystem::path& path)
-	{
-		auto load = Core::IO::DynamicByteBuffer::FromImage(path);
-		if (!load) return Core::NullOpt;
-
-		auto [size, channels, bytes] = load.Unwrap();
-
-		Image image(*queue.GetDevice(), size, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
-		Buffer buffer(*queue.GetDevice(), bytes, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
-
-
-		auto commandBuffer = queue.Create<CommandBuffer>();
-		commandBuffer.Begin(true);
-		commandBuffer.CopyBufferToImage(buffer, image);
-		commandBuffer.ImageMemoryBarrier(image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_GENERAL);
-		commandBuffer.End();
-		queue.Submit(std::move(commandBuffer));
-		queue.Wait();
-
-		return image;
-	}
-
-
 	Image::Image(const Device& device, uint32_t extent, VkFormat format, VkImageUsageFlags usage,
 				 uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling, VkImageLayout initialLayout)
 		: mImage(nullptr)
@@ -102,7 +79,7 @@ namespace Strawberry::Graphics::Vulkan
 
 		VkMemoryRequirements memoryRequirements;
 		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
-		mMemory = device.Create<DeviceMemory>(memoryRequirements.size, memoryRequirements.memoryTypeBits,
+		mMemory = DeviceMemory(device, memoryRequirements.size, memoryRequirements.memoryTypeBits,
 											  VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.mDeviceMemory, 0), VK_SUCCESS);
 	}
@@ -141,7 +118,7 @@ namespace Strawberry::Graphics::Vulkan
 		VkMemoryRequirements memoryRequirements;
 		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
 
-		mMemory = device.Create<DeviceMemory>(memoryRequirements.size, memoryRequirements.memoryTypeBits);
+		mMemory = DeviceMemory(device, memoryRequirements.size, memoryRequirements.memoryTypeBits);
 		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.mDeviceMemory, 0), VK_SUCCESS);
 	}
 

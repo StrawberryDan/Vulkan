@@ -83,7 +83,7 @@ namespace Strawberry::Graphics
 	Vulkan::RenderPass SpriteRenderer::CreateRenderPass(Vulkan::Queue& queue)
 	{
 		// Renderpass with 1 color attachment
-		return queue.GetDevice()->Create<Vulkan::RenderPass::Builder>()
+		return Vulkan::RenderPass::Builder(*queue.GetDevice())
 			.WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT, VK_ATTACHMENT_LOAD_OP_LOAD, VK_ATTACHMENT_STORE_OP_STORE)
 			.WithSubpass(Vulkan::SubpassDescription().WithColorAttachment(0))
 			.Build();

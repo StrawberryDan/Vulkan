@@ -27,12 +27,12 @@ namespace Strawberry::Graphics::Vulkan
 	class Queue
 		: public Core::EnableReflexivePointer<Queue>
 	{
+		friend class Device;
 		friend class Swapchain;
 		friend class CommandBuffer;
 
 
 	public:
-		explicit Queue(const Device& device);
 		Queue(const Queue& rhs) = delete;
 		Queue& operator=(const Queue& rhs) = delete;
 		Queue(Queue&& rhs) noexcept;
@@ -44,7 +44,7 @@ namespace Strawberry::Graphics::Vulkan
 		T Create(Args&&... args) const { return T(*this, std::forward<Args&&>(args)...); }
 
 
-		void Submit(CommandBuffer commandBuffer);
+		void Submit(const CommandBuffer& commandBuffer);
 		void Wait();
 
 
@@ -54,13 +54,15 @@ namespace Strawberry::Graphics::Vulkan
 		uint32_t GetFamilyIndex() const;
 
 
+	protected:
+		explicit Queue(const Device& device, uint32_t family, uint32_t index);
+
+
 	private:
 		VkQueue mQueue;
 		uint32_t mFamilyIndex;
 		Core::ReflexivePointer<Device> mDevice;
 		Fence mSubmissionFence;
-		Core::Uninitialised<CommandPool> mCommandPool;
 		bool mShouldWait = false;
-		Core::Optional<CommandBuffer> mCommandBuffer;
 	};
 }

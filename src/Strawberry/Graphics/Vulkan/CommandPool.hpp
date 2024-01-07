@@ -28,7 +28,7 @@ namespace Strawberry::Graphics::Vulkan
 
 
 	public:
-		CommandPool(const Queue& queue, bool resetBit);
+		CommandPool(const Queue& queue, bool resetBit = true);
 		CommandPool(const CommandPool& rhs) = delete;
 		CommandPool& operator=(const CommandPool& rhs) = delete;
 		CommandPool(CommandPool&& rhs) noexcept ;

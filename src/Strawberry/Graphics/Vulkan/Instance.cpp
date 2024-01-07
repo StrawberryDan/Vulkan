@@ -212,4 +212,36 @@ namespace Strawberry::Graphics::Vulkan
 
 		return *this;
 	}
+
+
+	const std::vector<PhysicalDevice>& Instance::GetPhysicalDevices() const
+	{
+		static const auto deviceSort = [](PhysicalDevice& a, PhysicalDevice& b) -> bool
+		{
+			// Prioritise discrete GPUs
+			if (b.GetType() == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) return true;
+
+			return false;
+		};
+
+		if (!mPhysicalDevices)
+		{
+			uint32_t count = 0;
+			Core::AssertEQ(vkEnumeratePhysicalDevices(mInstance, &count, nullptr), VK_SUCCESS);
+			std::vector<VkPhysicalDevice> devices(count);
+			Core::AssertEQ(vkEnumeratePhysicalDevices(mInstance, &count, devices.data()), VK_SUCCESS);
+
+			mPhysicalDevices.Emplace();
+			mPhysicalDevices->reserve(count);
+			for (auto deviceHandle : devices)
+			{
+				PhysicalDevice device(*this, deviceHandle);
+				mPhysicalDevices->emplace_back(std::move(device));
+			}
+
+			std::sort(mPhysicalDevices->begin(), mPhysicalDevices->end(), deviceSort);
+		}
+
+		return mPhysicalDevices.Value();
+	}
 }

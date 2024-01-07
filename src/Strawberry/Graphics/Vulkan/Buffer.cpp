@@ -35,7 +35,7 @@ namespace Strawberry::Graphics::Vulkan
 		VkMemoryRequirements memoryRequirements;
 		vkGetBufferMemoryRequirements(mDevice, mBuffer, &memoryRequirements);
 
-		mMemory = device.Create<DeviceMemory>(memoryRequirements.size, memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+		mMemory = DeviceMemory(device, memoryRequirements.size, memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		Core::AssertEQ(vkBindBufferMemory(mDevice, mBuffer, mMemory.mDeviceMemory, 0), VK_SUCCESS);
 	}
 

@@ -28,8 +28,8 @@ namespace Strawberry::Graphics::Vulkan
 		const auto COLOR_ATTACHMENT_COUNT = mRenderPass->mColorAttachmentFormats.size();
 		for (int i = 0; i < COLOR_ATTACHMENT_COUNT; i++)
 		{
-			mColorAttachments.emplace_back(mRenderPass->mDevice->Create<Image>(mSize, renderPass.mColorAttachmentFormats[i],
-																		   VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT));
+			mColorAttachments.emplace_back(*mRenderPass->mDevice, mSize, renderPass.mColorAttachmentFormats[i],
+																		   VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
 			mColorAttachmentViews.emplace_back(
 				mColorAttachments.back().Create<ImageView::Builder>()
 					.WithType(VK_IMAGE_VIEW_TYPE_2D)
@@ -132,7 +132,7 @@ namespace Strawberry::Graphics::Vulkan
 
 	Image Framebuffer::CreateDepthImage()
 	{
-		return mRenderPass->mDevice->Create<Image>(mSize, VK_FORMAT_D32_SFLOAT,
+		return Image(*mRenderPass->mDevice, mSize, VK_FORMAT_D32_SFLOAT,
 											   VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
 
 	}
@@ -155,7 +155,7 @@ namespace Strawberry::Graphics::Vulkan
 
 	Image Framebuffer::CreateStencilImage()
 	{
-		return mRenderPass->mDevice->Create<Image>(mSize, VK_FORMAT_S8_UINT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
+		return Image(*mRenderPass->mDevice, mSize, VK_FORMAT_S8_UINT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
 	}
 
 

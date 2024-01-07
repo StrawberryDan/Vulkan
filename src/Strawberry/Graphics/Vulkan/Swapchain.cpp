@@ -20,7 +20,7 @@ namespace Strawberry::Graphics::Vulkan
 		: mQueue(queue)
 		, mCommandPool(mQueue->Create<CommandPool>(false))
 		, mSize(extents)
-		, mNextImageFence(queue.GetDevice()->Create<Fence>())
+		, mNextImageFence(*queue.GetDevice())
 		, mNextImageIndex([this]() { return CalculateNextImageIndex(); })
 		, mNextImage([this]() { return CalculateNextImage(); })
 	{
@@ -30,9 +30,9 @@ namespace Strawberry::Graphics::Vulkan
 
 
 		uint32_t formatCount = 0;
-		vkGetPhysicalDeviceSurfaceFormatsKHR(mQueue->GetDevice()->mPhysicalDevice, surface.mSurface, &formatCount, nullptr);
+		vkGetPhysicalDeviceSurfaceFormatsKHR(mQueue->GetDevice()->GetPhysicalDevices()[0]->mPhysicalDevice, surface.mSurface, &formatCount, nullptr);
 		std::vector<VkSurfaceFormatKHR> deviceFormats(formatCount);;
-		vkGetPhysicalDeviceSurfaceFormatsKHR(mQueue->GetDevice()->mPhysicalDevice, surface.mSurface, &formatCount,
+		vkGetPhysicalDeviceSurfaceFormatsKHR(mQueue->GetDevice()->GetPhysicalDevices()[0]->mPhysicalDevice, surface.mSurface, &formatCount,
 											 deviceFormats.data());
 
 		std::erase_if(deviceFormats, [&](const VkSurfaceFormatKHR& x) -> bool
@@ -185,7 +185,7 @@ namespace Strawberry::Graphics::Vulkan
 
 	uint32_t Swapchain::CalculateNextImageIndex()
 	{
-		Fence nextImageFence = mQueue->GetDevice()->Create<Fence>();
+		Fence nextImageFence(*mQueue->GetDevice());
 		uint32_t imageIndex;
 		switch (vkAcquireNextImageKHR(mQueue->GetDevice()->mDevice, mSwapchain, UINT64_MAX, VK_NULL_HANDLE, nextImageFence.mFence,
 									  &imageIndex))

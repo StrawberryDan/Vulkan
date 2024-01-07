@@ -27,7 +27,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Graphics::Window
 {
-
 	class Window
 	{
 		friend class Graphics::Vulkan::Surface;

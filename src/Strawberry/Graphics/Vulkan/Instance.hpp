@@ -3,6 +3,7 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
+#include "PhysicalDevice.hpp"
 // Vulkan
 #include "vulkan/vulkan.h"
 // Standard Library
@@ -20,6 +21,7 @@ namespace Strawberry::Graphics::Vulkan
 
 
 	class Instance
+		: public Core::EnableReflexivePointer<Instance>
 	{
 		friend class Device;
 		friend class Surface;
@@ -33,7 +35,12 @@ namespace Strawberry::Graphics::Vulkan
 		Instance(Instance&&) noexcept ;
 
 		Instance& operator=(const Instance&) = delete;
-		Instance& operator=(Instance&&) noexcept ;
+		Instance& operator=(Instance&&) noexcept;
+
+
+		const std::vector<PhysicalDevice>& GetPhysicalDevices() const;
+		const std::vector<PhysicalDevice*> GetBestPhysicalDevice() const;
+
 
 		template <std::movable T, typename... Args> requires (std::constructible_from<T, const Instance&, Args...>)
 		T Create(const Args&... args) const { return T(*this, std::forward<const Args&>(args)...); }
@@ -41,6 +48,12 @@ namespace Strawberry::Graphics::Vulkan
 
 	private:
 		VkInstance mInstance = {};
+
+
+		mutable Core::Optional<std::vector<PhysicalDevice>> mPhysicalDevices;
+
+
+#if !NDEBUG
 		VkDebugReportCallbackEXT mDebugReportCallback;
 		VkDebugUtilsMessengerEXT mDebugUtilsCallback;
 
@@ -49,5 +62,6 @@ namespace Strawberry::Graphics::Vulkan
 		PFN_vkDestroyDebugReportCallbackEXT vkDestroyDebugReportCallbackEXT = nullptr;
 		PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessengerEXT = nullptr;
 		PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessengerEXT = nullptr;
+#endif
 	};
 }
