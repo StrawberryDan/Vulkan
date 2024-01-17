@@ -22,8 +22,8 @@ namespace Strawberry::Vulkan
 		: mImage(nullptr)
 		, mDevice(device.mDevice)
 		, mFormat(format)
-		, mSize(static_cast<int>(extent), 0, 0)
 		, mLastRecordedLayout(initialLayout)
+		, mSize(static_cast<int>(extent), 1, 1)
 	{
 		VkImageCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
@@ -52,8 +52,8 @@ namespace Strawberry::Vulkan
 		: mImage(nullptr)
 		, mDevice(device.mDevice)
 		, mFormat(format)
-		, mSize(extent)
 		, mLastRecordedLayout(initialLayout)
+		, mSize(extent[0], extent[1], 1)
 	{
 		VkImageCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
