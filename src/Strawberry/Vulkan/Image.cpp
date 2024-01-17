@@ -22,7 +22,6 @@ namespace Strawberry::Vulkan
 		: mImage(nullptr)
 		, mDevice(device.mDevice)
 		, mFormat(format)
-		, mLastRecordedLayout(initialLayout)
 		, mSize(static_cast<int>(extent), 1, 1)
 	{
 		VkImageCreateInfo createInfo{
@@ -52,7 +51,6 @@ namespace Strawberry::Vulkan
 		: mImage(nullptr)
 		, mDevice(device.mDevice)
 		, mFormat(format)
-		, mLastRecordedLayout(initialLayout)
 		, mSize(extent[0], extent[1], 1)
 	{
 		VkImageCreateInfo createInfo{
@@ -91,7 +89,6 @@ namespace Strawberry::Vulkan
 		, mDevice(device.mDevice)
 		, mFormat(format)
 		, mSize(extent)
-		, mLastRecordedLayout(initialLayout)
 	{
 		VkImageCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
@@ -174,28 +171,5 @@ namespace Strawberry::Vulkan
 	Core::Math::Vec3u Image::GetSize() const
 	{
 		return mSize;
-	}
-
-
-	Core::Math::Vector<uint8_t, 4> Image::ReadPixel(Core::Math::Vec2u pixel) const
-	{
-		Core::AssertEQ(GetFormat(), VK_FORMAT_R8G8B8A8_SRGB);
-		Core::Assert(pixel[0] < mSize[0]);
-		Core::Assert(pixel[1] < mSize[1]);
-		Core::Assert(mSize[2] == 0);
-
-		size_t pixelIndex = pixel[0] + pixel[1] * mSize[0];
-		Core::IO::DynamicByteBuffer bytes(mBytes.Data() + 4 * pixelIndex, 4);
-		return {bytes[0], bytes[1], bytes[2], bytes[3]};
-	}
-
-
-	void Image::ClearColor(Queue& queue, Core::Math::Vec4f clearColor)
-	{
-		auto commandBuffer = queue.Create<CommandBuffer>();
-		commandBuffer.Begin(true);
-		commandBuffer.ClearColorImage(*this, clearColor);
-		commandBuffer.End();
-		queue.Submit(std::move(commandBuffer));
 	}
 }

@@ -90,9 +90,5 @@ namespace Strawberry::Vulkan
 		VkDevice mDevice;
 		VkFormat mFormat;
 		Core::Math::Vec3u mSize;
-		VkImageLayout mLastRecordedLayout;
-
-
-		Core::IO::DynamicByteBuffer mBytes;
 	};
 }
