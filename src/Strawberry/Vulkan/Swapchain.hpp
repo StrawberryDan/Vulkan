@@ -6,6 +6,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 #include "CommandPool.hpp"
 #include "Fence.hpp"
+#include "Image.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Math/Vector.hpp"
 #include "Strawberry/Core/Types/ReflexivePointer.hpp"
@@ -45,21 +46,20 @@ namespace Strawberry::Vulkan
 		~Swapchain();
 
 
-		Core::Math::Vec2i GetSize() const;
-		VkSurfaceFormatKHR GetSurfaceFormat() const;
+		[[nodiscard]] Core::Math::Vec2i GetSize() const;
+		[[nodiscard]] VkSurfaceFormatKHR GetSurfaceFormat() const;
 
 
-		uint32_t GetNextImageIndex();
-		VkImage GetNextImage();
+		Core::Optional<uint32_t> GetNextImageIndex();
+		Core::Optional<uint32_t> WaitForNextImageIndex();
+
+
+
+		Core::Optional<Image*> GetNextImage();
+		Core::Optional<Image*> WaitForNextImage();
 
 
 		void Present();
-		void Present(Framebuffer& framebuffer);
-
-
-	protected:
-		uint32_t CalculateNextImageIndex();
-		VkImage CalculateNextImage();
 
 
 	private:
@@ -67,14 +67,10 @@ namespace Strawberry::Vulkan
 
 		Core::ReflexivePointer<Queue> mQueue;
 
-		CommandPool mCommandPool;
-
 		Core::Math::Vec2i mSize;
 		VkSurfaceFormatKHR mFormat;
 
-		Fence mNextImageFence;
-
-		Core::DynamicValue<uint32_t> mNextImageIndex;
-		Core::DynamicValue<VkImage> mNextImage;
+		std::vector<Image> mImages;
+		Core::Optional<uint32_t> mNextImageIndex;
 	};
 }

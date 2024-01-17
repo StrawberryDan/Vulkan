@@ -20,11 +20,7 @@ namespace Strawberry::Vulkan
 {
 	Swapchain::Swapchain(const Queue& queue, const Surface& surface, Core::Math::Vec2i extents)
 		: mQueue(queue)
-		, mCommandPool(mQueue->Create<CommandPool>(false))
 		, mSize(extents)
-		, mNextImageFence(*queue.GetDevice())
-		, mNextImageIndex([this]() { return CalculateNextImageIndex(); })
-		, mNextImage([this]() { return CalculateNextImage(); })
 	{
 		auto surfaceCapabilities = surface.GetCapabilities();
 		mSize[0] = std::clamp<int>(mSize[0], surfaceCapabilities.minImageExtent.width, surfaceCapabilities.maxImageExtent.width);
@@ -72,18 +68,27 @@ namespace Strawberry::Vulkan
 			};
 
 		Core::AssertEQ(vkCreateSwapchainKHR(queue.GetDevice()->mDevice, &createInfo, nullptr, &mSwapchain), VK_SUCCESS);
+
+
+		uint32_t imageCount = 0;
+		Core::AssertEQ(vkGetSwapchainImagesKHR(queue.GetDevice()->mDevice, mSwapchain, &imageCount, nullptr), VK_SUCCESS);
+		std::vector<VkImage> imageHandles(imageCount);
+		Core::AssertEQ(vkGetSwapchainImagesKHR(queue.GetDevice()->mDevice, mSwapchain, &imageCount, imageHandles.data()), VK_SUCCESS);
+		for (VkImage handle : imageHandles)
+		{
+			mImages.emplace_back(*queue.GetDevice(), handle, mSize.AsType<unsigned int>().WithAdditionalValues(1), mFormat.format);
+		}
 	}
 
 
 	Swapchain::Swapchain(Swapchain&& rhs) noexcept
 		: mSwapchain(std::exchange(rhs.mSwapchain, nullptr))
-		  , mQueue(std::move(rhs.mQueue))
-		  , mCommandPool(std::move(rhs.mCommandPool))
-		  , mNextImageFence(std::move(rhs.mNextImageFence))
-		  , mSize(std::exchange(rhs.mSize, {}))
-		  , mFormat(std::exchange(rhs.mFormat, VkSurfaceFormatKHR {}))
-		  , mNextImageIndex(rhs.mNextImageIndex)
-		  , mNextImage(rhs.mNextImage) {}
+		, mQueue(std::move(rhs.mQueue))
+		, mSize(std::exchange(rhs.mSize, {}))
+		, mFormat(std::exchange(rhs.mFormat, VkSurfaceFormatKHR {}))
+		, mImages(std::move(rhs.mImages))
+		, mNextImageIndex(std::move(rhs.mNextImageIndex))
+	{}
 
 
 	Swapchain& Swapchain::operator=(Swapchain&& rhs) noexcept
@@ -100,6 +105,12 @@ namespace Strawberry::Vulkan
 
 	Swapchain::~Swapchain()
 	{
+		// Images are destroyed by vkDestorySwapchain, so we should release our hold of them here.
+		for (auto& image : mImages)
+		{
+			image.Release();
+		}
+
 		if (mSwapchain)
 		{
 			vkDestroySwapchainKHR(mQueue->GetDevice()->mDevice, mSwapchain, nullptr);
@@ -119,22 +130,77 @@ namespace Strawberry::Vulkan
 	}
 
 
-	uint32_t Swapchain::GetNextImageIndex()
+	Core::Optional<Image*> Swapchain::GetNextImage()
 	{
-		return mNextImageIndex.Get();
+		auto index = GetNextImageIndex();
+		if (!index) return {};
+		return &mImages[*index];
 	}
 
 
-	VkImage Swapchain::GetNextImage()
+	Core::Optional<Image*> Swapchain::WaitForNextImage()
 	{
-		return mNextImage.Get();
+		auto index = WaitForNextImageIndex();
+		if (!index) return {};
+		return &mImages[*index];
+	}
+
+
+	Core::Optional<uint32_t> Swapchain::GetNextImageIndex()
+	{
+		if (mNextImageIndex) return *mNextImageIndex;
+
+
+		uint32_t imageIndex = 0;
+		auto result = vkAcquireNextImageKHR(mQueue->GetDevice()->mDevice, mSwapchain, 0, VK_NULL_HANDLE, VK_NULL_HANDLE, &imageIndex);
+
+
+		switch (result)
+		{
+			case VK_SUCCESS:
+				mNextImageIndex = imageIndex;
+				return imageIndex;
+			case VK_TIMEOUT:
+			case VK_NOT_READY:
+			case VK_SUBOPTIMAL_KHR:
+				return {};
+			default:
+				Core::Unreachable();
+		}
+	}
+
+
+	Core::Optional<uint32_t> Swapchain::WaitForNextImageIndex()
+	{
+		if (mNextImageIndex) return *mNextImageIndex;
+
+
+		Fence fence(*mQueue->GetDevice());
+		uint32_t imageIndex = 0;
+		auto result = vkAcquireNextImageKHR(mQueue->GetDevice()->mDevice, mSwapchain, 0, VK_NULL_HANDLE, fence.mFence, &imageIndex);
+		fence.Wait();
+
+		switch (result)
+		{
+			case VK_SUCCESS:
+				mNextImageIndex = imageIndex;
+				return imageIndex;
+			case VK_TIMEOUT:
+			case VK_NOT_READY:
+			case VK_SUBOPTIMAL_KHR:
+				return {};
+			default:
+				Core::Unreachable();
+		}
 	}
 
 
 	void Swapchain::Present()
 	{
-		VkResult result;
-		uint32_t imageIndex = GetNextImageIndex();
+		uint32_t imageIndex = WaitForNextImageIndex().Unwrap();
+
+
+		VkResult presentResult;
 		VkPresentInfoKHR presentInfo {
 				.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
 				.pNext = nullptr,
@@ -143,72 +209,22 @@ namespace Strawberry::Vulkan
 				.swapchainCount = 1,
 				.pSwapchains = &mSwapchain,
 				.pImageIndices = &imageIndex,
-				.pResults = &result,
+				.pResults = &presentResult,
 		};
 
 
-		result = vkQueuePresentKHR(mQueue->mQueue, &presentInfo);
+		auto result = vkQueuePresentKHR(mQueue->mQueue, &presentInfo);
 		switch (result)
 		{
 			{
 				case VK_SUCCESS:
 				case VK_SUBOPTIMAL_KHR:
-					Core::Assert(result == VK_SUCCESS || result == VK_SUBOPTIMAL_KHR);
-				mNextImageIndex.Invalidate();
-				mNextImage.Invalidate();
-				break;
+					break;
 				default:
 					Core::Unreachable();
 			}
 		}
-	}
 
-
-	void Swapchain::Present(Framebuffer& framebuffer)
-	{
-		CommandBuffer buffer = mCommandPool.Create<CommandBuffer>();
-		buffer.Begin(true);
-
-		for (int i = 0; i < framebuffer.GetColorAttachmentCount(); i++)
-		{
-			buffer.CopyImageToSwapchain(framebuffer.GetColorAttachment(i), *this);
-		}
-
-		buffer.ImageMemoryBarrier(GetNextImage(), VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-		                          VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
-		buffer.End();
-		mQueue->Submit(std::move(buffer));
-		mQueue->WaitUntilIdle();
-
-
-		Present();
-	}
-
-
-	uint32_t Swapchain::CalculateNextImageIndex()
-	{
-		Fence nextImageFence(*mQueue->GetDevice());
-		uint32_t imageIndex;
-		switch (vkAcquireNextImageKHR(mQueue->GetDevice()->mDevice, mSwapchain, UINT64_MAX, VK_NULL_HANDLE, nextImageFence.mFence,
-									  &imageIndex))
-		{
-			case VK_SUCCESS:
-			case VK_SUBOPTIMAL_KHR:
-				break;
-			default:
-				Core::Unreachable();
-		}
-		nextImageFence.Wait();
-		return imageIndex;
-	}
-
-
-	VkImage Swapchain::CalculateNextImage()
-	{
-		uint32_t imageCount;
-		Core::AssertEQ(vkGetSwapchainImagesKHR(mQueue->GetDevice()->mDevice, mSwapchain, &imageCount, nullptr), VK_SUCCESS);
-		std::vector<VkImage> images(imageCount);
-		Core::AssertEQ(vkGetSwapchainImagesKHR(mQueue->GetDevice()->mDevice, mSwapchain, &imageCount, images.data()), VK_SUCCESS);
-		return images[GetNextImageIndex()];
+		mNextImageIndex.Reset();
 	}
 }
