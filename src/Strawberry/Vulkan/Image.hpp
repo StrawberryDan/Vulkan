@@ -60,6 +60,11 @@ namespace Strawberry::Vulkan
 			  VkImageTiling tiling = VK_IMAGE_TILING_OPTIMAL,
 			  VkImageLayout initialLayout = VK_IMAGE_LAYOUT_UNDEFINED);
 
+		Image(const Device& device,
+			  VkImage imageHandle,
+			  Core::Math::Vec3u extent,
+			  VkFormat format);
+
 		Image(const Image& rhs) = delete;
 		Image& operator=(const Image& rhs) = delete;
 		Image(Image&& rhs) noexcept ;

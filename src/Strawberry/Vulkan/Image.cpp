@@ -123,6 +123,14 @@ namespace Strawberry::Vulkan
 	}
 
 
+	Image::Image(const Device& device, VkImage imageHandle, Core::Math::Vec3u extent, VkFormat format)
+		: mImage(imageHandle)
+		, mDevice(device.mDevice)
+		, mFormat(format)
+		, mSize(extent)
+	{}
+
+
 	Image::Image(Image&& rhs) noexcept
 		: mImage(std::exchange(rhs.mImage, nullptr))
 		, mMemory(std::move(rhs.mMemory))
