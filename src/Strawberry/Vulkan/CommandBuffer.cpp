@@ -19,6 +19,8 @@
 #include <memory>
 #include <vector>
 
+#include "../../../cmake-build-release/_deps/glfw-src/include/GLFW/glfw3.h"
+
 
 //======================================================================================================================
 //  Class Definitions
@@ -122,82 +124,71 @@ namespace Strawberry::Vulkan
 	}
 
 
-	void CommandBuffer::ImageMemoryBarrier(Image& image, VkImageAspectFlagBits aspect,
-	                                       VkImageLayout targetLayout, VkAccessFlags srcAccessMask, VkAccessFlags dstAccessMask)
+	void CommandBuffer::PipelineBarrier(VkPipelineStageFlags srcMask, VkPipelineStageFlags dstMask, VkDependencyFlags dependencyFlags,
+		const std::vector<VkMemoryBarrier>& memoryBarriers,
+		const std::vector<VkBufferMemoryBarrier>& bufferBarriers,
+		const std::vector<VkImageMemoryBarrier>& imageBarriers)
 	{
-		ImageMemoryBarrier(image.mImage, aspect, image.mLastRecordedLayout, targetLayout);
-		image.mLastRecordedLayout = targetLayout;
-	}
-
-
-	void CommandBuffer::ImageMemoryBarrier(VkImage image, VkImageAspectFlagBits aspect, VkImageLayout oldLayout,
-	                                       VkImageLayout targetLayout, VkAccessFlags srcAccessMask, VkAccessFlags dstAccessMask)
-	{
-		VkImageMemoryBarrier imageMemoryBarrier {
-			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-			.pNext = nullptr,
-			.srcAccessMask = srcAccessMask,
-			.dstAccessMask = dstAccessMask,
-			.oldLayout = oldLayout,
-			.newLayout = targetLayout,
-			.srcQueueFamilyIndex = mQueueFamilyIndex,
-			.dstQueueFamilyIndex = mQueueFamilyIndex,
-			.image = image,
-			.subresourceRange{
-				.aspectMask = aspect,
-				.baseMipLevel = 0,
-				.levelCount = 1,
-				.baseArrayLayer = 0,
-				.layerCount = 1,
-			}
-		};
 		vkCmdPipelineBarrier(mCommandBuffer,
-							 VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
-							 VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
-							 0,
-							 0, nullptr, 0, nullptr, 1,
-							 &imageMemoryBarrier);
+			srcMask, dstMask,
+			dependencyFlags,
+			memoryBarriers.size(), memoryBarriers.data(),
+			bufferBarriers.size(), bufferBarriers.data(),
+			imageBarriers.size(), imageBarriers.data());
 	}
 
 
-	void CommandBuffer::CopyImageToSwapchain(Image& image, Swapchain& swapchain)
+	void CommandBuffer::CopyImageToImage(const Image& source, VkImageLayout srcLayout, const Image& dest, VkImageLayout destLayout, VkImageAspectFlags aspect)
 	{
-		ImageMemoryBarrier(image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
-		ImageMemoryBarrier(swapchain.GetNextImage(), VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+		Core::AssertEQ(source.GetSize(), dest.GetSize());
 
 
-		VkImageBlit region {
-			.srcSubresource {
-				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+		VkImageCopy region {
+			.srcSubresource = VkImageSubresourceLayers {
+				.aspectMask = aspect,
 				.mipLevel = 0,
 				.baseArrayLayer = 0,
 				.layerCount = 1,
 			},
-			.srcOffsets{
-				{.x = 0, .y = 0, .z = 0},
-				{.x = static_cast<int32_t>(image.mSize[0]), .y = static_cast<int32_t>(image.mSize[1]), .z = 1},
-			},
-			.dstSubresource {
-				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+			.srcOffset = {0, 0, 0},
+			.dstSubresource = VkImageSubresourceLayers {
+				.aspectMask = aspect,
 				.mipLevel = 0,
 				.baseArrayLayer = 0,
 				.layerCount = 1,
 			},
-			.dstOffsets{
-				{.x = 0, .y = 0, .z = 0},
-				{.x = swapchain.GetSize()[0], .y = swapchain.GetSize()[1], .z = 1},
-			}
+			.dstOffset = {0,0, 0},
+			.extent = VkExtent3D{ source.GetSize()[0], source.GetSize()[1], source.GetSize()[2] }
 		};
-		vkCmdBlitImage(mCommandBuffer, image.mImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, swapchain.GetNextImage(),
-					   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region, VK_FILTER_NEAREST);
+		vkCmdCopyImage(mCommandBuffer, source.mImage, srcLayout, dest.mImage, destLayout, 1, &region);
+	}
+
+
+	void CommandBuffer::BlitImage(const Image& source, VkImageLayout srcLayout, const Image& dest, VkImageLayout destLayout, VkImageAspectFlags aspect, VkFilter filter)
+	{
+		VkImageBlit region {
+			.srcSubresource = VkImageSubresourceLayers {
+				.aspectMask = aspect,
+				.mipLevel = 0,
+				.baseArrayLayer = 0,
+				.layerCount = 1
+			},
+			.srcOffsets = {VkOffset3D{0, 0, 0}, VkOffset3D{(int) source.GetSize()[0], (int) source.GetSize()[1], (int) source.GetSize()[2]}},
+			.dstSubresource = VkImageSubresourceLayers {
+				.aspectMask = aspect,
+				.mipLevel = 0,
+				.baseArrayLayer = 0,
+				.layerCount = 1,
+			},
+			.dstOffsets = {VkOffset3D{0, 0, 0}, VkOffset3D{(int) dest.GetSize()[0], (int) dest.GetSize()[1], (int) dest.GetSize()[2]}},
+		};
+
+		vkCmdBlitImage(mCommandBuffer, source.mImage, srcLayout, dest.mImage, destLayout, 1, &region, filter);
 	}
 
 
 	void CommandBuffer::CopyBufferToImage(const Buffer& buffer, Image& image)
 	{
-		// Clear and put into DST_OPTIMAL
-		ImageMemoryBarrier(image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-
 		// Setup copy
 		VkImageSubresourceLayers subresource {
 			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
@@ -214,7 +205,6 @@ namespace Strawberry::Vulkan
 			.imageExtent{.width = image.mSize[0], .height = image.mSize[1], .depth = 1}
 		};
 		vkCmdCopyBufferToImage(mCommandBuffer, buffer.mBuffer, image.mImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
-		image.mBytes = buffer.GetBytes();
 	}
 
 
@@ -230,7 +220,6 @@ namespace Strawberry::Vulkan
 			0, 1
 		};
 
-		ImageMemoryBarrier(image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_GENERAL);
 		vkCmdClearColorImage(mCommandBuffer, image.mImage, VK_IMAGE_LAYOUT_GENERAL, &vulkanClearColor, 1, &range);
 	}
 
@@ -243,17 +232,6 @@ namespace Strawberry::Vulkan
 
 	void CommandBuffer::BeginRenderPass(const RenderPass& renderPass, Framebuffer& framebuffer)
 	{
-		for (int i = 0; i < framebuffer.GetColorAttachmentCount(); i++)
-		{
-			ImageMemoryBarrier(framebuffer.GetColorAttachment(i), VK_IMAGE_ASPECT_COLOR_BIT,
-			                   VK_IMAGE_LAYOUT_GENERAL);
-		}
-		ImageMemoryBarrier(framebuffer.GetDepthAttachment(), VK_IMAGE_ASPECT_DEPTH_BIT,
-		                   VK_IMAGE_LAYOUT_GENERAL);
-		ImageMemoryBarrier(framebuffer.GetStencilAttachment(), VK_IMAGE_ASPECT_STENCIL_BIT,
-		                   VK_IMAGE_LAYOUT_GENERAL);
-
-
 		VkRenderPassBeginInfo beginInfo {
 			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 			.pNext = nullptr,
