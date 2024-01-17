@@ -134,8 +134,6 @@ namespace Strawberry::Vulkan
 		, mDevice(std::exchange(rhs.mDevice, nullptr))
 		, mFormat(std::exchange(rhs.mFormat, VK_FORMAT_MAX_ENUM))
 		, mSize(std::exchange(rhs.mSize, Core::Math::Vec3u()))
-		, mLastRecordedLayout(std::exchange(rhs.mLastRecordedLayout, VK_IMAGE_LAYOUT_UNDEFINED))
-		, mBytes(std::move(rhs.mBytes))
 	{
 
 	}
@@ -159,6 +157,13 @@ namespace Strawberry::Vulkan
 		{
 			vkDestroyImage(mDevice, mImage, nullptr);
 		}
+	}
+
+
+	VkImage Image::Release()
+	{
+		mDevice = VK_NULL_HANDLE;
+		return std::exchange(mImage, VK_NULL_HANDLE);
 	}
 
 

@@ -76,12 +76,14 @@ namespace Strawberry::Vulkan
 		T Create(const Args&... args) const { return T(*this, std::forward<const Args&>(args)...); }
 
 
-		VkFormat GetFormat() const;
-		Core::Math::Vec3u GetSize() const;
-		Core::Math::Vector<uint8_t, 4> ReadPixel(Core::Math::Vec2u pixel) const;
+		VkImage Release();
 
 
-		void ClearColor(Queue& queue, Core::Math::Vec4f clearColor = {0.0f, 0.0f, 0.0f, 1.0f});
+		operator VkImage() const { return mImage; }
+
+
+		[[nodiscard]] VkFormat GetFormat() const;
+		[[nodiscard]] Core::Math::Vec3u GetSize() const;
 
 
 	private:
