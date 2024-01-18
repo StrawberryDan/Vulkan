@@ -82,6 +82,8 @@ add_library(StrawberryVulkan STATIC
 		src/Strawberry/Vulkan/Surface.hpp
 		src/Strawberry/Vulkan/Swapchain.cpp
 		src/Strawberry/Vulkan/Swapchain.hpp
+		src/Strawberry/Vulkan/PipelineLayout.hpp
+		src/Strawberry/Vulkan/PipelineLayout.cpp
 )
 target_link_libraries(StrawberryVulkan PUBLIC StrawberryCore StrawberryWindow Vulkan::Vulkan freetype)
 target_include_directories(StrawberryVulkan PUBLIC src)

@@ -65,6 +65,9 @@ namespace Strawberry::Vulkan
 		~Device();
 
 
+		operator VkDevice() const;
+
+
 		[[nodiscard]] Core::ReflexivePointer<Instance>                           GetInstance() const;
 		[[nodiscard]] const std::vector<Core::ReflexivePointer<PhysicalDevice>>& GetPhysicalDevices() const;
 

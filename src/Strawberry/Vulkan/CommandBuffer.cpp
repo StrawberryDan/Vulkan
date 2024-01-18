@@ -238,7 +238,7 @@ namespace Strawberry::Vulkan
 
 	void CommandBuffer::BindDescriptorSet(const Pipeline& pipeline, uint32_t set, const DescriptorSet& descriptorSet)
 	{
-		vkCmdBindDescriptorSets(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.mPipelineLayout, set, 1, &descriptorSet.mDescriptorSet, 0, nullptr);
+		vkCmdBindDescriptorSets(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, *pipeline.mPipelineLayout, set, 1, &descriptorSet.mDescriptorSet, 0, nullptr);
 	}
 
 
@@ -247,7 +247,7 @@ namespace Strawberry::Vulkan
 		std::vector<VkDescriptorSet> setHandles;
 		sets.reserve(sets.size());
 		std::transform(sets.begin(), sets.end(), std::back_inserter(setHandles), [](DescriptorSet* set) { return set->mDescriptorSet; });
-		vkCmdBindDescriptorSets(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.mPipelineLayout, firstSet, setHandles.size(), setHandles.data(), 0, nullptr);
+		vkCmdBindDescriptorSets(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, *pipeline.mPipelineLayout, firstSet, setHandles.size(), setHandles.data(), 0, nullptr);
 	}
 
 
@@ -275,6 +275,6 @@ namespace Strawberry::Vulkan
 
 	void CommandBuffer::PushConstants(const Pipeline& pipeline, VkShaderStageFlags stage, const Core::IO::DynamicByteBuffer& bytes, uint32_t offset)
 	{
-		vkCmdPushConstants(mCommandBuffer, pipeline.mPipelineLayout, stage, offset, bytes.Size(), bytes.Data());
+		vkCmdPushConstants(mCommandBuffer, *pipeline.mPipelineLayout, stage, offset, bytes.Size(), bytes.Data());
 	}
 }

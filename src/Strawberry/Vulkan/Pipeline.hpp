@@ -8,6 +8,7 @@
 #include "Buffer.hpp"
 #include "DescriptorPool.hpp"
 #include "DescriptorSet.hpp"
+#include "PipelineLayout.hpp"
 // Vulkan
 #include <vulkan/vulkan.h>
 // Strawberry Core
@@ -53,9 +54,6 @@ namespace Strawberry::Vulkan
 		T Create(const Args&... args) const { return T(*this, std::forward<const Args&>(args)...); }
 
 
-		DescriptorSet AllocateDescriptorSet(size_t layoutIndex) const;
-
-
 	private:
 		Pipeline();
 
@@ -63,17 +61,13 @@ namespace Strawberry::Vulkan
 	private:
 		// Our RenderPass
 		Core::ReflexivePointer<RenderPass> mRenderPass;
+		// Our Layout
+		Core::ReflexivePointer<PipelineLayout> mPipelineLayout;
 
 		// Handle to pipeline
 		VkPipeline mPipeline = nullptr;
-		// Handle to pipeline layout
-		VkPipelineLayout mPipelineLayout = nullptr;
 		// The size of the viewport to render to
 		VkViewport mViewport;
-		// The pool from which we allocate descriptor sets
-		Core::Optional<DescriptorPool> mDescriptorPool;
-		// Our descriptor set layouts
-		std::vector<VkDescriptorSetLayout> mDescriptorSetLayouts;
 	};
 
 
@@ -155,7 +149,7 @@ namespace Strawberry::Vulkan
 	class Pipeline::Builder
 	{
 	public:
-		explicit Builder(const RenderPass& renderPass, uint32_t subpass = 0);
+		explicit Builder(const PipelineLayout& layout, const RenderPass& renderPass, uint32_t subpass = 0);
 
 
 		Builder& WithShaderStage(VkShaderStageFlagBits stage, Shader shader);
@@ -182,16 +176,12 @@ namespace Strawberry::Vulkan
 		Builder& WithCullMode(VkCullModeFlags cullModeFlags);
 
 
-		Builder& WithPushConstantRange(VkShaderStageFlags stage, uint32_t size, uint32_t offset);
-
-
-		Builder& WithDescriptorSetLayout(const DescriptorSetLayout& descriptorSetLayout);
-
-
 		[[nodiscard]] Pipeline Build() const;
 
 
 	private:
+		Core::ReflexivePointer<PipelineLayout> mPipelineLayout;
+
 		Core::ReflexivePointer<RenderPass> mRenderPass;
 
 		uint32_t mSubpass;
@@ -217,11 +207,5 @@ namespace Strawberry::Vulkan
 		VkFrontFace mFrontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 
 		float mLineWidth = 1.0;
-
-		std::vector<VkPushConstantRange> mPushConstantRanges;
-
-		std::vector<VkDescriptorSetLayout> mDescriptorSetLayouts;
-
-		std::vector<VkDescriptorPoolSize> mDescriptorPoolSizes;
 	};
 }

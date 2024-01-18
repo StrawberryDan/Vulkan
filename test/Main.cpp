@@ -64,17 +64,25 @@ void BasicRendering()
 		.Build();
 	auto vertexShader = Shader::Compile(device, Core::IO::DynamicByteBuffer(meshVertexShader, sizeof(meshVertexShader))).Unwrap();
 	auto fragmentShader = Shader::Compile(device, Core::IO::DynamicByteBuffer(textureFragShader, sizeof(textureFragShader))).Unwrap();
-	Pipeline pipeline = renderPass.Create<Pipeline::Builder>()
+	PipelineLayout layout = PipelineLayout::Builder(device)
+		.WithPushConstantRange(16 * sizeof(float), 0, VK_SHADER_STAGE_VERTEX_BIT)
+		.WithPushConstantRange(3 * sizeof(float), 16 * sizeof(float), VK_SHADER_STAGE_FRAGMENT_BIT)
+		.WithDescriptorSet({
+			VkDescriptorSetLayoutBinding{
+				.binding = 0,
+				.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+				.descriptorCount = 1,
+				.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+				.pImmutableSamplers = nullptr,
+			}
+		})
+		.Build();
+	Pipeline pipeline = Pipeline::Builder(layout, renderPass, 0)
 		.WithShaderStage(VK_SHADER_STAGE_VERTEX_BIT, std::move(vertexShader))
 		.WithShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT, std::move(fragmentShader))
 		.WithVertexInput(vertexInputDescription())
 		.WithPrimitiveTopology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
 		.WithViewport({0, 0}, {1920, 1080})
-		.WithPushConstantRange(VK_SHADER_STAGE_VERTEX_BIT, 16 * sizeof(float), 0)
-		.WithPushConstantRange(VK_SHADER_STAGE_FRAGMENT_BIT, 3 * sizeof(float), 16 * sizeof(float))
-		.WithDescriptorSetLayout(
-			DescriptorSetLayout()
-				.WithBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT))
 		.Build();
 	auto queue = device.GetQueue(queueFamily, 0);
 	Vulkan::Swapchain swapchain = queue->Create<Swapchain>(surface, Core::Math::Vec2i(1920, 1080));
@@ -149,7 +157,8 @@ void BasicRendering()
 
 
 	Core::Clock clock;
-	Vulkan::DescriptorSet textureDescriptorSet = pipeline.AllocateDescriptorSet(0);
+	Vulkan::DescriptorPool descriptorPool(device, 0, 1, {VkDescriptorPoolSize{.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, .descriptorCount = 1}});
+	Vulkan::DescriptorSet textureDescriptorSet(descriptorPool, layout.GetSetLayout(0));
 
 
 	while (!window.CloseRequested())

@@ -26,8 +26,6 @@ namespace Strawberry::Vulkan
 		  , mRenderPass(std::move(rhs.mRenderPass))
 		  , mPipelineLayout(std::exchange(rhs.mPipelineLayout, nullptr))
 		  , mViewport(std::exchange(rhs.mViewport, {}))
-		  , mDescriptorPool(std::move(rhs.mDescriptorPool))
-		  , mDescriptorSetLayouts(std::move(rhs.mDescriptorSetLayouts))
 	{
 
 	}
@@ -49,17 +47,15 @@ namespace Strawberry::Vulkan
 	{
 		if (mPipeline)
 		{
-			vkDestroyPipelineLayout(mRenderPass->mDevice->mDevice, mPipelineLayout, nullptr);
-			for (VkDescriptorSetLayout layout: mDescriptorSetLayouts)
-				vkDestroyDescriptorSetLayout(mRenderPass->mDevice->mDevice, layout, nullptr);
 			vkDestroyPipeline(mRenderPass->mDevice->mDevice, mPipeline, nullptr);
 		}
 	}
 
 
-	Pipeline::Builder::Builder(const RenderPass& renderPass, uint32_t subpass)
+	Pipeline::Builder::Builder(const PipelineLayout& layout, const RenderPass& renderPass, uint32_t subpass)
 		: mRenderPass(renderPass)
 		, mSubpass(subpass)
+		, mPipelineLayout(layout)
 	{
 
 	}
@@ -126,51 +122,6 @@ namespace Strawberry::Vulkan
 	{
 		mCullingMode = cullModeFlags;
 		return *this;
-	}
-
-
-	Pipeline::Builder&
-	Pipeline::Builder::WithPushConstantRange(VkShaderStageFlags stage, uint32_t size, uint32_t offset)
-	{
-		mPushConstantRanges.emplace_back(VkPushConstantRange {
-			.stageFlags = stage,
-			.offset = offset,
-			.size = size,
-		});
-		return *this;
-	}
-
-
-	Pipeline::Builder& Pipeline::Builder::WithDescriptorSetLayout(const DescriptorSetLayout& descriptorSetLayout)
-	{
-		VkDescriptorSetLayout layout;
-		VkDescriptorSetLayoutCreateInfo createInfo {
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = 0,
-			.bindingCount = static_cast<uint32_t>(descriptorSetLayout.mBindings.size()),
-			.pBindings = descriptorSetLayout.mBindings.data()
-		};
-		Core::AssertEQ(vkCreateDescriptorSetLayout(mRenderPass->mDevice->mDevice, &createInfo, nullptr, &layout), VK_SUCCESS);
-		mDescriptorSetLayouts.emplace_back(layout);
-
-
-		for (auto layoutBinding: descriptorSetLayout.mBindings)
-		{
-			mDescriptorPoolSizes.emplace_back(VkDescriptorPoolSize {
-				.type = layoutBinding.descriptorType,
-				.descriptorCount = layoutBinding.descriptorCount
-			});
-		}
-
-
-		return *this;
-	}
-
-
-	DescriptorSet Pipeline::AllocateDescriptorSet(size_t layoutIndex) const
-	{
-		return mDescriptorPool->Create<DescriptorSet>(mDescriptorSetLayouts[layoutIndex]);
 	}
 
 
@@ -328,24 +279,11 @@ namespace Strawberry::Vulkan
 		};
 
 
-		// Create Descriptor pool and actual Pipeline Object
+		// Create Pipeline Object
 		Pipeline pipeline;
+		pipeline.mPipelineLayout = mPipelineLayout;
 		pipeline.mRenderPass = mRenderPass;
 		pipeline.mViewport = mViewport.Value();
-		pipeline.mDescriptorSetLayouts = mDescriptorSetLayouts;
-
-
-		// Pipeline layout
-		VkPipelineLayoutCreateInfo layoutCreateInfo {
-			.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = 0,
-			.setLayoutCount = static_cast<uint32_t>(mDescriptorSetLayouts.size()),
-			.pSetLayouts = mDescriptorSetLayouts.data(),
-			.pushConstantRangeCount = static_cast<uint32_t>(mPushConstantRanges.size()),
-			.pPushConstantRanges = mPushConstantRanges.data(),
-		};
-		Core::AssertEQ(vkCreatePipelineLayout(mRenderPass->mDevice->mDevice, &layoutCreateInfo, nullptr, &pipeline.mPipelineLayout), VK_SUCCESS);
 
 
 		// Create the Pipeline
@@ -365,7 +303,7 @@ namespace Strawberry::Vulkan
 				.pDepthStencilState = &depthStencilState,
 				.pColorBlendState = &colorBlendState,
 				.pDynamicState = &dynamicState,
-				.layout = pipeline.mPipelineLayout,
+				.layout = *pipeline.mPipelineLayout,
 				.renderPass = mRenderPass->mRenderPass,
 				.subpass = mSubpass,
 				.basePipelineHandle = nullptr,
@@ -379,12 +317,6 @@ namespace Strawberry::Vulkan
 												 nullptr,
 												 &pipeline.mPipeline),
 					   VK_SUCCESS);
-
-		if (!mDescriptorSetLayouts.empty())
-		{
-			DescriptorPool descriptorPool(*mRenderPass->GetDevice(), 0, mDescriptorSetLayouts.size(), mDescriptorPoolSizes);
-			pipeline.mDescriptorPool = std::move(descriptorPool);
-		}
 
 		return pipeline;
 	}

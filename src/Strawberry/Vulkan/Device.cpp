@@ -126,6 +126,12 @@ namespace Strawberry::Vulkan
 	}
 
 
+	Device::operator VkDevice() const
+	{
+		return mDevice;
+	}
+
+
 	Core::ReflexivePointer<Instance> Device::GetInstance() const
 	{
 		return mPhysicalDevices[0]->GetInstance();
