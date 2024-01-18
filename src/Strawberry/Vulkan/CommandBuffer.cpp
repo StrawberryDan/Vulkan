@@ -111,10 +111,15 @@ namespace Strawberry::Vulkan
 	}
 
 
-	void CommandBuffer::BindVertexBuffer(uint32_t binding, Buffer& buffer)
+	void CommandBuffer::BindVertexBuffer(uint32_t binding, Buffer& buffer, VkDeviceSize offset)
 	{
-		VkDeviceSize offset = 0;
 		vkCmdBindVertexBuffers(mCommandBuffer, binding, 1, &buffer.mBuffer, &offset);
+	}
+
+
+	void CommandBuffer::BindIndexBuffer(const Buffer& buffer, VkIndexType indexType, uint32_t offset)
+	{
+		vkCmdBindIndexBuffer(mCommandBuffer, buffer.mBuffer, offset, indexType);
 	}
 
 
@@ -124,10 +129,16 @@ namespace Strawberry::Vulkan
 	}
 
 
+	void CommandBuffer::DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t firstInstance, int32_t vertexOffset)
+	{
+		vkCmdDrawIndexed(mCommandBuffer, indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
+	}
+
+
 	void CommandBuffer::PipelineBarrier(VkPipelineStageFlags srcMask, VkPipelineStageFlags dstMask, VkDependencyFlags dependencyFlags,
-		const std::vector<VkMemoryBarrier>& memoryBarriers,
-		const std::vector<VkBufferMemoryBarrier>& bufferBarriers,
-		const std::vector<VkImageMemoryBarrier>& imageBarriers)
+										const std::vector<VkMemoryBarrier>& memoryBarriers,
+										const std::vector<VkBufferMemoryBarrier>& bufferBarriers,
+										const std::vector<VkImageMemoryBarrier>& imageBarriers)
 	{
 		vkCmdPipelineBarrier(mCommandBuffer,
 			srcMask, dstMask,
