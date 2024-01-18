@@ -29,7 +29,7 @@ namespace Strawberry::Vulkan
 			.pSetLayouts = &layout,
 		};
 
-		Core::AssertEQ(vkAllocateDescriptorSets(mDescriptorPool->GetDevice()->mDevice, &allocateInfo, &mDescriptorSet),
+		Core::AssertEQ(vkAllocateDescriptorSets(*mDescriptorPool->GetDevice(), &allocateInfo, &mDescriptorSet),
 					   VK_SUCCESS);
 	}
 
@@ -58,7 +58,7 @@ namespace Strawberry::Vulkan
 	{
 		if (mDescriptorSet && mDescriptorPool && mDescriptorPool->mFlags & VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT)
 		{
-			vkFreeDescriptorSets(mDescriptorPool->GetDevice()->mDevice, mDescriptorPool->mDescriptorPool, 1, &mDescriptorSet);
+			vkFreeDescriptorSets(*mDescriptorPool->GetDevice(), mDescriptorPool->mDescriptorPool, 1, &mDescriptorSet);
 		}
 	}
 
@@ -66,7 +66,7 @@ namespace Strawberry::Vulkan
 	void DescriptorSet::SetUniformBuffer(const Vulkan::Buffer& buffer, uint32_t binding, uint32_t arrayElement)
 	{
 		VkDescriptorBufferInfo bufferInfo {
-			.buffer = buffer.mBuffer,
+			.buffer = buffer,
 			.offset = 0,
 			.range = buffer.GetSize()
 		};
@@ -82,15 +82,15 @@ namespace Strawberry::Vulkan
 			.pBufferInfo = &bufferInfo,
 			.pTexelBufferView = nullptr,
 		};
-		vkUpdateDescriptorSets(mDescriptorPool->GetDevice()->mDevice, 1, &write, 0, nullptr);
+		vkUpdateDescriptorSets(*mDescriptorPool->GetDevice(), 1, &write, 0, nullptr);
 	}
 
 
 	void DescriptorSet::SetUniformTexture(const Sampler& sampler, const ImageView& image, VkImageLayout layout, uint32_t binding, uint32_t arrayElement)
 	{
 		VkDescriptorImageInfo imageInfo {
-			.sampler = sampler.mSampler,
-			.imageView = image.mImageView,
+			.sampler = sampler,
+			.imageView = image,
 			.imageLayout = layout,
 		};
 		VkWriteDescriptorSet write {
@@ -105,6 +105,6 @@ namespace Strawberry::Vulkan
 			.pBufferInfo = nullptr,
 			.pTexelBufferView = nullptr,
 		};
-		vkUpdateDescriptorSets(mDescriptorPool->GetDevice()->mDevice, 1, &write, 0, nullptr);
+		vkUpdateDescriptorSets(*mDescriptorPool->GetDevice(), 1, &write, 0, nullptr);
 	}
 }

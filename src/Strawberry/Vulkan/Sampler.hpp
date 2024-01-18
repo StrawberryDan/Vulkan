@@ -20,10 +20,6 @@ namespace Strawberry::Vulkan
 
 	class Sampler
 	{
-		friend class Pipeline;
-		friend class DescriptorSet;
-
-
 	public:
 		Sampler(const Device& device, VkFilter magFilter, VkFilter minFilter, bool normaliseCoords = true);
 		Sampler(const Sampler& rhs) = delete;
@@ -31,6 +27,9 @@ namespace Strawberry::Vulkan
 		Sampler(Sampler&& rhs) noexcept;
 		Sampler& operator=(Sampler&& rhs) noexcept;
 		~Sampler();
+
+
+		operator VkSampler() const;
 
 
 	private:

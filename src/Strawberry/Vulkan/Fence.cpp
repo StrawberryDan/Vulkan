@@ -14,7 +14,7 @@ namespace Strawberry::Vulkan
 {
 	Fence::Fence(const Device& device)
 		: mFence(nullptr)
-		, mDevice(device.mDevice)
+		, mDevice(device)
 	{
 		VkFenceCreateInfo createInfo {
 			.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,

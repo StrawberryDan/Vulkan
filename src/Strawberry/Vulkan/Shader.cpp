@@ -39,7 +39,7 @@ namespace Strawberry::Vulkan
 
 		VkShaderModule shaderModule = VK_NULL_HANDLE;
 
-		if (auto result = vkCreateShaderModule(device.mDevice, &createInfo, nullptr, &shaderModule); result == VK_SUCCESS)
+		if (auto result = vkCreateShaderModule(device, &createInfo, nullptr, &shaderModule); result == VK_SUCCESS)
 		{
 			return Shader(device, shaderModule);
 		}
@@ -74,8 +74,14 @@ namespace Strawberry::Vulkan
 	{
 		if (mShaderModule)
 		{
-			vkDestroyShaderModule(mDevice->mDevice, mShaderModule, nullptr);
+			vkDestroyShaderModule(*mDevice, mShaderModule, nullptr);
 		}
+	}
+
+
+	Shader::operator VkShaderModule_T*() const
+	{
+		return mShaderModule;
 	}
 
 

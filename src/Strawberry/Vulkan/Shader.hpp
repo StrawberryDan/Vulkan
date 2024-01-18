@@ -24,9 +24,6 @@ namespace Strawberry::Vulkan
 
 	class Shader
 	{
-		friend class Pipeline;
-
-
 	public:
 		static Core::Optional<Shader> Compile(const Device& device, const std::filesystem::path& file);
 		static Core::Optional<Shader> Compile(const Device& device, const Core::IO::DynamicByteBuffer& bytes);
@@ -37,6 +34,9 @@ namespace Strawberry::Vulkan
 		Shader(Shader&& rhs) noexcept;
 		Shader& operator=(Shader&& rhs) noexcept;
 		~Shader();
+
+
+		operator VkShaderModule() const;
 
 
 	protected:

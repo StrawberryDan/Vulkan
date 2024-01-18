@@ -21,13 +21,6 @@ namespace Strawberry::Vulkan
 
 	class ImageView
 	{
-		friend class Builder;
-		friend class CommandBuffer;
-		friend class Framebuffer;
-		friend class Pipeline;
-		friend class DescriptorSet;
-
-
 	public:
 		class Builder;
 
@@ -38,6 +31,9 @@ namespace Strawberry::Vulkan
 		ImageView(ImageView&& rhs) noexcept;
 		ImageView& operator=(ImageView&& rhs) noexcept;
 		~ImageView();
+
+
+		operator VkImageView() const;
 
 
 	private:

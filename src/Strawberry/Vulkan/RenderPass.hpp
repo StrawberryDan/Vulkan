@@ -26,7 +26,7 @@ namespace Strawberry::Vulkan
 		: public Core::EnableReflexivePointer<RenderPass>
 	{
 		friend class CommandBuffer;
-		friend class Pipeline;
+		friend class GraphicsPipeline;
 		friend class Framebuffer;
 
 

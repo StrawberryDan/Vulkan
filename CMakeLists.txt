@@ -68,8 +68,8 @@ add_library(StrawberryVulkan STATIC
 		src/Strawberry/Vulkan/Instance.hpp
 		src/Strawberry/Vulkan/PhysicalDevice.cpp
 		src/Strawberry/Vulkan/PhysicalDevice.hpp
-		src/Strawberry/Vulkan/Pipeline.cpp
-		src/Strawberry/Vulkan/Pipeline.hpp
+		src/Strawberry/Vulkan/GraphicsPipeline.cpp
+		src/Strawberry/Vulkan/GraphicsPipeline.hpp
 		src/Strawberry/Vulkan/Queue.cpp
 		src/Strawberry/Vulkan/Queue.hpp
 		src/Strawberry/Vulkan/RenderPass.cpp

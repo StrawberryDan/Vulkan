@@ -24,7 +24,7 @@ namespace Strawberry::Vulkan
 			.flags = resetBit ? VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT : VkCommandPoolCreateFlags(0),
 		};
 
-		Core::Assert(vkCreateCommandPool(mQueue->GetDevice()->mDevice, &createInfo, nullptr, &mCommandPool) == VK_SUCCESS);
+		Core::Assert(vkCreateCommandPool(*mQueue->GetDevice(), &createInfo, nullptr, &mCommandPool) == VK_SUCCESS);
 	}
 
 
@@ -52,7 +52,7 @@ namespace Strawberry::Vulkan
 	{
 		if (mCommandPool)
 		{
-			vkDestroyCommandPool(mQueue->GetDevice()->mDevice, mCommandPool, nullptr);
+			vkDestroyCommandPool(*mQueue->GetDevice(), mCommandPool, nullptr);
 		}
 	}
 

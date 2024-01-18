@@ -16,7 +16,7 @@
 namespace Strawberry::Vulkan
 {
 	DeviceMemory::DeviceMemory(const Device& device, uint32_t size, uint32_t typeMask, VkMemoryPropertyFlags properties)
-		: mDevice(device.mDevice)
+		: mDevice(device)
 		, mSize(size)
 	{
 		auto memoryProperties = device.GetPhysicalDevices()[0]->GetMemoryProperties();

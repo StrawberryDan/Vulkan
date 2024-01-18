@@ -3,7 +3,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 #include "Framebuffer.hpp"
 #include "Device.hpp"
-#include "Pipeline.hpp"
+#include "GraphicsPipeline.hpp"
 #include "ImageView.hpp"
 #include "RenderPass.hpp"
 // Strawberry Core
@@ -42,7 +42,7 @@ namespace Strawberry::Vulkan
 		std::vector<VkImageView> attachments;
 		std::transform(mColorAttachmentViews.begin(), mColorAttachmentViews.end(),
 					   std::back_inserter(attachments),
-					   [](const ImageView& view) { return view.mImageView; });
+					   [](const ImageView& view) -> VkImageView { return view; });
 
 		VkFramebufferCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
@@ -54,7 +54,7 @@ namespace Strawberry::Vulkan
 			.height = static_cast<uint32_t>(mSize[1]),
 			.layers = 1,
 		};
-		Core::AssertEQ(vkCreateFramebuffer(mRenderPass->mDevice->mDevice, &createInfo, nullptr, &mFramebuffer), VK_SUCCESS);
+		Core::AssertEQ(vkCreateFramebuffer(*mRenderPass->mDevice, &createInfo, nullptr, &mFramebuffer), VK_SUCCESS);
 	}
 
 
@@ -89,7 +89,7 @@ namespace Strawberry::Vulkan
 	{
 		if (mFramebuffer)
 		{
-			vkDestroyFramebuffer(mRenderPass->mDevice->mDevice, mFramebuffer, nullptr);
+			vkDestroyFramebuffer(*mRenderPass->mDevice, mFramebuffer, nullptr);
 		}
 	}
 

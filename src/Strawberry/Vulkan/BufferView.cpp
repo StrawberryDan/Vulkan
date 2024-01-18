@@ -15,13 +15,13 @@
 namespace Strawberry::Vulkan
 {
 	BufferView::BufferView(const Buffer& buffer, VkFormat format, VkDeviceSize offset, VkDeviceSize range)
-		: mDevice(buffer.mDevice)
+		: mDevice(buffer.GetDevice())
 	{
 		VkBufferViewCreateInfo createInfo {
 			.sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
-			.buffer = buffer.mBuffer,
+			.buffer = buffer,
 			.format = format,
 			.offset = offset,
 			.range = range

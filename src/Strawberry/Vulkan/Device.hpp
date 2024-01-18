@@ -23,7 +23,7 @@
 namespace Strawberry::Vulkan
 {
 	class Instance;
-	class Pipeline;
+	class GraphicsPipeline;
 
 
 	struct QueueCreateInfo
@@ -36,26 +36,6 @@ namespace Strawberry::Vulkan
 	class Device
 		: public Core::EnableReflexivePointer<Device>
 	{
-		friend class Pipeline;
-		friend class Swapchain;
-		friend class Surface;
-		friend class Queue;
-		friend class CommandBuffer;
-		friend class CommandPool;
-		friend class Buffer;
-		friend class BufferView;
-		friend class DeviceMemory;
-		friend class Image;
-		friend class Shader;
-		friend class Framebuffer;
-		friend class Fence;
-		friend class Sampler;
-		friend class RenderPass;
-		friend class Shader;
-		friend class DescriptorSet;
-		friend class DescriptorPool;
-
-
 	public:
 		explicit Device(const PhysicalDevice& physicalDevice, std::vector<QueueCreateInfo> queueCreateInfo);
 		Device(const Device& rhs) = delete;

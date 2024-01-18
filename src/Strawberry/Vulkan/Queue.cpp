@@ -19,7 +19,7 @@ namespace Strawberry::Vulkan
 		: mFamilyIndex(family)
 		, mDevice(device)
 	{
-		vkGetDeviceQueue(mDevice->mDevice, mFamilyIndex, index, &mQueue);
+		vkGetDeviceQueue(*mDevice, mFamilyIndex, index, &mQueue);
 	}
 
 
@@ -55,6 +55,8 @@ namespace Strawberry::Vulkan
 	{
 		WaitUntilIdle();
 
+		VkCommandBuffer handle = commandBuffer;
+
 		VkSubmitInfo submitInfo {
 			.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
 			.pNext = nullptr,
@@ -62,7 +64,7 @@ namespace Strawberry::Vulkan
 			.pWaitSemaphores = nullptr,
 			.pWaitDstStageMask = nullptr,
 			.commandBufferCount = 1,
-			.pCommandBuffers = &commandBuffer.mCommandBuffer,
+			.pCommandBuffers = &handle,
 			.signalSemaphoreCount = 0,
 			.pSignalSemaphores = nullptr,
 		};

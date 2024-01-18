@@ -2,7 +2,7 @@
 #include "Strawberry/Core/UTF.hpp"
 #include "../src/Strawberry/Vulkan/Instance.hpp"
 #include "../src/Strawberry/Vulkan/Device.hpp"
-#include "../src/Strawberry/Vulkan/Pipeline.hpp"
+#include "../src/Strawberry/Vulkan/GraphicsPipeline.hpp"
 #include "../src/Strawberry/Vulkan/Swapchain.hpp"
 #include "../src/Strawberry/Vulkan/Queue.hpp"
 #include "../src/Strawberry/Vulkan/CommandPool.hpp"
@@ -41,14 +41,6 @@ void BasicRendering()
 		#include "Texture.frag.bin"
 	};
 
-	auto vertexInputDescription = []() -> VertexInputDescription
-	{
-		VertexInputDescription description;
-		description.AddBinding(3 * sizeof(float))
-			.WithAttribute(0, VK_FORMAT_R32G32B32_SFLOAT, 0);
-		return description;
-	};
-
 
 	Window::Window window("StrawberryGraphics Test", Core::Math::Vec2i(1920, 1080));
 	Instance instance;
@@ -77,12 +69,9 @@ void BasicRendering()
 			}
 		})
 		.Build();
-	Pipeline pipeline = Pipeline::Builder(layout, renderPass, 0)
+	GraphicsPipeline pipeline = GraphicsPipeline::Builder(layout, renderPass, 0)
 		.WithShaderStage(VK_SHADER_STAGE_VERTEX_BIT, std::move(vertexShader))
 		.WithShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT, std::move(fragmentShader))
-		.WithVertexInput(vertexInputDescription())
-		.WithPrimitiveTopology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
-		.WithViewport({0, 0}, {1920, 1080})
 		.Build();
 	auto queue = device.GetQueue(queueFamily, 0);
 	Vulkan::Swapchain swapchain = queue->Create<Swapchain>(surface, Core::Math::Vec2i(1920, 1080));

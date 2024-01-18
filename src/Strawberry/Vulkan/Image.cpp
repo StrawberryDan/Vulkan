@@ -20,7 +20,7 @@ namespace Strawberry::Vulkan
 	Image::Image(const Device& device, uint32_t extent, VkFormat format, VkImageUsageFlags usage,
 				 uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling, VkImageLayout initialLayout)
 		: mImage(nullptr)
-		, mDevice(device.mDevice)
+		, mDevice(device)
 		, mFormat(format)
 		, mSize(static_cast<int>(extent), 1, 1)
 	{
@@ -49,7 +49,7 @@ namespace Strawberry::Vulkan
 	Image::Image(const Device& device, Core::Math::Vec2u extent, VkFormat format, VkImageUsageFlags usage,
 				 uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling, VkImageLayout initialLayout)
 		: mImage(nullptr)
-		, mDevice(device.mDevice)
+		, mDevice(device)
 		, mFormat(format)
 		, mSize(extent[0], extent[1], 1)
 	{
@@ -86,7 +86,7 @@ namespace Strawberry::Vulkan
 	Image::Image(const Device& device, Core::Math::Vec3u extent, VkFormat format, VkImageUsageFlags usage,
 				 uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling, VkImageLayout initialLayout)
 		: mImage(nullptr)
-		, mDevice(device.mDevice)
+		, mDevice(device)
 		, mFormat(format)
 		, mSize(extent)
 	{
@@ -122,7 +122,7 @@ namespace Strawberry::Vulkan
 
 	Image::Image(const Device& device, VkImage imageHandle, Core::Math::Vec3u extent, VkFormat format)
 		: mImage(imageHandle)
-		, mDevice(device.mDevice)
+		, mDevice(device)
 		, mFormat(format)
 		, mSize(extent)
 	{}

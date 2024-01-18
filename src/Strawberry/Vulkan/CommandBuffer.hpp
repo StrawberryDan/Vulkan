@@ -23,7 +23,7 @@ namespace Strawberry::Vulkan
 {
 	class CommandPool;
 	class Buffer;
-	class Pipeline;
+	class GraphicsPipeline;
 	class Framebuffer;
 	class RenderPass;
 	class DescriptorSet;
@@ -32,9 +32,6 @@ namespace Strawberry::Vulkan
 
 	class CommandBuffer
 	{
-		friend class Queue;
-
-
 	public:
 		explicit CommandBuffer(const CommandPool& commandPool);
 		CommandBuffer(const CommandBuffer& rhs) = delete;
@@ -42,6 +39,9 @@ namespace Strawberry::Vulkan
 		CommandBuffer(CommandBuffer&& rhs) noexcept ;
 		CommandBuffer& operator=(CommandBuffer&& rhs) noexcept ;
 		~CommandBuffer();
+
+
+		operator VkCommandBuffer() const;
 
 
 		Core::ReflexivePointer<CommandPool> GetCommandPool() const;
@@ -52,14 +52,14 @@ namespace Strawberry::Vulkan
 		void Reset();
 
 
-		void BindPipeline(const Pipeline& pipeline);
+		void BindPipeline(const GraphicsPipeline& pipeline);
 
 
 		void BeginRenderPass(const RenderPass& renderPass, Framebuffer& framebuffer);
 		void EndRenderPass();
 
 
-		void PushConstants(const Pipeline& pipeline, VkShaderStageFlags stage, const Core::IO::DynamicByteBuffer& bytes, uint32_t offset);
+		void PushConstants(const GraphicsPipeline& pipeline, VkShaderStageFlags stage, const Core::IO::DynamicByteBuffer& bytes, uint32_t offset);
 
 
 		void BindVertexBuffer(uint32_t binding, Buffer& buffer, VkDeviceSize offset = 0);
@@ -116,8 +116,8 @@ namespace Strawberry::Vulkan
 		void ClearColorImage(Image& image, Core::Math::Vec4f clearColor = {0.0f, 0.0f, 0.0f, 1.0f});
 
 
-		void BindDescriptorSet(const Pipeline& pipeline, uint32_t set, const DescriptorSet& descriptorSet);
-		void BindDescriptorSets(const Pipeline& pipeline, uint32_t firstSet, std::vector<DescriptorSet*> sets);
+		void BindDescriptorSet(const GraphicsPipeline& pipeline, uint32_t set, const DescriptorSet& descriptorSet);
+		void BindDescriptorSets(const GraphicsPipeline& pipeline, uint32_t firstSet, std::vector<DescriptorSet*> sets);
 
 
 	private:

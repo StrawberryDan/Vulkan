@@ -5,7 +5,7 @@
 #include "CommandPool.hpp"
 #include "Buffer.hpp"
 #include "Image.hpp"
-#include "Pipeline.hpp"
+#include "GraphicsPipeline.hpp"
 #include "Framebuffer.hpp"
 #include "Fence.hpp"
 #include "Device.hpp"
@@ -41,7 +41,7 @@ namespace Strawberry::Vulkan
 			.commandBufferCount = 1,
 		};
 
-		Core::Assert(vkAllocateCommandBuffers(mCommandPool->GetQueue()->GetDevice()->mDevice, &allocateInfo, &mCommandBuffer) == VK_SUCCESS);
+		Core::Assert(vkAllocateCommandBuffers(*mCommandPool->GetQueue()->GetDevice(), &allocateInfo, &mCommandBuffer) == VK_SUCCESS);
 	}
 
 
@@ -70,8 +70,14 @@ namespace Strawberry::Vulkan
 	{
 		if (mCommandBuffer)
 		{
-			vkFreeCommandBuffers(mCommandPool->GetQueue()->GetDevice()->mDevice, mCommandPool->mCommandPool, 1, &mCommandBuffer);
+			vkFreeCommandBuffers(*mCommandPool->GetQueue()->GetDevice(), mCommandPool->mCommandPool, 1, &mCommandBuffer);
 		}
+	}
+
+
+	CommandBuffer::operator VkCommandBuffer_T*() const
+	{
+		return mCommandBuffer;
 	}
 
 
@@ -106,7 +112,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	void CommandBuffer::BindPipeline(const Pipeline& pipeline)
+	void CommandBuffer::BindPipeline(const GraphicsPipeline& pipeline)
 	{
 		vkCmdBindPipeline(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.mPipeline);
 	}
@@ -114,13 +120,14 @@ namespace Strawberry::Vulkan
 
 	void CommandBuffer::BindVertexBuffer(uint32_t binding, Buffer& buffer, VkDeviceSize offset)
 	{
-		vkCmdBindVertexBuffers(mCommandBuffer, binding, 1, &buffer.mBuffer, &offset);
+		VkBuffer handle = buffer;
+		vkCmdBindVertexBuffers(mCommandBuffer, binding, 1, &handle, &offset);
 	}
 
 
 	void CommandBuffer::BindIndexBuffer(const Buffer& buffer, VkIndexType indexType, uint32_t offset)
 	{
-		vkCmdBindIndexBuffer(mCommandBuffer, buffer.mBuffer, offset, indexType);
+		vkCmdBindIndexBuffer(mCommandBuffer, buffer, offset, indexType);
 	}
 
 
@@ -167,7 +174,7 @@ namespace Strawberry::Vulkan
 			.imageOffset{.x = 0, .y = 0, .z = 0},
 			.imageExtent{.width = image.mSize[0], .height = image.mSize[1], .depth = 1}
 		};
-		vkCmdCopyBufferToImage(mCommandBuffer, buffer.mBuffer, image.mImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+		vkCmdCopyBufferToImage(mCommandBuffer, buffer, image.mImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 	}
 
 
@@ -236,13 +243,13 @@ namespace Strawberry::Vulkan
 	}
 
 
-	void CommandBuffer::BindDescriptorSet(const Pipeline& pipeline, uint32_t set, const DescriptorSet& descriptorSet)
+	void CommandBuffer::BindDescriptorSet(const GraphicsPipeline& pipeline, uint32_t set, const DescriptorSet& descriptorSet)
 	{
 		vkCmdBindDescriptorSets(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, *pipeline.mPipelineLayout, set, 1, &descriptorSet.mDescriptorSet, 0, nullptr);
 	}
 
 
-	void CommandBuffer::BindDescriptorSets(const Pipeline& pipeline, uint32_t firstSet, std::vector<DescriptorSet*> sets)
+	void CommandBuffer::BindDescriptorSets(const GraphicsPipeline& pipeline, uint32_t firstSet, std::vector<DescriptorSet*> sets)
 	{
 		std::vector<VkDescriptorSet> setHandles;
 		sets.reserve(sets.size());
@@ -273,7 +280,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	void CommandBuffer::PushConstants(const Pipeline& pipeline, VkShaderStageFlags stage, const Core::IO::DynamicByteBuffer& bytes, uint32_t offset)
+	void CommandBuffer::PushConstants(const GraphicsPipeline& pipeline, VkShaderStageFlags stage, const Core::IO::DynamicByteBuffer& bytes, uint32_t offset)
 	{
 		vkCmdPushConstants(mCommandBuffer, *pipeline.mPipelineLayout, stage, offset, bytes.Size(), bytes.Data());
 	}

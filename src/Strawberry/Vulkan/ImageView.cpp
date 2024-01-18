@@ -63,6 +63,12 @@ namespace Strawberry::Vulkan
 	}
 
 
+	ImageView::operator VkImageView_T*() const
+	{
+		return mImageView;
+	}
+
+
 	ImageView::Builder::Builder(const Image& image)
 		: mImage(&image)
 	{

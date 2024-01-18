@@ -17,7 +17,7 @@ namespace Strawberry::Vulkan
 {
 	Buffer::Buffer(const Device& device, uint64_t size, VkBufferUsageFlags usage)
 		: mSize(size)
-		, mDevice(device.mDevice)
+		, mDevice(device)
 	{
 		VkBufferCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
@@ -72,6 +72,18 @@ namespace Strawberry::Vulkan
 		{
 			vkDestroyBuffer(mDevice, mBuffer, nullptr);
 		}
+	}
+
+
+	Buffer::operator VkBuffer() const
+	{
+		return mBuffer;
+	}
+
+
+	VkDevice Buffer::GetDevice() const
+	{
+		return mDevice;
 	}
 
 

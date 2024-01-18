@@ -23,12 +23,6 @@ namespace Strawberry::Vulkan
 
 	class Buffer
 	{
-		friend class BufferView;
-		friend class CommandBuffer;
-		friend class Pipeline;
-		friend class DescriptorSet;
-
-
 	public:
 		Buffer(const Device& device, uint64_t size, VkBufferUsageFlags usage);
 		Buffer(const Device& device, const Core::IO::DynamicByteBuffer& bytes, VkBufferUsageFlags usage);
@@ -37,6 +31,12 @@ namespace Strawberry::Vulkan
 		Buffer(Buffer&& rhs) noexcept;
 		Buffer& operator=(Buffer&& rhs) noexcept;
 		~Buffer();
+
+
+		operator VkBuffer() const;
+
+
+		VkDevice GetDevice() const;
 
 
 		template<std::movable T, typename... Args>
