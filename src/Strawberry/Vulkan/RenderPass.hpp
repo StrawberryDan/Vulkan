@@ -89,14 +89,17 @@ namespace Strawberry::Vulkan
 
 
 		Builder& WithColorAttachment(VkFormat format, VkAttachmentLoadOp loadOp, VkAttachmentStoreOp storeOp,
+									 VkImageLayout initialLayout, VkImageLayout finalLayout,
 									 Core::Math::Vec4f clearColor = Core::Math::Vec4f(0.0f, 0.0f, 0.0f, 0.0f),
 									 VkAttachmentLoadOp stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 									 VkAttachmentStoreOp stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE);
 		Builder& WithDepthAttachment(VkFormat format, VkAttachmentLoadOp loadOp, VkAttachmentStoreOp storeOp,
+									 VkImageLayout initialLayout, VkImageLayout finalLayout,
 		                             float clearValue = 0.0f,
 		                             VkAttachmentLoadOp stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 		                             VkAttachmentStoreOp stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE);
 		Builder& WithStencilAttachment(VkFormat format, VkAttachmentLoadOp loadOp, VkAttachmentStoreOp storeOp,
+									   VkImageLayout initialLayout, VkImageLayout finalLayout,
 		                               uint32_t clearValue = 0,
 		                               VkAttachmentLoadOp stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 		                               VkAttachmentStoreOp stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE);
