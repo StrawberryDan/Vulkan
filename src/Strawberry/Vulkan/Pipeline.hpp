@@ -132,20 +132,6 @@ namespace Strawberry::Vulkan
 	};
 
 
-	class DescriptorSetLayout
-	{
-		friend class Pipeline;
-
-
-	public:
-		DescriptorSetLayout& WithBinding(VkDescriptorType type, uint32_t count, VkShaderStageFlags stage);
-
-
-	private:
-		std::vector<VkDescriptorSetLayoutBinding> mBindings;
-	};
-
-
 	class Pipeline::Builder
 	{
 	public:

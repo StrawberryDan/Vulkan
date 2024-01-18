@@ -392,18 +392,4 @@ namespace Strawberry::Vulkan
 		}
 		return attributes;
 	}
-
-
-	DescriptorSetLayout&
-	DescriptorSetLayout::WithBinding(VkDescriptorType type, uint32_t count, VkShaderStageFlags stage)
-	{
-		mBindings.emplace_back(VkDescriptorSetLayoutBinding {
-			.binding = static_cast<uint32_t>(mBindings.size()),
-			.descriptorType = type,
-			.descriptorCount = count,
-			.stageFlags = stage,
-			.pImmutableSamplers = nullptr,
-		});
-		return *this;
-	}
 }
