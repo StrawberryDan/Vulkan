@@ -110,13 +110,14 @@ namespace Strawberry::Vulkan
 		}
 
 
+		void CopyBufferToImage(const Buffer& buffer, Image& image);
 		void CopyImageToImage(const Image& source, VkImageLayout srcLayout, const Image& dest, VkImageLayout destLayout, VkImageAspectFlags aspect);
 		void BlitImage(const Image& source, VkImageLayout srcLayout, const Image& dest, VkImageLayout destLayout, VkImageAspectFlags aspect, VkFilter filter);
-		void CopyBufferToImage(const Buffer& buffer, Image& image);
 		void ClearColorImage(Image& image, Core::Math::Vec4f clearColor = {0.0f, 0.0f, 0.0f, 1.0f});
 
 
 		void BindDescriptorSet(const Pipeline& pipeline, uint32_t set, const DescriptorSet& descriptorSet);
+		void BindDescriptorSets(const Pipeline& pipeline, uint32_t firstSet, std::vector<DescriptorSet*> sets);
 
 
 	private:

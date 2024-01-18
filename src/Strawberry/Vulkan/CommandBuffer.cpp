@@ -16,6 +16,7 @@
 #include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
 // Standard Library
+#include <algorithm>
 #include <memory>
 #include <vector>
 
@@ -149,6 +150,27 @@ namespace Strawberry::Vulkan
 	}
 
 
+	void CommandBuffer::CopyBufferToImage(const Buffer& buffer, Image& image)
+	{
+		// Setup copy
+		VkImageSubresourceLayers subresource {
+			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+			.mipLevel = 0,
+			.baseArrayLayer = 0,
+			.layerCount = 1,
+		};
+		VkBufferImageCopy region {
+			.bufferOffset = 0,
+			.bufferRowLength = 0,
+			.bufferImageHeight = 0,
+			.imageSubresource = subresource,
+			.imageOffset{.x = 0, .y = 0, .z = 0},
+			.imageExtent{.width = image.mSize[0], .height = image.mSize[1], .depth = 1}
+		};
+		vkCmdCopyBufferToImage(mCommandBuffer, buffer.mBuffer, image.mImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+	}
+
+
 	void CommandBuffer::CopyImageToImage(const Image& source, VkImageLayout srcLayout, const Image& dest, VkImageLayout destLayout, VkImageAspectFlags aspect)
 	{
 		Core::AssertEQ(source.GetSize(), dest.GetSize());
@@ -198,27 +220,6 @@ namespace Strawberry::Vulkan
 	}
 
 
-	void CommandBuffer::CopyBufferToImage(const Buffer& buffer, Image& image)
-	{
-		// Setup copy
-		VkImageSubresourceLayers subresource {
-			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-			.mipLevel = 0,
-			.baseArrayLayer = 0,
-			.layerCount = 1,
-		};
-		VkBufferImageCopy region {
-			.bufferOffset = 0,
-			.bufferRowLength = 0,
-			.bufferImageHeight = 0,
-			.imageSubresource = subresource,
-			.imageOffset{.x = 0, .y = 0, .z = 0},
-			.imageExtent{.width = image.mSize[0], .height = image.mSize[1], .depth = 1}
-		};
-		vkCmdCopyBufferToImage(mCommandBuffer, buffer.mBuffer, image.mImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
-	}
-
-
 	void CommandBuffer::ClearColorImage(Image& image, Core::Math::Vec4f clearColor)
 	{
 		VkClearColorValue vulkanClearColor {
@@ -238,6 +239,15 @@ namespace Strawberry::Vulkan
 	void CommandBuffer::BindDescriptorSet(const Pipeline& pipeline, uint32_t set, const DescriptorSet& descriptorSet)
 	{
 		vkCmdBindDescriptorSets(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.mPipelineLayout, set, 1, &descriptorSet.mDescriptorSet, 0, nullptr);
+	}
+
+
+	void CommandBuffer::BindDescriptorSets(const Pipeline& pipeline, uint32_t firstSet, std::vector<DescriptorSet*> sets)
+	{
+		std::vector<VkDescriptorSet> setHandles;
+		sets.reserve(sets.size());
+		std::transform(sets.begin(), sets.end(), std::back_inserter(setHandles), [](DescriptorSet* set) { return set->mDescriptorSet; });
+		vkCmdBindDescriptorSets(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.mPipelineLayout, firstSet, setHandles.size(), setHandles.data(), 0, nullptr);
 	}
 
 
