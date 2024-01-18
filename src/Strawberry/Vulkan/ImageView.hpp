@@ -51,7 +51,6 @@ namespace Strawberry::Vulkan
 	private:
 		VkImageView mImageView;
 		VkDevice mDevice;
-		Core::Math::Vec3i mSize;
 	};
 
 
@@ -61,31 +60,22 @@ namespace Strawberry::Vulkan
 		Builder(const Image& image);
 
 
+		Builder& WithType(VkImageViewType type);
 		Builder& WithFormat(VkFormat format);
 
 
-		Builder& WithType(VkImageViewType type);
-
-
-//		Builder& WithSize(uint32_t size);
-//		Builder& WithSize(Core::Math::Vec2i size);
-//		Builder& WithSize(Core::Math::Vec3i size);
+		Builder& WithSubresourceRange(VkImageSubresourceRange range);
 
 
 		Builder& WithSwizzling(VkComponentMapping mapping);
-
-
-		Builder& WithSubresourceRange(VkImageSubresourceRange range);
 
 
 		ImageView Build();
 
 	private:
 		const Image* mImage;
-
 		Core::Optional<VkImageViewType> mViewType;
 		Core::Optional<VkFormat> mFormat;
-		Core::Optional<Core::Math::Vec3i> mSize;
 
 		VkComponentMapping mComponentMapping{
 			.r = VK_COMPONENT_SWIZZLE_IDENTITY,

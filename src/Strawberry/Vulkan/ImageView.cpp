@@ -18,7 +18,6 @@ namespace Strawberry::Vulkan
 						 VkComponentMapping componentMapping, VkImageSubresourceRange subresourceRange)
 		: mImageView(nullptr)
 		, mDevice(image.mDevice)
-		, mSize(image.mSize)
 	{
 		VkImageViewCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
@@ -38,7 +37,6 @@ namespace Strawberry::Vulkan
 	ImageView::ImageView(ImageView&& rhs) noexcept
 		: mImageView(std::exchange(rhs.mImageView, nullptr))
 		, mDevice(std::exchange(rhs.mDevice, nullptr))
-		, mSize(std::exchange(rhs.mSize, Core::Math::Vec3i()))
 	{
 
 	}
@@ -86,16 +84,16 @@ namespace Strawberry::Vulkan
 	}
 
 
-	ImageView::Builder& ImageView::Builder::WithSwizzling(VkComponentMapping mapping)
+	ImageView::Builder& ImageView::Builder::WithSubresourceRange(VkImageSubresourceRange range)
 	{
-		mComponentMapping = mapping;
+		mSubresourceRange = range;
 		return *this;
 	}
 
 
-	ImageView::Builder& ImageView::Builder::WithSubresourceRange(VkImageSubresourceRange range)
+	ImageView::Builder& ImageView::Builder::WithSwizzling(VkComponentMapping mapping)
 	{
-		mSubresourceRange = range;
+		mComponentMapping = mapping;
 		return *this;
 	}
 
