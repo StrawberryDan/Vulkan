@@ -67,48 +67,150 @@ namespace Strawberry::Vulkan
 	}
 
 
-	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithVertexInput()
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithVertexInput(const std::vector<VkVertexInputBindingDescription>& bindings, const std::vector<VkVertexInputAttributeDescription>& attributes)
 	{
+		VkPipelineVertexInputStateCreateInfo createInfo {
+			.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.vertexBindingDescriptionCount = static_cast<uint32_t>(bindings.size()),
+			.pVertexBindingDescriptions = bindings.data(),
+			.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributes.size()),
+			.pVertexAttributeDescriptions = attributes.data()
+		};
+
+		mVertexInputStateCreateInfo = createInfo;
+		return *this;
 	}
 
 
-	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithInputAssembly()
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithInputAssembly(VkPrimitiveTopology topology, bool primitiveRestart)
 	{
+		VkPipelineInputAssemblyStateCreateInfo createInfo {
+			.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.topology = topology,
+			.primitiveRestartEnable = primitiveRestart ? VK_TRUE : VK_FALSE,
+		};
+
+
+		mInputAssemblyStateCreateInfo = createInfo;
+		return *this;
 	}
 
 
-	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithTesselation()
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithTesselation(uint32_t controlPoints)
 	{
+		VkPipelineTessellationStateCreateInfo createInfo {
+			.sType = VK_STRUCTURE_TYPE_PIPELINE_TESSELLATION_STATE_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.patchControlPoints = controlPoints,
+		};
+
+		mTessellationStateCreateInfo = createInfo;
+		return *this;
 	}
 
 
-	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithViewport()
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithViewport(const std::vector<VkViewport> viewports, const std::vector<VkRect2D> scissors)
 	{
+		VkPipelineViewportStateCreateInfo createInfo {
+			.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.viewportCount = static_cast<uint32_t>(viewports.size()),
+			.pViewports = viewports.data(),
+			.scissorCount = static_cast<uint32_t>(scissors.size()),
+			.pScissors = scissors.data()
+		};
+
+		mViewportStateCreateInfo = createInfo;
+		return *this;
 	}
 
 
-	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithRasterization()
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithRasterization(VkPolygonMode polygonMode, VkCullModeFlags cullMode, VkFrontFace frontFace)
 	{
+		VkPipelineRasterizationStateCreateInfo createInfo {
+			.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.depthClampEnable = VK_FALSE,
+			.rasterizerDiscardEnable = VK_FALSE,
+			.polygonMode = polygonMode,
+			.cullMode = cullMode,
+			.frontFace = frontFace,
+			.depthBiasEnable = VK_FALSE,
+			.depthBiasConstantFactor = 0,
+			.depthBiasClamp = 0,
+			.depthBiasSlopeFactor = 0,
+			.lineWidth = 1.0f,
+		};
+
+		mRasterizationStateCreateInfo = createInfo;
+		return *this;
 	}
 
 
-	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithMultisample()
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithMultisample(VkSampleCountFlagBits samples, bool sampleShading)
 	{
+		VkPipelineMultisampleStateCreateInfo createInfo {
+			.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.rasterizationSamples = samples,
+			.sampleShadingEnable = sampleShading ? VK_TRUE : VK_FALSE,
+			.minSampleShading = 1.0,
+			.pSampleMask = nullptr,
+			.alphaToCoverageEnable = VK_FALSE,
+			.alphaToOneEnable = VK_FALSE,
+		};
+
+		mMultisampleStateCreateInfo = createInfo;
+		return *this;
 	}
 
 
-	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithDepthStencil()
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithDepthStencil(VkPipelineDepthStencilStateCreateInfo createInfo)
 	{
+		mDepthStencilStateCreateInfo = createInfo;
+		return *this;
 	}
 
 
-	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithColorBlending()
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithColorBlending(std::vector<VkPipelineColorBlendAttachmentState> attachments)
 	{
+		VkPipelineColorBlendStateCreateInfo createInfo {
+			.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.logicOpEnable = VK_FALSE,
+			.logicOp = {},
+			.attachmentCount = static_cast<uint32_t>(attachments.size()),
+			.pAttachments = attachments.data(),
+			.blendConstants = {0.0f, 0.0f, 0.0f, 0.0f}
+		};
+
+		mColorBlendStateCreateInfo = createInfo;
+		return *this;
 	}
 
 
-	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithDynamicState()
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithDynamicState(const std::vector<VkDynamicState>& states)
 	{
+		VkPipelineDynamicStateCreateInfo createInfo {
+			.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.dynamicStateCount = static_cast<uint32_t>(states.size()),
+			.pDynamicStates = states.data()
+		};
+
+
+		mDynamicStateCreateInfo = createInfo;
+		return *this;
 	}
 
 
@@ -116,9 +218,7 @@ namespace Strawberry::Vulkan
 		: mPipeline(handle)
 		, mPipelineLayout(layout)
 		, mRenderPass(renderPass)
-	{
-
-	}
+	{}
 
 
 	GraphicsPipeline GraphicsPipeline::Builder::Build() const

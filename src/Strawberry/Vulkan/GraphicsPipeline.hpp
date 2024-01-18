@@ -76,15 +76,15 @@ namespace Strawberry::Vulkan
 		Builder& WithShaderStage(VkShaderStageFlagBits stage, Shader shader);
 
 
-		Builder& WithVertexInput();
-		Builder& WithInputAssembly();
-		Builder& WithTesselation();
-		Builder& WithViewport();
-		Builder& WithRasterization();
-		Builder& WithMultisample();
-		Builder& WithDepthStencil();
-		Builder& WithColorBlending();
-		Builder& WithDynamicState();
+		Builder& WithVertexInput(const std::vector<VkVertexInputBindingDescription>& bindings, const std::vector<VkVertexInputAttributeDescription>& attributes);
+		Builder& WithInputAssembly(VkPrimitiveTopology topology, bool primitiveRestart);
+		Builder& WithTesselation(uint32_t controlPoints);
+		Builder& WithViewport(const std::vector<VkViewport> viewports, const std::vector<VkRect2D> scissors);
+		Builder& WithRasterization(VkPolygonMode polygonMode, VkCullModeFlags cullMode, VkFrontFace frontFace);
+		Builder& WithMultisample(VkSampleCountFlagBits samples, bool sampleShading);
+		Builder& WithDepthStencil(VkPipelineDepthStencilStateCreateInfo createInfo);
+		Builder& WithColorBlending(std::vector<VkPipelineColorBlendAttachmentState> attachments);
+		Builder& WithDynamicState(const std::vector<VkDynamicState>& states);
 
 
 		[[nodiscard]] GraphicsPipeline Build() const;

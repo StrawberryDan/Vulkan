@@ -72,6 +72,39 @@ void BasicRendering()
 	GraphicsPipeline pipeline = GraphicsPipeline::Builder(layout, renderPass, 0)
 		.WithShaderStage(VK_SHADER_STAGE_VERTEX_BIT, std::move(vertexShader))
 		.WithShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT, std::move(fragmentShader))
+		.WithVertexInput(
+			{
+				VkVertexInputBindingDescription {
+				.binding = 0,
+				.stride = 3 * sizeof(float),
+				.inputRate = VK_VERTEX_INPUT_RATE_VERTEX
+				}
+			},
+			{
+				VkVertexInputAttributeDescription {
+					.location = 0,
+					.binding = 0,
+					.format = VK_FORMAT_R32G32B32_SFLOAT,
+					.offset = 0,
+				}
+			}
+		)
+		.WithInputAssembly(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, false)
+		.WithViewport({VkViewport {.x = 0, .y = 0, .width = 1920.0, .height = 1080.0, .minDepth = 0.0, .maxDepth = 1.0}}, { VkRect2D{.offset = {0, 0}, .extent = {1920, 1080}}})
+		.WithRasterization(VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE, VK_FRONT_FACE_COUNTER_CLOCKWISE)
+		.WithColorBlending({
+			VkPipelineColorBlendAttachmentState {
+				.blendEnable = VK_TRUE,
+				.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
+				.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
+				.colorBlendOp = VK_BLEND_OP_ADD,
+				.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
+				.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
+				.alphaBlendOp = VK_BLEND_OP_ADD,
+				.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT
+			}
+		})
+		.WithMultisample(VK_SAMPLE_COUNT_1_BIT, false)
 		.Build();
 	auto queue = device.GetQueue(queueFamily, 0);
 	Vulkan::Swapchain swapchain = queue->Create<Swapchain>(surface, Core::Math::Vec2i(1920, 1080));
