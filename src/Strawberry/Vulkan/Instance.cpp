@@ -147,10 +147,10 @@ namespace Strawberry::Vulkan
 
 		VkInstanceCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-#if STRAWBERRY_RELEASE
-			.pNext = nullptr,
-#else
+#if STRAWBERRY_DEBUG
 			.pNext = &messengerCreateInfo,
+#else
+			.pNext = nullptr,
 #endif
 #if __APPLE__
 			.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR,
