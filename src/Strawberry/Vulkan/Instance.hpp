@@ -39,7 +39,6 @@ namespace Strawberry::Vulkan
 
 
 		const std::vector<PhysicalDevice>& GetPhysicalDevices() const;
-		const std::vector<PhysicalDevice*> GetBestPhysicalDevice() const;
 
 
 		template <std::movable T, typename... Args> requires (std::constructible_from<T, const Instance&, Args...>)
