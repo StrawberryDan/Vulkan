@@ -12,6 +12,8 @@
 #include "RenderPass.hpp"
 #include "Queue.hpp"
 #include "DescriptorSet.hpp"
+// GLFW3
+#include "GLFW/glfw3.h"
 // Strawberry Core
 #include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
@@ -19,8 +21,6 @@
 #include <algorithm>
 #include <memory>
 #include <vector>
-
-#include "../../../cmake-build-release/_deps/glfw-src/include/GLFW/glfw3.h"
 
 
 //======================================================================================================================
