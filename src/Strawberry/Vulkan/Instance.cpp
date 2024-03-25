@@ -6,7 +6,7 @@
 #include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/IO/Logging.hpp"
 // GLFW3
-#include "../../../cmake-build-debug/_deps/glfw-src/include/GLFW/glfw3.h"
+#include "GLFW/glfw3.h"
 // Standard Library
 #include <algorithm>
 #include <memory>
