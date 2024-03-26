@@ -151,8 +151,10 @@ namespace Strawberry::Vulkan
 		if (mNextImageIndex) return *mNextImageIndex;
 
 
+		Fence fence(*mQueue->GetDevice());
 		uint32_t imageIndex = 0;
-		auto result = vkAcquireNextImageKHR(*mQueue->GetDevice(), mSwapchain, 0, VK_NULL_HANDLE, VK_NULL_HANDLE, &imageIndex);
+		auto result = vkAcquireNextImageKHR(*mQueue->GetDevice(), mSwapchain, 0, VK_NULL_HANDLE, fence.mFence, &imageIndex);
+		fence.Wait();
 
 
 		switch (result)
