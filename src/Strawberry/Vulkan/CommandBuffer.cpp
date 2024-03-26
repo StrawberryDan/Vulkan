@@ -237,7 +237,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	void CommandBuffer::ClearColorImage(Image& image, Core::Math::Vec4f clearColor)
+	void CommandBuffer::ClearColorImage(Image& image, VkImageLayout layout, Core::Math::Vec4f clearColor)
 	{
 		VkClearColorValue vulkanClearColor {
 			.float32{clearColor[0], clearColor[1], clearColor[2], clearColor[3]}
@@ -249,7 +249,7 @@ namespace Strawberry::Vulkan
 			0, 1
 		};
 
-		vkCmdClearColorImage(mCommandBuffer, image.mImage, VK_IMAGE_LAYOUT_GENERAL, &vulkanClearColor, 1, &range);
+		vkCmdClearColorImage(mCommandBuffer, image.mImage, layout, &vulkanClearColor, 1, &range);
 	}
 
 
