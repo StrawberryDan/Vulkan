@@ -131,43 +131,11 @@ void BasicRendering()
 	textureBuffer.SetData(bytes);
 	Image texture(device, size, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
 	commandBuffer.Begin(true);
-	commandBuffer.PipelineBarrier(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, VkImageMemoryBarrier{
-		.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-		.pNext = nullptr,
-		.srcAccessMask = VK_ACCESS_NONE,
-		.dstAccessMask = VK_ACCESS_NONE,
-		.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-		.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-		.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-		.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-		.image = texture,
-		.subresourceRange = VkImageSubresourceRange {
-			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-			.baseMipLevel = 0,
-			.levelCount = VK_REMAINING_MIP_LEVELS,
-			.baseArrayLayer = 0,
-			.layerCount = VK_REMAINING_ARRAY_LAYERS
-		}
-	});
+	commandBuffer.PipelineBarrier(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0,
+	{ImageMemoryBarrier(texture, VK_IMAGE_ASPECT_COLOR_BIT).ToLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)});
 	commandBuffer.CopyBufferToImage(textureBuffer, texture);
-	commandBuffer.PipelineBarrier(VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, 0, VkImageMemoryBarrier{
-		.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-		.pNext = nullptr,
-		.srcAccessMask = VK_ACCESS_NONE,
-		.dstAccessMask = VK_ACCESS_NONE,
-		.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-		.newLayout = VK_IMAGE_LAYOUT_GENERAL,
-		.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-		.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-		.image = texture,
-		.subresourceRange = VkImageSubresourceRange {
-			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-			.baseMipLevel = 0,
-			.levelCount = VK_REMAINING_MIP_LEVELS,
-			.baseArrayLayer = 0,
-			.layerCount = VK_REMAINING_ARRAY_LAYERS
-		}
-	});
+	commandBuffer.PipelineBarrier(VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, 0,
+		{ImageMemoryBarrier(texture, VK_IMAGE_ASPECT_COLOR_BIT).FromLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL).ToLayout(VK_IMAGE_LAYOUT_GENERAL)});
 	commandBuffer.End();
 	queue->Submit(commandBuffer);
 	queue->WaitUntilIdle();
@@ -208,24 +176,8 @@ void BasicRendering()
 
 
 		commandBuffer.Begin(true);
-		commandBuffer.PipelineBarrier(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, VkImageMemoryBarrier{
-			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-			.pNext = nullptr,
-			.srcAccessMask = VK_ACCESS_NONE,
-			.dstAccessMask = VK_ACCESS_NONE,
-			.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-			.newLayout = VK_IMAGE_LAYOUT_GENERAL,
-			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-			.image = framebuffer.GetColorAttachment(0),
-			.subresourceRange = VkImageSubresourceRange {
-				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-				.baseMipLevel = 0,
-				.levelCount = VK_REMAINING_MIP_LEVELS,
-				.baseArrayLayer = 0,
-				.layerCount = VK_REMAINING_ARRAY_LAYERS
-			}
-		});
+		commandBuffer.PipelineBarrier(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0,
+			{ImageMemoryBarrier(framebuffer.GetColorAttachment(0), VK_IMAGE_ASPECT_COLOR_BIT).ToLayout(VK_IMAGE_LAYOUT_GENERAL)});
 		commandBuffer.BeginRenderPass(renderPass, framebuffer);
 		commandBuffer.BindPipeline(pipeline);
 		commandBuffer.BindVertexBuffer(0, buffer);
@@ -234,43 +186,11 @@ void BasicRendering()
 		commandBuffer.PushConstants(pipeline, VK_SHADER_STAGE_FRAGMENT_BIT, Core::IO::DynamicByteBuffer(Color), 64);
 		commandBuffer.Draw(6);
 		commandBuffer.EndRenderPass();
-		commandBuffer.PipelineBarrier(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, 0, VkImageMemoryBarrier{
-			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-			.pNext = nullptr,
-			.srcAccessMask = VK_ACCESS_NONE,
-			.dstAccessMask = VK_ACCESS_NONE,
-			.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-			.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-			.image = renderTarget,
-			.subresourceRange = VkImageSubresourceRange {
-				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-				.baseMipLevel = 0,
-				.levelCount = VK_REMAINING_MIP_LEVELS,
-				.baseArrayLayer = 0,
-				.layerCount = VK_REMAINING_ARRAY_LAYERS
-			}
-		});
+		commandBuffer.PipelineBarrier(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, 0,
+			{ImageMemoryBarrier(renderTarget, VK_IMAGE_ASPECT_COLOR_BIT).ToLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)});
 		commandBuffer.BlitImage(framebuffer.GetColorAttachment(0), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, renderTarget, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_ASPECT_COLOR_BIT, VK_FILTER_NEAREST);
-		commandBuffer.PipelineBarrier(VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, 0, VkImageMemoryBarrier{
-			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-			.pNext = nullptr,
-			.srcAccessMask = VK_ACCESS_NONE,
-			.dstAccessMask = VK_ACCESS_NONE,
-			.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-			.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-			.image = renderTarget,
-			.subresourceRange = VkImageSubresourceRange {
-				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-				.baseMipLevel = 0,
-				.levelCount = VK_REMAINING_MIP_LEVELS,
-				.baseArrayLayer = 0,
-				.layerCount = VK_REMAINING_ARRAY_LAYERS
-			}
-		});
+		commandBuffer.PipelineBarrier(VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, 0,
+			{ImageMemoryBarrier(renderTarget, VK_IMAGE_ASPECT_COLOR_BIT).FromLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL).ToLayout(VK_IMAGE_LAYOUT_PRESENT_SRC_KHR)});
 		commandBuffer.End();
 		queue->Submit(commandBuffer);
 		queue->WaitUntilIdle();

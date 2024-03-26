@@ -60,16 +60,20 @@ add_library(StrawberryVulkan STATIC
 		src/Strawberry/Vulkan/Fence.hpp
 		src/Strawberry/Vulkan/Framebuffer.cpp
 		src/Strawberry/Vulkan/Framebuffer.hpp
+		src/Strawberry/Vulkan/GraphicsPipeline.cpp
+		src/Strawberry/Vulkan/GraphicsPipeline.hpp
 		src/Strawberry/Vulkan/Image.cpp
 		src/Strawberry/Vulkan/Image.hpp
+		src/Strawberry/Vulkan/ImageMemoryBarrier.hpp
+		src/Strawberry/Vulkan/ImageMemoryBarrier.cpp
 		src/Strawberry/Vulkan/ImageView.cpp
 		src/Strawberry/Vulkan/ImageView.hpp
 		src/Strawberry/Vulkan/Instance.cpp
 		src/Strawberry/Vulkan/Instance.hpp
 		src/Strawberry/Vulkan/PhysicalDevice.cpp
 		src/Strawberry/Vulkan/PhysicalDevice.hpp
-		src/Strawberry/Vulkan/GraphicsPipeline.cpp
-		src/Strawberry/Vulkan/GraphicsPipeline.hpp
+		src/Strawberry/Vulkan/PipelineLayout.cpp
+		src/Strawberry/Vulkan/PipelineLayout.hpp
 		src/Strawberry/Vulkan/Queue.cpp
 		src/Strawberry/Vulkan/Queue.hpp
 		src/Strawberry/Vulkan/RenderPass.cpp
@@ -82,8 +86,6 @@ add_library(StrawberryVulkan STATIC
 		src/Strawberry/Vulkan/Surface.hpp
 		src/Strawberry/Vulkan/Swapchain.cpp
 		src/Strawberry/Vulkan/Swapchain.hpp
-		src/Strawberry/Vulkan/PipelineLayout.hpp
-		src/Strawberry/Vulkan/PipelineLayout.cpp
 )
 target_link_libraries(StrawberryVulkan PUBLIC StrawberryCore StrawberryWindow Vulkan::Vulkan freetype)
 target_include_directories(StrawberryVulkan PUBLIC src)
