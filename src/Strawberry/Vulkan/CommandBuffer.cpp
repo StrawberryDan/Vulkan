@@ -143,11 +143,21 @@ namespace Strawberry::Vulkan
 	}
 
 
-	void CommandBuffer::PipelineBarrier(VkPipelineStageFlags srcMask, VkPipelineStageFlags dstMask, VkDependencyFlags dependencyFlags,
-										const std::vector<VkMemoryBarrier>& memoryBarriers,
-										const std::vector<VkBufferMemoryBarrier>& bufferBarriers,
-										const std::vector<VkImageMemoryBarrier>& imageBarriers)
+	void CommandBuffer::PipelineBarrier(VkPipelineStageFlags srcMask, VkPipelineStageFlags dstMask,
+		VkDependencyFlags dependencyFlags, const std::vector<Barrier>& barriers)
 	{
+		std::vector<VkMemoryBarrier> memoryBarriers;
+		std::vector<VkBufferMemoryBarrier> bufferBarriers;
+		std::vector<VkImageMemoryBarrier> imageBarriers;
+
+		for (const auto& barrier : barriers)
+		{
+			if (barrier.IsType<ImageMemoryBarrier>())
+			{
+				imageBarriers.emplace_back(barrier.Value<ImageMemoryBarrier>().Value());
+			}
+		}
+
 		vkCmdPipelineBarrier(mCommandBuffer,
 			srcMask, dstMask,
 			dependencyFlags,

@@ -5,15 +5,16 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 #include "ImageView.hpp"
+#include "ImageMemoryBarrier.hpp"
 // Vulkan
 #include <vulkan/vulkan.h>
 // Strawberry Core
-#include "Strawberry/Core/Math/Vector.hpp"
 #include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
+#include "Strawberry/Core/Math/Vector.hpp"
 #include "Strawberry/Core/Types/ReflexivePointer.hpp"
+#include "Strawberry/Core/Types/Variant.hpp"
 // Standard Library
 #include <vector>
-
 
 
 //======================================================================================================================
@@ -28,6 +29,9 @@ namespace Strawberry::Vulkan
 	class RenderPass;
 	class DescriptorSet;
 	class Swapchain;
+
+
+	using Barrier = Core::Variant<ImageMemoryBarrier>;
 
 
 	class CommandBuffer
@@ -68,46 +72,7 @@ namespace Strawberry::Vulkan
 		void DrawIndexed(uint32_t indexCount, uint32_t instanceCount = 1, uint32_t firstIndex = 0, uint32_t firstInstance = 0, int32_t vertexOffset = 0);
 
 
-		void PipelineBarrier(VkPipelineStageFlags srcMask, VkPipelineStageFlags dstMask, VkDependencyFlags dependencyFlags,
-							 const std::vector<VkMemoryBarrier>&       memoryBarriers,
-							 const std::vector<VkBufferMemoryBarrier>& bufferBarriers,
-							 const std::vector<VkImageMemoryBarrier>&  imageBarriers);
-
-		void PipelineBarrier(VkPipelineStageFlags srcMask, VkPipelineStageFlags dstMask, VkDependencyFlags dependencyFlags,
-							 const std::vector<VkMemoryBarrier>& memoryBarriers)
-		{
-			PipelineBarrier(srcMask, dstMask, dependencyFlags, memoryBarriers, {}, {});
-		}
-
-		void PipelineBarrier(VkPipelineStageFlags srcMask, VkPipelineStageFlags dstMask, VkDependencyFlags dependencyFlags,
-							 VkMemoryBarrier memoryBarrier)
-		{
-			PipelineBarrier(srcMask, dstMask, dependencyFlags, {memoryBarrier}, {}, {});
-		}
-
-		void PipelineBarrier(VkPipelineStageFlags srcMask, VkPipelineStageFlags dstMask, VkDependencyFlags dependencyFlags,
-							 const std::vector<VkBufferMemoryBarrier>& bufferBarriers)
-		{
-			PipelineBarrier(srcMask, dstMask, dependencyFlags, {}, bufferBarriers, {});
-		}
-
-		void PipelineBarrier(VkPipelineStageFlags srcMask, VkPipelineStageFlags dstMask, VkDependencyFlags dependencyFlags,
-							 VkBufferMemoryBarrier bufferBarrier)
-		{
-			PipelineBarrier(srcMask, dstMask, dependencyFlags, {}, {bufferBarrier}, {});
-		}
-
-		void PipelineBarrier(VkPipelineStageFlags srcMask, VkPipelineStageFlags dstMask, VkDependencyFlags dependencyFlags,
-							 const std::vector<VkImageMemoryBarrier>& imageBarriers)
-		{
-			PipelineBarrier(srcMask, dstMask, dependencyFlags, {}, {}, imageBarriers);
-		}
-
-		void PipelineBarrier(VkPipelineStageFlags srcMask, VkPipelineStageFlags dstMask, VkDependencyFlags dependencyFlags,
-							 VkImageMemoryBarrier imageBarrier)
-		{
-			PipelineBarrier(srcMask, dstMask, dependencyFlags, {}, {}, {imageBarrier});
-		}
+		void PipelineBarrier(VkPipelineStageFlags srcMask, VkPipelineStageFlags dstMask, VkDependencyFlags dependencyFlags, const std::vector<Barrier>& barriers);
 
 
 		void CopyBufferToImage(const Buffer& buffer, Image& image);
