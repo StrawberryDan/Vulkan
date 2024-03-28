@@ -100,9 +100,10 @@ endif()
 add_executable(StrawberryVulkanTest test/Main.cpp)
 target_link_libraries(StrawberryVulkanTest PRIVATE StrawberryVulkan)
 set_target_properties(StrawberryVulkanTest PROPERTIES CXX_STANDARD 20)
-add_target_shader(StrawberryVulkanTest ${CMAKE_CURRENT_SOURCE_DIR}/test/Mesh.vert)
-add_target_shader(StrawberryVulkanTest ${CMAKE_CURRENT_SOURCE_DIR}/test/SolidColor.frag)
-add_target_shader(StrawberryVulkanTest ${CMAKE_CURRENT_SOURCE_DIR}/test/Texture.frag)
+add_target_shaders(TARGET StrawberryVulkanTest SHADERS
+		${CMAKE_CURRENT_SOURCE_DIR}/test/Mesh.vert
+		${CMAKE_CURRENT_SOURCE_DIR}/test/SolidColor.frag
+		${CMAKE_CURRENT_SOURCE_DIR}/test/Texture.frag)
 
 if (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
 	target_link_options(StrawberryVulkanTest PRIVATE "-static")

@@ -17,3 +17,19 @@ function(add_target_shader TARGET SOURCE)
 
 	target_sources(${TARGET} PUBLIC ${SOURCE}.bin)
 endfunction()
+
+
+function(add_target_shaders)
+	cmake_parse_arguments(
+			ARG
+			""
+			"TARGET"
+			"SHADERS"
+			${ARGN}
+	)
+
+
+	foreach (SHADER ${ARG_SHADERS})
+		add_target_shader(${ARG_TARGET} ${SHADER})
+	endforeach ()
+endfunction()
