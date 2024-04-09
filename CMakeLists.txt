@@ -40,6 +40,7 @@ endif()
 
 
 add_library(StrawberryVulkan STATIC
+		src/Strawberry/Vulkan/Allocator.hpp
 		src/Strawberry/Vulkan/Buffer.cpp
 		src/Strawberry/Vulkan/Buffer.hpp
 		src/Strawberry/Vulkan/BufferView.cpp
@@ -86,6 +87,7 @@ add_library(StrawberryVulkan STATIC
 		src/Strawberry/Vulkan/Surface.hpp
 		src/Strawberry/Vulkan/Swapchain.cpp
 		src/Strawberry/Vulkan/Swapchain.hpp
+		src/Strawberry/Vulkan/Allocator.hpp
 )
 target_link_libraries(StrawberryVulkan PUBLIC StrawberryCore StrawberryWindow Vulkan::Vulkan freetype)
 target_include_directories(StrawberryVulkan PUBLIC src)
