@@ -19,19 +19,8 @@ namespace Strawberry::Vulkan
 		: mDevice(device)
 		, mSize(size)
 	{
-		auto memoryProperties = device.GetPhysicalDevices()[0]->GetMemoryProperties();
-
-		Core::Optional<uint32_t> memoryTypeIndex;
-		for (int i = 0; i < memoryProperties.memoryTypeCount; i++)
-		{
-			const bool validType = typeMask & (1 << i);
-			const bool propertiesAvailable = (properties & memoryProperties.memoryTypes[i].propertyFlags) == properties;
-			if (validType && propertiesAvailable)
-			{
-				memoryTypeIndex = i;
-				break;
-			}
-		}
+		auto memoryTypeCandidates = device.GetPhysicalDevices()[0]->SearchMemoryTypes(typeMask, properties);
+		Core::Assert(!memoryTypeCandidates.empty());
 
 
 		VkMemoryAllocateInfo allocateInfo
@@ -39,7 +28,7 @@ namespace Strawberry::Vulkan
 			.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
 			.pNext = nullptr,
 			.allocationSize = size,
-			.memoryTypeIndex = memoryTypeIndex.Unwrap(),
+			.memoryTypeIndex = memoryTypeCandidates[0]
 		};
 
 		Core::AssertEQ(vkAllocateMemory(mDevice, &allocateInfo, nullptr, &mDeviceMemory), VK_SUCCESS);

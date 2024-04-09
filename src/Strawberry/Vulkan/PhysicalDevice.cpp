@@ -145,4 +145,23 @@ namespace Strawberry::Vulkan
 
 		return familyIndices;
 	}
+
+
+	std::vector<uint32_t> PhysicalDevice::SearchMemoryTypes(uint32_t typeBits, VkMemoryPropertyFlags properties) const
+	{
+		std::vector<uint32_t> memoryTypes;
+		auto memoryProperties = GetMemoryProperties();
+
+		for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; i++)
+		{
+			const bool validType = typeBits & (1 << i);
+			const bool propertiesAvailable = (properties & memoryProperties.memoryTypes[i].propertyFlags) == properties;
+			if (validType && propertiesAvailable)
+			{
+				memoryTypes.emplace_back(i);
+			}
+		}
+
+		return memoryTypes;
+	}
 }

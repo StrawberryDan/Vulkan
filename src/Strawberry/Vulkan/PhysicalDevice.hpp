@@ -48,6 +48,7 @@ namespace Strawberry::Vulkan
 
 
 		std::vector<uint32_t>                       SearchQueueFamilies(std::underlying_type_t<VkQueueFlagBits> flagBits) const;
+		std::vector<uint32_t>                       SearchMemoryTypes(uint32_t typeBits, VkMemoryPropertyFlags properties) const;
 
 
 	protected:
