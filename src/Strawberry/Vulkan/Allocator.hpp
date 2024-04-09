@@ -2,7 +2,8 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
-// Strawberry Graphics
+// Strawberry Vulkan
+#include "Strawberry/Vulkan/Address.hpp"
 #include "Strawberry/Vulkan/Device.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Types/ReflexivePointer.hpp"
@@ -18,44 +19,11 @@
 //======================================================================================================================
 //  Class Declaration
 //----------------------------------------------------------------------------------------------------------------------
-namespace Strawberry::Vulkan
-{
-	struct GPUAddress
-	{
-		VkDeviceMemory deviceMemory = VK_NULL_HANDLE;
-		size_t         offset       = 0;
 
-
-		bool operator==(const GPUAddress&) const noexcept = default;
-		bool operator!=(const GPUAddress&) const noexcept = default;
-	};
-}
-
-
-namespace std
-{
-	template <>
-	struct hash<Strawberry::Vulkan::GPUAddress>
-	{
-		std::size_t operator()(const Strawberry::Vulkan::GPUAddress& address) const noexcept
-		{
-			std::size_t hash = reinterpret_cast<std::size_t>(address.deviceMemory);
-			hash = hash xor address.offset;
-			return hash;
-		}
-	};
-}
 
 
 namespace Strawberry::Vulkan
 {
-	struct GPUMemoryRange
-	{
-		GPUAddress address = GPUAddress();
-		size_t     size    = 0;
-	};
-
-
 	struct AllocationError
 	{
 

@@ -40,6 +40,9 @@ endif()
 
 
 add_library(StrawberryVulkan STATIC
+		src/Strawberry/Vulkan/Address.hpp
+		src/Strawberry/Vulkan/Allocator.cpp
+		src/Strawberry/Vulkan/Allocator.hpp
 		src/Strawberry/Vulkan/Allocator.hpp
 		src/Strawberry/Vulkan/Buffer.cpp
 		src/Strawberry/Vulkan/Buffer.hpp
@@ -63,12 +66,14 @@ add_library(StrawberryVulkan STATIC
 		src/Strawberry/Vulkan/GraphicsPipeline.hpp
 		src/Strawberry/Vulkan/Image.cpp
 		src/Strawberry/Vulkan/Image.hpp
-		src/Strawberry/Vulkan/ImageMemoryBarrier.hpp
 		src/Strawberry/Vulkan/ImageMemoryBarrier.cpp
+		src/Strawberry/Vulkan/ImageMemoryBarrier.hpp
 		src/Strawberry/Vulkan/ImageView.cpp
 		src/Strawberry/Vulkan/ImageView.hpp
 		src/Strawberry/Vulkan/Instance.cpp
 		src/Strawberry/Vulkan/Instance.hpp
+		src/Strawberry/Vulkan/NaiveAllocator.cpp
+		src/Strawberry/Vulkan/NaiveAllocator.hpp
 		src/Strawberry/Vulkan/PhysicalDevice.cpp
 		src/Strawberry/Vulkan/PhysicalDevice.hpp
 		src/Strawberry/Vulkan/PipelineLayout.cpp
@@ -85,10 +90,6 @@ add_library(StrawberryVulkan STATIC
 		src/Strawberry/Vulkan/Surface.hpp
 		src/Strawberry/Vulkan/Swapchain.cpp
 		src/Strawberry/Vulkan/Swapchain.hpp
-		src/Strawberry/Vulkan/Allocator.hpp
-		src/Strawberry/Vulkan/Allocator.cpp
-		src/Strawberry/Vulkan/NaiveAllocator.hpp
-		src/Strawberry/Vulkan/NaiveAllocator.cpp
 )
 target_link_libraries(StrawberryVulkan PUBLIC StrawberryCore StrawberryWindow Vulkan::Vulkan freetype)
 target_include_directories(StrawberryVulkan PUBLIC src)
