@@ -32,7 +32,7 @@ namespace Strawberry::Vulkan
 
 
 	public:
-		Framebuffer(const RenderPass& mRenderPass, Core::Math::Vec2u size);
+		Framebuffer(const RenderPass& mRenderPass, Allocator* allocator, Core::Math::Vec2u size);
 		Framebuffer(const Framebuffer& rhs) = delete;
 		Framebuffer& operator=(const Framebuffer& rhs) = delete;
 		Framebuffer(Framebuffer&& rhs) noexcept;
@@ -53,9 +53,9 @@ namespace Strawberry::Vulkan
 
 
 	private:
-		Image CreateDepthImage();
+		Image CreateDepthImage(Allocator* allocator);
 		ImageView CreateDepthImageView();
-		Image CreateStencilImage();
+		Image CreateStencilImage(Allocator* allocator);
 		ImageView CreateStencilImageView();
 
 

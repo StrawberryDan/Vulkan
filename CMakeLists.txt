@@ -55,8 +55,6 @@ add_library(StrawberryVulkan STATIC
 		src/Strawberry/Vulkan/DescriptorSet.hpp
 		src/Strawberry/Vulkan/Device.cpp
 		src/Strawberry/Vulkan/Device.hpp
-		src/Strawberry/Vulkan/DeviceMemory.cpp
-		src/Strawberry/Vulkan/DeviceMemory.hpp
 		src/Strawberry/Vulkan/Fence.cpp
 		src/Strawberry/Vulkan/Fence.hpp
 		src/Strawberry/Vulkan/Framebuffer.cpp
@@ -88,6 +86,7 @@ add_library(StrawberryVulkan STATIC
 		src/Strawberry/Vulkan/Swapchain.cpp
 		src/Strawberry/Vulkan/Swapchain.hpp
 		src/Strawberry/Vulkan/Allocator.hpp
+		src/Strawberry/Vulkan/Allocator.cpp
 )
 target_link_libraries(StrawberryVulkan PUBLIC StrawberryCore StrawberryWindow Vulkan::Vulkan freetype)
 target_include_directories(StrawberryVulkan PUBLIC src)

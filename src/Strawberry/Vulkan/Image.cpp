@@ -17,10 +17,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Image::Image(const Device& device, uint32_t extent, VkFormat format, VkImageUsageFlags usage,
-				 uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling, VkImageLayout initialLayout)
-		: mImage(nullptr)
-		, mDevice(device)
+	Image::Image(Allocator* allocator, VkMemoryPropertyFlags memoryProperties, uint32_t extent, VkFormat format,
+				 VkImageUsageFlags usage, uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling,
+				 VkImageLayout initialLayout) noexcept
+			: mImage(nullptr)
+		, mDevice(*allocator->GetDevice())
 		, mFormat(format)
 		, mSize(static_cast<int>(extent), 1, 1)
 	{
@@ -41,15 +42,23 @@ namespace Strawberry::Vulkan
 			.pQueueFamilyIndices = nullptr,
 			.initialLayout = initialLayout
 		};
-
 		Core::AssertEQ(vkCreateImage(mDevice, &createInfo, nullptr, &mImage), VK_SUCCESS);
+
+
+		VkMemoryRequirements memoryRequirements;
+		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
+
+		mMemory = allocator->Allocate(memoryRequirements.size, memoryRequirements.memoryTypeBits, memoryProperties).Unwrap();
+		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.Address().deviceMemory, mMemory.Address().offset), VK_SUCCESS);
 	}
 
 
-	Image::Image(const Device& device, Core::Math::Vec2u extent, VkFormat format, VkImageUsageFlags usage,
-				 uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling, VkImageLayout initialLayout)
-		: mImage(nullptr)
-		, mDevice(device)
+	Image::Image(Allocator* allocator, VkMemoryPropertyFlags memoryProperties, Core::Math::Vec2u extent,
+				 VkFormat format,
+				 VkImageUsageFlags usage, uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling,
+				 VkImageLayout initialLayout) noexcept
+			: mImage(nullptr)
+		, mDevice(*allocator->GetDevice())
 		, mFormat(format)
 		, mSize(extent[0], extent[1], 1)
 	{
@@ -70,23 +79,23 @@ namespace Strawberry::Vulkan
 			.pQueueFamilyIndices = nullptr,
 			.initialLayout = initialLayout
 		};
-
-
 		Core::AssertEQ(vkCreateImage(mDevice, &createInfo, nullptr, &mImage), VK_SUCCESS);
 
 
 		VkMemoryRequirements memoryRequirements;
 		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
-		mMemory = DeviceMemory(device, memoryRequirements.size, memoryRequirements.memoryTypeBits,
-											  VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.mDeviceMemory, 0), VK_SUCCESS);
+
+		mMemory = allocator->Allocate(memoryRequirements.size, memoryRequirements.memoryTypeBits, memoryProperties).Unwrap();
+		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.Address().deviceMemory, mMemory.Address().offset), VK_SUCCESS);
 	}
 
 
-	Image::Image(const Device& device, Core::Math::Vec3u extent, VkFormat format, VkImageUsageFlags usage,
-				 uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling, VkImageLayout initialLayout)
-		: mImage(nullptr)
-		, mDevice(device)
+	Image::Image(Allocator* allocator, VkMemoryPropertyFlags memoryProperties, Core::Math::Vec3u extent,
+				 VkFormat format,
+				 VkImageUsageFlags usage, uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling,
+				 VkImageLayout initialLayout) noexcept
+			: mImage(nullptr)
+		, mDevice(*allocator->GetDevice())
 		, mFormat(format)
 		, mSize(extent)
 	{
@@ -108,15 +117,14 @@ namespace Strawberry::Vulkan
 			.pQueueFamilyIndices = nullptr,
 			.initialLayout = initialLayout
 		};
-
 		Core::AssertEQ(vkCreateImage(mDevice, &createInfo, nullptr, &mImage), VK_SUCCESS);
 
 
 		VkMemoryRequirements memoryRequirements;
 		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
 
-		mMemory = DeviceMemory(device, memoryRequirements.size, memoryRequirements.memoryTypeBits);
-		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.mDeviceMemory, 0), VK_SUCCESS);
+		mMemory = allocator->Allocate(memoryRequirements.size, memoryRequirements.memoryTypeBits, memoryProperties).Unwrap();
+		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.Address().deviceMemory, mMemory.Address().offset), VK_SUCCESS);
 	}
 
 

@@ -4,7 +4,8 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
-#include "DeviceMemory.hpp"
+// Strawberry Vulkan
+#include "Allocator.hpp"
 #include "Queue.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Types/Optional.hpp"
@@ -33,32 +34,18 @@ namespace Strawberry::Vulkan
 
 
 	public:
-		Image(const Device& device,
-			  uint32_t extent,
-			  VkFormat format,
-			  VkImageUsageFlags usage,
-			  uint32_t mipLevels = 1,
-			  uint32_t arrayLayers = 1,
-			  VkImageTiling tiling = VK_IMAGE_TILING_OPTIMAL,
-			  VkImageLayout initialLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+		Image(Allocator* allocator, VkMemoryPropertyFlags memoryProperties, uint32_t extent, VkFormat format,
+			  VkImageUsageFlags usage, uint32_t mipLevels = 1, uint32_t arrayLayers = 1,
+			  VkImageTiling tiling = VK_IMAGE_TILING_OPTIMAL, VkImageLayout initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
 
-		Image(const Device& device,
-			  Core::Math::Vec2u extent,
-			  VkFormat format,
-			  VkImageUsageFlags usage,
-			  uint32_t mipLevels = 1,
-			  uint32_t arrayLayers = 1,
-			  VkImageTiling tiling = VK_IMAGE_TILING_OPTIMAL,
-			  VkImageLayout initialLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+		Image(Allocator* allocator, VkMemoryPropertyFlags memoryProperties, Core::Math::Vec2u extent, VkFormat format,
+			  VkImageUsageFlags usage, uint32_t mipLevels = 1, uint32_t arrayLayers = 1,
+			  VkImageTiling tiling = VK_IMAGE_TILING_OPTIMAL, VkImageLayout initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
 
-		Image(const Device& device,
-			  Core::Math::Vec3u extent,
-			  VkFormat format,
-			  VkImageUsageFlags usage,
-			  uint32_t mipLevels = 1,
-			  uint32_t arrayLayers = 1,
+		Image(Allocator* allocator, VkMemoryPropertyFlags memoryProperties, Core::Math::Vec3u extent, VkFormat format,
+			  VkImageUsageFlags usage, uint32_t mipLevels = 1, uint32_t arrayLayers = 1,
 			  VkImageTiling tiling = VK_IMAGE_TILING_OPTIMAL,
-			  VkImageLayout initialLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+			  VkImageLayout initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
 
 		Image(const Device& device,
 			  VkImage imageHandle,
@@ -67,7 +54,7 @@ namespace Strawberry::Vulkan
 
 		Image(const Image& rhs) = delete;
 		Image& operator=(const Image& rhs) = delete;
-		Image(Image&& rhs) noexcept ;
+		Image(Image&& rhs) noexcept;
 		Image& operator=(Image&& rhs) noexcept;
 		~Image();
 
@@ -88,7 +75,7 @@ namespace Strawberry::Vulkan
 
 	private:
 		VkImage mImage;
-		DeviceMemory mMemory;
+		Allocation mMemory;
 		VkDevice mDevice;
 		VkFormat mFormat;
 		Core::Math::Vec3u mSize;

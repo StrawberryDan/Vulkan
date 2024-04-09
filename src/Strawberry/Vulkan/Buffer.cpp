@@ -15,9 +15,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Buffer::Buffer(const Device& device, uint64_t size, VkBufferUsageFlags usage)
+	Buffer::Buffer(Allocator* allocator, VkMemoryPropertyFlags properties, uint64_t size, VkBufferUsageFlags usage)
 		: mSize(size)
-		, mDevice(device)
+		, mDevice(*allocator->GetDevice())
 	{
 		VkBufferCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
@@ -35,13 +35,15 @@ namespace Strawberry::Vulkan
 		VkMemoryRequirements memoryRequirements;
 		vkGetBufferMemoryRequirements(mDevice, mBuffer, &memoryRequirements);
 
-		mMemory = DeviceMemory(device, memoryRequirements.size, memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-		Core::AssertEQ(vkBindBufferMemory(mDevice, mBuffer, mMemory.mDeviceMemory, 0), VK_SUCCESS);
+
+		mMemory = allocator->Allocate(memoryRequirements.size, memoryRequirements.memoryTypeBits, properties).Unwrap();
+		Core::AssertEQ(vkBindBufferMemory(mDevice, mBuffer, mMemory.Address().deviceMemory, mMemory.Address().offset), VK_SUCCESS);
 	}
 
 
-	Buffer::Buffer(const Device& device, const Core::IO::DynamicByteBuffer& bytes, VkBufferUsageFlags usage)
-		: Buffer(device, bytes.Size(), usage)
+	Buffer::Buffer(Allocator* allocator, VkMemoryPropertyFlags properties, const Core::IO::DynamicByteBuffer& bytes,
+				   VkBufferUsageFlags usage)
+		: Buffer(allocator, properties, bytes.Size(), usage)
 	{
 		Core::Assert(usage & VK_BUFFER_USAGE_TRANSFER_DST_BIT);
 		SetData(bytes);
@@ -90,19 +92,12 @@ namespace Strawberry::Vulkan
 	void Buffer::SetData(const Core::IO::DynamicByteBuffer& bytes)
 	{
 		Core::AssertEQ(bytes.Size(), GetSize());
-		mBytes = bytes;
-		mMemory.SetData(GetBytes());
+		mMemory.Overwrite(bytes);
 	}
 
 
 	uint64_t Buffer::GetSize() const
 	{
 		return mSize;
-	}
-
-
-	Core::IO::DynamicByteBuffer Buffer::GetBytes() const
-	{
-		return mBytes;
 	}
 }

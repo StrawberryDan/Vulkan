@@ -4,13 +4,14 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
-// Vulkan
-#include <vulkan/vulkan.h>
+// Strawberry Vulkan
+#include "Strawberry/Vulkan/Allocator.hpp"
 // Strawberry Core
 #include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
+// Vulkan
+#include <vulkan/vulkan.h>
 // Standard Library
 #include <concepts>
-#include "DeviceMemory.hpp"
 
 
 //======================================================================================================================
@@ -24,8 +25,9 @@ namespace Strawberry::Vulkan
 	class Buffer
 	{
 	public:
-		Buffer(const Device& device, uint64_t size, VkBufferUsageFlags usage);
-		Buffer(const Device& device, const Core::IO::DynamicByteBuffer& bytes, VkBufferUsageFlags usage);
+		Buffer(Allocator* allocator, VkMemoryPropertyFlags properties, uint64_t size, VkBufferUsageFlags usage);
+		Buffer(Allocator* allocator, VkMemoryPropertyFlags properties, const Core::IO::DynamicByteBuffer& bytes,
+			   VkBufferUsageFlags usage);
 		Buffer(const Buffer& rhs) = delete;
 		Buffer& operator=(const Buffer& rhs) = delete;
 		Buffer(Buffer&& rhs) noexcept;
@@ -47,15 +49,12 @@ namespace Strawberry::Vulkan
 
 
 		[[nodiscard]] uint64_t GetSize() const;
-		Core::IO::DynamicByteBuffer GetBytes() const;
 
 
 	private:
-		uint64_t mSize;
-		VkBuffer mBuffer;
-		DeviceMemory mMemory;
-		VkDevice mDevice;
-
-		Core::IO::DynamicByteBuffer mBytes;
+		uint64_t   mSize;
+		VkBuffer   mBuffer;
+		Allocation mMemory;
+		VkDevice   mDevice;
 	};
 }

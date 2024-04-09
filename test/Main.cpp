@@ -112,7 +112,11 @@ void BasicRendering()
 	Vulkan::CommandBuffer commandBuffer = commandPool.Create<CommandBuffer>();
 
 
-	Buffer buffer(device, 6 * sizeof(float) * 3, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+	NaiveAllocator allocator(device);
+
+
+	Buffer buffer(&allocator, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, 6 * sizeof(float) * 3,
+				  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 	Core::IO::DynamicByteBuffer vertices;
 	vertices.Push<Core::Math::Vec3f>(Core::Math::Vec3f(0.0f, 0.0f, 0.0f));
 	vertices.Push<Core::Math::Vec3f>(Core::Math::Vec3f(1.0f, 0.0f, 0.0f));
@@ -123,13 +127,13 @@ void BasicRendering()
 	buffer.SetData(vertices);
 
 
-	auto framebuffer = renderPass.Create<Framebuffer>(Core::Math::Vec2u(1920, 1080));
+	auto framebuffer = renderPass.Create<Framebuffer>(&allocator, Core::Math::Vec2u(1920, 1080));
 
 
 	auto [size, channels, bytes] = Core::IO::DynamicByteBuffer::FromImage("data/dio.png").Unwrap();
-	Buffer textureBuffer(device, bytes.Size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+	Buffer textureBuffer(&allocator, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, bytes.Size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
 	textureBuffer.SetData(bytes);
-	Image texture(device, size, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
+	Image texture(&allocator, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, size, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
 	commandBuffer.Begin(true);
 	commandBuffer.PipelineBarrier(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0,
 	{ImageMemoryBarrier(texture, VK_IMAGE_ASPECT_COLOR_BIT).ToLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)});

@@ -17,18 +17,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Framebuffer::Framebuffer(const RenderPass& renderPass, Core::Math::Vec2u size)
+	Framebuffer::Framebuffer(const RenderPass& renderPass, Allocator* allocator, Core::Math::Vec2u size)
 		: mRenderPass(renderPass)
 		, mSize(size)
-		, mDepthAttachment(CreateDepthImage())
+		, mDepthAttachment(CreateDepthImage(allocator))
 		, mDepthAttachmentView(CreateDepthImageView())
-		, mStencilAttachment(CreateStencilImage())
+		, mStencilAttachment(CreateStencilImage(allocator))
 		, mStencilAttachmentView(CreateStencilImageView())
 	{
 		const auto COLOR_ATTACHMENT_COUNT = mRenderPass->mColorAttachmentFormats.size();
 		for (int i = 0; i < COLOR_ATTACHMENT_COUNT; i++)
 		{
-			mColorAttachments.emplace_back(*mRenderPass->mDevice, mSize, renderPass.mColorAttachmentFormats[i],
+			mColorAttachments.emplace_back(allocator, 0, mSize, renderPass.mColorAttachmentFormats[i],
 																		   VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
 			mColorAttachmentViews.emplace_back(
 				mColorAttachments.back().Create<ImageView::Builder>()
@@ -130,9 +130,9 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Image Framebuffer::CreateDepthImage()
+	Image Framebuffer::CreateDepthImage(Allocator* allocator)
 	{
-		return Image(*mRenderPass->mDevice, mSize, VK_FORMAT_D32_SFLOAT,
+		return Image(allocator, 0, mSize, VK_FORMAT_D32_SFLOAT,
 											   VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
 
 	}
@@ -153,9 +153,9 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Image Framebuffer::CreateStencilImage()
+	Image Framebuffer::CreateStencilImage(Allocator* allocator)
 	{
-		return Image(*mRenderPass->mDevice, mSize, VK_FORMAT_S8_UINT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
+		return Image(allocator, 0, mSize, VK_FORMAT_S8_UINT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
 	}
 
 
