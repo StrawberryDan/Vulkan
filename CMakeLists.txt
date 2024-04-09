@@ -87,6 +87,8 @@ add_library(StrawberryVulkan STATIC
 		src/Strawberry/Vulkan/Swapchain.hpp
 		src/Strawberry/Vulkan/Allocator.hpp
 		src/Strawberry/Vulkan/Allocator.cpp
+		src/Strawberry/Vulkan/NaiveAllocator.hpp
+		src/Strawberry/Vulkan/NaiveAllocator.cpp
 )
 target_link_libraries(StrawberryVulkan PUBLIC StrawberryCore StrawberryWindow Vulkan::Vulkan freetype)
 target_include_directories(StrawberryVulkan PUBLIC src)

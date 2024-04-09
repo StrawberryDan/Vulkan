@@ -11,6 +11,7 @@
 #include "Strawberry/Vulkan/GraphicsPipeline.hpp"
 #include "Strawberry/Vulkan/Image.hpp"
 #include "Strawberry/Vulkan/Instance.hpp"
+#include "Strawberry/Vulkan/NaiveAllocator.hpp"
 #include "Strawberry/Vulkan/Queue.hpp"
 #include "Strawberry/Vulkan/RenderPass.hpp"
 #include "Strawberry/Vulkan/Sampler.hpp"
