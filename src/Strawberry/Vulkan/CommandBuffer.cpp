@@ -31,7 +31,6 @@ namespace Strawberry::Vulkan
 	CommandBuffer::CommandBuffer(const CommandPool& commandPool, VkCommandBufferLevel level)
 		: mCommandBuffer {}
 		, mCommandPool(commandPool)
-		, mQueueFamilyIndex(mCommandPool->GetQueue()->GetFamilyIndex())
 	{
 		VkCommandBufferAllocateInfo allocateInfo {
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
@@ -48,7 +47,6 @@ namespace Strawberry::Vulkan
 	CommandBuffer::CommandBuffer(CommandBuffer&& rhs) noexcept
 		: mCommandBuffer(std::exchange(rhs.mCommandBuffer, nullptr))
 		  , mCommandPool(std::move(rhs.mCommandPool))
-		  , mQueueFamilyIndex(std::exchange(rhs.mQueueFamilyIndex, 0))
 	{
 
 	}
