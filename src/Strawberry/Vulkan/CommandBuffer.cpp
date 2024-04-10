@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	CommandBuffer::CommandBuffer(const CommandPool& commandPool)
+	CommandBuffer::CommandBuffer(const CommandPool& commandPool, VkCommandBufferLevel level)
 		: mCommandBuffer {}
 		, mCommandPool(commandPool)
 		, mQueueFamilyIndex(mCommandPool->GetQueue()->GetFamilyIndex())
@@ -37,7 +37,7 @@ namespace Strawberry::Vulkan
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
 			.pNext = nullptr,
 			.commandPool = mCommandPool->mCommandPool,
-			.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+			.level = level,
 			.commandBufferCount = 1,
 		};
 
@@ -293,5 +293,11 @@ namespace Strawberry::Vulkan
 	void CommandBuffer::PushConstants(const GraphicsPipeline& pipeline, VkShaderStageFlags stage, const Core::IO::DynamicByteBuffer& bytes, uint32_t offset)
 	{
 		vkCmdPushConstants(mCommandBuffer, *pipeline.mPipelineLayout, stage, offset, bytes.Size(), bytes.Data());
+	}
+
+
+	void CommandBuffer::ExcecuteSecondaryBuffer(const CommandBuffer& buffer)
+	{
+		vkCmdExecuteCommands(mCommandBuffer, 1, &buffer.mCommandBuffer);
 	}
 }

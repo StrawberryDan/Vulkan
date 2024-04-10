@@ -37,7 +37,9 @@ namespace Strawberry::Vulkan
 	class CommandBuffer
 	{
 	public:
-		explicit CommandBuffer(const CommandPool& commandPool);
+		explicit CommandBuffer(const CommandPool& commandPool, VkCommandBufferLevel level = VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+
+
 		CommandBuffer(const CommandBuffer& rhs) = delete;
 		CommandBuffer& operator=(const CommandBuffer& rhs) = delete;
 		CommandBuffer(CommandBuffer&& rhs) noexcept ;
@@ -61,6 +63,9 @@ namespace Strawberry::Vulkan
 
 		void BeginRenderPass(const RenderPass& renderPass, Framebuffer& framebuffer);
 		void EndRenderPass();
+
+
+		void ExcecuteSecondaryBuffer(const CommandBuffer& buffer);
 
 
 		void PushConstants(const GraphicsPipeline& pipeline, VkShaderStageFlags stage, const Core::IO::DynamicByteBuffer& bytes, uint32_t offset);
