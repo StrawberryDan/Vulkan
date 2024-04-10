@@ -53,6 +53,7 @@ namespace Strawberry::Vulkan
 		Core::ReflexivePointer<CommandPool> GetCommandPool() const;
 
 
+		bool Began() const noexcept;
 		void Begin(bool oneTimeSubmit);
 		void Begin(bool oneTimeSubmit, const RenderPass& renderPass, uint32_t subpass);
 		void Begin(bool oneTimeSubmit, const RenderPass& renderPass, uint32_t subpass, const Framebuffer& framebuffer);
@@ -93,7 +94,8 @@ namespace Strawberry::Vulkan
 
 
 	private:
-		VkCommandBuffer mCommandBuffer;
+		VkCommandBuffer                     mCommandBuffer;
 		Core::ReflexivePointer<CommandPool> mCommandPool;
+		bool                                mHasBegan = false;
 	};
 }

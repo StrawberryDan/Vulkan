@@ -85,8 +85,16 @@ namespace Strawberry::Vulkan
 	}
 
 
+	bool CommandBuffer::Began() const noexcept
+	{
+		return mHasBegan;
+	}
+
+
 	void CommandBuffer::Begin(bool oneTimeSubmit)
 	{
+		Core::Assert(!Began());
+
 		VkCommandBufferBeginInfo beginInfo {
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
 			.pNext = nullptr,
@@ -95,11 +103,14 @@ namespace Strawberry::Vulkan
 		};
 
 		Core::AssertEQ(vkBeginCommandBuffer(mCommandBuffer, &beginInfo), VK_SUCCESS);
+		mHasBegan = true;
 	}
 
 
 	void CommandBuffer::Begin(bool oneTimeSubmit, const RenderPass& renderPass, uint32_t subpass)
 	{
+		Core::Assert(!Began());
+
 		VkCommandBufferInheritanceInfo inheritanceInfo
 		{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO,
@@ -119,12 +130,15 @@ namespace Strawberry::Vulkan
 		};
 
 		Core::AssertEQ(vkBeginCommandBuffer(mCommandBuffer, &beginInfo), VK_SUCCESS);
+		mHasBegan = true;
 	}
 
 
 	void CommandBuffer::Begin(bool oneTimeSubmit, const RenderPass& renderPass, uint32_t subpass,
 							  const Framebuffer& framebuffer)
 	{
+		Core::Assert(!Began());
+
 		VkCommandBufferInheritanceInfo inheritanceInfo
 				{
 						.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO,
@@ -144,12 +158,15 @@ namespace Strawberry::Vulkan
 		};
 
 		Core::AssertEQ(vkBeginCommandBuffer(mCommandBuffer, &beginInfo), VK_SUCCESS);
+		mHasBegan = true;
 	}
 
 
 	void CommandBuffer::End()
 	{
+		Core::Assert(Began());
 		Core::AssertEQ(vkEndCommandBuffer(mCommandBuffer), VK_SUCCESS);
+		mHasBegan = false;
 	}
 
 
