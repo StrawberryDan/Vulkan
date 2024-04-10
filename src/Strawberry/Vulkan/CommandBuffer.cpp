@@ -85,15 +85,15 @@ namespace Strawberry::Vulkan
 	}
 
 
-	bool CommandBuffer::Began() const noexcept
+	CommandBufferState CommandBuffer::State() const noexcept
 	{
-		return mHasBegan;
+		return mState;
 	}
 
 
 	void CommandBuffer::Begin(bool oneTimeSubmit)
 	{
-		Core::Assert(!Began());
+		Core::Assert(State() == CommandBufferState::Initial);
 
 		VkCommandBufferBeginInfo beginInfo {
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
@@ -103,13 +103,13 @@ namespace Strawberry::Vulkan
 		};
 
 		Core::AssertEQ(vkBeginCommandBuffer(mCommandBuffer, &beginInfo), VK_SUCCESS);
-		mHasBegan = true;
+		mState = CommandBufferState::Recording;
 	}
 
 
 	void CommandBuffer::Begin(bool oneTimeSubmit, const RenderPass& renderPass, uint32_t subpass)
 	{
-		Core::Assert(!Began());
+		Core::Assert(State() == CommandBufferState::Initial);
 
 		VkCommandBufferInheritanceInfo inheritanceInfo
 		{
@@ -130,14 +130,14 @@ namespace Strawberry::Vulkan
 		};
 
 		Core::AssertEQ(vkBeginCommandBuffer(mCommandBuffer, &beginInfo), VK_SUCCESS);
-		mHasBegan = true;
+		mState = CommandBufferState::Recording;
 	}
 
 
 	void CommandBuffer::Begin(bool oneTimeSubmit, const RenderPass& renderPass, uint32_t subpass,
 							  const Framebuffer& framebuffer)
 	{
-		Core::Assert(!Began());
+		Core::Assert(State() == CommandBufferState::Initial);
 
 		VkCommandBufferInheritanceInfo inheritanceInfo
 				{
@@ -158,32 +158,40 @@ namespace Strawberry::Vulkan
 		};
 
 		Core::AssertEQ(vkBeginCommandBuffer(mCommandBuffer, &beginInfo), VK_SUCCESS);
-		mHasBegan = true;
+		mState = CommandBufferState::Recording;
 	}
 
 
 	void CommandBuffer::End()
 	{
-		Core::Assert(Began());
+		Core::Assert(State() == CommandBufferState::Recording);
 		Core::AssertEQ(vkEndCommandBuffer(mCommandBuffer), VK_SUCCESS);
-		mHasBegan = false;
+		mState = CommandBufferState::Executable;
 	}
 
 
 	void CommandBuffer::Reset()
 	{
+		if (State() == CommandBufferState::Initial) return;
+
+		Core::Assert(State() == CommandBufferState::Recording  ||
+		             State() == CommandBufferState::Executable ||
+					 State() == CommandBufferState::Invalid);
 		Core::AssertEQ(vkResetCommandBuffer(mCommandBuffer, 0), VK_SUCCESS);
+		mState = CommandBufferState::Initial;
 	}
 
 
 	void CommandBuffer::BindPipeline(const GraphicsPipeline& pipeline)
 	{
+		Core::Assert(State() == CommandBufferState::Recording);
 		vkCmdBindPipeline(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.mPipeline);
 	}
 
 
 	void CommandBuffer::BindVertexBuffer(uint32_t binding, Buffer& buffer, VkDeviceSize offset)
 	{
+		Core::Assert(State() == CommandBufferState::Recording);
 		VkBuffer handle = buffer;
 		vkCmdBindVertexBuffers(mCommandBuffer, binding, 1, &handle, &offset);
 	}
@@ -191,18 +199,21 @@ namespace Strawberry::Vulkan
 
 	void CommandBuffer::BindIndexBuffer(const Buffer& buffer, VkIndexType indexType, uint32_t offset)
 	{
+		Core::Assert(State() == CommandBufferState::Recording);
 		vkCmdBindIndexBuffer(mCommandBuffer, buffer, offset, indexType);
 	}
 
 
 	void CommandBuffer::Draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t vertexOffset, uint32_t instanceOffset)
 	{
+		Core::Assert(State() == CommandBufferState::Recording);
 		vkCmdDraw(mCommandBuffer, vertexCount, instanceCount, vertexOffset, instanceOffset);
 	}
 
 
 	void CommandBuffer::DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t firstInstance, int32_t vertexOffset)
 	{
+		Core::Assert(State() == CommandBufferState::Recording);
 		vkCmdDrawIndexed(mCommandBuffer, indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 	}
 
@@ -210,6 +221,8 @@ namespace Strawberry::Vulkan
 	void CommandBuffer::PipelineBarrier(VkPipelineStageFlags srcMask, VkPipelineStageFlags dstMask,
 		VkDependencyFlags dependencyFlags, const std::vector<Barrier>& barriers)
 	{
+		Core::Assert(State() == CommandBufferState::Recording);
+
 		std::vector<VkMemoryBarrier> memoryBarriers;
 		std::vector<VkBufferMemoryBarrier> bufferBarriers;
 		std::vector<VkImageMemoryBarrier> imageBarriers;
@@ -233,6 +246,8 @@ namespace Strawberry::Vulkan
 
 	void CommandBuffer::CopyBufferToImage(const Buffer& buffer, Image& image)
 	{
+		Core::Assert(State() == CommandBufferState::Recording);
+
 		// Setup copy
 		VkImageSubresourceLayers subresource {
 			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
@@ -254,6 +269,7 @@ namespace Strawberry::Vulkan
 
 	void CommandBuffer::CopyImageToImage(const Image& source, VkImageLayout srcLayout, const Image& dest, VkImageLayout destLayout, VkImageAspectFlags aspect)
 	{
+		Core::Assert(State() == CommandBufferState::Recording);
 		Core::AssertEQ(source.GetSize(), dest.GetSize());
 
 
@@ -280,6 +296,8 @@ namespace Strawberry::Vulkan
 
 	void CommandBuffer::BlitImage(const Image& source, VkImageLayout srcLayout, const Image& dest, VkImageLayout destLayout, VkImageAspectFlags aspect, VkFilter filter)
 	{
+		Core::Assert(State() == CommandBufferState::Recording);
+
 		VkImageBlit region {
 			.srcSubresource = VkImageSubresourceLayers {
 				.aspectMask = aspect,
@@ -303,6 +321,8 @@ namespace Strawberry::Vulkan
 
 	void CommandBuffer::ClearColorImage(Image& image, VkImageLayout layout, Core::Math::Vec4f clearColor)
 	{
+		Core::Assert(State() == CommandBufferState::Recording);
+
 		VkClearColorValue vulkanClearColor {
 			.float32{clearColor[0], clearColor[1], clearColor[2], clearColor[3]}
 		};
@@ -319,12 +339,15 @@ namespace Strawberry::Vulkan
 
 	void CommandBuffer::BindDescriptorSet(const GraphicsPipeline& pipeline, uint32_t set, const DescriptorSet& descriptorSet)
 	{
+		Core::Assert(State() == CommandBufferState::Recording);
 		vkCmdBindDescriptorSets(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, *pipeline.mPipelineLayout, set, 1, &descriptorSet.mDescriptorSet, 0, nullptr);
 	}
 
 
 	void CommandBuffer::BindDescriptorSets(const GraphicsPipeline& pipeline, uint32_t firstSet, std::vector<DescriptorSet*> sets)
 	{
+		Core::Assert(State() == CommandBufferState::Recording);
+
 		std::vector<VkDescriptorSet> setHandles;
 		sets.reserve(sets.size());
 		std::transform(sets.begin(), sets.end(), std::back_inserter(setHandles), [](DescriptorSet* set) { return set->mDescriptorSet; });
@@ -332,8 +355,10 @@ namespace Strawberry::Vulkan
 	}
 
 
-	void CommandBuffer::BeginRenderPass(const RenderPass& renderPass, Framebuffer& framebuffer)
+	void CommandBuffer::BeginRenderPass(const RenderPass& renderPass, Framebuffer& framebuffer, VkSubpassContents contents)
 	{
+		Core::Assert(State() == CommandBufferState::Recording);
+
 		VkRenderPassBeginInfo beginInfo {
 			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 			.pNext = nullptr,
@@ -344,24 +369,27 @@ namespace Strawberry::Vulkan
 			.clearValueCount = static_cast<uint32_t>(renderPass.mClearColors.size()),
 			.pClearValues = renderPass.mClearColors.data(),
 		};
-		vkCmdBeginRenderPass(mCommandBuffer, &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
+		vkCmdBeginRenderPass(mCommandBuffer, &beginInfo, contents);
 	}
 
 
 	void CommandBuffer::EndRenderPass()
 	{
+		Core::Assert(State() == CommandBufferState::Recording);
 		vkCmdEndRenderPass(mCommandBuffer);
 	}
 
 
 	void CommandBuffer::PushConstants(const GraphicsPipeline& pipeline, VkShaderStageFlags stage, const Core::IO::DynamicByteBuffer& bytes, uint32_t offset)
 	{
+		Core::Assert(State() == CommandBufferState::Recording);
 		vkCmdPushConstants(mCommandBuffer, *pipeline.mPipelineLayout, stage, offset, bytes.Size(), bytes.Data());
 	}
 
 
 	void CommandBuffer::ExcecuteSecondaryBuffer(const CommandBuffer& buffer)
 	{
+		Core::Assert(State() == CommandBufferState::Recording);
 		vkCmdExecuteCommands(mCommandBuffer, 1, &buffer.mCommandBuffer);
 	}
 }

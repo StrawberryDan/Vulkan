@@ -34,6 +34,16 @@ namespace Strawberry::Vulkan
 	using Barrier = Core::Variant<ImageMemoryBarrier>;
 
 
+	enum class CommandBufferState
+	{
+		Initial,
+		Recording,
+		Executable,
+		Pending,
+		Invalid,
+	};
+
+
 	class CommandBuffer
 	{
 	public:
@@ -53,7 +63,9 @@ namespace Strawberry::Vulkan
 		Core::ReflexivePointer<CommandPool> GetCommandPool() const;
 
 
-		bool Began() const noexcept;
+		CommandBufferState State() const noexcept;
+
+
 		void Begin(bool oneTimeSubmit);
 		void Begin(bool oneTimeSubmit, const RenderPass& renderPass, uint32_t subpass);
 		void Begin(bool oneTimeSubmit, const RenderPass& renderPass, uint32_t subpass, const Framebuffer& framebuffer);
@@ -64,7 +76,7 @@ namespace Strawberry::Vulkan
 		void BindPipeline(const GraphicsPipeline& pipeline);
 
 
-		void BeginRenderPass(const RenderPass& renderPass, Framebuffer& framebuffer);
+		void BeginRenderPass(const RenderPass& renderPass, Framebuffer& framebuffer, VkSubpassContents contents = VK_SUBPASS_CONTENTS_INLINE);
 		void EndRenderPass();
 
 
@@ -96,6 +108,6 @@ namespace Strawberry::Vulkan
 	private:
 		VkCommandBuffer                     mCommandBuffer;
 		Core::ReflexivePointer<CommandPool> mCommandPool;
-		bool                                mHasBegan = false;
+		CommandBufferState                  mState = CommandBufferState::Initial;
 	};
 }
