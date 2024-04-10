@@ -32,6 +32,9 @@ namespace Strawberry::Vulkan
 		~Fence();
 
 
+		bool Signaled() const noexcept;
+
+
 		void Wait();
 		void Reset();
 

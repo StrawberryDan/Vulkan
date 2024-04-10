@@ -53,6 +53,21 @@ namespace Strawberry::Vulkan
 	}
 
 
+	bool Fence::Signaled() const noexcept
+	{
+		auto result = vkGetFenceStatus(mDevice, mFence);
+		switch (result)
+		{
+			case VK_SUCCESS:
+				return true;
+			case VK_NOT_READY:
+				return false;
+			default:
+				Core::Unreachable();
+		}
+	}
+
+
 	void Fence::Wait()
 	{
 		Core::AssertEQ(vkWaitForFences(mDevice, 1, &mFence, VK_TRUE, UINT64_MAX), VK_SUCCESS);
