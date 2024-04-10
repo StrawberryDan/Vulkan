@@ -94,6 +94,12 @@ namespace Strawberry::Vulkan
 	}
 
 
+	Framebuffer::operator VkFramebuffer() const noexcept
+	{
+		return mFramebuffer;
+	}
+
+
 	Core::ReflexivePointer<RenderPass> Framebuffer::GetRenderPass() const
 	{
 		return mRenderPass;
