@@ -217,7 +217,6 @@ namespace Strawberry::Vulkan
 		Core::AssertEQ(vkResetCommandBuffer(mCommandBuffer, 0), VK_SUCCESS);
 		mState = CommandBufferState::Initial;
 		mRecordedSecondaryBuffers.clear();
-		mExecutionFenceOrParentBuffer = nullptr;
 	}
 
 
