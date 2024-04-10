@@ -100,6 +100,55 @@ namespace Strawberry::Vulkan
 	}
 
 
+	void CommandBuffer::Begin(bool oneTimeSubmit, const RenderPass& renderPass, uint32_t subpass)
+	{
+		VkCommandBufferInheritanceInfo inheritanceInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO,
+			.pNext = nullptr,
+			.renderPass = renderPass,
+			.subpass = subpass,
+			.framebuffer = VK_NULL_HANDLE,
+			.occlusionQueryEnable = VK_FALSE,
+			.queryFlags = 0,
+			.pipelineStatistics = 0,
+		};
+		VkCommandBufferBeginInfo beginInfo {
+				.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+				.pNext = nullptr,
+				.flags = oneTimeSubmit ? VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT : VkCommandBufferUsageFlags(0),
+				.pInheritanceInfo = &inheritanceInfo,
+		};
+
+		Core::AssertEQ(vkBeginCommandBuffer(mCommandBuffer, &beginInfo), VK_SUCCESS);
+	}
+
+
+	void CommandBuffer::Begin(bool oneTimeSubmit, const RenderPass& renderPass, uint32_t subpass,
+							  const Framebuffer& framebuffer)
+	{
+		VkCommandBufferInheritanceInfo inheritanceInfo
+				{
+						.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO,
+						.pNext = nullptr,
+						.renderPass = renderPass,
+						.subpass = subpass,
+						.framebuffer = framebuffer,
+						.occlusionQueryEnable = VK_FALSE,
+						.queryFlags = 0,
+						.pipelineStatistics = 0,
+				};
+		VkCommandBufferBeginInfo beginInfo {
+				.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+				.pNext = nullptr,
+				.flags = oneTimeSubmit ? VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT : VkCommandBufferUsageFlags(0),
+				.pInheritanceInfo = &inheritanceInfo,
+		};
+
+		Core::AssertEQ(vkBeginCommandBuffer(mCommandBuffer, &beginInfo), VK_SUCCESS);
+	}
+
+
 	void CommandBuffer::End()
 	{
 		Core::AssertEQ(vkEndCommandBuffer(mCommandBuffer), VK_SUCCESS);

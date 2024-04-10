@@ -54,6 +54,8 @@ namespace Strawberry::Vulkan
 
 
 		void Begin(bool oneTimeSubmit);
+		void Begin(bool oneTimeSubmit, const RenderPass& renderPass, uint32_t subpass);
+		void Begin(bool oneTimeSubmit, const RenderPass& renderPass, uint32_t subpass, const Framebuffer& framebuffer);
 		void End();
 		void Reset();
 
