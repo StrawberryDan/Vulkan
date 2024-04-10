@@ -24,9 +24,31 @@
 
 namespace Strawberry::Vulkan
 {
-	struct AllocationError
+	class AllocationError
 	{
+	public:
+		struct OutOfHostMemory {};
+		struct OutOfDeviceMemory {};
+		struct MemoryTypeUnavailable {};
 
+
+		template <typename T>
+		AllocationError(T info)
+			: mInfo(info)
+		{}
+
+
+		template <typename T>
+		[[nodiscard]] bool IsType() const noexcept { return mInfo.IsType<T>(); }
+
+
+		template <typename T>
+		[[nodiscard]] T    GetInfo() const noexcept { Core::Assert(IsType<T>()); return mInfo.Value<T>(); }
+
+
+	private:
+		using Info = Core::Variant<OutOfHostMemory, OutOfDeviceMemory, MemoryTypeUnavailable>;
+		Info mInfo;
 	};
 
 

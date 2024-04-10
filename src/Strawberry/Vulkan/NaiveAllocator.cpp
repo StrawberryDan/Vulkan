@@ -18,7 +18,12 @@ namespace Strawberry::Vulkan
 	{
 		auto physicalDevice = GetDevice()->GetPhysicalDevices()[0];
 		auto memoryTypeCandidates = physicalDevice->SearchMemoryTypes(typeMask, properties);
-		Core::Assert(!memoryTypeCandidates.empty());
+
+
+		if (memoryTypeCandidates.empty())
+		{
+			return AllocationResult::Err(AllocationError::MemoryTypeUnavailable());
+		}
 		auto chosenMemoryType = memoryTypeCandidates[0];
 
 
@@ -31,7 +36,20 @@ namespace Strawberry::Vulkan
 		};
 
 		GPUAddress address;
-		Core::AssertEQ(vkAllocateMemory(*GetDevice(), &allocateInfo, nullptr, &address.deviceMemory), VK_SUCCESS);
+		VkResult allocationResult = vkAllocateMemory(*GetDevice(), &allocateInfo, nullptr, &address.deviceMemory);
+
+		switch (allocationResult)
+		{
+			case VK_ERROR_OUT_OF_HOST_MEMORY:
+				return AllocationResult::Err(AllocationError::OutOfHostMemory());
+			case VK_ERROR_OUT_OF_DEVICE_MEMORY:
+				return AllocationResult::Err(AllocationError::OutOfDeviceMemory());
+			case VK_SUCCESS:
+				break;
+			default:
+				Core::Unreachable();
+		}
+
 
 		mMemoryProperties.emplace(address.deviceMemory, physicalDevice->GetMemoryProperties().memoryTypes[chosenMemoryType].propertyFlags);
 
