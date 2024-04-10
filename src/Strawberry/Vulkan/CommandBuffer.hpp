@@ -4,6 +4,7 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
+#include "Fence.hpp"
 #include "ImageView.hpp"
 #include "ImageMemoryBarrier.hpp"
 // Vulkan
@@ -45,7 +46,11 @@ namespace Strawberry::Vulkan
 
 
 	class CommandBuffer
+		: public Core::EnableReflexivePointer<CommandBuffer>
 	{
+		friend class Queue;
+
+
 	public:
 		explicit CommandBuffer(const CommandPool& commandPool, VkCommandBufferLevel level = VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
@@ -64,6 +69,9 @@ namespace Strawberry::Vulkan
 
 
 		CommandBufferState State() const noexcept;
+
+
+		VkCommandBufferLevel Level() const noexcept;
 
 
 		void Begin(bool oneTimeSubmit);
@@ -106,8 +114,19 @@ namespace Strawberry::Vulkan
 
 
 	private:
-		VkCommandBuffer                     mCommandBuffer;
-		Core::ReflexivePointer<CommandPool> mCommandPool;
-		CommandBufferState                  mState = CommandBufferState::Initial;
+		static Core::Variant<Fence, Core::ReflexivePointer<CommandBuffer>> ConstructExecutionFence(const Device& device, VkCommandBufferLevel level);
+		void MoveIntoPendingState() const noexcept;
+		void MoveIntoCompletedState() const noexcept;
+		bool IsExecutionFenceSignalled() const noexcept;
+
+
+	private:
+		VkCommandBuffer                                                     mCommandBuffer;
+		Core::ReflexivePointer<CommandPool>                                 mCommandPool;
+		mutable CommandBufferState                                          mState = CommandBufferState::Initial;
+		bool                                                                mOneTimeSubmission;
+		mutable Core::Variant<Fence, Core::ReflexivePointer<CommandBuffer>> mExecutionFenceOrParentBuffer;
+
+		mutable std::vector<Core::ReflexivePointer<CommandBuffer>>          mRecordedSecondaryBuffers;
 	};
 }

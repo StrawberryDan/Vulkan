@@ -31,6 +31,7 @@ namespace Strawberry::Vulkan
 	CommandBuffer::CommandBuffer(const CommandPool& commandPool, VkCommandBufferLevel level)
 		: mCommandBuffer {}
 		, mCommandPool(commandPool)
+		, mExecutionFenceOrParentBuffer(ConstructExecutionFence(*commandPool.mQueue->GetDevice(), level))
 	{
 		VkCommandBufferAllocateInfo allocateInfo {
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
@@ -46,10 +47,12 @@ namespace Strawberry::Vulkan
 
 	CommandBuffer::CommandBuffer(CommandBuffer&& rhs) noexcept
 		: mCommandBuffer(std::exchange(rhs.mCommandBuffer, nullptr))
-		  , mCommandPool(std::move(rhs.mCommandPool))
-	{
-
-	}
+		, mCommandPool(std::move(rhs.mCommandPool))
+		, mState(std::exchange(rhs.mState, CommandBufferState::Invalid))
+		, mOneTimeSubmission(rhs.mOneTimeSubmission)
+		, mExecutionFenceOrParentBuffer(std::move(rhs.mExecutionFenceOrParentBuffer))
+		, mRecordedSecondaryBuffers(std::move(rhs.mRecordedSecondaryBuffers))
+	{}
 
 
 	CommandBuffer& CommandBuffer::operator=(CommandBuffer&& rhs) noexcept
@@ -87,13 +90,44 @@ namespace Strawberry::Vulkan
 
 	CommandBufferState CommandBuffer::State() const noexcept
 	{
+		// Check if we can move the buffer out of the Pending state.
+		if (mState == CommandBufferState::Pending)
+		{
+			// If we own the fence we can check it normally.
+			if (IsExecutionFenceSignalled())
+			{
+				mExecutionFenceOrParentBuffer.Ptr<Fence>()->Reset();
+				MoveIntoCompletedState();
+			}
+		}
+
 		return mState;
+	}
+
+
+	VkCommandBufferLevel CommandBuffer::Level() const noexcept
+	{
+		if (mExecutionFenceOrParentBuffer.IsType<Fence>())
+		{
+			return VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		}
+		else if (mExecutionFenceOrParentBuffer.IsType<Core::ReflexivePointer<CommandBuffer>>())
+		{
+			return VK_COMMAND_BUFFER_LEVEL_SECONDARY;
+		}
+		else
+		{
+			Core::Unreachable();
+		}
 	}
 
 
 	void CommandBuffer::Begin(bool oneTimeSubmit)
 	{
-		Core::Assert(State() == CommandBufferState::Initial);
+		Core::Assert(State() == CommandBufferState::Initial ||
+		             State() == CommandBufferState::Invalid);
+
+		mOneTimeSubmission = oneTimeSubmit;
 
 		VkCommandBufferBeginInfo beginInfo {
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
@@ -109,7 +143,8 @@ namespace Strawberry::Vulkan
 
 	void CommandBuffer::Begin(bool oneTimeSubmit, const RenderPass& renderPass, uint32_t subpass)
 	{
-		Core::Assert(State() == CommandBufferState::Initial);
+		Core::Assert(State() == CommandBufferState::Initial ||
+		             State() == CommandBufferState::Executable);
 
 		VkCommandBufferInheritanceInfo inheritanceInfo
 		{
@@ -140,21 +175,23 @@ namespace Strawberry::Vulkan
 		Core::Assert(State() == CommandBufferState::Initial);
 
 		VkCommandBufferInheritanceInfo inheritanceInfo
-				{
-						.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO,
-						.pNext = nullptr,
-						.renderPass = renderPass,
-						.subpass = subpass,
-						.framebuffer = framebuffer,
-						.occlusionQueryEnable = VK_FALSE,
-						.queryFlags = 0,
-						.pipelineStatistics = 0,
-				};
-		VkCommandBufferBeginInfo beginInfo {
-				.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-				.pNext = nullptr,
-				.flags = oneTimeSubmit ? VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT : VkCommandBufferUsageFlags(0),
-				.pInheritanceInfo = &inheritanceInfo,
+		{
+			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO,
+			.pNext = nullptr,
+			.renderPass = renderPass,
+			.subpass = subpass,
+			.framebuffer = framebuffer,
+			.occlusionQueryEnable = VK_FALSE,
+			.queryFlags = 0,
+			.pipelineStatistics = 0,
+		};
+
+		VkCommandBufferBeginInfo beginInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+			.pNext = nullptr,
+			.flags = oneTimeSubmit ? VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT : VkCommandBufferUsageFlags(0),
+			.pInheritanceInfo = &inheritanceInfo,
 		};
 
 		Core::AssertEQ(vkBeginCommandBuffer(mCommandBuffer, &beginInfo), VK_SUCCESS);
@@ -179,6 +216,8 @@ namespace Strawberry::Vulkan
 					 State() == CommandBufferState::Invalid);
 		Core::AssertEQ(vkResetCommandBuffer(mCommandBuffer, 0), VK_SUCCESS);
 		mState = CommandBufferState::Initial;
+		mRecordedSecondaryBuffers.clear();
+		mExecutionFenceOrParentBuffer = nullptr;
 	}
 
 
@@ -389,7 +428,65 @@ namespace Strawberry::Vulkan
 
 	void CommandBuffer::ExcecuteSecondaryBuffer(const CommandBuffer& buffer)
 	{
+		Core::AssertEQ(buffer.Level(), VK_COMMAND_BUFFER_LEVEL_SECONDARY);
 		Core::Assert(State() == CommandBufferState::Recording);
 		vkCmdExecuteCommands(mCommandBuffer, 1, &buffer.mCommandBuffer);
+	}
+
+
+	Core::Variant<Fence, Core::ReflexivePointer<CommandBuffer>> CommandBuffer::ConstructExecutionFence(const Device& device, VkCommandBufferLevel level)
+	{
+		switch (level)
+		{
+			case VK_COMMAND_BUFFER_LEVEL_PRIMARY:
+				return Fence(device);
+			case VK_COMMAND_BUFFER_LEVEL_SECONDARY:
+				return nullptr;
+			default:
+				Core::Unreachable();
+		}
+	}
+
+
+	void CommandBuffer::MoveIntoPendingState() const noexcept
+	{
+		mState = CommandBufferState::Pending;
+		for (auto secondaryBuffer : mRecordedSecondaryBuffers)
+		{
+			secondaryBuffer->MoveIntoPendingState();
+		}
+	}
+
+
+	void CommandBuffer::MoveIntoCompletedState() const noexcept
+	{
+		mState = mOneTimeSubmission ? CommandBufferState::Invalid : CommandBufferState::Executable;
+
+		if (mOneTimeSubmission)
+		{
+			mRecordedSecondaryBuffers.clear();
+		}
+
+		for (auto secondaryBuffer : mRecordedSecondaryBuffers)
+		{
+			secondaryBuffer->MoveIntoCompletedState();
+		}
+	}
+
+
+	bool CommandBuffer::IsExecutionFenceSignalled() const noexcept
+	{
+		if (auto fence = mExecutionFenceOrParentBuffer.Ptr<Fence>())
+		{
+			return fence->Signaled();
+		}
+		else if (auto parent = mExecutionFenceOrParentBuffer.Ptr<Core::ReflexivePointer<CommandBuffer>>())
+		{
+			return (**parent)->IsExecutionFenceSignalled();
+		}
+		else
+		{
+			Core::Unreachable();
+		}
 	}
 }
