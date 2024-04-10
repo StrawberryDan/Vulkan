@@ -75,7 +75,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	CommandBuffer::operator VkCommandBuffer_T*() const
+	CommandBuffer::operator VkCommandBuffer() const
 	{
 		return mCommandBuffer;
 	}
