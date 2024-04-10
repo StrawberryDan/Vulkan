@@ -42,6 +42,9 @@ namespace Strawberry::Vulkan
 		~RenderPass();
 
 
+		operator VkRenderPass() const noexcept;
+
+
 		template<std::movable T, typename... Args>
 		T Create(const Args&... args) const { return T(*this, std::forward<const Args&>(args)...); }
 

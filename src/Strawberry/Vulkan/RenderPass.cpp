@@ -51,6 +51,12 @@ namespace Strawberry::Vulkan
 	}
 
 
+	RenderPass::operator VkRenderPass() const noexcept
+	{
+		return mRenderPass;
+	}
+
+
 	Core::ReflexivePointer<Device> RenderPass::GetDevice() const
 	{
 		return mDevice;
