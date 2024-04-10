@@ -88,6 +88,5 @@ namespace Strawberry::Vulkan
 	private:
 		VkCommandBuffer mCommandBuffer;
 		Core::ReflexivePointer<CommandPool> mCommandPool;
-		uint32_t mQueueFamilyIndex;
 	};
 }
