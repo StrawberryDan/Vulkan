@@ -71,26 +71,26 @@ void BasicRendering()
 		})
 		.Build();
 	GraphicsPipeline pipeline = GraphicsPipeline::Builder(layout, renderPass, 0)
-		.WithShaderStage(VK_SHADER_STAGE_VERTEX_BIT, std::move(vertexShader))
-		.WithShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT, std::move(fragmentShader))
-		.WithVertexInput(
-			{
-				VkVertexInputBindingDescription {
-				.binding = 0,
-				.stride = 3 * sizeof(float),
-				.inputRate = VK_VERTEX_INPUT_RATE_VERTEX
-				}
-			},
-			{
-				VkVertexInputAttributeDescription {
-					.location = 0,
-					.binding = 0,
-					.format = VK_FORMAT_R32G32B32_SFLOAT,
-					.offset = 0,
-				}
-			}
-		)
-		.WithInputAssembly(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, false)
+			.WithShaderStage(VK_SHADER_STAGE_VERTEX_BIT, std::move(vertexShader))
+			.WithShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT, std::move(fragmentShader))
+			.WithVertexInput(
+					{
+							VkVertexInputBindingDescription{
+									.binding = 0,
+									.stride = 3 * sizeof(float),
+									.inputRate = VK_VERTEX_INPUT_RATE_VERTEX
+							}
+					},
+					{
+							VkVertexInputAttributeDescription{
+									.location = 0,
+									.binding = 0,
+									.format = VK_FORMAT_R32G32B32_SFLOAT,
+									.offset = 0,
+							}
+					}
+			)
+			.WithInputAssembly(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
 		.WithViewport({VkViewport {.x = 0, .y = 0, .width = 1920.0, .height = 1080.0, .minDepth = 0.0, .maxDepth = 1.0}}, { VkRect2D{.offset = {0, 0}, .extent = {1920, 1080}}})
 		.WithRasterization(VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE, VK_FRONT_FACE_COUNTER_CLOCKWISE)
 		.WithColorBlending({
