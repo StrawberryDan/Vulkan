@@ -63,7 +63,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	void DescriptorSet::SetUniformBuffer(const Vulkan::Buffer& buffer, uint32_t binding, uint32_t arrayElement)
+	void DescriptorSet::SetUniformBuffer(uint32_t binding, uint32_t arrayElement, const Vulkan::Buffer& buffer)
 	{
 		VkDescriptorBufferInfo bufferInfo {
 			.buffer = buffer,
@@ -86,7 +86,9 @@ namespace Strawberry::Vulkan
 	}
 
 
-	void DescriptorSet::SetUniformTexture(const Sampler& sampler, const ImageView& image, VkImageLayout layout, uint32_t binding, uint32_t arrayElement)
+	void DescriptorSet::SetUniformTexture(uint32_t binding, uint32_t arrayElement, const Sampler& sampler,
+										  const ImageView& image,
+										  VkImageLayout layout)
 	{
 		VkDescriptorImageInfo imageInfo {
 			.sampler = sampler,
