@@ -84,14 +84,14 @@ namespace Strawberry::Vulkan
 	}
 
 
-	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithInputAssembly(VkPrimitiveTopology topology, bool primitiveRestart)
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithInputAssembly(VkPrimitiveTopology topology)
 	{
 		VkPipelineInputAssemblyStateCreateInfo createInfo {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
 			.topology = topology,
-			.primitiveRestartEnable = primitiveRestart ? VK_TRUE : VK_FALSE,
+			.primitiveRestartEnable = VK_FALSE,
 		};
 
 
@@ -223,6 +223,16 @@ namespace Strawberry::Vulkan
 
 	GraphicsPipeline GraphicsPipeline::Builder::Build()
 	{
+		// Input Assembly MUST be specified.
+		Core::Assert(mInputAssemblyStateCreateInfo.HasValue());
+		// Viewport State MUST be specified
+		Core::Assert(mViewportStateCreateInfo.HasValue());
+		// Rasterization State MUST be specified.
+		Core::Assert(mRasterizationStateCreateInfo.HasValue());
+		// Color Blend State MUST be specified
+		Core::Assert(mColorBlendStateCreateInfo.HasValue());
+
+
 		// Create Shader Stages
 		std::vector<VkPipelineShaderStageCreateInfo> stages;
 		for (auto& [stage, shader]: mStages)
@@ -236,6 +246,21 @@ namespace Strawberry::Vulkan
 				.pName = "main",
 				.pSpecializationInfo = nullptr,
 			});
+		}
+
+
+		// Use default vertex input if none specified
+		if (!mVertexInputStateCreateInfo)
+		{
+			mVertexInputStateCreateInfo = VkPipelineVertexInputStateCreateInfo {
+					.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+					.pNext = nullptr,
+					.flags = 0,
+					.vertexBindingDescriptionCount = 0,
+					.pVertexBindingDescriptions = nullptr,
+					.vertexAttributeDescriptionCount = 0,
+					.pVertexAttributeDescriptions = nullptr
+			};
 		}
 
 

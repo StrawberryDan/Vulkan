@@ -77,7 +77,7 @@ namespace Strawberry::Vulkan
 
 
 		Builder& WithVertexInput(const std::vector<VkVertexInputBindingDescription>& bindings, const std::vector<VkVertexInputAttributeDescription>& attributes);
-		Builder& WithInputAssembly(VkPrimitiveTopology topology, bool primitiveRestart);
+		Builder& WithInputAssembly(VkPrimitiveTopology topology);
 		Builder& WithTesselation(uint32_t controlPoints);
 		Builder& WithViewport(const std::vector<VkViewport> viewports, const std::vector<VkRect2D> scissors);
 		Builder& WithRasterization(VkPolygonMode polygonMode, VkCullModeFlags cullMode, VkFrontFace frontFace);
