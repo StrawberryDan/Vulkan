@@ -46,7 +46,7 @@ namespace Strawberry::Vulkan
     class PipelineLayout::Builder
     {
     public:
-        Builder(Device& device);
+        Builder(const Device& device);
         Builder(const Builder&) = delete;
         Builder(Builder&&);
         Builder& operator=(const Builder&) = delete;
