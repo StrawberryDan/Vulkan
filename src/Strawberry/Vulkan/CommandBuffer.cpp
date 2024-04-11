@@ -160,7 +160,7 @@ namespace Strawberry::Vulkan
 		VkCommandBufferBeginInfo beginInfo {
 				.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
 				.pNext = nullptr,
-				.flags = oneTimeSubmit ? VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT : VkCommandBufferUsageFlags(0),
+				.flags = (oneTimeSubmit ? VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT : VkCommandBufferUsageFlags(0)) | VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT,
 				.pInheritanceInfo = &inheritanceInfo,
 		};
 
@@ -190,7 +190,7 @@ namespace Strawberry::Vulkan
 		{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
 			.pNext = nullptr,
-			.flags = oneTimeSubmit ? VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT : VkCommandBufferUsageFlags(0),
+			.flags = (oneTimeSubmit ? VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT : VkCommandBufferUsageFlags(0)) | VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT,
 			.pInheritanceInfo = &inheritanceInfo,
 		};
 
