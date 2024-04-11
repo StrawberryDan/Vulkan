@@ -154,14 +154,14 @@ namespace Strawberry::Vulkan
 	}
 
 
-	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithMultisample(VkSampleCountFlagBits samples, bool sampleShading)
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithMultisample(VkSampleCountFlagBits samples)
 	{
 		VkPipelineMultisampleStateCreateInfo createInfo {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
 			.rasterizationSamples = samples,
-			.sampleShadingEnable = sampleShading ? VK_TRUE : VK_FALSE,
+			.sampleShadingEnable =  VK_FALSE,
 			.minSampleShading = 1.0,
 			.pSampleMask = nullptr,
 			.alphaToCoverageEnable = VK_FALSE,

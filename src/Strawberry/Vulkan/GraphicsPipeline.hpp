@@ -81,7 +81,7 @@ namespace Strawberry::Vulkan
 		Builder& WithTesselation(uint32_t controlPoints);
 		Builder& WithViewport(const std::vector<VkViewport> viewports, const std::vector<VkRect2D> scissors);
 		Builder& WithRasterization(VkPolygonMode polygonMode, VkCullModeFlags cullMode, VkFrontFace frontFace);
-		Builder& WithMultisample(VkSampleCountFlagBits samples, bool sampleShading);
+		Builder& WithMultisample(VkSampleCountFlagBits samples);
 		Builder& WithDepthStencil(VkPipelineDepthStencilStateCreateInfo createInfo);
 		Builder& WithColorBlending(std::vector<VkPipelineColorBlendAttachmentState> attachments);
 		Builder& WithDynamicState(const std::vector<VkDynamicState>& states);
