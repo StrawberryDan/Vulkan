@@ -221,7 +221,7 @@ namespace Strawberry::Vulkan
 	{}
 
 
-	GraphicsPipeline GraphicsPipeline::Builder::Build() const
+	GraphicsPipeline GraphicsPipeline::Builder::Build()
 	{
 		// Create Shader Stages
 		std::vector<VkPipelineShaderStageCreateInfo> stages;

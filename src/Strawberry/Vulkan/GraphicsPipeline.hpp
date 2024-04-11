@@ -87,7 +87,7 @@ namespace Strawberry::Vulkan
 		Builder& WithDynamicState(const std::vector<VkDynamicState>& states);
 
 
-		[[nodiscard]] GraphicsPipeline Build() const;
+		[[nodiscard]] GraphicsPipeline Build();
 
 
 	private:
