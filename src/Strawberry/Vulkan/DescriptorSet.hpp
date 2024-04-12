@@ -38,7 +38,8 @@ namespace Strawberry::Vulkan
 		~DescriptorSet();
 
 
-		void SetUniformBuffer(uint32_t binding, uint32_t arrayElement, const Vulkan::Buffer& buffer);
+		void SetUniformBuffer(uint32_t binding, uint32_t arrayElement, const Buffer& buffer);
+		void SetStorageBuffer(uint32_t binding, uint32_t arrayElement, const Buffer& buffer);
 
 
 		void SetUniformTexture(uint32_t binding, uint32_t arrayElement, const Sampler& sampler, const ImageView& image, VkImageLayout layout);
