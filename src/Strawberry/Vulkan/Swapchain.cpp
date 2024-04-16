@@ -227,6 +227,14 @@ namespace Strawberry::Vulkan
 			}
 		}
 
+		switch (presentResult)
+		{
+			case VK_SUCCESS:
+				break;
+			default:
+				Core::Unreachable();
+		}
+
 		mNextImageIndex.Reset();
 	}
 }
