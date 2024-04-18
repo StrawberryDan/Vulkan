@@ -38,7 +38,7 @@ namespace Strawberry::Vulkan
 
 
 	public:
-		explicit Swapchain(const Queue& queue, const Surface& surface, Core::Math::Vec2i extents);
+		Swapchain(const Queue& queue, const Surface& surface, Core::Math::Vec2i extents, VkPresentModeKHR presentMode);
 		Swapchain(const Swapchain& rhs) = delete;
 		Swapchain& operator=(const Swapchain& rhs) = delete;
 		Swapchain(Swapchain&& rhs) noexcept;

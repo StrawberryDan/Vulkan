@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Swapchain::Swapchain(const Queue& queue, const Surface& surface, Core::Math::Vec2i extents)
+	Swapchain::Swapchain(const Queue& queue, const Surface& surface, Core::Math::Vec2i extents, VkPresentModeKHR presentMode)
 		: mQueue(queue)
 		, mSize(extents)
 	{
@@ -62,7 +62,7 @@ namespace Strawberry::Vulkan
 				.pQueueFamilyIndices = nullptr,
 				.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR,
 				.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
-				.presentMode = VK_PRESENT_MODE_FIFO_KHR,
+				.presentMode = presentMode,
 				.clipped = VK_TRUE,
 				.oldSwapchain = VK_NULL_HANDLE,
 			};
