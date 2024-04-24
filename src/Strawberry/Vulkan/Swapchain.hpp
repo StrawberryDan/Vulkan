@@ -62,6 +62,9 @@ namespace Strawberry::Vulkan
 		void Present();
 
 
+		bool IsOutOfDate() const;
+
+
 	private:
 		VkSwapchainKHR mSwapchain;
 
@@ -72,5 +75,7 @@ namespace Strawberry::Vulkan
 
 		std::vector<Image> mImages;
 		Core::Optional<uint32_t> mNextImageIndex;
+
+		bool mIsOutOfDate = false;
 	};
 }

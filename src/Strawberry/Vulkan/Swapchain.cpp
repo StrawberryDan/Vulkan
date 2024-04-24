@@ -220,7 +220,11 @@ namespace Strawberry::Vulkan
 		{
 			{
 				case VK_SUCCESS:
+					break;
 				case VK_SUBOPTIMAL_KHR:
+					break;
+				case VK_ERROR_OUT_OF_DATE_KHR:
+					mIsOutOfDate = true;
 					break;
 				default:
 					Core::Unreachable();
@@ -231,10 +235,19 @@ namespace Strawberry::Vulkan
 		{
 			case VK_SUCCESS:
 				break;
+			case VK_ERROR_OUT_OF_DATE_KHR:
+				mIsOutOfDate = true;
+				break;
 			default:
 				Core::Unreachable();
 		}
 
 		mNextImageIndex.Reset();
+	}
+
+
+	bool Swapchain::IsOutOfDate() const
+	{
+		return mIsOutOfDate;
 	}
 }
