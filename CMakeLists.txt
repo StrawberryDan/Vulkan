@@ -18,17 +18,6 @@ include(share/Shaders.cmake)
 find_package(Vulkan REQUIRED)
 
 
-option(FT_DISABLE_BROTLI "" ON)
-option(FT_DISABLE_BZIP2 "" ON)
-option(FT_DISABLE_HARFBUZZ "" ON)
-option(FT_DISABLE_PNG "" ON)
-option(FT_DISABLE_ZLIB "" ON)
-FetchContent_Declare(FREETYPE
-	GIT_REPOSITORY "https://gitlab.freedesktop.org/freetype/freetype.git"
-)
-FetchContent_MakeAvailable(FREETYPE)
-
-
 if (NOT TARGET StrawberryCore AND IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../Core)
 	add_subdirectory(../Core ${CMAKE_CURRENT_BINARY_DIR}/Core)
 endif()
@@ -91,7 +80,7 @@ add_library(StrawberryVulkan STATIC
 		src/Strawberry/Vulkan/Swapchain.cpp
 		src/Strawberry/Vulkan/Swapchain.hpp
 )
-target_link_libraries(StrawberryVulkan PUBLIC StrawberryCore StrawberryWindow Vulkan::Vulkan freetype)
+target_link_libraries(StrawberryVulkan PUBLIC StrawberryCore StrawberryWindow Vulkan::Vulkan)
 target_include_directories(StrawberryVulkan PUBLIC src)
 target_compile_definitions(StrawberryVulkan PUBLIC GLFW_INCLUDE_VULKAN)
 set_target_properties(StrawberryVulkan PROPERTIES CXX_STANDARD 20)
