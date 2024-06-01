@@ -270,7 +270,7 @@ namespace Strawberry::Vulkan
 		{
 			if (barrier.IsType<ImageMemoryBarrier>())
 			{
-				imageBarriers.emplace_back(barrier.Value<ImageMemoryBarrier>().Value());
+				imageBarriers.emplace_back(barrier.Ref<ImageMemoryBarrier>());
 			}
 		}
 
