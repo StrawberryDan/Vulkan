@@ -85,10 +85,6 @@ target_include_directories(StrawberryVulkan PUBLIC src)
 target_compile_definitions(StrawberryVulkan PUBLIC GLFW_INCLUDE_VULKAN)
 set_target_properties(StrawberryVulkan PROPERTIES CXX_STANDARD 23)
 
-if (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
-	target_link_options(StrawberryVulkan PRIVATE "-static")
-endif()
-
 
 add_executable(StrawberryVulkanTest test/Main.cpp)
 target_link_libraries(StrawberryVulkanTest PRIVATE StrawberryVulkan)
@@ -97,7 +93,3 @@ add_target_shaders(TARGET StrawberryVulkanTest SHADERS
 		${CMAKE_CURRENT_SOURCE_DIR}/test/Mesh.vert
 		${CMAKE_CURRENT_SOURCE_DIR}/test/SolidColor.frag
 		${CMAKE_CURRENT_SOURCE_DIR}/test/Texture.frag)
-
-if (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
-	target_link_options(StrawberryVulkanTest PRIVATE "-static")
-endif()
