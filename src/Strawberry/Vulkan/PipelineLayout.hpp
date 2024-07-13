@@ -14,7 +14,7 @@
 namespace Strawberry::Vulkan
 {
     class PipelineLayout
-        : public Core::EnableReflexivePointer<PipelineLayout>
+        : public Core::EnableReflexivePointer
     {
     public:
         class Builder;

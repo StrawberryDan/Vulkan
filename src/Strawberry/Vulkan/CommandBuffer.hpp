@@ -46,7 +46,7 @@ namespace Strawberry::Vulkan
 
 
 	class CommandBuffer
-		: public Core::EnableReflexivePointer<CommandBuffer>
+		: public Core::EnableReflexivePointer
 	{
 		friend class Queue;
 

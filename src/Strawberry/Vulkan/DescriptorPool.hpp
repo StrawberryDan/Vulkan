@@ -22,7 +22,7 @@ namespace Strawberry::Vulkan
 
 
 	class DescriptorPool
-		: public Core::EnableReflexivePointer<DescriptorPool>
+		: public Core::EnableReflexivePointer
 	{
 		friend class DescriptorSet;
 

@@ -34,7 +34,7 @@ namespace Strawberry::Vulkan
 
 
 	class Device
-		: public Core::EnableReflexivePointer<Device>
+		: public Core::EnableReflexivePointer
 	{
 	public:
 		explicit Device(const PhysicalDevice& physicalDevice, std::vector<QueueCreateInfo> queueCreateInfo);

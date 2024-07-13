@@ -20,7 +20,7 @@ namespace Strawberry::Vulkan
     
     
 	class PhysicalDevice
-		: public Core::EnableReflexivePointer<PhysicalDevice>
+		: public Core::EnableReflexivePointer
 	{
 		friend class Instance;
 		friend class Surface;

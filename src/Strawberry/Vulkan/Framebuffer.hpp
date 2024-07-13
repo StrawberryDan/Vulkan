@@ -26,7 +26,7 @@ namespace Strawberry::Vulkan
 
 
 	class Framebuffer
-		: public Core::EnableReflexivePointer<Framebuffer>
+		: public Core::EnableReflexivePointer
 	{
 		friend class CommandBuffer;
 

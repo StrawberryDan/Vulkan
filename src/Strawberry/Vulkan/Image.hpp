@@ -27,7 +27,7 @@ namespace Strawberry::Vulkan
 
 
 	class Image
-		: public Core::EnableReflexivePointer<Image>
+		: public Core::EnableReflexivePointer
 	{
 		friend class ImageView;
 		friend class CommandBuffer;

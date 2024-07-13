@@ -59,7 +59,7 @@ namespace Strawberry::Vulkan
 
 
 	class Allocator
-		: public Core::EnableReflexivePointer<Allocator>
+		: public Core::EnableReflexivePointer
 	{
 	public:
 		                         Allocator(Device& device);

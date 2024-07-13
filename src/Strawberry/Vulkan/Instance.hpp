@@ -21,7 +21,7 @@ namespace Strawberry::Vulkan
 
 
 	class Instance
-		: public Core::EnableReflexivePointer<Instance>
+		: public Core::EnableReflexivePointer
 	{
 		friend class Device;
 		friend class Surface;

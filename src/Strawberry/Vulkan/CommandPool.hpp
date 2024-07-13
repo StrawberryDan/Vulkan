@@ -22,7 +22,7 @@ namespace Strawberry::Vulkan
 
 
 	class CommandPool
-		: public Core::EnableReflexivePointer<CommandPool>
+		: public Core::EnableReflexivePointer
 	{
 		friend class CommandBuffer;
 

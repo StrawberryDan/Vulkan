@@ -25,7 +25,7 @@ namespace Strawberry::Vulkan
 
 
 	class Queue
-		: public Core::EnableReflexivePointer<Queue>
+		: public Core::EnableReflexivePointer
 	{
 		friend class Device;
 		friend class Swapchain;
