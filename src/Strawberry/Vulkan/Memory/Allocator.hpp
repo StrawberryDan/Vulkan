@@ -3,7 +3,7 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 // Strawberry Vulkan
-#include "Strawberry/Vulkan/Address.hpp"
+#include "Strawberry/Vulkan/Memory/Memory.hpp"
 #include "Strawberry/Vulkan/Device.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Types/ReflexivePointer.hpp"

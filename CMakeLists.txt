@@ -29,10 +29,10 @@ endif ()
 
 
 add_library(StrawberryVulkan STATIC
-	src/Strawberry/Vulkan/Address.hpp
-	src/Strawberry/Vulkan/Allocator.cpp
-	src/Strawberry/Vulkan/Allocator.hpp
-	src/Strawberry/Vulkan/Allocator.hpp
+	src/Strawberry/Vulkan/Memory/Memory.hpp
+	src/Strawberry/Vulkan/Memory/Allocator.cpp
+	src/Strawberry/Vulkan/Memory/Allocator.hpp
+	src/Strawberry/Vulkan/Memory/Allocator.hpp
 	src/Strawberry/Vulkan/Buffer.cpp
 	src/Strawberry/Vulkan/Buffer.hpp
 	src/Strawberry/Vulkan/BufferView.cpp
@@ -61,8 +61,8 @@ add_library(StrawberryVulkan STATIC
 	src/Strawberry/Vulkan/ImageView.hpp
 	src/Strawberry/Vulkan/Instance.cpp
 	src/Strawberry/Vulkan/Instance.hpp
-	src/Strawberry/Vulkan/NaiveAllocator.cpp
-	src/Strawberry/Vulkan/NaiveAllocator.hpp
+	src/Strawberry/Vulkan/Memory/NaiveAllocator.cpp
+	src/Strawberry/Vulkan/Memory/NaiveAllocator.hpp
 	src/Strawberry/Vulkan/PhysicalDevice.cpp
 	src/Strawberry/Vulkan/PhysicalDevice.hpp
 	src/Strawberry/Vulkan/PipelineLayout.cpp

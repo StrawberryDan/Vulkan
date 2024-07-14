@@ -2,7 +2,7 @@
 #include "Strawberry/Core/Math/Matrix.hpp"
 #include "Strawberry/Core/Timing/Clock.hpp"
 #include "Strawberry/Core/UTF.hpp"
-#include "Strawberry/Vulkan/Allocator.hpp"
+#include "Strawberry/Vulkan/Memory/Allocator.hpp"
 #include "Strawberry/Vulkan/Buffer.hpp"
 #include "Strawberry/Vulkan/CommandBuffer.hpp"
 #include "Strawberry/Vulkan/CommandPool.hpp"
@@ -11,7 +11,7 @@
 #include "Strawberry/Vulkan/GraphicsPipeline.hpp"
 #include "Strawberry/Vulkan/Image.hpp"
 #include "Strawberry/Vulkan/Instance.hpp"
-#include "Strawberry/Vulkan/NaiveAllocator.hpp"
+#include "Strawberry/Vulkan/Memory/NaiveAllocator.hpp"
 #include "Strawberry/Vulkan/Queue.hpp"
 #include "Strawberry/Vulkan/RenderPass.hpp"
 #include "Strawberry/Vulkan/Sampler.hpp"
@@ -52,28 +52,28 @@ void BasicRendering()
 	Vulkan::Device  device(gpu, {QueueCreateInfo{queueFamily, 1}});
 	Vulkan::Surface surface    = window.Create<Surface>(device);
 	RenderPass      renderPass = RenderPass::Builder(device)
-	                             .WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT,
-	                                                  VK_ATTACHMENT_LOAD_OP_CLEAR,
-	                                                  VK_ATTACHMENT_STORE_OP_STORE,
-	                                                  VK_IMAGE_LAYOUT_GENERAL,
-	                                                  VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
-	                             .WithSubpass(SubpassDescription().WithColorAttachment(0))
-	                             .Build();
+	                        .WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT,
+	                                             VK_ATTACHMENT_LOAD_OP_CLEAR,
+	                                             VK_ATTACHMENT_STORE_OP_STORE,
+	                                             VK_IMAGE_LAYOUT_GENERAL,
+	                                             VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+	                        .WithSubpass(SubpassDescription().WithColorAttachment(0))
+	                        .Build();
 	auto           vertexShader   = Shader::Compile(device, Core::IO::DynamicByteBuffer(meshVertexShader, sizeof(meshVertexShader))).Unwrap();
 	auto           fragmentShader = Shader::Compile(device, Core::IO::DynamicByteBuffer(textureFragShader, sizeof(textureFragShader))).Unwrap();
 	PipelineLayout layout         = PipelineLayout::Builder(device)
-	                                .WithPushConstantRange(16 * sizeof(float), 0, VK_SHADER_STAGE_VERTEX_BIT)
-	                                .WithPushConstantRange(3 * sizeof(float), 16 * sizeof(float), VK_SHADER_STAGE_FRAGMENT_BIT)
-	                                .WithDescriptorSet({
-		                                VkDescriptorSetLayoutBinding{
-			                                .binding = 0,
-			                                .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			                                .descriptorCount = 1,
-			                                .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
-			                                .pImmutableSamplers = nullptr,
-		                                }
-	                                })
-	                                .Build();
+	                        .WithPushConstantRange(16 * sizeof(float), 0, VK_SHADER_STAGE_VERTEX_BIT)
+	                        .WithPushConstantRange(3 * sizeof(float), 16 * sizeof(float), VK_SHADER_STAGE_FRAGMENT_BIT)
+	                        .WithDescriptorSet({
+		                        VkDescriptorSetLayoutBinding{
+			                        .binding = 0,
+			                        .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			                        .descriptorCount = 1,
+			                        .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+			                        .pImmutableSamplers = nullptr,
+		                        }
+	                        })
+	                        .Build();
 	GraphicsPipeline pipeline = GraphicsPipeline::Builder(layout, renderPass, 0)
 	                            .WithShaderStage(VK_SHADER_STAGE_VERTEX_BIT, std::move(vertexShader))
 	                            .WithShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT, std::move(fragmentShader))

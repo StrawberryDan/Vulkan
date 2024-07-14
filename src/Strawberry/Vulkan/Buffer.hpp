@@ -5,7 +5,7 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 // Strawberry Vulkan
-#include "Strawberry/Vulkan/Allocator.hpp"
+#include "Strawberry/Vulkan/Memory/Allocator.hpp"
 // Strawberry Core
 #include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
 // Vulkan
