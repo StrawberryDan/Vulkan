@@ -74,7 +74,7 @@ namespace Strawberry::Vulkan
 
 
 		virtual AllocationResult Allocate(size_t size, uint32_t typeMask, VkMemoryPropertyFlags properties) noexcept = 0;
-		virtual void             Free(GPUAddress address) noexcept = 0;
+		virtual void             Free(Address address) noexcept = 0;
 		virtual                  ~Allocator() = default;
 
 
@@ -89,7 +89,7 @@ namespace Strawberry::Vulkan
 	{
 	public:
 		Allocation() = default;
-		Allocation(Allocator& allocator, GPUMemoryRange memoryRange, VkMemoryPropertyFlags memoryType);
+		Allocation(Allocator& allocator, MemorySpan memoryRange, VkMemoryPropertyFlags memoryType);
 		Allocation(const Allocation&)            = delete;
 		Allocation& operator=(const Allocation&) = delete;
 		Allocation(Allocation&& other) noexcept;
@@ -97,7 +97,7 @@ namespace Strawberry::Vulkan
 		~Allocation();
 
 
-		const GPUAddress& Address() const noexcept;
+		const Address& Address() const noexcept;
 		const size_t      Size() const noexcept;
 
 
@@ -107,7 +107,7 @@ namespace Strawberry::Vulkan
 
 	private:
 		Core::ReflexivePointer<Allocator> mAllocator = nullptr;
-		GPUMemoryRange                    mRange     = GPUMemoryRange();
+		MemorySpan                    mRange     = MemorySpan();
 		VkMemoryPropertyFlags             mMemoryType;
 		mutable Core::Optional<uint8_t*>  mMappedAddress;
 	};

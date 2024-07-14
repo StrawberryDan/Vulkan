@@ -19,7 +19,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Allocation::Allocation(Allocator& allocator, GPUMemoryRange memoryRange, VkMemoryPropertyFlags memoryType)
+	Allocation::Allocation(Allocator& allocator, MemorySpan memoryRange, VkMemoryPropertyFlags memoryType)
 		: mAllocator(allocator)
 		, mRange(memoryRange)
 		, mMemoryType(memoryType) {}
@@ -49,7 +49,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	const GPUAddress& Allocation::Address() const noexcept
+	const Address& Allocation::Address() const noexcept
 	{
 		return mRange.address;
 	}

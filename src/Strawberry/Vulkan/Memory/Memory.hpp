@@ -13,21 +13,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	struct GPUAddress
+	struct Address
 	{
 		VkDeviceMemory deviceMemory = VK_NULL_HANDLE;
 		uintptr_t      offset       = 0;
 
 
-		bool operator==(const GPUAddress&) const noexcept = default;
-		bool operator!=(const GPUAddress&) const noexcept = default;
+		bool operator==(const Address&) const noexcept = default;
+		bool operator!=(const Address&) const noexcept = default;
 	};
 
 
-	struct GPUMemoryRange
+	struct MemorySpan
 	{
-		GPUAddress address = GPUAddress();
-		size_t     size    = 0;
+		Address address = Address();
+		size_t  size    = 0;
 	};
 }
 
@@ -35,9 +35,9 @@ namespace Strawberry::Vulkan
 namespace std
 {
 	template<>
-	struct hash<Strawberry::Vulkan::GPUAddress>
+	struct hash<Strawberry::Vulkan::Address>
 	{
-		std::size_t operator()(const Strawberry::Vulkan::GPUAddress& address) const noexcept
+		std::size_t operator()(const Strawberry::Vulkan::Address& address) const noexcept
 		{
 			std::size_t hash = reinterpret_cast<uintptr_t>(address.deviceMemory);
 			hash             = hash xor address.offset;

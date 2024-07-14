@@ -19,6 +19,6 @@ namespace Strawberry::Vulkan
 
 
 		AllocationResult Allocate(size_t size, uint32_t typeMask, VkMemoryPropertyFlags properties) noexcept override;
-		void             Free(GPUAddress address) noexcept override;
+		void             Free(Address address) noexcept override;
 	};
 }

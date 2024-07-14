@@ -34,7 +34,7 @@ namespace Strawberry::Vulkan
 			.memoryTypeIndex = chosenMemoryType,
 		};
 
-		GPUAddress address;
+		Address address;
 		VkResult   allocationResult = vkAllocateMemory(*GetDevice(), &allocateInfo, nullptr, &address.deviceMemory);
 
 		switch (allocationResult)
@@ -54,7 +54,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	void NaiveAllocator::Free(GPUAddress address) noexcept
+	void NaiveAllocator::Free(Address address) noexcept
 	{
 		vkFreeMemory(*GetDevice(), address.deviceMemory, nullptr);
 	}
