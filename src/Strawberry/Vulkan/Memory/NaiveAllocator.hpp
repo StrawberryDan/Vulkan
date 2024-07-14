@@ -17,7 +17,13 @@ namespace Strawberry::Vulkan
 			: public Allocator
 	{
 	public:
+		using RawAllocationResult = Core::Result<Allocation, AllocationError>;
+
+
 		NaiveAllocator(Device& device);
+
+
+		RawAllocationResult AllocateRaw(size_t size, uint32_t typeMask, VkMemoryPropertyFlags properties) noexcept;
 
 
 		AllocationResult Allocate(size_t size, uint32_t typeMask, VkMemoryPropertyFlags properties) noexcept override;

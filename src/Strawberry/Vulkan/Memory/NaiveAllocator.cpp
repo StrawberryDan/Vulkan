@@ -13,7 +13,7 @@ namespace Strawberry::Vulkan
 		: Allocator(device) {}
 
 
-	AllocationResult NaiveAllocator::Allocate(size_t size, uint32_t typeMask, VkMemoryPropertyFlags properties) noexcept
+	NaiveAllocator::RawAllocationResult NaiveAllocator::AllocateRaw(size_t size, uint32_t typeMask, VkMemoryPropertyFlags properties) noexcept
 	{
 		auto physicalDevice       = GetDevice()->GetPhysicalDevices()[0];
 		auto memoryTypeCandidates = physicalDevice->SearchMemoryTypes(typeMask, properties);
@@ -21,7 +21,7 @@ namespace Strawberry::Vulkan
 
 		if (memoryTypeCandidates.empty())
 		{
-			return AllocationResult::Err(AllocationError::MemoryTypeUnavailable());
+			return RawAllocationResult::Err(AllocationError::MemoryTypeUnavailable());
 		}
 		auto chosenMemoryType = memoryTypeCandidates[0];
 
@@ -40,9 +40,9 @@ namespace Strawberry::Vulkan
 		switch (allocationResult)
 		{
 			case VK_ERROR_OUT_OF_HOST_MEMORY:
-				return AllocationResult::Err(AllocationError::OutOfHostMemory());
+				return RawAllocationResult::Err(AllocationError::OutOfHostMemory());
 			case VK_ERROR_OUT_OF_DEVICE_MEMORY:
-				return AllocationResult::Err(AllocationError::OutOfDeviceMemory());
+				return RawAllocationResult::Err(AllocationError::OutOfDeviceMemory());
 			case VK_SUCCESS:
 				break;
 			default:
@@ -50,10 +50,22 @@ namespace Strawberry::Vulkan
 		}
 
 
-		Allocation allocation(*this, address.deviceMemory, size, physicalDevice->GetMemoryProperties().memoryTypes[chosenMemoryType].propertyFlags);
-		auto allocationIter = mAllocations.emplace(address.deviceMemory, std::move(allocation)).first;
+		return Allocation(*this, address.deviceMemory, size, physicalDevice->GetMemoryProperties().memoryTypes[chosenMemoryType].propertyFlags);
+	}
 
-		return allocationIter->second.AllocateView(0, size);
+
+	AllocationResult NaiveAllocator::Allocate(size_t size, uint32_t typeMask, VkMemoryPropertyFlags properties) noexcept
+	{
+		if (auto allocation = AllocateRaw(size, typeMask, properties))
+		{
+			auto address = allocation->Memory();
+			auto allocationIter = mAllocations.emplace(address, allocation.Unwrap()).first;
+			return allocationIter->second.AllocateView(0, size);
+		}
+		else
+		{
+			return allocation.Err();
+		}
 	}
 
 
