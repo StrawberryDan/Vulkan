@@ -94,7 +94,7 @@ namespace Strawberry::Vulkan
 
 	private:
 		VkImage           mImage;
-		Allocation        mMemory;
+		AllocationView    mMemory;
 		VkDevice          mDevice;
 		VkFormat          mFormat;
 		Core::Math::Vec3u mSize;

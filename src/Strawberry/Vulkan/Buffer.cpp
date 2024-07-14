@@ -37,7 +37,7 @@ namespace Strawberry::Vulkan
 
 
 		mMemory = allocator->Allocate(memoryRequirements.size, memoryRequirements.memoryTypeBits, properties).Unwrap();
-		Core::AssertEQ(vkBindBufferMemory(mDevice, mBuffer, mMemory.Address().deviceMemory, mMemory.Address().offset), VK_SUCCESS);
+		Core::AssertEQ(vkBindBufferMemory(mDevice, mBuffer, mMemory.Memory(), mMemory.Offset()), VK_SUCCESS);
 	}
 
 

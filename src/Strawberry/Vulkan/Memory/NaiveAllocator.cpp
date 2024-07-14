@@ -50,12 +50,16 @@ namespace Strawberry::Vulkan
 		}
 
 
-		return Allocation(*this, address.deviceMemory, size, physicalDevice->GetMemoryProperties().memoryTypes[chosenMemoryType].propertyFlags);
+		Allocation allocation(*this, address.deviceMemory, size, physicalDevice->GetMemoryProperties().memoryTypes[chosenMemoryType].propertyFlags);
+		auto allocationIter = mAllocations.emplace(address.deviceMemory, std::move(allocation)).first;
+
+		return allocationIter->second.AllocateView(0, size);
 	}
 
 
-	void NaiveAllocator::Free(Allocation&& address) noexcept
+	void NaiveAllocator::Free(AllocationView&& address) noexcept
 	{
-		vkFreeMemory(*GetDevice(), address.Memory(), nullptr);
+		// Free memory
+		mAllocations.erase(address.Memory());
 	}
 }

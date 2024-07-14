@@ -61,9 +61,10 @@ namespace Strawberry::Vulkan
 
 
 	class Allocation;
+	class AllocationView;
 
 
-	using AllocationResult = Core::Result<Allocation, AllocationError>;
+	using AllocationResult = Core::Result<AllocationView, AllocationError>;
 
 
 	class Allocator
@@ -74,7 +75,8 @@ namespace Strawberry::Vulkan
 
 
 		virtual AllocationResult Allocate(size_t size, uint32_t typeMask, VkMemoryPropertyFlags properties) noexcept = 0;
-		virtual void             Free(Allocation&& address) noexcept = 0;
+		void                     Free(Allocation&& allocation) const;
+		virtual void             Free(AllocationView&& address) noexcept = 0;
 		virtual                  ~Allocator() = default;
 
 
@@ -86,6 +88,7 @@ namespace Strawberry::Vulkan
 
 
 	class Allocation
+			: public Core::EnableReflexivePointer
 	{
 	public:
 		Allocation() = default;
@@ -94,23 +97,52 @@ namespace Strawberry::Vulkan
 		Allocation& operator=(const Allocation&) = delete;
 		Allocation(Allocation&& other) noexcept;
 		Allocation& operator=(Allocation&& other) noexcept;
-		~Allocation();
+		~Allocation() override;
 
 
-		VkDeviceMemory Memory() const noexcept;
-		Address Address() const noexcept;
-		size_t  Size() const noexcept;
+		AllocationView AllocateView(size_t offset, size_t size);
 
 
-		uint8_t* GetMappedAddress() const noexcept;
-		void     Flush() const noexcept;
-		void     Overwrite(const Core::IO::DynamicByteBuffer& bytes) const noexcept;
+		Core::ReflexivePointer<Allocator> GetAllocator() const noexcept;
+		VkDeviceMemory                    Memory() const noexcept;
+		size_t                            Size() const noexcept;
+		VkMemoryPropertyFlags             Properties() const;
+		uint8_t*                          GetMappedAddress() const noexcept;
+
+
+		void Flush() const noexcept;
+		void Overwrite(const Core::IO::DynamicByteBuffer& bytes) const noexcept;
 
 	private:
-		Core::ReflexivePointer<Allocator> mAllocator  = nullptr;
-		VkDeviceMemory                    mMemory     = VK_NULL_HANDLE;
-		size_t                            mSize       = 0;
+		Core::ReflexivePointer<Allocator> mAllocator        = nullptr;
+		VkDeviceMemory                    mMemory           = VK_NULL_HANDLE;
+		size_t                            mSize             = 0;
 		VkMemoryPropertyFlags             mMemoryProperties = 0;
 		mutable Core::Optional<uint8_t*>  mMappedAddress;
+	};
+
+
+	class AllocationView
+	{
+	public:
+		AllocationView() = default;
+		AllocationView(Allocation& allocation, size_t offset, size_t size);
+
+
+		[[nodiscard]] Core::ReflexivePointer<Allocator> GetAllocator() const noexcept;
+		[[nodiscard]] VkDeviceMemory                    Memory() const noexcept;
+		[[nodiscard]] size_t                            Offset() const noexcept;
+		[[nodiscard]] size_t                            Size() const noexcept;
+		[[nodiscard]] VkMemoryPropertyFlags             Properties() const;
+		[[nodiscard]] uint8_t*                          GetMappedAddress() const noexcept;
+
+
+		void Flush() const noexcept;
+		void Overwrite(const Core::IO::DynamicByteBuffer& bytes) const noexcept;
+
+	private:
+		Core::ReflexivePointer<Allocation> mAllocation = nullptr;
+		size_t                             mOffset     = 0;
+		size_t                             mSize       = 0;
 	};
 }

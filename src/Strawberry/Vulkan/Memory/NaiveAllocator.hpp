@@ -4,6 +4,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Strawberry Vulkan
 #include "Allocator.hpp"
+// Standard Library
+#include <set>
 
 
 //======================================================================================================================
@@ -19,6 +21,9 @@ namespace Strawberry::Vulkan
 
 
 		AllocationResult Allocate(size_t size, uint32_t typeMask, VkMemoryPropertyFlags properties) noexcept override;
-		void             Free(Allocation&& address) noexcept override;
+		void             Free(AllocationView&& address) noexcept override;
+
+	private:
+		std::map<VkDeviceMemory, Allocation> mAllocations;
 	};
 }

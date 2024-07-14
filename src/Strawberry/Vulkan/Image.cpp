@@ -55,7 +55,7 @@ namespace Strawberry::Vulkan
 		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
 
 		mMemory = allocator->Allocate(memoryRequirements.size, memoryRequirements.memoryTypeBits, memoryProperties).Unwrap();
-		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.Address().deviceMemory, mMemory.Address().offset), VK_SUCCESS);
+		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.Memory(), mMemory.Offset()), VK_SUCCESS);
 	}
 
 
@@ -97,7 +97,7 @@ namespace Strawberry::Vulkan
 		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
 
 		mMemory = allocator->Allocate(memoryRequirements.size, memoryRequirements.memoryTypeBits, memoryProperties).Unwrap();
-		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.Address().deviceMemory, mMemory.Address().offset), VK_SUCCESS);
+		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.Memory(), mMemory.Offset()), VK_SUCCESS);
 	}
 
 
@@ -143,7 +143,7 @@ namespace Strawberry::Vulkan
 		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
 
 		mMemory = allocator->Allocate(memoryRequirements.size, memoryRequirements.memoryTypeBits, memoryProperties).Unwrap();
-		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.Address().deviceMemory, mMemory.Address().offset), VK_SUCCESS);
+		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.Memory(), mMemory.Offset()), VK_SUCCESS);
 	}
 
 

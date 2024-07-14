@@ -56,9 +56,9 @@ namespace Strawberry::Vulkan
 		[[nodiscard]] uint64_t GetSize() const;
 
 	private:
-		uint64_t   mSize;
-		VkBuffer   mBuffer;
-		Allocation mMemory;
-		VkDevice   mDevice;
+		uint64_t       mSize;
+		VkBuffer       mBuffer;
+		AllocationView mMemory;
+		VkDevice       mDevice;
 	};
 }
