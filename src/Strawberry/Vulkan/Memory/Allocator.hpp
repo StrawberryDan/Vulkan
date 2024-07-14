@@ -78,7 +78,7 @@ namespace Strawberry::Vulkan
 		virtual                  ~Allocator() = default;
 
 
-		Core::ReflexivePointer<Device> GetDevice() const noexcept;
+		[[nodiscard]] Core::ReflexivePointer<Device> GetDevice() const noexcept;
 
 	private:
 		Core::ReflexivePointer<Device> mDevice;
