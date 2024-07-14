@@ -50,15 +50,12 @@ namespace Strawberry::Vulkan
 		}
 
 
-		mMemoryProperties.emplace(address.deviceMemory, physicalDevice->GetMemoryProperties().memoryTypes[chosenMemoryType].propertyFlags);
-
-		return Allocation(*this, {address, size});
+		return Allocation(*this, {address, size}, physicalDevice->GetMemoryProperties().memoryTypes[chosenMemoryType].propertyFlags);
 	}
 
 
 	void NaiveAllocator::Free(GPUAddress address) noexcept
 	{
-		mMemoryProperties.erase(address.deviceMemory);
 		vkFreeMemory(*GetDevice(), address.deviceMemory, nullptr);
 	}
 }

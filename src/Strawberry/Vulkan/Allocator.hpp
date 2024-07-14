@@ -70,7 +70,7 @@ namespace Strawberry::Vulkan
 			: public Core::EnableReflexivePointer
 	{
 	public:
-		Allocator(Device& device);
+		explicit Allocator(Device& device);
 
 
 		virtual AllocationResult Allocate(size_t size, uint32_t typeMask, VkMemoryPropertyFlags properties) noexcept = 0;
@@ -80,23 +80,8 @@ namespace Strawberry::Vulkan
 
 		Core::ReflexivePointer<Device> GetDevice() const noexcept;
 
-
-		VkMemoryPropertyFlags GetMemoryProperties(VkDeviceMemory memory) const noexcept;
-		bool                  MemoryHasProperty(VkDeviceMemory memory, VkMemoryPropertyFlags properties) const noexcept;
-
-
-		Core::Optional<uint8_t*> MapMemory(VkDeviceMemory memory) const noexcept;
-		void                     UnmapMemory(VkDeviceMemory memory) const noexcept;
-		bool                     IsMemoryMapped(VkDeviceMemory memory) const noexcept;
-		void                     FlushMappedMemory(VkDeviceMemory memory) const noexcept;
-
-	protected:
-		// Deriving classes MUST keep this table up to date in their Allocate and Free methods.
-		mutable std::map<VkDeviceMemory, VkMemoryPropertyFlags> mMemoryProperties;
-
 	private:
-		Core::ReflexivePointer<Device>             mDevice;
-		mutable std::map<VkDeviceMemory, uint8_t*> mMemoryMappings;
+		Core::ReflexivePointer<Device> mDevice;
 	};
 
 
@@ -104,7 +89,7 @@ namespace Strawberry::Vulkan
 	{
 	public:
 		Allocation() = default;
-		Allocation(Allocator& allocator, GPUMemoryRange memoryRange);
+		Allocation(Allocator& allocator, GPUMemoryRange memoryRange, VkMemoryPropertyFlags memoryType);
 		Allocation(const Allocation&)            = delete;
 		Allocation& operator=(const Allocation&) = delete;
 		Allocation(Allocation&& other) noexcept;
@@ -123,5 +108,7 @@ namespace Strawberry::Vulkan
 	private:
 		Core::ReflexivePointer<Allocator> mAllocator = nullptr;
 		GPUMemoryRange                    mRange     = GPUMemoryRange();
+		VkMemoryPropertyFlags             mMemoryType;
+		mutable Core::Optional<uint8_t*>  mMappedAddress;
 	};
 }
