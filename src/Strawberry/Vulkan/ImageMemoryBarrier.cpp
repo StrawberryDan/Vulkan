@@ -29,8 +29,7 @@ namespace Strawberry::Vulkan
 				.baseArrayLayer = 0,
 				.layerCount = VK_REMAINING_ARRAY_LAYERS
 			},
-		}
-	{}
+		} {}
 
 
 	ImageMemoryBarrier::operator VkImageMemoryBarrier() const

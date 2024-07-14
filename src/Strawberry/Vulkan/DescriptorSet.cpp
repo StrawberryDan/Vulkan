@@ -21,7 +21,7 @@ namespace Strawberry::Vulkan
 		: mDescriptorSet(VK_NULL_HANDLE)
 		, mDescriptorPool(descriptorPool)
 	{
-		VkDescriptorSetAllocateInfo allocateInfo {
+		VkDescriptorSetAllocateInfo allocateInfo{
 			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
 			.pNext = nullptr,
 			.descriptorPool = mDescriptorPool->mDescriptorPool,
@@ -30,24 +30,21 @@ namespace Strawberry::Vulkan
 		};
 
 		Core::AssertEQ(vkAllocateDescriptorSets(*mDescriptorPool->GetDevice(), &allocateInfo, &mDescriptorSet),
-					   VK_SUCCESS);
+		               VK_SUCCESS);
 	}
 
 
 	DescriptorSet::DescriptorSet(DescriptorSet&& rhs) noexcept
 		: mDescriptorSet(std::exchange(rhs.mDescriptorSet, VK_NULL_HANDLE))
-		, mDescriptorPool(std::move(rhs.mDescriptorPool))
-	{
-
-	}
+		, mDescriptorPool(std::move(rhs.mDescriptorPool)) {}
 
 
 	DescriptorSet& DescriptorSet::operator=(DescriptorSet&& rhs) noexcept
 	{
 		if (this != &rhs)
 		{
-		    std::destroy_at(this);
-		    std::construct_at(this, std::move(rhs));
+			std::destroy_at(this);
+			std::construct_at(this, std::move(rhs));
 		}
 
 		return *this;
@@ -65,12 +62,12 @@ namespace Strawberry::Vulkan
 
 	void DescriptorSet::SetUniformBuffer(uint32_t binding, uint32_t arrayElement, const Buffer& buffer)
 	{
-		VkDescriptorBufferInfo bufferInfo {
+		VkDescriptorBufferInfo bufferInfo{
 			.buffer = buffer,
 			.offset = 0,
 			.range = buffer.GetSize()
 		};
-		VkWriteDescriptorSet write {
+		VkWriteDescriptorSet write{
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 			.pNext = nullptr,
 			.dstSet = mDescriptorSet,
@@ -88,36 +85,39 @@ namespace Strawberry::Vulkan
 
 	void DescriptorSet::SetStorageBuffer(uint32_t binding, uint32_t arrayElement, const Strawberry::Vulkan::Buffer& buffer)
 	{
-		VkDescriptorBufferInfo bufferInfo {
-				.buffer = buffer,
-				.offset = 0,
-				.range = buffer.GetSize()
+		VkDescriptorBufferInfo bufferInfo{
+			.buffer = buffer,
+			.offset = 0,
+			.range = buffer.GetSize()
 		};
-		VkWriteDescriptorSet write {
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.pNext = nullptr,
-				.dstSet = mDescriptorSet,
-				.dstBinding = binding,
-				.dstArrayElement = arrayElement,
-				.descriptorCount = 1,
-				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-				.pImageInfo = nullptr,
-				.pBufferInfo = &bufferInfo,
-				.pTexelBufferView = nullptr,
+		VkWriteDescriptorSet write{
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.pNext = nullptr,
+			.dstSet = mDescriptorSet,
+			.dstBinding = binding,
+			.dstArrayElement = arrayElement,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.pImageInfo = nullptr,
+			.pBufferInfo = &bufferInfo,
+			.pTexelBufferView = nullptr,
 		};
 		vkUpdateDescriptorSets(*mDescriptorPool->GetDevice(), 1, &write, 0, nullptr);
 	}
 
-	void DescriptorSet::SetUniformTexture(uint32_t binding, uint32_t arrayElement, const Sampler& sampler,
-										  const ImageView& image,
-										  VkImageLayout layout)
+
+	void DescriptorSet::SetUniformTexture(uint32_t         binding,
+	                                      uint32_t         arrayElement,
+	                                      const Sampler&   sampler,
+	                                      const ImageView& image,
+	                                      VkImageLayout    layout)
 	{
-		VkDescriptorImageInfo imageInfo {
+		VkDescriptorImageInfo imageInfo{
 			.sampler = sampler,
 			.imageView = image,
 			.imageLayout = layout,
 		};
-		VkWriteDescriptorSet write {
+		VkWriteDescriptorSet write{
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 			.pNext = nullptr,
 			.dstSet = mDescriptorSet,

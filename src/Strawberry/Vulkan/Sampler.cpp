@@ -17,7 +17,7 @@ namespace Strawberry::Vulkan
 	Sampler::Sampler(const Device& device, VkFilter magFilter, VkFilter minFilter, bool normaliseCoords)
 		: mDevice(device)
 	{
-		VkSamplerCreateInfo createInfo {
+		VkSamplerCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -43,18 +43,15 @@ namespace Strawberry::Vulkan
 
 	Sampler::Sampler(Sampler&& rhs) noexcept
 		: mSampler(std::exchange(rhs.mSampler, nullptr))
-		, mDevice(std::move(rhs.mDevice))
-	{
-
-	}
+		, mDevice(std::move(rhs.mDevice)) {}
 
 
 	Sampler& Sampler::operator=(Sampler&& rhs) noexcept
 	{
 		if (this != &rhs)
 		{
-		    std::destroy_at(this);
-		    std::construct_at(this, std::move(rhs));
+			std::destroy_at(this);
+			std::construct_at(this, std::move(rhs));
 		}
 
 		return *this;

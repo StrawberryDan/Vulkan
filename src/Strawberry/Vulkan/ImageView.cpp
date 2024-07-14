@@ -14,8 +14,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	ImageView::ImageView(const Image& image, VkImageViewType viewType, VkFormat format,
-						 VkComponentMapping componentMapping, VkImageSubresourceRange subresourceRange)
+	ImageView::ImageView(const Image&            image,
+	                     VkImageViewType         viewType,
+	                     VkFormat                format,
+	                     VkComponentMapping      componentMapping,
+	                     VkImageSubresourceRange subresourceRange)
 		: mImageView(nullptr)
 		, mDevice(image.mDevice)
 	{
@@ -36,10 +39,7 @@ namespace Strawberry::Vulkan
 
 	ImageView::ImageView(ImageView&& rhs) noexcept
 		: mImageView(std::exchange(rhs.mImageView, nullptr))
-		, mDevice(std::exchange(rhs.mDevice, nullptr))
-	{
-
-	}
+		, mDevice(std::exchange(rhs.mDevice, nullptr)) {}
 
 
 	ImageView& ImageView::operator=(ImageView&& rhs) noexcept
@@ -70,10 +70,7 @@ namespace Strawberry::Vulkan
 
 
 	ImageView::Builder::Builder(const Image& image)
-		: mImage(&image)
-	{
-
-	}
+		: mImage(&image) {}
 
 
 	ImageView::Builder& ImageView::Builder::WithType(VkImageViewType type)

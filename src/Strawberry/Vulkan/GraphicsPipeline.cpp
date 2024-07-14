@@ -24,10 +24,7 @@ namespace Strawberry::Vulkan
 	GraphicsPipeline::GraphicsPipeline(GraphicsPipeline&& rhs) noexcept
 		: mPipeline(std::exchange(rhs.mPipeline, nullptr))
 		, mPipelineLayout(std::exchange(rhs.mPipelineLayout, nullptr))
-		, mRenderPass(std::move(rhs.mRenderPass))
-	{
-
-	}
+		, mRenderPass(std::move(rhs.mRenderPass)) {}
 
 
 	GraphicsPipeline& GraphicsPipeline::operator=(GraphicsPipeline&& rhs) noexcept
@@ -54,8 +51,7 @@ namespace Strawberry::Vulkan
 	GraphicsPipeline::Builder::Builder(const PipelineLayout& layout, const RenderPass& renderPass, uint32_t subpass)
 		: mRenderPass(renderPass)
 		, mSubpass(subpass)
-		, mPipelineLayout(layout)
-	{}
+		, mPipelineLayout(layout) {}
 
 
 	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithShaderStage(VkShaderStageFlagBits stage, Shader shader)
@@ -67,9 +63,10 @@ namespace Strawberry::Vulkan
 	}
 
 
-	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithVertexInput(const std::vector<VkVertexInputBindingDescription>& bindings, const std::vector<VkVertexInputAttributeDescription>& attributes)
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithVertexInput(const std::vector<VkVertexInputBindingDescription>&   bindings,
+	                                                                      const std::vector<VkVertexInputAttributeDescription>& attributes)
 	{
-		VkPipelineVertexInputStateCreateInfo createInfo {
+		VkPipelineVertexInputStateCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -86,7 +83,7 @@ namespace Strawberry::Vulkan
 
 	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithInputAssembly(VkPrimitiveTopology topology)
 	{
-		VkPipelineInputAssemblyStateCreateInfo createInfo {
+		VkPipelineInputAssemblyStateCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -102,7 +99,7 @@ namespace Strawberry::Vulkan
 
 	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithTesselation(uint32_t controlPoints)
 	{
-		VkPipelineTessellationStateCreateInfo createInfo {
+		VkPipelineTessellationStateCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_TESSELLATION_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -116,7 +113,7 @@ namespace Strawberry::Vulkan
 
 	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithViewport(const std::vector<VkViewport> viewports, const std::vector<VkRect2D> scissors)
 	{
-		VkPipelineViewportStateCreateInfo createInfo {
+		VkPipelineViewportStateCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -133,7 +130,7 @@ namespace Strawberry::Vulkan
 
 	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithRasterization(VkPolygonMode polygonMode, VkCullModeFlags cullMode, VkFrontFace frontFace)
 	{
-		VkPipelineRasterizationStateCreateInfo createInfo {
+		VkPipelineRasterizationStateCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -156,12 +153,12 @@ namespace Strawberry::Vulkan
 
 	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithMultisample(VkSampleCountFlagBits samples)
 	{
-		VkPipelineMultisampleStateCreateInfo createInfo {
+		VkPipelineMultisampleStateCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
 			.rasterizationSamples = samples,
-			.sampleShadingEnable =  VK_FALSE,
+			.sampleShadingEnable = VK_FALSE,
 			.minSampleShading = 1.0,
 			.pSampleMask = nullptr,
 			.alphaToCoverageEnable = VK_FALSE,
@@ -182,7 +179,7 @@ namespace Strawberry::Vulkan
 
 	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithColorBlending(std::vector<VkPipelineColorBlendAttachmentState> attachments)
 	{
-		VkPipelineColorBlendStateCreateInfo createInfo {
+		VkPipelineColorBlendStateCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -200,7 +197,7 @@ namespace Strawberry::Vulkan
 
 	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithDynamicState(const std::vector<VkDynamicState>& states)
 	{
-		VkPipelineDynamicStateCreateInfo createInfo {
+		VkPipelineDynamicStateCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -217,8 +214,7 @@ namespace Strawberry::Vulkan
 	GraphicsPipeline::GraphicsPipeline(VkPipeline handle, PipelineLayout& layout, RenderPass& renderPass)
 		: mPipeline(handle)
 		, mPipelineLayout(layout)
-		, mRenderPass(renderPass)
-	{}
+		, mRenderPass(renderPass) {}
 
 
 	GraphicsPipeline GraphicsPipeline::Builder::Build()
@@ -237,7 +233,7 @@ namespace Strawberry::Vulkan
 		std::vector<VkPipelineShaderStageCreateInfo> stages;
 		for (auto& [stage, shader]: mStages)
 		{
-			stages.emplace_back(VkPipelineShaderStageCreateInfo {
+			stages.emplace_back(VkPipelineShaderStageCreateInfo{
 				.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
 				.pNext = nullptr,
 				.flags = 0,
@@ -252,14 +248,14 @@ namespace Strawberry::Vulkan
 		// Use default vertex input if none specified
 		if (!mVertexInputStateCreateInfo)
 		{
-			mVertexInputStateCreateInfo = VkPipelineVertexInputStateCreateInfo {
-					.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-					.pNext = nullptr,
-					.flags = 0,
-					.vertexBindingDescriptionCount = 0,
-					.pVertexBindingDescriptions = nullptr,
-					.vertexAttributeDescriptionCount = 0,
-					.pVertexAttributeDescriptions = nullptr
+			mVertexInputStateCreateInfo = VkPipelineVertexInputStateCreateInfo{
+				.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+				.pNext = nullptr,
+				.flags = 0,
+				.vertexBindingDescriptionCount = 0,
+				.pVertexBindingDescriptions = nullptr,
+				.vertexAttributeDescriptionCount = 0,
+				.pVertexAttributeDescriptions = nullptr
 			};
 		}
 
@@ -273,7 +269,7 @@ namespace Strawberry::Vulkan
 				.pNext = nullptr,
 				.flags = 0,
 				.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,
-				.sampleShadingEnable =  VK_FALSE,
+				.sampleShadingEnable = VK_FALSE,
 				.minSampleShading = 1.0,
 				.pSampleMask = nullptr,
 				.alphaToCoverageEnable = VK_FALSE,
@@ -283,8 +279,8 @@ namespace Strawberry::Vulkan
 
 
 		// Create the Pipeline
-		std::vector<VkGraphicsPipelineCreateInfo> createInfos {
-			VkGraphicsPipelineCreateInfo {
+		std::vector<VkGraphicsPipelineCreateInfo> createInfos{
+			VkGraphicsPipelineCreateInfo{
 				.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
 				.pNext = nullptr,
 				.flags = 0,
@@ -308,12 +304,12 @@ namespace Strawberry::Vulkan
 		};
 		VkPipeline handle = VK_NULL_HANDLE;
 		Core::AssertEQ(vkCreateGraphicsPipelines(*mRenderPass->mDevice,
-												 nullptr,
-												 createInfos.size(),
-												 createInfos.data(),
-												 nullptr,
-												 &handle),
-					   VK_SUCCESS);
+		                                         nullptr,
+		                                         createInfos.size(),
+		                                         createInfos.data(),
+		                                         nullptr,
+		                                         &handle),
+		               VK_SUCCESS);
 
 		return GraphicsPipeline(handle, *mPipelineLayout, *mRenderPass);
 	}

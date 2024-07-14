@@ -18,7 +18,10 @@
 //======================================================================================================================
 //  Foreward Declarations
 //----------------------------------------------------------------------------------------------------------------------
-namespace Strawberry::Window { class Window; }
+namespace Strawberry::Window
+{
+	class Window;
+}
 
 
 //======================================================================================================================
@@ -36,46 +39,43 @@ namespace Strawberry::Vulkan
 	{
 		friend class CommandBuffer;
 
-
-	public:
-		Swapchain(const Queue& queue, const Surface& surface, Core::Math::Vec2i extents, VkPresentModeKHR presentMode);
-		Swapchain(const Swapchain& rhs) = delete;
-		Swapchain& operator=(const Swapchain& rhs) = delete;
-		Swapchain(Swapchain&& rhs) noexcept;
-		Swapchain& operator=(Swapchain&& rhs) noexcept;
-		~Swapchain();
-
-
-		[[nodiscard]] Core::Math::Vec2i GetSize() const;
-		[[nodiscard]] VkSurfaceFormatKHR GetSurfaceFormat() const;
+		public:
+			Swapchain(const Queue& queue, const Surface& surface, Core::Math::Vec2i extents, VkPresentModeKHR presentMode);
+			Swapchain(const Swapchain& rhs)            = delete;
+			Swapchain& operator=(const Swapchain& rhs) = delete;
+			Swapchain(Swapchain&& rhs) noexcept;
+			Swapchain& operator=(Swapchain&& rhs) noexcept;
+			~Swapchain();
 
 
-		Core::Optional<uint32_t> GetNextImageIndex();
-		Core::Optional<uint32_t> WaitForNextImageIndex();
+			[[nodiscard]] Core::Math::Vec2i  GetSize() const;
+			[[nodiscard]] VkSurfaceFormatKHR GetSurfaceFormat() const;
 
 
-
-		Core::Optional<Image*> GetNextImage();
-		Core::Optional<Image*> WaitForNextImage();
-
-
-		void Present();
+			Core::Optional<uint32_t> GetNextImageIndex();
+			Core::Optional<uint32_t> WaitForNextImageIndex();
 
 
-		bool IsOutOfDate() const;
+			Core::Optional<Image*> GetNextImage();
+			Core::Optional<Image*> WaitForNextImage();
 
 
-	private:
-		VkSwapchainKHR mSwapchain;
+			void Present();
 
-		Core::ReflexivePointer<Queue> mQueue;
 
-		Core::Math::Vec2i mSize;
-		VkSurfaceFormatKHR mFormat;
+			bool IsOutOfDate() const;
 
-		std::vector<Image> mImages;
-		Core::Optional<uint32_t> mNextImageIndex;
+		private:
+			VkSwapchainKHR mSwapchain;
 
-		bool mIsOutOfDate = false;
+			Core::ReflexivePointer<Queue> mQueue;
+
+			Core::Math::Vec2i  mSize;
+			VkSurfaceFormatKHR mFormat;
+
+			std::vector<Image>       mImages;
+			Core::Optional<uint32_t> mNextImageIndex;
+
+			bool mIsOutOfDate = false;
 	};
 }

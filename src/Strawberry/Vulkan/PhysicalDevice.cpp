@@ -14,8 +14,7 @@ namespace Strawberry::Vulkan
 {
 	PhysicalDevice::PhysicalDevice(const Instance& instance, VkPhysicalDevice rawHandle)
 		: mPhysicalDevice(rawHandle)
-		, mInstance(instance)
-	{}
+		, mInstance(instance) {}
 
 
 	PhysicalDevice::PhysicalDevice(PhysicalDevice&& other)
@@ -23,8 +22,7 @@ namespace Strawberry::Vulkan
 		, mInstance(std::move(other.mInstance))
 		, mFeatures(std::move(other.mFeatures))
 		, mProperties(std::move(other.mProperties))
-		, mQueueFamilyProperties(std::move(other.mQueueFamilyProperties))
-	{}
+		, mQueueFamilyProperties(std::move(other.mQueueFamilyProperties)) {}
 
 
 	PhysicalDevice& PhysicalDevice::operator=(PhysicalDevice&& other)
@@ -116,8 +114,10 @@ namespace Strawberry::Vulkan
 
 			mExtensionProperties.Emplace(extensionPropertyCount);
 			std::vector<VkExtensionProperties> extensionProperties(extensionPropertyCount);
-			vkEnumerateDeviceExtensionProperties(mPhysicalDevice, nullptr, &extensionPropertyCount,
-												 mExtensionProperties->data());
+			vkEnumerateDeviceExtensionProperties(mPhysicalDevice,
+			                                     nullptr,
+			                                     &extensionPropertyCount,
+			                                     mExtensionProperties->data());
 		}
 
 		return mExtensionProperties.Value();
@@ -138,10 +138,12 @@ namespace Strawberry::Vulkan
 			}
 		}
 
-		std::sort(familyIndices.begin(), familyIndices.end(), [this](uint32_t a, uint32_t b)
-		{
-			return GetQueueFamilyProperties()[a].queueCount > GetQueueFamilyProperties()[b].queueCount;
-		});
+		std::sort(familyIndices.begin(),
+		          familyIndices.end(),
+		          [this](uint32_t a, uint32_t b)
+		          {
+			          return GetQueueFamilyProperties()[a].queueCount > GetQueueFamilyProperties()[b].queueCount;
+		          });
 
 		return familyIndices;
 	}
@@ -150,11 +152,11 @@ namespace Strawberry::Vulkan
 	std::vector<uint32_t> PhysicalDevice::SearchMemoryTypes(uint32_t typeBits, VkMemoryPropertyFlags properties) const
 	{
 		std::vector<uint32_t> memoryTypes;
-		auto memoryProperties = GetMemoryProperties();
+		auto                  memoryProperties = GetMemoryProperties();
 
 		for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; i++)
 		{
-			const bool validType = typeBits & (1 << i);
+			const bool validType           = typeBits & (1 << i);
 			const bool propertiesAvailable = (properties & memoryProperties.memoryTypes[i].propertyFlags) == properties;
 			if (validType && propertiesAvailable)
 			{

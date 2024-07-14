@@ -19,14 +19,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	static VkBool32 DebugReportCallback(VkDebugReportFlagsEXT flags,
-										VkDebugReportObjectTypeEXT objectType,
-										uint64_t object,
-										size_t location,
-										int32_t messageCode,
-										const char* pLayerPrefix,
-										const char* pMessage,
-										void* pUserData)
+	static VkBool32 DebugReportCallback(VkDebugReportFlagsEXT      flags,
+	                                    VkDebugReportObjectTypeEXT objectType,
+	                                    uint64_t                   object,
+	                                    size_t                     location,
+	                                    int32_t                    messageCode,
+	                                    const char*                pLayerPrefix,
+	                                    const char*                pMessage,
+	                                    void*                      pUserData)
 	{
 		switch (flags)
 		{
@@ -52,10 +52,10 @@ namespace Strawberry::Vulkan
 	}
 
 
-	static VkBool32 DebugUtilsCallback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
-									   VkDebugUtilsMessageTypeFlagsEXT type,
-									   const VkDebugUtilsMessengerCallbackDataEXT* callbackData,
-									   void* userData)
+	static VkBool32 DebugUtilsCallback(VkDebugUtilsMessageSeverityFlagBitsEXT      severity,
+	                                   VkDebugUtilsMessageTypeFlagsEXT             type,
+	                                   const VkDebugUtilsMessengerCallbackDataEXT* callbackData,
+	                                   void*                                       userData)
 	{
 		switch (severity)
 		{
@@ -83,13 +83,13 @@ namespace Strawberry::Vulkan
 	Instance::Instance()
 	{
 		VkApplicationInfo applicationInfo{};
-		applicationInfo.pNext = nullptr;
-		applicationInfo.apiVersion = VK_MAKE_VERSION(1, 2, 269);
+		applicationInfo.pNext              = nullptr;
+		applicationInfo.apiVersion         = VK_MAKE_VERSION(1, 2, 269);
 		applicationInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-		applicationInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-		applicationInfo.pApplicationName = "StrawberryGraphics";
-		applicationInfo.pEngineName = "StrawberryGraphics";
-		applicationInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+		applicationInfo.engineVersion      = VK_MAKE_VERSION(1, 0, 0);
+		applicationInfo.pApplicationName   = "StrawberryGraphics";
+		applicationInfo.pEngineName        = "StrawberryGraphics";
+		applicationInfo.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 
 		std::vector<const char*> extensions =
 		{
@@ -101,13 +101,18 @@ namespace Strawberry::Vulkan
 		};
 
 		// Append glfw extensions
-		uint32_t glfwExtensionCount = 0;
-		const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+		uint32_t     glfwExtensionCount = 0;
+		const char** glfwExtensions     = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 		Core::Assert(glfwExtensions != nullptr);
 
 		for (int i = 0; i < glfwExtensionCount; i++)
 		{
-			if (!std::any_of(extensions.begin(), extensions.end(),[&](const char* x) { return std::strcmp(x, glfwExtensions[i]) == 0; } ))
+			if (!std::any_of(extensions.begin(),
+			                 extensions.end(),
+			                 [&](const char* x)
+			                 {
+				                 return std::strcmp(x, glfwExtensions[i]) == 0;
+			                 }))
 			{
 				extensions.push_back(glfwExtensions[i]);
 			}
@@ -122,24 +127,24 @@ namespace Strawberry::Vulkan
 
 
 #if STRAWBERRY_DEBUG
-		VkDebugReportCallbackCreateInfoEXT callbackCreateInfo {
+		VkDebugReportCallbackCreateInfoEXT callbackCreateInfo{
 			.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT,
-			.pNext= nullptr,
+			.pNext = nullptr,
 			.pfnCallback = DebugReportCallback,
 			.pUserData = nullptr,
 		};
-		VkDebugUtilsMessengerCreateInfoEXT messengerCreateInfo {
+		VkDebugUtilsMessengerCreateInfoEXT messengerCreateInfo{
 			.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
 			.pNext = &callbackCreateInfo,
 			.flags = 0,
 			.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT
-							 | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT
-							 | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
-							 | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+			| VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT
+			| VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
+			| VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
 			.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
-				| VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
-				| VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT
-				| VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT,
+			| VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
+			| VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT
+			| VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT,
 			.pfnUserCallback = DebugUtilsCallback,
 			.pUserData = nullptr,
 		};
@@ -169,18 +174,24 @@ namespace Strawberry::Vulkan
 		Core::Assert(result == VK_SUCCESS);
 
 #if STRAWBERRY_DEBUG
-		vkCreateDebugReportCallbackEXT = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(vkGetInstanceProcAddr(mInstance, "vkCreateDebugReportCallbackEXT"));
-		vkDestroyDebugReportCallbackEXT = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(mInstance, "vkDestroyDebugReportCallbackEXT"));
-		vkCreateDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(mInstance, "vkCreateDebugUtilsMessengerEXT"));
-		vkDestroyDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(mInstance, "vkDestroyDebugUtilsMessengerEXT"));
+		vkCreateDebugReportCallbackEXT = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(
+			vkGetInstanceProcAddr(mInstance, "vkCreateDebugReportCallbackEXT"));
+		vkDestroyDebugReportCallbackEXT = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(
+			mInstance,
+			"vkDestroyDebugReportCallbackEXT"));
+		vkCreateDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(
+			vkGetInstanceProcAddr(mInstance, "vkCreateDebugUtilsMessengerEXT"));
+		vkDestroyDebugUtilsMessengerEXT = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(
+			mInstance,
+			"vkDestroyDebugUtilsMessengerEXT"));
 
 		messengerCreateInfo.pNext = nullptr;
 		Core::AssertEQ(vkCreateDebugUtilsMessengerEXT(mInstance, &messengerCreateInfo, nullptr, &mDebugUtilsCallback),
-					   VK_SUCCESS);
+		               VK_SUCCESS);
 
 		Core::AssertEQ(
-				vkCreateDebugReportCallbackEXT(mInstance, &callbackCreateInfo, nullptr, &mDebugReportCallback),
-				VK_SUCCESS);
+			vkCreateDebugReportCallbackEXT(mInstance, &callbackCreateInfo, nullptr, &mDebugReportCallback),
+			VK_SUCCESS);
 #endif
 	}
 
@@ -233,7 +244,7 @@ namespace Strawberry::Vulkan
 
 			mPhysicalDevices.Emplace();
 			mPhysicalDevices->reserve(count);
-			for (auto deviceHandle : devices)
+			for (auto deviceHandle: devices)
 			{
 				PhysicalDevice device(*this, deviceHandle);
 				mPhysicalDevices->emplace_back(std::move(device));

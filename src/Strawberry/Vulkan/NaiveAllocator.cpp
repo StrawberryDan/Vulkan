@@ -10,13 +10,12 @@
 namespace Strawberry::Vulkan
 {
 	NaiveAllocator::NaiveAllocator(Device& device)
-			: Allocator(device)
-	{}
+		: Allocator(device) {}
 
 
 	AllocationResult NaiveAllocator::Allocate(size_t size, uint32_t typeMask, VkMemoryPropertyFlags properties) noexcept
 	{
-		auto physicalDevice = GetDevice()->GetPhysicalDevices()[0];
+		auto physicalDevice       = GetDevice()->GetPhysicalDevices()[0];
 		auto memoryTypeCandidates = physicalDevice->SearchMemoryTypes(typeMask, properties);
 
 
@@ -29,14 +28,14 @@ namespace Strawberry::Vulkan
 
 		VkMemoryAllocateInfo allocateInfo
 		{
-				.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
-				.pNext = nullptr,
-				.allocationSize = size,
-				.memoryTypeIndex = chosenMemoryType,
+			.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+			.pNext = nullptr,
+			.allocationSize = size,
+			.memoryTypeIndex = chosenMemoryType,
 		};
 
 		GPUAddress address;
-		VkResult allocationResult = vkAllocateMemory(*GetDevice(), &allocateInfo, nullptr, &address.deviceMemory);
+		VkResult   allocationResult = vkAllocateMemory(*GetDevice(), &allocateInfo, nullptr, &address.deviceMemory);
 
 		switch (allocationResult)
 		{

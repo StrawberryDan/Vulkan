@@ -22,24 +22,23 @@ namespace Strawberry::Vulkan
 		friend class CommandBuffer;
 		friend class Queue;
 
-
-	public:
-		Fence(const Device& device);
-		Fence(const Fence& rhs) = delete;
-		Fence& operator=(const Fence& rhs) = delete;
-		Fence(Fence&& rhs) noexcept;
-		Fence& operator=(Fence&& rhs) noexcept;
-		~Fence();
-
-
-		bool Signaled() const noexcept;
+		public:
+			Fence(const Device& device);
+			Fence(const Fence& rhs)            = delete;
+			Fence& operator=(const Fence& rhs) = delete;
+			Fence(Fence&& rhs) noexcept;
+			Fence& operator=(Fence&& rhs) noexcept;
+			~Fence();
 
 
-		void Wait();
-		void Reset();
+			bool Signaled() const noexcept;
 
-	private:
-		VkFence mFence;
-		VkDevice mDevice;
+
+			void Wait();
+			void Reset();
+
+		private:
+			VkFence  mFence;
+			VkDevice mDevice;
 	};
 }

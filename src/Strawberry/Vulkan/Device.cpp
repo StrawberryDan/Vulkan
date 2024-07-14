@@ -28,17 +28,17 @@ namespace Strawberry::Vulkan
 
 		// Describes Queues
 		std::vector<VkDeviceQueueCreateInfo> queues;
-		std::vector<std::vector<float>> queuePriorities;
-		for (auto& info : queueCreateInfo)
+		std::vector<std::vector<float>>      queuePriorities;
+		for (auto& info: queueCreateInfo)
 		{
 			queuePriorities.emplace_back(info.count, 1.0f);
 			queues.push_back(VkDeviceQueueCreateInfo{
-					.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-					.pNext = nullptr,
-					.flags = 0,
-					.queueFamilyIndex = info.familyIndex,
-					.queueCount = info.count,
-					.pQueuePriorities = queuePriorities.back().data()
+				.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+				.pNext = nullptr,
+				.flags = 0,
+				.queueFamilyIndex = info.familyIndex,
+				.queueCount = info.count,
+				.pQueuePriorities = queuePriorities.back().data()
 			});
 		}
 
@@ -47,10 +47,10 @@ namespace Strawberry::Vulkan
 
 		// Select Extensions
 		std::vector<const char*> extensions
-				{
-					"VK_KHR_dynamic_rendering",
-					"VK_KHR_swapchain"
-				};
+		{
+			"VK_KHR_dynamic_rendering",
+			"VK_KHR_swapchain"
+		};
 		// Select Features
 		VkPhysicalDeviceFeatures features{};
 
@@ -60,10 +60,12 @@ namespace Strawberry::Vulkan
 
 
 		// Add portability subset if available
-		if (std::any_of(extensionProperties.begin(), extensionProperties.end(), [](VkExtensionProperties x)
-		{
-			return strcmp(x.extensionName, "VK_KHR_portability_subset") == 0;
-		}))
+		if (std::any_of(extensionProperties.begin(),
+		                extensionProperties.end(),
+		                [](VkExtensionProperties x)
+		                {
+			                return strcmp(x.extensionName, "VK_KHR_portability_subset") == 0;
+		                }))
 		{
 			extensions.push_back("VK_KHR_portability_subset");
 		}
@@ -71,24 +73,24 @@ namespace Strawberry::Vulkan
 
 		// Populate info struct
 		VkDeviceCreateInfo createInfo
-				{
-					.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-					.pNext = nullptr,
-					.flags = 0,
-					.queueCreateInfoCount = static_cast<uint32_t>(queues.size()),
-					.pQueueCreateInfos = queues.data(),
-					.enabledLayerCount = static_cast<uint32_t>(layers.size()),
-					.ppEnabledLayerNames = layers.data(),
-					.enabledExtensionCount = static_cast<uint32_t>(extensions.size()),
-					.ppEnabledExtensionNames = extensions.data(),
-					.pEnabledFeatures = &features
-				};
+		{
+			.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.queueCreateInfoCount = static_cast<uint32_t>(queues.size()),
+			.pQueueCreateInfos = queues.data(),
+			.enabledLayerCount = static_cast<uint32_t>(layers.size()),
+			.ppEnabledLayerNames = layers.data(),
+			.enabledExtensionCount = static_cast<uint32_t>(extensions.size()),
+			.ppEnabledExtensionNames = extensions.data(),
+			.pEnabledFeatures = &features
+		};
 
 		// Create Device
 		Core::AssertEQ(vkCreateDevice(physicalDevice.mPhysicalDevice, &createInfo, nullptr, &mDevice), VK_SUCCESS);
 
 
-		for (auto& createInfo : queueCreateInfo)
+		for (auto& createInfo: queueCreateInfo)
 		{
 			for (int i = 0; i < createInfo.count; i++)
 				mQueues[createInfo.familyIndex].emplace_back(Queue(*this, createInfo.familyIndex, i));
@@ -99,8 +101,7 @@ namespace Strawberry::Vulkan
 	Device::Device(Device&& rhs) noexcept
 		: mDevice(std::exchange(rhs.mDevice, nullptr))
 		, mPhysicalDevices(std::move(rhs.mPhysicalDevices))
-		, mQueues(std::move(rhs.mQueues))
-	{}
+		, mQueues(std::move(rhs.mQueues)) {}
 
 
 	Device& Device::operator=(Device&& rhs) noexcept

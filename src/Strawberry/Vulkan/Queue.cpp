@@ -26,8 +26,7 @@ namespace Strawberry::Vulkan
 	Queue::Queue(Queue&& rhs) noexcept
 		: mQueue(std::exchange(rhs.mQueue, nullptr))
 		, mFamilyIndex(std::exchange(rhs.mFamilyIndex, 0))
-		, mDevice(std::move(rhs.mDevice))
-	{}
+		, mDevice(std::move(rhs.mDevice)) {}
 
 
 	Queue& Queue::operator=(Queue&& rhs)
@@ -59,7 +58,7 @@ namespace Strawberry::Vulkan
 		WaitUntilIdle();
 
 		VkCommandBuffer handle = commandBuffer;
-		VkSubmitInfo submitInfo {
+		VkSubmitInfo    submitInfo{
 			.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
 			.pNext = nullptr,
 			.waitSemaphoreCount = 0,

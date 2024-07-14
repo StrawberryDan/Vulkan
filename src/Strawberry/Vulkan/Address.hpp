@@ -34,13 +34,13 @@ namespace Strawberry::Vulkan
 
 namespace std
 {
-	template <>
+	template<>
 	struct hash<Strawberry::Vulkan::GPUAddress>
 	{
 		std::size_t operator()(const Strawberry::Vulkan::GPUAddress& address) const noexcept
 		{
 			std::size_t hash = reinterpret_cast<uintptr_t>(address.deviceMemory);
-			hash = hash xor address.offset;
+			hash             = hash xor address.offset;
 			return hash;
 		}
 	};

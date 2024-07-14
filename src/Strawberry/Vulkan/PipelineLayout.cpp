@@ -14,15 +14,13 @@ namespace Strawberry::Vulkan
 	PipelineLayout::PipelineLayout(VkPipelineLayout handle, Core::ReflexivePointer<Device> device, std::vector<VkDescriptorSetLayout> setLayouts)
 		: mHandle(handle)
 		, mDevice(std::move(device))
-		, mSetLayouts(std::move(setLayouts))
-	{}
+		, mSetLayouts(std::move(setLayouts)) {}
 
 
 	PipelineLayout::PipelineLayout(PipelineLayout&& rhs)
 		: mHandle(std::exchange(rhs.mHandle, VK_NULL_HANDLE))
 		, mDevice(std::move(rhs.mDevice))
-		, mSetLayouts(std::move(rhs.mSetLayouts))
-	{}
+		, mSetLayouts(std::move(rhs.mSetLayouts)) {}
 
 
 	PipelineLayout& PipelineLayout::operator=(PipelineLayout&& rhs)
@@ -39,7 +37,7 @@ namespace Strawberry::Vulkan
 
 	PipelineLayout::~PipelineLayout()
 	{
-		for (auto setLayout : mSetLayouts)
+		for (auto setLayout: mSetLayouts)
 		{
 			vkDestroyDescriptorSetLayout(*mDevice, setLayout, nullptr);
 		}
@@ -64,15 +62,13 @@ namespace Strawberry::Vulkan
 
 
 	PipelineLayout::Builder::Builder(const Device& device)
-		: mDevice(device)
-	{}
+		: mDevice(device) {}
 
 
 	PipelineLayout::Builder::Builder(Builder&& rhs)
 		: mDevice(std::move(rhs.mDevice))
 		, mSetLayouts(std::move(rhs.mSetLayouts))
-		, mPushConstantRanges(std::move(rhs.mPushConstantRanges))
-	{}
+		, mPushConstantRanges(std::move(rhs.mPushConstantRanges)) {}
 
 
 	PipelineLayout::Builder& PipelineLayout::Builder::operator=(Builder&& rhs)
@@ -89,7 +85,7 @@ namespace Strawberry::Vulkan
 
 	PipelineLayout::Builder::~Builder()
 	{
-		for (auto layout : mSetLayouts)
+		for (auto layout: mSetLayouts)
 		{
 			vkDestroyDescriptorSetLayout(*mDevice, layout, nullptr);
 		}
@@ -98,7 +94,7 @@ namespace Strawberry::Vulkan
 
 	PipelineLayout::Builder& PipelineLayout::Builder::WithDescriptorSet(const std::vector<VkDescriptorSetLayoutBinding>& bindings)
 	{
-		VkDescriptorSetLayoutCreateInfo createInfo {
+		VkDescriptorSetLayoutCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -116,7 +112,7 @@ namespace Strawberry::Vulkan
 
 	PipelineLayout::Builder& PipelineLayout::Builder::WithPushConstantRange(uint32_t size, uint32_t offset, VkShaderStageFlags stageFlags)
 	{
-		VkPushConstantRange range {
+		VkPushConstantRange range{
 			.stageFlags = stageFlags,
 			.offset = offset,
 			.size = size,

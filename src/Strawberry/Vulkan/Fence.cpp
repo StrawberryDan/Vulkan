@@ -16,7 +16,7 @@ namespace Strawberry::Vulkan
 		: mFence(nullptr)
 		, mDevice(device)
 	{
-		VkFenceCreateInfo createInfo {
+		VkFenceCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -26,10 +26,8 @@ namespace Strawberry::Vulkan
 
 
 	Fence::Fence(Fence&& rhs) noexcept
-		: mFence(std::exchange(rhs.mFence, nullptr)), mDevice(std::exchange(rhs.mDevice, nullptr))
-	{
-
-	}
+		: mFence(std::exchange(rhs.mFence, nullptr))
+		, mDevice(std::exchange(rhs.mDevice, nullptr)) {}
 
 
 	Fence& Fence::operator=(Fence&& rhs) noexcept

@@ -13,7 +13,10 @@
 //======================================================================================================================
 //  Foreward Declarations
 //----------------------------------------------------------------------------------------------------------------------
-namespace Strawberry::Window { class Window; }
+namespace Strawberry::Window
+{
+	class Window;
+}
 
 
 //======================================================================================================================
@@ -28,23 +31,21 @@ namespace Strawberry::Vulkan
 	{
 		friend class Swapchain;
 
-
-	public:
-		explicit Surface(const Window::Window& window, const Device& device);
-		Surface(const Surface& rhs) = delete;
-		Surface& operator=(const Surface& rhs) = delete;
-		Surface(Surface&& rhs) noexcept ;
-		Surface& operator=(Surface&& rhs);
-		~Surface();
-
-
-		VkSurfaceCapabilitiesKHR GetCapabilities() const;
+		public:
+			explicit Surface(const Window::Window& window, const Device& device);
+			Surface(const Surface& rhs)            = delete;
+			Surface& operator=(const Surface& rhs) = delete;
+			Surface(Surface&& rhs) noexcept;
+			Surface& operator=(Surface&& rhs);
+			~Surface();
 
 
-	private:
-		VkSurfaceKHR mSurface;
+			VkSurfaceCapabilitiesKHR GetCapabilities() const;
+
+		private:
+			VkSurfaceKHR mSurface;
 
 
-		Core::ReflexivePointer<Device> mDevice;
+			Core::ReflexivePointer<Device> mDevice;
 	};
 }

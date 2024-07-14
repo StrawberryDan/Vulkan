@@ -23,49 +23,56 @@ namespace Strawberry::Vulkan
 		, mSize(extents)
 	{
 		auto surfaceCapabilities = surface.GetCapabilities();
-		mSize[0] = std::clamp<int>(mSize[0], surfaceCapabilities.minImageExtent.width, surfaceCapabilities.maxImageExtent.width);
-		mSize[1] = std::clamp<int>(mSize[1], surfaceCapabilities.minImageExtent.height, surfaceCapabilities.maxImageExtent.height);
+		mSize[0]                 = std::clamp<int>(mSize[0], surfaceCapabilities.minImageExtent.width, surfaceCapabilities.maxImageExtent.width);
+		mSize[1]                 = std::clamp<int>(mSize[1], surfaceCapabilities.minImageExtent.height, surfaceCapabilities.maxImageExtent.height);
 
 
 		uint32_t formatCount = 0;
 		vkGetPhysicalDeviceSurfaceFormatsKHR(mQueue->GetDevice()->GetPhysicalDevices()[0]->mPhysicalDevice, surface.mSurface, &formatCount, nullptr);
 		std::vector<VkSurfaceFormatKHR> deviceFormats(formatCount);;
-		vkGetPhysicalDeviceSurfaceFormatsKHR(mQueue->GetDevice()->GetPhysicalDevices()[0]->mPhysicalDevice, surface.mSurface, &formatCount,
-											 deviceFormats.data());
+		vkGetPhysicalDeviceSurfaceFormatsKHR(mQueue->GetDevice()->GetPhysicalDevices()[0]->mPhysicalDevice,
+		                                     surface.mSurface,
+		                                     &formatCount,
+		                                     deviceFormats.data());
 
-		std::erase_if(deviceFormats, [&](const VkSurfaceFormatKHR& x) -> bool
-		{
-			const bool colorspace = x.colorSpace == VK_COLORSPACE_SRGB_NONLINEAR_KHR;
-			const bool format = x.format == VK_FORMAT_B8G8R8A8_SRGB;
-			return !(format && colorspace);
-		});
+		std::erase_if(deviceFormats,
+		              [&](const VkSurfaceFormatKHR& x) -> bool
+		              {
+			              const bool colorspace = x.colorSpace == VK_COLORSPACE_SRGB_NONLINEAR_KHR;
+			              const bool format     = x.format == VK_FORMAT_B8G8R8A8_SRGB;
+			              return !(format && colorspace);
+		              });
 
-		std::sort(deviceFormats.begin(), deviceFormats.end(),
-				  [](const VkSurfaceFormatKHR& a, const VkSurfaceFormatKHR& b) { return a.format > b.format; });
+		std::sort(deviceFormats.begin(),
+		          deviceFormats.end(),
+		          [](const VkSurfaceFormatKHR& a, const VkSurfaceFormatKHR& b)
+		          {
+			          return a.format > b.format;
+		          });
 
 		mFormat = deviceFormats.at(0);
 
 		VkSwapchainCreateInfoKHR createInfo
-			{
-				.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
-				.pNext = nullptr,
-				.flags = 0,
-				.surface = surface.mSurface,
-				.minImageCount = 2,
-				.imageFormat = mFormat.format,
-				.imageColorSpace = deviceFormats[0].colorSpace,
-				.imageExtent = VkExtent2D {.width = static_cast<uint32_t>(mSize[0]), .height = static_cast<uint32_t>(mSize[1])},
-				.imageArrayLayers = 1,
-				.imageUsage = VK_IMAGE_USAGE_TRANSFER_DST_BIT,
-				.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
-				.queueFamilyIndexCount = 0,
-				.pQueueFamilyIndices = nullptr,
-				.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR,
-				.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
-				.presentMode = presentMode,
-				.clipped = VK_TRUE,
-				.oldSwapchain = VK_NULL_HANDLE,
-			};
+		{
+			.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
+			.pNext = nullptr,
+			.flags = 0,
+			.surface = surface.mSurface,
+			.minImageCount = 2,
+			.imageFormat = mFormat.format,
+			.imageColorSpace = deviceFormats[0].colorSpace,
+			.imageExtent = VkExtent2D{.width = static_cast<uint32_t>(mSize[0]), .height = static_cast<uint32_t>(mSize[1])},
+			.imageArrayLayers = 1,
+			.imageUsage = VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+			.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
+			.queueFamilyIndexCount = 0,
+			.pQueueFamilyIndices = nullptr,
+			.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR,
+			.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
+			.presentMode = presentMode,
+			.clipped = VK_TRUE,
+			.oldSwapchain = VK_NULL_HANDLE,
+		};
 
 		Core::AssertEQ(vkCreateSwapchainKHR(*queue.GetDevice(), &createInfo, nullptr, &mSwapchain), VK_SUCCESS);
 
@@ -74,7 +81,7 @@ namespace Strawberry::Vulkan
 		Core::AssertEQ(vkGetSwapchainImagesKHR(*queue.GetDevice(), mSwapchain, &imageCount, nullptr), VK_SUCCESS);
 		std::vector<VkImage> imageHandles(imageCount);
 		Core::AssertEQ(vkGetSwapchainImagesKHR(*queue.GetDevice(), mSwapchain, &imageCount, imageHandles.data()), VK_SUCCESS);
-		for (VkImage handle : imageHandles)
+		for (VkImage handle: imageHandles)
 		{
 			mImages.emplace_back(*queue.GetDevice(), handle, mSize.AsType<unsigned int>().WithAdditionalValues(1), mFormat.format);
 		}
@@ -85,10 +92,9 @@ namespace Strawberry::Vulkan
 		: mSwapchain(std::exchange(rhs.mSwapchain, nullptr))
 		, mQueue(std::move(rhs.mQueue))
 		, mSize(std::exchange(rhs.mSize, {}))
-		, mFormat(std::exchange(rhs.mFormat, VkSurfaceFormatKHR {}))
+		, mFormat(std::exchange(rhs.mFormat, VkSurfaceFormatKHR{}))
 		, mImages(std::move(rhs.mImages))
-		, mNextImageIndex(std::move(rhs.mNextImageIndex))
-	{}
+		, mNextImageIndex(std::move(rhs.mNextImageIndex)) {}
 
 
 	Swapchain& Swapchain::operator=(Swapchain&& rhs) noexcept
@@ -106,7 +112,7 @@ namespace Strawberry::Vulkan
 	Swapchain::~Swapchain()
 	{
 		// Images are destroyed by vkDestorySwapchain, so we should release our hold of them here.
-		for (auto& image : mImages)
+		for (auto& image: mImages)
 		{
 			image.Release();
 		}
@@ -151,9 +157,9 @@ namespace Strawberry::Vulkan
 		if (mNextImageIndex) return *mNextImageIndex;
 
 
-		Fence fence(*mQueue->GetDevice());
+		Fence    fence(*mQueue->GetDevice());
 		uint32_t imageIndex = 0;
-		auto result = vkAcquireNextImageKHR(*mQueue->GetDevice(), mSwapchain, 0, VK_NULL_HANDLE, fence.mFence, &imageIndex);
+		auto     result     = vkAcquireNextImageKHR(*mQueue->GetDevice(), mSwapchain, 0, VK_NULL_HANDLE, fence.mFence, &imageIndex);
 		fence.Wait();
 
 
@@ -177,9 +183,9 @@ namespace Strawberry::Vulkan
 		if (mNextImageIndex) return *mNextImageIndex;
 
 
-		Fence fence(*mQueue->GetDevice());
+		Fence    fence(*mQueue->GetDevice());
 		uint32_t imageIndex = 0;
-		auto result = vkAcquireNextImageKHR(*mQueue->GetDevice(), mSwapchain, 0, VK_NULL_HANDLE, fence.mFence, &imageIndex);
+		auto     result     = vkAcquireNextImageKHR(*mQueue->GetDevice(), mSwapchain, 0, VK_NULL_HANDLE, fence.mFence, &imageIndex);
 		fence.Wait();
 
 		switch (result)
@@ -202,23 +208,23 @@ namespace Strawberry::Vulkan
 		uint32_t imageIndex = WaitForNextImageIndex().Unwrap();
 
 
-		VkResult presentResult;
-		VkPresentInfoKHR presentInfo {
-				.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-				.pNext = nullptr,
-				.waitSemaphoreCount = 0,
-				.pWaitSemaphores = nullptr,
-				.swapchainCount = 1,
-				.pSwapchains = &mSwapchain,
-				.pImageIndices = &imageIndex,
-				.pResults = &presentResult,
+		VkResult         presentResult;
+		VkPresentInfoKHR presentInfo{
+			.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+			.pNext = nullptr,
+			.waitSemaphoreCount = 0,
+			.pWaitSemaphores = nullptr,
+			.swapchainCount = 1,
+			.pSwapchains = &mSwapchain,
+			.pImageIndices = &imageIndex,
+			.pResults = &presentResult,
 		};
 
 
 		auto result = vkQueuePresentKHR(mQueue->mQueue, &presentInfo);
 		switch (result)
 		{
-			{
+				{
 				case VK_SUCCESS:
 					break;
 				case VK_SUBOPTIMAL_KHR:
@@ -228,7 +234,7 @@ namespace Strawberry::Vulkan
 					break;
 				default:
 					Core::Unreachable();
-			}
+				}
 		}
 
 		switch (presentResult)

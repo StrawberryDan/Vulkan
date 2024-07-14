@@ -30,10 +30,7 @@ namespace Strawberry::Vulkan
 
 	CommandPool::CommandPool(CommandPool&& rhs) noexcept
 		: mCommandPool(std::exchange(rhs.mCommandPool, nullptr))
-		, mQueue(std::move(rhs.mQueue))
-	  {
-
-	  }
+		, mQueue(std::move(rhs.mQueue)) {}
 
 
 	CommandPool& CommandPool::operator=(CommandPool&& rhs)

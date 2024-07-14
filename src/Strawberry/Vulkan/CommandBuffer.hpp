@@ -46,87 +46,92 @@ namespace Strawberry::Vulkan
 
 
 	class CommandBuffer
-		: public Core::EnableReflexivePointer
+			: public Core::EnableReflexivePointer
 	{
 		friend class Queue;
 
-
-	public:
-		explicit CommandBuffer(const CommandPool& commandPool, VkCommandBufferLevel level = VK_COMMAND_BUFFER_LEVEL_PRIMARY);
-
-
-		CommandBuffer(const CommandBuffer& rhs) = delete;
-		CommandBuffer& operator=(const CommandBuffer& rhs) = delete;
-		CommandBuffer(CommandBuffer&& rhs) noexcept ;
-		CommandBuffer& operator=(CommandBuffer&& rhs) noexcept ;
-		~CommandBuffer();
+		public:
+			explicit CommandBuffer(const CommandPool& commandPool, VkCommandBufferLevel level = VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
 
-		operator VkCommandBuffer() const;
+			CommandBuffer(const CommandBuffer& rhs)            = delete;
+			CommandBuffer& operator=(const CommandBuffer& rhs) = delete;
+			CommandBuffer(CommandBuffer&& rhs) noexcept;
+			CommandBuffer& operator=(CommandBuffer&& rhs) noexcept;
+			~CommandBuffer();
 
 
-		Core::ReflexivePointer<CommandPool> GetCommandPool() const;
+			operator VkCommandBuffer() const;
 
 
-		CommandBufferState State() const noexcept;
+			Core::ReflexivePointer<CommandPool> GetCommandPool() const;
 
 
-		VkCommandBufferLevel Level() const noexcept;
+			CommandBufferState State() const noexcept;
 
 
-		void Begin(bool oneTimeSubmit);
-		void Begin(bool oneTimeSubmit, const RenderPass& renderPass, uint32_t subpass);
-		void Begin(bool oneTimeSubmit, const RenderPass& renderPass, uint32_t subpass, const Framebuffer& framebuffer);
-		void End();
-		void Reset();
+			VkCommandBufferLevel Level() const noexcept;
 
 
-		void BindPipeline(const GraphicsPipeline& pipeline);
+			void Begin(bool oneTimeSubmit);
+			void Begin(bool oneTimeSubmit, const RenderPass& renderPass, uint32_t subpass);
+			void Begin(bool oneTimeSubmit, const RenderPass& renderPass, uint32_t subpass, const Framebuffer& framebuffer);
+			void End();
+			void Reset();
 
 
-		void BeginRenderPass(const RenderPass& renderPass, Framebuffer& framebuffer, VkSubpassContents contents = VK_SUBPASS_CONTENTS_INLINE);
-		void EndRenderPass();
+			void BindPipeline(const GraphicsPipeline& pipeline);
 
 
-		void ExcecuteSecondaryBuffer(const CommandBuffer& buffer);
+			void BeginRenderPass(const RenderPass& renderPass, Framebuffer& framebuffer, VkSubpassContents contents = VK_SUBPASS_CONTENTS_INLINE);
+			void EndRenderPass();
 
 
-		void PushConstants(const GraphicsPipeline& pipeline, VkShaderStageFlags stage, const Core::IO::DynamicByteBuffer& bytes, uint32_t offset);
+			void ExcecuteSecondaryBuffer(const CommandBuffer& buffer);
 
 
-		void BindVertexBuffer(uint32_t binding, Buffer& buffer, VkDeviceSize offset = 0);
-		void BindIndexBuffer(const Buffer& buffer, VkIndexType indexType, uint32_t offset = 0);
-		void Draw(uint32_t vertexCount, uint32_t instanceCount = 1, uint32_t vertexOffset = 0, uint32_t instanceOffset = 0);
-		void DrawIndexed(uint32_t indexCount, uint32_t instanceCount = 1, uint32_t firstIndex = 0, uint32_t firstInstance = 0, int32_t vertexOffset = 0);
+			void PushConstants(const GraphicsPipeline& pipeline, VkShaderStageFlags stage, const Core::IO::DynamicByteBuffer& bytes, uint32_t offset);
 
 
-		void PipelineBarrier(VkPipelineStageFlags srcMask, VkPipelineStageFlags dstMask, VkDependencyFlags dependencyFlags, const std::vector<Barrier>& barriers);
+			void BindVertexBuffer(uint32_t binding, Buffer& buffer, VkDeviceSize offset = 0);
+			void BindIndexBuffer(const Buffer& buffer, VkIndexType indexType, uint32_t offset = 0);
+			void Draw(uint32_t vertexCount, uint32_t instanceCount = 1, uint32_t vertexOffset = 0, uint32_t instanceOffset = 0);
+			void DrawIndexed(uint32_t indexCount, uint32_t instanceCount = 1, uint32_t firstIndex = 0, uint32_t firstInstance = 0, int32_t vertexOffset = 0);
 
 
-		void CopyBufferToImage(const Buffer& buffer, Image& image);
-		void CopyImageToImage(const Image& source, VkImageLayout srcLayout, const Image& dest, VkImageLayout destLayout, VkImageAspectFlags aspect);
-		void BlitImage(const Image& source, VkImageLayout srcLayout, const Image& dest, VkImageLayout destLayout, VkImageAspectFlags aspect, VkFilter filter);
-		void ClearColorImage(Image& image, VkImageLayout layout, Core::Math::Vec4f clearColor = {0.0f, 0.0f, 0.0f, 1.0f});
+			void PipelineBarrier(VkPipelineStageFlags        srcMask,
+			                     VkPipelineStageFlags        dstMask,
+			                     VkDependencyFlags           dependencyFlags,
+			                     const std::vector<Barrier>& barriers);
 
 
-		void BindDescriptorSet(const GraphicsPipeline& pipeline, uint32_t set, const DescriptorSet& descriptorSet);
-		void BindDescriptorSets(const GraphicsPipeline& pipeline, uint32_t firstSet, std::vector<DescriptorSet*> sets);
+			void CopyBufferToImage(const Buffer& buffer, Image& image);
+			void CopyImageToImage(const Image& source, VkImageLayout srcLayout, const Image& dest, VkImageLayout destLayout, VkImageAspectFlags aspect);
+			void BlitImage(const Image&       source,
+			               VkImageLayout      srcLayout,
+			               const Image&       dest,
+			               VkImageLayout      destLayout,
+			               VkImageAspectFlags aspect,
+			               VkFilter           filter);
+			void ClearColorImage(Image& image, VkImageLayout layout, Core::Math::Vec4f clearColor = {0.0f, 0.0f, 0.0f, 1.0f});
 
 
-	private:
-		static Core::Variant<Fence, Core::ReflexivePointer<CommandBuffer>> ConstructExecutionFence(const Device& device, VkCommandBufferLevel level);
-		void MoveIntoPendingState() const noexcept;
-		void MoveIntoCompletedState() const noexcept;
-		bool IsExecutionFenceSignalled() const noexcept;
+			void BindDescriptorSet(const GraphicsPipeline& pipeline, uint32_t set, const DescriptorSet& descriptorSet);
+			void BindDescriptorSets(const GraphicsPipeline& pipeline, uint32_t firstSet, std::vector<DescriptorSet*> sets);
 
+		private:
+			static Core::Variant<Fence, Core::ReflexivePointer<CommandBuffer>> ConstructExecutionFence(const Device& device, VkCommandBufferLevel level);
+			void                                                               MoveIntoPendingState() const noexcept;
+			void                                                               MoveIntoCompletedState() const noexcept;
+			bool                                                               IsExecutionFenceSignalled() const noexcept;
 
-	private:
-		VkCommandBuffer                                                     mCommandBuffer;
-		Core::ReflexivePointer<CommandPool>                                 mCommandPool;
-		mutable CommandBufferState                                          mState = CommandBufferState::Initial;
-		bool                                                                mOneTimeSubmission;
-		mutable Core::Variant<Fence, Core::ReflexivePointer<CommandBuffer>> mExecutionFenceOrParentBuffer;
+		private:
+			VkCommandBuffer                                                     mCommandBuffer;
+			Core::ReflexivePointer<CommandPool>                                 mCommandPool;
+			mutable CommandBufferState                                          mState = CommandBufferState::Initial;
+			bool                                                                mOneTimeSubmission;
+			mutable Core::Variant<Fence, Core::ReflexivePointer<CommandBuffer>> mExecutionFenceOrParentBuffer;
 
-		mutable std::vector<Core::ReflexivePointer<CommandBuffer>>          mRecordedSecondaryBuffers;
+			mutable std::vector<Core::ReflexivePointer<CommandBuffer>> mRecordedSecondaryBuffers;
 	};
 }

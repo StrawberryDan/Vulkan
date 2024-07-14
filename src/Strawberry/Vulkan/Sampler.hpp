@@ -20,20 +20,19 @@ namespace Strawberry::Vulkan
 
 	class Sampler
 	{
-	public:
-		Sampler(const Device& device, VkFilter magFilter, VkFilter minFilter, bool normaliseCoords = true);
-		Sampler(const Sampler& rhs) = delete;
-		Sampler& operator=(const Sampler& rhs) = delete;
-		Sampler(Sampler&& rhs) noexcept;
-		Sampler& operator=(Sampler&& rhs) noexcept;
-		~Sampler();
+		public:
+			Sampler(const Device& device, VkFilter magFilter, VkFilter minFilter, bool normaliseCoords = true);
+			Sampler(const Sampler& rhs)            = delete;
+			Sampler& operator=(const Sampler& rhs) = delete;
+			Sampler(Sampler&& rhs) noexcept;
+			Sampler& operator=(Sampler&& rhs) noexcept;
+			~Sampler();
 
 
-		operator VkSampler() const;
+			operator VkSampler() const;
 
-
-	private:
-		VkSampler mSampler;
-		Core::ReflexivePointer<Device> mDevice;
+		private:
+			VkSampler                      mSampler;
+			Core::ReflexivePointer<Device> mDevice;
 	};
 }

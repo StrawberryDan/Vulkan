@@ -17,7 +17,7 @@ namespace Strawberry::Vulkan
 	BufferView::BufferView(const Buffer& buffer, VkFormat format, VkDeviceSize offset, VkDeviceSize range)
 		: mDevice(buffer.GetDevice())
 	{
-		VkBufferViewCreateInfo createInfo {
+		VkBufferViewCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -32,16 +32,15 @@ namespace Strawberry::Vulkan
 
 	BufferView::BufferView(BufferView&& rhs) noexcept
 		: mBufferView(std::exchange(rhs.mBufferView, nullptr))
-		, mDevice(std::exchange(rhs.mDevice, nullptr))
-	{}
+		, mDevice(std::exchange(rhs.mDevice, nullptr)) {}
 
 
 	BufferView& BufferView::operator=(BufferView&& rhs) noexcept
 	{
 		if (this != &rhs)
 		{
-		    std::destroy_at(this);
-		    std::construct_at(this, std::move(rhs));
+			std::destroy_at(this);
+			std::construct_at(this, std::move(rhs));
 		}
 
 		return *this;

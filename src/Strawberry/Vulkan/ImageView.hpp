@@ -21,71 +21,68 @@ namespace Strawberry::Vulkan
 
 	class ImageView
 	{
-	public:
-		class Builder;
+		public:
+			class Builder;
+
+		public:
+			ImageView(const ImageView& rhs)            = delete;
+			ImageView& operator=(const ImageView& rhs) = delete;
+			ImageView(ImageView&& rhs) noexcept;
+			ImageView& operator=(ImageView&& rhs) noexcept;
+			~ImageView();
 
 
-	public:
-		ImageView(const ImageView& rhs) = delete;
-		ImageView& operator=(const ImageView& rhs) = delete;
-		ImageView(ImageView&& rhs) noexcept;
-		ImageView& operator=(ImageView&& rhs) noexcept;
-		~ImageView();
+			operator VkImageView() const;
 
+		private:
+			ImageView(const Image&            image,
+			          VkImageViewType         viewType,
+			          VkFormat                format,
+			          VkComponentMapping      componentMapping,
+			          VkImageSubresourceRange subresourceRange);
 
-		operator VkImageView() const;
-
-
-	private:
-		ImageView(const Image& image,
-				  VkImageViewType viewType,
-				  VkFormat format,
-				  VkComponentMapping componentMapping,
-				  VkImageSubresourceRange subresourceRange);
-
-
-	private:
-		VkImageView mImageView;
-		VkDevice mDevice;
+		private:
+			VkImageView mImageView;
+			VkDevice    mDevice;
 	};
 
 
 	class ImageView::Builder
 	{
-	public:
-		Builder(const Image& image);
+		public:
+			Builder(const Image& image);
 
 
-		Builder& WithType(VkImageViewType type);
-		Builder& WithFormat(VkFormat format);
+			Builder& WithType(VkImageViewType type);
+			Builder& WithFormat(VkFormat format);
 
 
-		Builder& WithSubresourceRange(VkImageSubresourceRange range);
+			Builder& WithSubresourceRange(VkImageSubresourceRange range);
 
 
-		Builder& WithSwizzling(VkComponentMapping mapping);
+			Builder& WithSwizzling(VkComponentMapping mapping);
 
 
-		ImageView Build();
+			ImageView Build();
 
-	private:
-		const Image* mImage;
-		Core::Optional<VkImageViewType> mViewType;
-		Core::Optional<VkFormat> mFormat;
+		private:
+			const Image*                    mImage;
+			Core::Optional<VkImageViewType> mViewType;
+			Core::Optional<VkFormat>        mFormat;
 
-		VkComponentMapping mComponentMapping{
-			.r = VK_COMPONENT_SWIZZLE_IDENTITY,
-			.g = VK_COMPONENT_SWIZZLE_IDENTITY,
-			.b = VK_COMPONENT_SWIZZLE_IDENTITY,
-			.a = VK_COMPONENT_SWIZZLE_IDENTITY
-		};
+			VkComponentMapping mComponentMapping{
+				.r = VK_COMPONENT_SWIZZLE_IDENTITY,
+				.g = VK_COMPONENT_SWIZZLE_IDENTITY,
+				.b = VK_COMPONENT_SWIZZLE_IDENTITY,
+				.a = VK_COMPONENT_SWIZZLE_IDENTITY
+			};
 
-		VkImageSubresourceRange mSubresourceRange{
-			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-			.baseMipLevel = 0,
-			.levelCount = 1,
-			.baseArrayLayer = 0,
-			.layerCount = 1
-		};
+			VkImageSubresourceRange mSubresourceRange{
+				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.baseMipLevel = 0,
+				.levelCount = 1,
+				.baseArrayLayer = 0,
+				.layerCount = 1
+			};
 	};
 }

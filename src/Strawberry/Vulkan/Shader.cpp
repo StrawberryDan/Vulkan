@@ -15,7 +15,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-
 	Core::Optional<Shader> Shader::Compile(const Device& device, const std::filesystem::path& file)
 	{
 		if (auto bytes = Core::IO::DynamicByteBuffer::FromFile(file))
@@ -29,12 +28,12 @@ namespace Strawberry::Vulkan
 
 	Core::Optional<Shader> Shader::Compile(const Device& device, const Core::IO::DynamicByteBuffer& bytes)
 	{
-		VkShaderModuleCreateInfo createInfo {
-				.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-				.pNext = nullptr,
-				.flags = 0,
-				.codeSize = bytes.Size(),
-				.pCode = reinterpret_cast<const uint32_t*>(bytes.Data()),
+		VkShaderModuleCreateInfo createInfo{
+			.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.codeSize = bytes.Size(),
+			.pCode = reinterpret_cast<const uint32_t*>(bytes.Data()),
 		};
 
 		VkShaderModule shaderModule = VK_NULL_HANDLE;
@@ -52,18 +51,15 @@ namespace Strawberry::Vulkan
 
 	Shader::Shader(Shader&& rhs) noexcept
 		: mShaderModule(std::exchange(rhs.mShaderModule, nullptr))
-		, mDevice(std::exchange(rhs.mDevice, nullptr))
-	{
-
-	}
+		, mDevice(std::exchange(rhs.mDevice, nullptr)) {}
 
 
 	Shader& Shader::operator=(Shader&& rhs) noexcept
 	{
 		if (this != &rhs)
 		{
-		    std::destroy_at(this);
-		    std::construct_at(this, std::move(rhs));
+			std::destroy_at(this);
+			std::construct_at(this, std::move(rhs));
 		}
 
 		return *this;
@@ -87,6 +83,5 @@ namespace Strawberry::Vulkan
 
 	Shader::Shader(const Device& device, VkShaderModule module)
 		: mShaderModule(module)
-		, mDevice(device)
-	{}
+		, mDevice(device) {}
 }

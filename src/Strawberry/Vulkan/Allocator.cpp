@@ -10,8 +10,7 @@
 namespace Strawberry::Vulkan
 {
 	Allocator::Allocator(Device& device)
-		: mDevice(device)
-	{}
+		: mDevice(device) {}
 
 
 	Core::ReflexivePointer<Device> Allocator::GetDevice() const noexcept
@@ -77,14 +76,12 @@ namespace Strawberry::Vulkan
 
 	Allocation::Allocation(Allocator& allocator, GPUMemoryRange memoryRange)
 		: mAllocator(allocator)
-		, mRange(memoryRange)
-	{}
+		, mRange(memoryRange) {}
 
 
 	Allocation::Allocation(Allocation&& other) noexcept
 		: mAllocator(std::move(other.mAllocator))
-		, mRange(other.mRange)
-	{}
+		, mRange(other.mRange) {}
 
 
 	Allocation& Allocation::operator=(Allocation&& other) noexcept

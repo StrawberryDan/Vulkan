@@ -17,7 +17,7 @@ namespace Strawberry::Vulkan
 		, mDevice(device)
 		, mFlags(flags)
 	{
-		VkDescriptorPoolCreateInfo createInfo {
+		VkDescriptorPoolCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = flags,
@@ -27,23 +27,22 @@ namespace Strawberry::Vulkan
 		};
 
 		Core::AssertEQ(vkCreateDescriptorPool(*mDevice, &createInfo, nullptr, &mDescriptorPool),
-					   VK_SUCCESS);
+		               VK_SUCCESS);
 	}
 
 
 	DescriptorPool::DescriptorPool(DescriptorPool&& rhs) noexcept
 		: mDescriptorPool(std::exchange(rhs.mDescriptorPool, VK_NULL_HANDLE))
 		, mDevice(std::move(rhs.mDevice))
-		, mFlags(std::exchange(rhs.mFlags, 0))
-	{}
+		, mFlags(std::exchange(rhs.mFlags, 0)) {}
 
 
 	DescriptorPool& DescriptorPool::operator=(DescriptorPool&& rhs) noexcept
 	{
 		if (this != &rhs)
 		{
-		    std::destroy_at(this);
-		    std::construct_at(this, std::move(rhs));
+			std::destroy_at(this);
+			std::construct_at(this, std::move(rhs));
 		}
 
 		return *this;

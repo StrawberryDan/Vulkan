@@ -41,8 +41,10 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Buffer::Buffer(Allocator* allocator, VkMemoryPropertyFlags properties, const Core::IO::DynamicByteBuffer& bytes,
-				   VkBufferUsageFlags usage)
+	Buffer::Buffer(Allocator*                         allocator,
+	               VkMemoryPropertyFlags              properties,
+	               const Core::IO::DynamicByteBuffer& bytes,
+	               VkBufferUsageFlags                 usage)
 		: Buffer(allocator, properties, bytes.Size(), usage)
 	{
 		Core::Assert(usage & VK_BUFFER_USAGE_TRANSFER_DST_BIT);
@@ -53,7 +55,7 @@ namespace Strawberry::Vulkan
 	Buffer::Buffer(Buffer&& rhs) noexcept
 		: mBuffer(std::exchange(rhs.mBuffer, nullptr))
 		, mMemory(std::move(rhs.mMemory))
-		  , mDevice(std::exchange(rhs.mDevice, nullptr)) {}
+		, mDevice(std::exchange(rhs.mDevice, nullptr)) {}
 
 
 	Buffer& Buffer::operator=(Buffer&& rhs) noexcept

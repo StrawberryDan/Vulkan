@@ -34,32 +34,31 @@ namespace Strawberry::Vulkan
 
 
 	class Device
-		: public Core::EnableReflexivePointer
+			: public Core::EnableReflexivePointer
 	{
-	public:
-		explicit Device(const PhysicalDevice& physicalDevice, std::vector<QueueCreateInfo> queueCreateInfo);
-		Device(const Device& rhs) = delete;
-		Device& operator=(const Device& rhs) = delete;
-		Device(Device&& rhs) noexcept;
-		Device& operator=(Device&& rhs) noexcept ;
-		~Device();
+		public:
+			explicit Device(const PhysicalDevice& physicalDevice, std::vector<QueueCreateInfo> queueCreateInfo);
+			Device(const Device& rhs)            = delete;
+			Device& operator=(const Device& rhs) = delete;
+			Device(Device&& rhs) noexcept;
+			Device& operator=(Device&& rhs) noexcept;
+			~Device();
 
 
-		operator VkDevice() const;
+			operator VkDevice() const;
 
 
-		[[nodiscard]] Core::ReflexivePointer<Instance>                           GetInstance() const;
-		[[nodiscard]] const std::vector<Core::ReflexivePointer<PhysicalDevice>>& GetPhysicalDevices() const;
+			[[nodiscard]] Core::ReflexivePointer<Instance>                           GetInstance() const;
+			[[nodiscard]] const std::vector<Core::ReflexivePointer<PhysicalDevice>>& GetPhysicalDevices() const;
 
 
-		[[nodiscard]] Core::ReflexivePointer<Queue>                              GetQueue(uint32_t family, uint32_t index);
+			[[nodiscard]] Core::ReflexivePointer<Queue> GetQueue(uint32_t family, uint32_t index);
+
+		private:
+			VkDevice                                            mDevice;
+			std::vector<Core::ReflexivePointer<PhysicalDevice>> mPhysicalDevices;
 
 
-	private:
-		VkDevice mDevice;
-		std::vector<Core::ReflexivePointer<PhysicalDevice>> mPhysicalDevices;
-
-
-		std::map<uint32_t, std::vector<Queue>> mQueues;
+			std::map<uint32_t, std::vector<Queue>> mQueues;
 	};
 }

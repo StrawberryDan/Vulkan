@@ -17,10 +17,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Image::Image(Allocator* allocator, VkMemoryPropertyFlags memoryProperties, uint32_t extent, VkFormat format,
-				 VkImageUsageFlags usage, uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling,
-				 VkImageLayout initialLayout) noexcept
-			: mImage(nullptr)
+	Image::Image(Allocator*            allocator,
+	             VkMemoryPropertyFlags memoryProperties,
+	             uint32_t              extent,
+	             VkFormat              format,
+	             VkImageUsageFlags     usage,
+	             uint32_t              mipLevels,
+	             uint32_t              arrayLayers,
+	             VkImageTiling         tiling,
+	             VkImageLayout         initialLayout) noexcept
+		: mImage(nullptr)
 		, mDevice(*allocator->GetDevice())
 		, mFormat(format)
 		, mSize(static_cast<int>(extent), 1, 1)
@@ -53,11 +59,16 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Image::Image(Allocator* allocator, VkMemoryPropertyFlags memoryProperties, Core::Math::Vec2u extent,
-				 VkFormat format,
-				 VkImageUsageFlags usage, uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling,
-				 VkImageLayout initialLayout) noexcept
-			: mImage(nullptr)
+	Image::Image(Allocator*            allocator,
+	             VkMemoryPropertyFlags memoryProperties,
+	             Core::Math::Vec2u     extent,
+	             VkFormat              format,
+	             VkImageUsageFlags     usage,
+	             uint32_t              mipLevels,
+	             uint32_t              arrayLayers,
+	             VkImageTiling         tiling,
+	             VkImageLayout         initialLayout) noexcept
+		: mImage(nullptr)
 		, mDevice(*allocator->GetDevice())
 		, mFormat(format)
 		, mSize(extent[0], extent[1], 1)
@@ -90,11 +101,16 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Image::Image(Allocator* allocator, VkMemoryPropertyFlags memoryProperties, Core::Math::Vec3u extent,
-				 VkFormat format,
-				 VkImageUsageFlags usage, uint32_t mipLevels, uint32_t arrayLayers, VkImageTiling tiling,
-				 VkImageLayout initialLayout) noexcept
-			: mImage(nullptr)
+	Image::Image(Allocator*            allocator,
+	             VkMemoryPropertyFlags memoryProperties,
+	             Core::Math::Vec3u     extent,
+	             VkFormat              format,
+	             VkImageUsageFlags     usage,
+	             uint32_t              mipLevels,
+	             uint32_t              arrayLayers,
+	             VkImageTiling         tiling,
+	             VkImageLayout         initialLayout) noexcept
+		: mImage(nullptr)
 		, mDevice(*allocator->GetDevice())
 		, mFormat(format)
 		, mSize(extent)
@@ -105,8 +121,11 @@ namespace Strawberry::Vulkan
 			.flags = 0,
 			.imageType = VK_IMAGE_TYPE_3D,
 			.format = format,
-			.extent = VkExtent3D{static_cast<uint32_t>(extent[0]), static_cast<uint32_t>(extent[1]),
-								 static_cast<uint32_t>(extent[2])},
+			.extent = VkExtent3D{
+				static_cast<uint32_t>(extent[0]),
+				static_cast<uint32_t>(extent[1]),
+				static_cast<uint32_t>(extent[2])
+			},
 			.mipLevels = mipLevels,
 			.arrayLayers = arrayLayers,
 			.samples = VK_SAMPLE_COUNT_1_BIT,
@@ -132,8 +151,7 @@ namespace Strawberry::Vulkan
 		: mImage(imageHandle)
 		, mDevice(device)
 		, mFormat(format)
-		, mSize(extent)
-	{}
+		, mSize(extent) {}
 
 
 	Image::Image(Image&& rhs) noexcept
@@ -141,10 +159,7 @@ namespace Strawberry::Vulkan
 		, mMemory(std::move(rhs.mMemory))
 		, mDevice(std::exchange(rhs.mDevice, nullptr))
 		, mFormat(std::exchange(rhs.mFormat, VK_FORMAT_MAX_ENUM))
-		, mSize(std::exchange(rhs.mSize, Core::Math::Vec3u()))
-	{
-
-	}
+		, mSize(std::exchange(rhs.mSize, Core::Math::Vec3u())) {}
 
 
 	Image& Image::operator=(Image&& rhs) noexcept

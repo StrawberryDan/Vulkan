@@ -21,8 +21,7 @@ namespace Strawberry::Vulkan
 
 	Surface::Surface(Surface&& rhs) noexcept
 		: mSurface(std::exchange(rhs.mSurface, nullptr))
-		, mDevice(std::move(rhs.mDevice))
-	{}
+		, mDevice(std::move(rhs.mDevice)) {}
 
 
 	Surface& Surface::operator=(Surface&& rhs)
