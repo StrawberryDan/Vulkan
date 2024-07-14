@@ -74,7 +74,7 @@ namespace Strawberry::Vulkan
 
 
 		virtual AllocationResult Allocate(size_t size, uint32_t typeMask, VkMemoryPropertyFlags properties) noexcept = 0;
-		virtual void             Free(Address address) noexcept = 0;
+		virtual void             Free(Allocation&& address) noexcept = 0;
 		virtual                  ~Allocator() = default;
 
 
@@ -89,7 +89,7 @@ namespace Strawberry::Vulkan
 	{
 	public:
 		Allocation() = default;
-		Allocation(Allocator& allocator, MemorySpan memoryRange, VkMemoryPropertyFlags memoryType);
+		Allocation(Allocator& allocator, VkDeviceMemory memory, size_t size, VkMemoryPropertyFlags memoryType);
 		Allocation(const Allocation&)            = delete;
 		Allocation& operator=(const Allocation&) = delete;
 		Allocation(Allocation&& other) noexcept;
@@ -97,8 +97,9 @@ namespace Strawberry::Vulkan
 		~Allocation();
 
 
-		const Address& Address() const noexcept;
-		const size_t      Size() const noexcept;
+		VkDeviceMemory Memory() const noexcept;
+		Address Address() const noexcept;
+		size_t  Size() const noexcept;
 
 
 		uint8_t* GetMappedAddress() const noexcept;
@@ -106,9 +107,10 @@ namespace Strawberry::Vulkan
 		void     Overwrite(const Core::IO::DynamicByteBuffer& bytes) const noexcept;
 
 	private:
-		Core::ReflexivePointer<Allocator> mAllocator = nullptr;
-		MemorySpan                    mRange     = MemorySpan();
-		VkMemoryPropertyFlags             mMemoryType;
+		Core::ReflexivePointer<Allocator> mAllocator  = nullptr;
+		VkDeviceMemory                    mMemory     = VK_NULL_HANDLE;
+		size_t                            mSize       = 0;
+		VkMemoryPropertyFlags             mMemoryProperties = 0;
 		mutable Core::Optional<uint8_t*>  mMappedAddress;
 	};
 }

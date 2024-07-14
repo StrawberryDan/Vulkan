@@ -50,12 +50,12 @@ namespace Strawberry::Vulkan
 		}
 
 
-		return Allocation(*this, {address, size}, physicalDevice->GetMemoryProperties().memoryTypes[chosenMemoryType].propertyFlags);
+		return Allocation(*this, address.deviceMemory, size, physicalDevice->GetMemoryProperties().memoryTypes[chosenMemoryType].propertyFlags);
 	}
 
 
-	void NaiveAllocator::Free(Address address) noexcept
+	void NaiveAllocator::Free(Allocation&& address) noexcept
 	{
-		vkFreeMemory(*GetDevice(), address.deviceMemory, nullptr);
+		vkFreeMemory(*GetDevice(), address.Memory(), nullptr);
 	}
 }

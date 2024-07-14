@@ -19,16 +19,18 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Allocation::Allocation(Allocator& allocator, MemorySpan memoryRange, VkMemoryPropertyFlags memoryType)
+	Allocation::Allocation(Allocator& allocator, VkDeviceMemory memory, size_t size, VkMemoryPropertyFlags memoryType)
 		: mAllocator(allocator)
-		, mRange(memoryRange)
-		, mMemoryType(memoryType) {}
+		, mMemory(memory)
+		, mSize(size)
+		, mMemoryProperties(memoryType) {}
 
 
 	Allocation::Allocation(Allocation&& other) noexcept
 		: mAllocator(std::move(other.mAllocator))
-		, mRange(other.mRange)
-		, mMemoryType(std::exchange(other.mMemoryType, {})) {}
+		, mMemory(std::exchange(other.mMemory, VK_NULL_HANDLE))
+		, mSize(std::exchange(other.mSize, 0))
+		, mMemoryProperties(std::exchange(other.mMemoryProperties, {})) {}
 
 
 	Allocation& Allocation::operator=(Allocation&& other) noexcept
@@ -45,27 +47,33 @@ namespace Strawberry::Vulkan
 
 	Allocation::~Allocation()
 	{
-		if (mAllocator) mAllocator->Free(mRange.address);
+		if (mAllocator) mAllocator->Free(std::move(*this));
 	}
 
 
-	const Address& Allocation::Address() const noexcept
+	VkDeviceMemory Allocation::Memory() const noexcept
 	{
-		return mRange.address;
+		return mMemory;
 	}
 
 
-	const size_t Allocation::Size() const noexcept
+	Address Allocation::Address() const noexcept
 	{
-		return mRange.size;
+		return {mMemory, 0};
+	}
+
+
+	size_t Allocation::Size() const noexcept
+	{
+		return mSize;
 	}
 
 
 	uint8_t* Allocation::GetMappedAddress() const noexcept
 	{
-		Core::Assert(mMemoryType & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+		Core::Assert(mMemoryProperties & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		void* mappedAddress = nullptr;
-		Core::AssertEQ(vkMapMemory(*mAllocator->GetDevice(), mRange.address.deviceMemory, mRange.address.offset, mRange.size, 0, &mappedAddress), VK_SUCCESS);
+		Core::AssertEQ(vkMapMemory(*mAllocator->GetDevice(), mMemory, 0, VK_WHOLE_SIZE, 0, &mappedAddress), VK_SUCCESS);
 		mMappedAddress = static_cast<uint8_t*>(mappedAddress);
 		return mMappedAddress.Value();
 	}
@@ -77,9 +85,9 @@ namespace Strawberry::Vulkan
 		{
 			.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE,
 			.pNext = nullptr,
-			.memory = mRange.address.deviceMemory,
-			.offset = mRange.address.offset,
-			.size = mRange.size
+			.memory = mMemory,
+			.offset = 0,
+			.size = VK_WHOLE_SIZE
 		};
 		Core::AssertEQ(vkFlushMappedMemoryRanges(*mAllocator->GetDevice(), 1, &range), VK_SUCCESS);
 	}
@@ -90,7 +98,7 @@ namespace Strawberry::Vulkan
 		Core::Assert(bytes.Size() <= Size());
 		std::memcpy(GetMappedAddress(), bytes.Data(), bytes.Size());
 
-		if (!(mMemoryType & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT))
+		if (!(mMemoryProperties & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT))
 		{
 			Flush();
 		}
