@@ -15,55 +15,55 @@ namespace Strawberry::Vulkan
 	class PipelineLayout
 			: public Core::EnableReflexivePointer
 	{
-		public:
-			class Builder;
+	public:
+		class Builder;
 
 
-			PipelineLayout(const PipelineLayout&) = delete;
-			PipelineLayout(PipelineLayout&&);
-			PipelineLayout& operator=(const PipelineLayout&) = delete;
-			PipelineLayout& operator=(PipelineLayout&&);
-			~PipelineLayout();
+		PipelineLayout(const PipelineLayout&) = delete;
+		PipelineLayout(PipelineLayout&&);
+		PipelineLayout& operator=(const PipelineLayout&) = delete;
+		PipelineLayout& operator=(PipelineLayout&&);
+		~PipelineLayout();
 
 
-			operator VkPipelineLayout() const;
+		operator VkPipelineLayout() const;
 
 
-			VkDescriptorSetLayout GetSetLayout(uint32_t index);
+		VkDescriptorSetLayout GetSetLayout(uint32_t index);
 
-		protected:
-			PipelineLayout(VkPipelineLayout handle, Core::ReflexivePointer<Device> device, std::vector<VkDescriptorSetLayout> setLayouts);
+	protected:
+		PipelineLayout(VkPipelineLayout handle, Core::ReflexivePointer<Device> device, std::vector<VkDescriptorSetLayout> setLayouts);
 
-		private:
-			VkPipelineLayout                   mHandle;
-			Core::ReflexivePointer<Device>     mDevice;
-			std::vector<VkDescriptorSetLayout> mSetLayouts;
+	private:
+		VkPipelineLayout                   mHandle;
+		Core::ReflexivePointer<Device>     mDevice;
+		std::vector<VkDescriptorSetLayout> mSetLayouts;
 	};
 
 
 	class PipelineLayout::Builder
 	{
-		public:
-			Builder(const Device& device);
-			Builder(const Builder&) = delete;
-			Builder(Builder&&);
-			Builder& operator=(const Builder&) = delete;
-			Builder& operator=(Builder&&);
-			~Builder();
+	public:
+		Builder(const Device& device);
+		Builder(const Builder&) = delete;
+		Builder(Builder&&);
+		Builder& operator=(const Builder&) = delete;
+		Builder& operator=(Builder&&);
+		~Builder();
 
 
-			Builder& WithDescriptorSet(const std::vector<VkDescriptorSetLayoutBinding>& bindings);
+		Builder& WithDescriptorSet(const std::vector<VkDescriptorSetLayoutBinding>& bindings);
 
 
-			Builder& WithPushConstantRange(uint32_t size, uint32_t offset, VkShaderStageFlags stageFlags);
+		Builder& WithPushConstantRange(uint32_t size, uint32_t offset, VkShaderStageFlags stageFlags);
 
 
-			PipelineLayout Build();
+		PipelineLayout Build();
 
-		private:
-			Core::ReflexivePointer<Device> mDevice;
+	private:
+		Core::ReflexivePointer<Device> mDevice;
 
-			std::vector<VkDescriptorSetLayout> mSetLayouts;
-			std::vector<VkPushConstantRange>   mPushConstantRanges;
+		std::vector<VkDescriptorSetLayout> mSetLayouts;
+		std::vector<VkPushConstantRange>   mPushConstantRanges;
 	};
 }

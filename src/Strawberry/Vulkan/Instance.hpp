@@ -26,42 +26,42 @@ namespace Strawberry::Vulkan
 		friend class Device;
 		friend class Surface;
 
-		public:
-			Instance();
-			~Instance();
+	public:
+		Instance();
+		~Instance();
 
-			Instance(const Instance&) = delete;
-			Instance(Instance&&) noexcept;
+		Instance(const Instance&) = delete;
+		Instance(Instance&&) noexcept;
 
-			Instance& operator=(const Instance&) = delete;
-			Instance& operator=(Instance&&) noexcept;
-
-
-			const std::vector<PhysicalDevice>& GetPhysicalDevices() const;
+		Instance& operator=(const Instance&) = delete;
+		Instance& operator=(Instance&&) noexcept;
 
 
-			template<std::movable T, typename... Args> requires (std::constructible_from<T, const Instance&, Args...>)
-			T Create(const Args&... args) const
-			{
-				return T(*this, std::forward<const Args&>(args)...);
-			}
-
-		private:
-			VkInstance mInstance = {};
+		const std::vector<PhysicalDevice>& GetPhysicalDevices() const;
 
 
-			mutable Core::Optional<std::vector<PhysicalDevice>> mPhysicalDevices;
+		template<std::movable T, typename... Args> requires (std::constructible_from<T, const Instance&, Args...>)
+		T Create(const Args&... args) const
+		{
+			return T(*this, std::forward<const Args&>(args)...);
+		}
+
+	private:
+		VkInstance mInstance = {};
+
+
+		mutable Core::Optional<std::vector<PhysicalDevice>> mPhysicalDevices;
 
 
 #if STRAWBERRY_DEBUG
-			VkDebugReportCallbackEXT mDebugReportCallback;
-			VkDebugUtilsMessengerEXT mDebugUtilsCallback;
+		VkDebugReportCallbackEXT mDebugReportCallback;
+		VkDebugUtilsMessengerEXT mDebugUtilsCallback;
 
 
-			PFN_vkCreateDebugReportCallbackEXT  vkCreateDebugReportCallbackEXT  = nullptr;
-			PFN_vkDestroyDebugReportCallbackEXT vkDestroyDebugReportCallbackEXT = nullptr;
-			PFN_vkCreateDebugUtilsMessengerEXT  vkCreateDebugUtilsMessengerEXT  = nullptr;
-			PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessengerEXT = nullptr;
+		PFN_vkCreateDebugReportCallbackEXT  vkCreateDebugReportCallbackEXT  = nullptr;
+		PFN_vkDestroyDebugReportCallbackEXT vkDestroyDebugReportCallbackEXT = nullptr;
+		PFN_vkCreateDebugUtilsMessengerEXT  vkCreateDebugUtilsMessengerEXT  = nullptr;
+		PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessengerEXT = nullptr;
 #endif
 	};
 }

@@ -26,26 +26,26 @@ namespace Strawberry::Vulkan
 	{
 		friend class CommandBuffer;
 
-		public:
-			CommandPool(const Queue& queue, bool resetBit = true);
-			CommandPool(const CommandPool& rhs)            = delete;
-			CommandPool& operator=(const CommandPool& rhs) = delete;
-			CommandPool(CommandPool&& rhs) noexcept;
-			CommandPool& operator=(CommandPool&& rhs);
-			~CommandPool();
+	public:
+		CommandPool(const Queue& queue, bool resetBit = true);
+		CommandPool(const CommandPool& rhs)            = delete;
+		CommandPool& operator=(const CommandPool& rhs) = delete;
+		CommandPool(CommandPool&& rhs) noexcept;
+		CommandPool& operator=(CommandPool&& rhs);
+		~CommandPool();
 
 
-			Core::ReflexivePointer<Queue> GetQueue() const;
+		Core::ReflexivePointer<Queue> GetQueue() const;
 
 
-			template<std::movable T, typename... Args> requires (std::constructible_from<T, const CommandPool&, Args...>)
-			T Create(const Args&... args) const
-			{
-				return T(*this, std::forward<const Args&>(args)...);
-			}
+		template<std::movable T, typename... Args> requires (std::constructible_from<T, const CommandPool&, Args...>)
+		T Create(const Args&... args) const
+		{
+			return T(*this, std::forward<const Args&>(args)...);
+		}
 
-		private:
-			VkCommandPool                 mCommandPool;
-			Core::ReflexivePointer<Queue> mQueue;
+	private:
+		VkCommandPool                 mCommandPool;
+		Core::ReflexivePointer<Queue> mQueue;
 	};
 }

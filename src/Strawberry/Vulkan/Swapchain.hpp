@@ -39,43 +39,43 @@ namespace Strawberry::Vulkan
 	{
 		friend class CommandBuffer;
 
-		public:
-			Swapchain(const Queue& queue, const Surface& surface, Core::Math::Vec2i extents, VkPresentModeKHR presentMode);
-			Swapchain(const Swapchain& rhs)            = delete;
-			Swapchain& operator=(const Swapchain& rhs) = delete;
-			Swapchain(Swapchain&& rhs) noexcept;
-			Swapchain& operator=(Swapchain&& rhs) noexcept;
-			~Swapchain();
+	public:
+		Swapchain(const Queue& queue, const Surface& surface, Core::Math::Vec2i extents, VkPresentModeKHR presentMode);
+		Swapchain(const Swapchain& rhs)            = delete;
+		Swapchain& operator=(const Swapchain& rhs) = delete;
+		Swapchain(Swapchain&& rhs) noexcept;
+		Swapchain& operator=(Swapchain&& rhs) noexcept;
+		~Swapchain();
 
 
-			[[nodiscard]] Core::Math::Vec2i  GetSize() const;
-			[[nodiscard]] VkSurfaceFormatKHR GetSurfaceFormat() const;
+		[[nodiscard]] Core::Math::Vec2i  GetSize() const;
+		[[nodiscard]] VkSurfaceFormatKHR GetSurfaceFormat() const;
 
 
-			Core::Optional<uint32_t> GetNextImageIndex();
-			Core::Optional<uint32_t> WaitForNextImageIndex();
+		Core::Optional<uint32_t> GetNextImageIndex();
+		Core::Optional<uint32_t> WaitForNextImageIndex();
 
 
-			Core::Optional<Image*> GetNextImage();
-			Core::Optional<Image*> WaitForNextImage();
+		Core::Optional<Image*> GetNextImage();
+		Core::Optional<Image*> WaitForNextImage();
 
 
-			void Present();
+		void Present();
 
 
-			bool IsOutOfDate() const;
+		bool IsOutOfDate() const;
 
-		private:
-			VkSwapchainKHR mSwapchain;
+	private:
+		VkSwapchainKHR mSwapchain;
 
-			Core::ReflexivePointer<Queue> mQueue;
+		Core::ReflexivePointer<Queue> mQueue;
 
-			Core::Math::Vec2i  mSize;
-			VkSurfaceFormatKHR mFormat;
+		Core::Math::Vec2i  mSize;
+		VkSurfaceFormatKHR mFormat;
 
-			std::vector<Image>       mImages;
-			Core::Optional<uint32_t> mNextImageIndex;
+		std::vector<Image>       mImages;
+		Core::Optional<uint32_t> mNextImageIndex;
 
-			bool mIsOutOfDate = false;
+		bool mIsOutOfDate = false;
 	};
 }

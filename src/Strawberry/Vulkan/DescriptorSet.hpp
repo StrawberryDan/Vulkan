@@ -27,23 +27,23 @@ namespace Strawberry::Vulkan
 	{
 		friend class CommandBuffer;
 
-		public:
-			DescriptorSet(const DescriptorPool& descriptorPool, VkDescriptorSetLayout layout);
-			DescriptorSet(const DescriptorSet& rhs)            = default;
-			DescriptorSet& operator=(const DescriptorSet& rhs) = default;
-			DescriptorSet(DescriptorSet&& rhs) noexcept;
-			DescriptorSet& operator=(DescriptorSet&& rhs) noexcept;
-			~DescriptorSet();
+	public:
+		DescriptorSet(const DescriptorPool& descriptorPool, VkDescriptorSetLayout layout);
+		DescriptorSet(const DescriptorSet& rhs)            = default;
+		DescriptorSet& operator=(const DescriptorSet& rhs) = default;
+		DescriptorSet(DescriptorSet&& rhs) noexcept;
+		DescriptorSet& operator=(DescriptorSet&& rhs) noexcept;
+		~DescriptorSet();
 
 
-			void SetUniformBuffer(uint32_t binding, uint32_t arrayElement, const Buffer& buffer);
-			void SetStorageBuffer(uint32_t binding, uint32_t arrayElement, const Buffer& buffer);
+		void SetUniformBuffer(uint32_t binding, uint32_t arrayElement, const Buffer& buffer);
+		void SetStorageBuffer(uint32_t binding, uint32_t arrayElement, const Buffer& buffer);
 
 
-			void SetUniformTexture(uint32_t binding, uint32_t arrayElement, const Sampler& sampler, const ImageView& image, VkImageLayout layout);
+		void SetUniformTexture(uint32_t binding, uint32_t arrayElement, const Sampler& sampler, const ImageView& image, VkImageLayout layout);
 
-		private:
-			VkDescriptorSet                        mDescriptorSet;
-			Core::ReflexivePointer<DescriptorPool> mDescriptorPool;
+	private:
+		VkDescriptorSet                        mDescriptorSet;
+		Core::ReflexivePointer<DescriptorPool> mDescriptorPool;
 	};
 }

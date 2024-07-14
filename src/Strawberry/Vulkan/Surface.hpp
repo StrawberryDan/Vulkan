@@ -31,21 +31,21 @@ namespace Strawberry::Vulkan
 	{
 		friend class Swapchain;
 
-		public:
-			explicit Surface(const Window::Window& window, const Device& device);
-			Surface(const Surface& rhs)            = delete;
-			Surface& operator=(const Surface& rhs) = delete;
-			Surface(Surface&& rhs) noexcept;
-			Surface& operator=(Surface&& rhs);
-			~Surface();
+	public:
+		explicit Surface(const Window::Window& window, const Device& device);
+		Surface(const Surface& rhs)            = delete;
+		Surface& operator=(const Surface& rhs) = delete;
+		Surface(Surface&& rhs) noexcept;
+		Surface& operator=(Surface&& rhs);
+		~Surface();
 
 
-			VkSurfaceCapabilitiesKHR GetCapabilities() const;
+		VkSurfaceCapabilitiesKHR GetCapabilities() const;
 
-		private:
-			VkSurfaceKHR mSurface;
+	private:
+		VkSurfaceKHR mSurface;
 
 
-			Core::ReflexivePointer<Device> mDevice;
+		Core::ReflexivePointer<Device> mDevice;
 	};
 }

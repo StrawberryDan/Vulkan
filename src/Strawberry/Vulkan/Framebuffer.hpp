@@ -30,48 +30,48 @@ namespace Strawberry::Vulkan
 	{
 		friend class CommandBuffer;
 
-		public:
-			Framebuffer(const RenderPass& mRenderPass, Allocator* allocator, Core::Math::Vec2u size);
-			Framebuffer(const Framebuffer& rhs)            = delete;
-			Framebuffer& operator=(const Framebuffer& rhs) = delete;
-			Framebuffer(Framebuffer&& rhs) noexcept;
-			Framebuffer& operator=(Framebuffer&& rhs) noexcept;
-			~Framebuffer();
+	public:
+		Framebuffer(const RenderPass& mRenderPass, Allocator* allocator, Core::Math::Vec2u size);
+		Framebuffer(const Framebuffer& rhs)            = delete;
+		Framebuffer& operator=(const Framebuffer& rhs) = delete;
+		Framebuffer(Framebuffer&& rhs) noexcept;
+		Framebuffer& operator=(Framebuffer&& rhs) noexcept;
+		~Framebuffer();
 
 
-			operator VkFramebuffer() const noexcept;
+		operator VkFramebuffer() const noexcept;
 
 
-			[[nodiscard]] Core::ReflexivePointer<RenderPass> GetRenderPass() const;
+		[[nodiscard]] Core::ReflexivePointer<RenderPass> GetRenderPass() const;
 
 
-			[[nodiscard]] Core::Math::Vec2u GetSize() const;
+		[[nodiscard]] Core::Math::Vec2u GetSize() const;
 
 
-			[[nodiscard]] uint32_t GetColorAttachmentCount() const;
-			Image&                 GetColorAttachment(uint32_t index);
-			Image&                 GetDepthAttachment();
-			Image&                 GetStencilAttachment();
+		[[nodiscard]] uint32_t GetColorAttachmentCount() const;
+		Image&                 GetColorAttachment(uint32_t index);
+		Image&                 GetDepthAttachment();
+		Image&                 GetStencilAttachment();
 
-		private:
-			Image     CreateDepthImage(Allocator* allocator);
-			ImageView CreateDepthImageView();
-			Image     CreateStencilImage(Allocator* allocator);
-			ImageView CreateStencilImageView();
+	private:
+		Image     CreateDepthImage(Allocator* allocator);
+		ImageView CreateDepthImageView();
+		Image     CreateStencilImage(Allocator* allocator);
+		ImageView CreateStencilImageView();
 
-		private:
-			VkFramebuffer                      mFramebuffer;
-			Core::ReflexivePointer<RenderPass> mRenderPass;
-			Core::Math::Vec2u                  mSize;
-
-
-			std::vector<Image>     mColorAttachments;
-			std::vector<ImageView> mColorAttachmentViews;
+	private:
+		VkFramebuffer                      mFramebuffer;
+		Core::ReflexivePointer<RenderPass> mRenderPass;
+		Core::Math::Vec2u                  mSize;
 
 
-			Image     mDepthAttachment;
-			ImageView mDepthAttachmentView;
-			Image     mStencilAttachment;
-			ImageView mStencilAttachmentView;
+		std::vector<Image>     mColorAttachments;
+		std::vector<ImageView> mColorAttachmentViews;
+
+
+		Image     mDepthAttachment;
+		ImageView mDepthAttachmentView;
+		Image     mStencilAttachment;
+		ImageView mStencilAttachmentView;
 	};
 }
