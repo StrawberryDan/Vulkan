@@ -105,10 +105,10 @@ void BasicRendering()
 				.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT
 			}
 		})
-		.WithMultisample(VK_SAMPLE_COUNT_1_BIT, false)
+		.WithMultisample(VK_SAMPLE_COUNT_1_BIT)
 		.Build();
 	auto queue = device.GetQueue(queueFamily, 0);
-	Vulkan::Swapchain swapchain = queue->Create<Swapchain>(surface, Core::Math::Vec2i(1920, 1080));
+	Vulkan::Swapchain swapchain = queue->Create<Swapchain>(surface, Core::Math::Vec2i(1920, 1080), VK_PRESENT_MODE_IMMEDIATE_KHR);
 	Vulkan::CommandPool commandPool = queue->Create<CommandPool>(true);
 	Vulkan::CommandBuffer commandBuffer = commandPool.Create<CommandBuffer>();
 
