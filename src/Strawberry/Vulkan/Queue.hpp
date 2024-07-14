@@ -41,7 +41,7 @@ namespace Strawberry::Vulkan
 
 
 		template <typename T, typename... Args>
-		T Create(Args&&... args) const { return T(*this, std::forward<Args&&>(args)...); }
+		T Create(Args&&... args) const { return T(*this, std::forward<Args>(args)...); }
 
 
 		void Submit(const CommandBuffer& commandBuffer);
