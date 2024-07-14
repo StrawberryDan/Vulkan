@@ -16,7 +16,7 @@ namespace Strawberry::Vulkan
 	struct GPUAddress
 	{
 		VkDeviceMemory deviceMemory = VK_NULL_HANDLE;
-		size_t         offset       = 0;
+		uintptr_t      offset       = 0;
 
 
 		bool operator==(const GPUAddress&) const noexcept = default;
@@ -39,7 +39,7 @@ namespace std
 	{
 		std::size_t operator()(const Strawberry::Vulkan::GPUAddress& address) const noexcept
 		{
-			std::size_t hash = reinterpret_cast<std::size_t>(address.deviceMemory);
+			std::size_t hash = reinterpret_cast<uintptr_t>(address.deviceMemory);
 			hash = hash xor address.offset;
 			return hash;
 		}
