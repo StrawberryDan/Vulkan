@@ -19,6 +19,14 @@ namespace Strawberry::Vulkan
 	class Instance;
 
 
+	struct MemoryType
+	{
+		uint32_t              index;
+		size_t                heapSize;
+		VkMemoryPropertyFlags properties;
+	};
+
+
 	class PhysicalDevice
 			: public Core::EnableReflexivePointer
 	{
@@ -26,6 +34,7 @@ namespace Strawberry::Vulkan
 		friend class Surface;
 		friend class Device;
 		friend class Swapchain;
+
 
 	public:
 		PhysicalDevice(const PhysicalDevice&)            = delete;
@@ -46,11 +55,13 @@ namespace Strawberry::Vulkan
 		const std::vector<VkExtensionProperties>&   GetExtensionProperties() const;
 
 
-		std::vector<uint32_t> SearchQueueFamilies(std::underlying_type_t<VkQueueFlagBits> flagBits) const;
-		std::vector<uint32_t> SearchMemoryTypes(uint32_t typeBits, VkMemoryPropertyFlags properties) const;
+		std::vector<uint32_t>   SearchQueueFamilies(VkQueueFlags flagBits) const;
+		std::vector<MemoryType> SearchMemoryTypes(MemoryTypeCriteria memoryCriteria) const;
+
 
 	protected:
 		PhysicalDevice(const Instance& instance, VkPhysicalDevice rawHandle);
+
 
 	private:
 		VkPhysicalDevice mPhysicalDevice;

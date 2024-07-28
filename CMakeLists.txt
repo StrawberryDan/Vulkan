@@ -75,8 +75,8 @@ if (NOT TARGET StrawberryVulkan)
 		src/Strawberry/Vulkan/Swapchain.hpp
 		src/Strawberry/Vulkan/Memory/BuddyAllocator.cpp
 		src/Strawberry/Vulkan/Memory/BuddyAllocator.hpp
-		src/Strawberry/Vulkan/Memory/MemoryCriteria.hpp
-		src/Strawberry/Vulkan/Memory/MemoryCriteria.cpp
+		src/Strawberry/Vulkan/Memory/MemoryTypeCriteria.hpp
+		src/Strawberry/Vulkan/Memory/MemoryTypeCriteria.cpp
 	)
 
 

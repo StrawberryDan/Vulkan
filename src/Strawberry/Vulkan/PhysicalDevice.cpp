@@ -124,7 +124,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	std::vector<uint32_t> PhysicalDevice::SearchQueueFamilies(std::underlying_type_t<VkQueueFlagBits> flagBits) const
+	std::vector<uint32_t> PhysicalDevice::SearchQueueFamilies(VkQueueFlags flagBits) const
 	{
 		std::vector<uint32_t> familyIndices;
 
@@ -151,19 +151,54 @@ namespace Strawberry::Vulkan
 
 	std::vector<uint32_t> PhysicalDevice::SearchMemoryTypes(uint32_t typeBits, VkMemoryPropertyFlags properties) const
 	{
-		std::vector<uint32_t> memoryTypes;
-		auto                  memoryProperties = GetMemoryProperties();
+		VkMemoryPropertyFlags requiredProperties                   = memoryCriteria.requiredProperties;
+		VkMemoryPropertyFlags preferredProperties                  = memoryCriteria.preferredProperties;
+		const auto&           [typeCount, types, heapCount, heaps] = GetMemoryProperties();
+		std::vector<uint32_t> memoryTypes(typeCount);
+		std::iota(memoryTypes.begin(), memoryTypes.end(), 0);
 
-		for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; i++)
+		std::vector<uint32_t> viableMemoryTypes;
+		// Guess that half of the memory types are available.
+		// This is probably a sensible assumption.
+		viableMemoryTypes.reserve(typeCount / 2);
+		for (uint32_t type: memoryTypes)
 		{
-			const bool validType           = typeBits & (1 << i);
-			const bool propertiesAvailable = (properties & memoryProperties.memoryTypes[i].propertyFlags) == properties;
-			if (validType && propertiesAvailable)
+			if (requiredProperties == (types[type].propertyFlags & requiredProperties))
 			{
-				memoryTypes.emplace_back(i);
+				viableMemoryTypes.emplace_back(type);
 			}
 		}
 
-		return memoryTypes;
+
+		std::vector<uint32_t> preferredMemoryTypes;
+		// Assume that half of the viable types are preferred.
+		// This is probably a sensible assumption.
+		preferredMemoryTypes.reserve(typeCount / 4);
+		for (uint32_t type: viableMemoryTypes)
+		{
+			if (preferredProperties == (types[type].propertyFlags & preferredProperties))
+			{
+				preferredMemoryTypes.emplace_back(type);
+			}
+		}
+
+
+		std::vector<uint32_t> candidates = !preferredMemoryTypes.empty()
+		                                   ? preferredMemoryTypes
+		                                   : !viableMemoryTypes.empty()
+		                                     ? viableMemoryTypes
+		                                     : std::vector<uint32_t>();
+
+
+		return candidates
+				| std::ranges::views::transform([&](uint32_t type)
+				{
+					return MemoryType{
+						.index = type,
+						.heapSize = heaps[types[type].heapIndex].size,
+						.properties = types[type].propertyFlags,
+					};
+				})
+				| std::ranges::to<std::vector>();
 	}
 }
