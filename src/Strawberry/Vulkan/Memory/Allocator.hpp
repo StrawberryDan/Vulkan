@@ -74,7 +74,7 @@ namespace Strawberry::Vulkan
 		explicit Allocator(Device& device);
 
 
-		virtual AllocationResult Allocate(size_t size, uint32_t typeMask, VkMemoryPropertyFlags properties) noexcept = 0;
+		virtual AllocationResult Allocate(size_t size, const MemoryTypeCriteria& criteria) noexcept = 0;
 		void                     Free(Allocation&& allocation) const;
 		virtual void             Free(AllocationView&& address) noexcept = 0;
 		virtual                  ~Allocator() = default;

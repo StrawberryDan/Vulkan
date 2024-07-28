@@ -17,15 +17,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Image::Image(Allocator*            allocator,
-	             VkMemoryPropertyFlags memoryProperties,
-	             uint32_t              extent,
-	             VkFormat              format,
-	             VkImageUsageFlags     usage,
-	             uint32_t              mipLevels,
-	             uint32_t              arrayLayers,
-	             VkImageTiling         tiling,
-	             VkImageLayout         initialLayout) noexcept
+	Image::Image(Allocator*                allocator,
+	             const MemoryTypeCriteria& memoryCriteria,
+	             uint32_t                  extent,
+	             VkFormat                  format,
+	             VkImageUsageFlags         usage,
+	             uint32_t                  mipLevels,
+	             uint32_t                  arrayLayers,
+	             VkImageTiling             tiling,
+	             VkImageLayout             initialLayout) noexcept
 		: mImage(nullptr)
 		, mDevice(*allocator->GetDevice())
 		, mFormat(format)
@@ -54,20 +54,20 @@ namespace Strawberry::Vulkan
 		VkMemoryRequirements memoryRequirements;
 		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
 
-		mMemory = allocator->Allocate(memoryRequirements.size, memoryRequirements.memoryTypeBits, memoryProperties).Unwrap();
+		mMemory = allocator->Allocate(memoryRequirements.size, memoryCriteria).Unwrap();
 		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.Memory(), mMemory.Offset()), VK_SUCCESS);
 	}
 
 
-	Image::Image(Allocator*            allocator,
-	             VkMemoryPropertyFlags memoryProperties,
-	             Core::Math::Vec2u     extent,
-	             VkFormat              format,
-	             VkImageUsageFlags     usage,
-	             uint32_t              mipLevels,
-	             uint32_t              arrayLayers,
-	             VkImageTiling         tiling,
-	             VkImageLayout         initialLayout) noexcept
+	Image::Image(Allocator*                allocator,
+	             const MemoryTypeCriteria& memoryCriteria,
+	             Core::Math::Vec2u         extent,
+	             VkFormat                  format,
+	             VkImageUsageFlags         usage,
+	             uint32_t                  mipLevels,
+	             uint32_t                  arrayLayers,
+	             VkImageTiling             tiling,
+	             VkImageLayout             initialLayout) noexcept
 		: mImage(nullptr)
 		, mDevice(*allocator->GetDevice())
 		, mFormat(format)
@@ -96,13 +96,13 @@ namespace Strawberry::Vulkan
 		VkMemoryRequirements memoryRequirements;
 		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
 
-		mMemory = allocator->Allocate(memoryRequirements.size, memoryRequirements.memoryTypeBits, memoryProperties).Unwrap();
+		mMemory = allocator->Allocate(memoryRequirements.size, memoryCriteria).Unwrap();
 		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.Memory(), mMemory.Offset()), VK_SUCCESS);
 	}
 
 
 	Image::Image(Allocator*            allocator,
-	             VkMemoryPropertyFlags memoryProperties,
+	             const MemoryTypeCriteria& memoryCriteria,
 	             Core::Math::Vec3u     extent,
 	             VkFormat              format,
 	             VkImageUsageFlags     usage,
@@ -142,7 +142,7 @@ namespace Strawberry::Vulkan
 		VkMemoryRequirements memoryRequirements;
 		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
 
-		mMemory = allocator->Allocate(memoryRequirements.size, memoryRequirements.memoryTypeBits, memoryProperties).Unwrap();
+		mMemory = allocator->Allocate(memoryRequirements.size, memoryCriteria).Unwrap();
 		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.Memory(), mMemory.Offset()), VK_SUCCESS);
 	}
 

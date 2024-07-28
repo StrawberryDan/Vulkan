@@ -13,10 +13,10 @@ namespace Strawberry::Vulkan
 		: Allocator(device) {}
 
 
-	NaiveAllocator::RawAllocationResult NaiveAllocator::AllocateRaw(size_t size, uint32_t typeMask, VkMemoryPropertyFlags properties) noexcept
+	NaiveAllocator::RawAllocationResult NaiveAllocator::AllocateRaw(size_t size, const MemoryTypeCriteria& criteria) noexcept
 	{
 		auto physicalDevice       = GetDevice()->GetPhysicalDevices()[0];
-		auto memoryTypeCandidates = physicalDevice->SearchMemoryTypes(typeMask, properties);
+		auto memoryTypeCandidates = physicalDevice->SearchMemoryTypes(criteria);
 
 
 		if (memoryTypeCandidates.empty())
@@ -31,7 +31,7 @@ namespace Strawberry::Vulkan
 			.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
 			.pNext = nullptr,
 			.allocationSize = size,
-			.memoryTypeIndex = chosenMemoryType,
+			.memoryTypeIndex = chosenMemoryType.index,
 		};
 
 		Address address;
@@ -50,13 +50,13 @@ namespace Strawberry::Vulkan
 		}
 
 
-		return Allocation(*this, address.deviceMemory, size, physicalDevice->GetMemoryProperties().memoryTypes[chosenMemoryType].propertyFlags);
+		return Allocation(*this, address.deviceMemory, size, chosenMemoryType.properties);
 	}
 
 
-	AllocationResult NaiveAllocator::Allocate(size_t size, uint32_t typeMask, VkMemoryPropertyFlags properties) noexcept
+	AllocationResult NaiveAllocator::Allocate(size_t size, const MemoryTypeCriteria& criteria) noexcept
 	{
-		if (auto allocation = AllocateRaw(size, typeMask, properties))
+		if (auto allocation = AllocateRaw(size, criteria))
 		{
 			auto address = allocation->Memory();
 			auto allocationIter = mAllocations.emplace(address, allocation.Unwrap()).first;

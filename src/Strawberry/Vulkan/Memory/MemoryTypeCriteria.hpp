@@ -18,6 +18,7 @@ namespace Strawberry::Vulkan
 		VkMemoryPropertyFlags preferredProperties;
 
 
+		static MemoryTypeCriteria Null();
 		static MemoryTypeCriteria DeviceLocal();
 		static MemoryTypeCriteria HostVisible();
 	};

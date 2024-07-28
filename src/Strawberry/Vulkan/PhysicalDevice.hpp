@@ -2,6 +2,7 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
+#include "Strawberry/Vulkan/Memory/MemoryTypeCriteria.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Types/ReflexivePointer.hpp"
 #include "Strawberry/Core/Types/Optional.hpp"
@@ -56,7 +57,7 @@ namespace Strawberry::Vulkan
 
 
 		std::vector<uint32_t>   SearchQueueFamilies(VkQueueFlags flagBits) const;
-		std::vector<MemoryType> SearchMemoryTypes(MemoryTypeCriteria memoryCriteria) const;
+		std::vector<MemoryType> SearchMemoryTypes(const MemoryTypeCriteria& memoryCriteria) const;
 
 
 	protected:

@@ -23,10 +23,10 @@ namespace Strawberry::Vulkan
 		NaiveAllocator(Device& device);
 
 
-		RawAllocationResult AllocateRaw(size_t size, uint32_t typeMask, VkMemoryPropertyFlags properties) noexcept;
+		RawAllocationResult AllocateRaw(size_t size, const MemoryTypeCriteria& criteria) noexcept;
 
 
-		AllocationResult Allocate(size_t size, uint32_t typeMask, VkMemoryPropertyFlags properties) noexcept override;
+		AllocationResult Allocate(size_t size, const MemoryTypeCriteria& criteria) noexcept override;
 		void             Free(AllocationView&& address) noexcept override;
 
 	private:

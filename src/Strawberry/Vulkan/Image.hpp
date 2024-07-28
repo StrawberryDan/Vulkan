@@ -31,35 +31,35 @@ namespace Strawberry::Vulkan
 		friend class CommandBuffer;
 
 	public:
-		Image(Allocator*            allocator,
-		      VkMemoryPropertyFlags memoryProperties,
-		      uint32_t              extent,
-		      VkFormat              format,
-		      VkImageUsageFlags     usage,
-		      uint32_t              mipLevels     = 1,
-		      uint32_t              arrayLayers   = 1,
-		      VkImageTiling         tiling        = VK_IMAGE_TILING_OPTIMAL,
-		      VkImageLayout         initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
+		Image(Allocator*                allocator,
+		      const MemoryTypeCriteria& memoryCriteria,
+		      uint32_t                  extent,
+		      VkFormat                  format,
+		      VkImageUsageFlags         usage,
+		      uint32_t                  mipLevels     = 1,
+		      uint32_t                  arrayLayers   = 1,
+		      VkImageTiling             tiling        = VK_IMAGE_TILING_OPTIMAL,
+		      VkImageLayout             initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
 
-		Image(Allocator*            allocator,
-		      VkMemoryPropertyFlags memoryProperties,
-		      Core::Math::Vec2u     extent,
-		      VkFormat              format,
-		      VkImageUsageFlags     usage,
-		      uint32_t              mipLevels     = 1,
-		      uint32_t              arrayLayers   = 1,
-		      VkImageTiling         tiling        = VK_IMAGE_TILING_OPTIMAL,
-		      VkImageLayout         initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
+		Image(Allocator*                allocator,
+		      const MemoryTypeCriteria& memoryCriteria,
+		      Core::Math::Vec2u         extent,
+		      VkFormat                  format,
+		      VkImageUsageFlags         usage,
+		      uint32_t                  mipLevels     = 1,
+		      uint32_t                  arrayLayers   = 1,
+		      VkImageTiling             tiling        = VK_IMAGE_TILING_OPTIMAL,
+		      VkImageLayout             initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
 
-		Image(Allocator*            allocator,
-		      VkMemoryPropertyFlags memoryProperties,
-		      Core::Math::Vec3u     extent,
-		      VkFormat              format,
-		      VkImageUsageFlags     usage,
-		      uint32_t              mipLevels     = 1,
-		      uint32_t              arrayLayers   = 1,
-		      VkImageTiling         tiling        = VK_IMAGE_TILING_OPTIMAL,
-		      VkImageLayout         initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
+		Image(Allocator*                allocator,
+		      const MemoryTypeCriteria& memoryCriteria,
+		      Core::Math::Vec3u         extent,
+		      VkFormat                  format,
+		      VkImageUsageFlags         usage,
+		      uint32_t                  mipLevels     = 1,
+		      uint32_t                  arrayLayers   = 1,
+		      VkImageTiling             tiling        = VK_IMAGE_TILING_OPTIMAL,
+		      VkImageLayout             initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
 
 		Image(const Device&     device,
 		      VkImage           imageHandle,

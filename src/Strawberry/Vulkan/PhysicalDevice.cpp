@@ -5,6 +5,8 @@
 #include "Instance.hpp"
 // Standard Library
 #include <algorithm>
+#include <numeric>
+#include <ranges>
 
 
 //======================================================================================================================
@@ -149,7 +151,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	std::vector<uint32_t> PhysicalDevice::SearchMemoryTypes(uint32_t typeBits, VkMemoryPropertyFlags properties) const
+	std::vector<MemoryType> PhysicalDevice::SearchMemoryTypes(const MemoryTypeCriteria& memoryCriteria) const
 	{
 		VkMemoryPropertyFlags requiredProperties                   = memoryCriteria.requiredProperties;
 		VkMemoryPropertyFlags preferredProperties                  = memoryCriteria.preferredProperties;

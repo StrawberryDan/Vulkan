@@ -29,7 +29,7 @@ namespace Strawberry::Vulkan
 		for (int i = 0; i < COLOR_ATTACHMENT_COUNT; i++)
 		{
 			mColorAttachments.emplace_back(allocator,
-			                               0,
+			                               MemoryTypeCriteria::Null(),
 			                               mSize,
 			                               renderPass.mColorAttachmentFormats[i],
 			                               VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
@@ -143,7 +143,7 @@ namespace Strawberry::Vulkan
 	Image Framebuffer::CreateDepthImage(Allocator* allocator)
 	{
 		return Image(allocator,
-		             0,
+		             MemoryTypeCriteria::Null(),
 		             mSize,
 		             VK_FORMAT_D32_SFLOAT,
 		             VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
@@ -168,7 +168,7 @@ namespace Strawberry::Vulkan
 
 	Image Framebuffer::CreateStencilImage(Allocator* allocator)
 	{
-		return Image(allocator, 0, mSize, VK_FORMAT_S8_UINT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
+		return Image(allocator, MemoryTypeCriteria::Null(), mSize, VK_FORMAT_S8_UINT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
 	}
 
 

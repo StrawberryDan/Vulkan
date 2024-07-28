@@ -123,7 +123,7 @@ void BasicRendering()
 
 
 	Buffer buffer(&allocator,
-	              VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+	              MemoryTypeCriteria::HostVisible(),
 	              6 * sizeof(float) * 3,
 	              VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 	Core::IO::DynamicByteBuffer vertices;
@@ -140,9 +140,9 @@ void BasicRendering()
 
 
 	auto   [size, channels, bytes] = Core::IO::DynamicByteBuffer::FromImage("data/dio.png").Unwrap();
-	Buffer textureBuffer(&allocator, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, bytes.Size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+	Buffer textureBuffer(&allocator, MemoryTypeCriteria::HostVisible(), bytes.Size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
 	textureBuffer.SetData(bytes);
-	Image texture(&allocator, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, size, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
+	Image texture(&allocator, MemoryTypeCriteria::DeviceLocal(), size, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
 	commandBuffer.Begin(true);
 	commandBuffer.PipelineBarrier(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
 	                              VK_PIPELINE_STAGE_TRANSFER_BIT,
