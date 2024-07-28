@@ -22,7 +22,7 @@ if (NOT TARGET StrawberryVulkan)
 	find_strawberry_library(NAMES Core Window)
 
 
-	add_library(StrawberryVulkan STATIC
+	list(APPEND StrawberryVulkan_Source
 		src/Strawberry/Vulkan/Memory/Memory.hpp
 		src/Strawberry/Vulkan/Memory/Allocator.cpp
 		src/Strawberry/Vulkan/Memory/Allocator.hpp
@@ -73,7 +73,16 @@ if (NOT TARGET StrawberryVulkan)
 		src/Strawberry/Vulkan/Surface.hpp
 		src/Strawberry/Vulkan/Swapchain.cpp
 		src/Strawberry/Vulkan/Swapchain.hpp
+		src/Strawberry/Vulkan/Memory/BuddyAllocator.cpp
+		src/Strawberry/Vulkan/Memory/BuddyAllocator.hpp
+		src/Strawberry/Vulkan/Memory/MemoryCriteria.hpp
+		src/Strawberry/Vulkan/Memory/MemoryCriteria.cpp
 	)
+
+
+	new_strawberry_library(NAME StrawberryVulkan SOURCE ${StrawberryVulkan_Source})
+
+
 	target_link_libraries(StrawberryVulkan PUBLIC StrawberryCore StrawberryWindow Vulkan::Vulkan)
 	target_include_directories(StrawberryVulkan PUBLIC src)
 	target_compile_definitions(StrawberryVulkan PUBLIC GLFW_INCLUDE_VULKAN)
