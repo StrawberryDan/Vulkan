@@ -42,7 +42,7 @@ namespace Strawberry::Vulkan
 		const VkPhysicalDeviceLimits&               GetLimits() const;
 		const VkPhysicalDeviceFeatures&             GetFeatures() const;
 		const std::vector<VkQueueFamilyProperties>& GetQueueFamilyProperties() const;
-		const VkPhysicalDeviceMemoryProperties      GetMemoryProperties() const;
+		const VkPhysicalDeviceMemoryProperties&     GetMemoryProperties() const;
 		const std::vector<VkExtensionProperties>&   GetExtensionProperties() const;
 
 

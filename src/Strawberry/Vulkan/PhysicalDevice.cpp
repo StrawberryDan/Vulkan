@@ -93,7 +93,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	const VkPhysicalDeviceMemoryProperties PhysicalDevice::GetMemoryProperties() const
+	const VkPhysicalDeviceMemoryProperties& PhysicalDevice::GetMemoryProperties() const
 	{
 		if (!mMemoryProperties)
 		{
@@ -101,7 +101,7 @@ namespace Strawberry::Vulkan
 			vkGetPhysicalDeviceMemoryProperties(mPhysicalDevice, &mMemoryProperties.Value());
 		}
 
-		return mMemoryProperties.Value();
+		return mMemoryProperties.Ref();
 	}
 
 
