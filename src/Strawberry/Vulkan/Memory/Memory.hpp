@@ -32,16 +32,13 @@ namespace Strawberry::Vulkan
 }
 
 
-namespace std
+template<>
+struct std::hash<Strawberry::Vulkan::Address>
 {
-	template<>
-	struct hash<Strawberry::Vulkan::Address>
+	std::size_t operator()(const Strawberry::Vulkan::Address& address) const noexcept
 	{
-		std::size_t operator()(const Strawberry::Vulkan::Address& address) const noexcept
-		{
-			std::size_t hash = reinterpret_cast<uintptr_t>(address.deviceMemory);
-			hash             = hash xor address.offset;
-			return hash;
-		}
-	};
-}
+		std::size_t hash = reinterpret_cast<uintptr_t>(address.deviceMemory);
+		hash             = hash xor address.offset;
+		return hash;
+	}
+};
