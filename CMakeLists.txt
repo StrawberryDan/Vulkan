@@ -23,10 +23,6 @@ if (NOT TARGET StrawberryVulkan)
 
 
 	list(APPEND StrawberryVulkan_Source
-		src/Strawberry/Vulkan/Memory/Memory.hpp
-		src/Strawberry/Vulkan/Memory/Allocator.cpp
-		src/Strawberry/Vulkan/Memory/Allocator.hpp
-		src/Strawberry/Vulkan/Memory/Allocator.hpp
 		src/Strawberry/Vulkan/Buffer.cpp
 		src/Strawberry/Vulkan/Buffer.hpp
 		src/Strawberry/Vulkan/BufferView.cpp
@@ -55,6 +51,12 @@ if (NOT TARGET StrawberryVulkan)
 		src/Strawberry/Vulkan/ImageView.hpp
 		src/Strawberry/Vulkan/Instance.cpp
 		src/Strawberry/Vulkan/Instance.hpp
+		src/Strawberry/Vulkan/Memory/Allocator.cpp
+		src/Strawberry/Vulkan/Memory/Allocator.hpp
+		src/Strawberry/Vulkan/Memory/Allocator.hpp
+		src/Strawberry/Vulkan/Memory/Memory.hpp
+		src/Strawberry/Vulkan/Memory/MemoryTypeCriteria.cpp
+		src/Strawberry/Vulkan/Memory/MemoryTypeCriteria.hpp
 		src/Strawberry/Vulkan/Memory/NaiveAllocator.cpp
 		src/Strawberry/Vulkan/Memory/NaiveAllocator.hpp
 		src/Strawberry/Vulkan/PhysicalDevice.cpp
@@ -73,8 +75,6 @@ if (NOT TARGET StrawberryVulkan)
 		src/Strawberry/Vulkan/Surface.hpp
 		src/Strawberry/Vulkan/Swapchain.cpp
 		src/Strawberry/Vulkan/Swapchain.hpp
-		src/Strawberry/Vulkan/Memory/MemoryCriteria.hpp
-		src/Strawberry/Vulkan/Memory/MemoryCriteria.cpp
 	)
 
 
