@@ -21,7 +21,7 @@ namespace Strawberry::Vulkan
 
 		if (memoryTypeCandidates.empty())
 		{
-			return RawAllocationResult::Err(AllocationError::MemoryTypeUnavailable());
+			return AllocationError::MemoryTypeUnavailable();
 		}
 		auto chosenMemoryType = memoryTypeCandidates[0];
 
