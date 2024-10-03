@@ -17,19 +17,19 @@ namespace Strawberry::Vulkan
 			: public Allocator
 	{
 	public:
-		using RawAllocationResult = Core::Result<Allocation, AllocationError>;
+		using RawAllocationResult = Core::Result<MemoryPool, AllocationError>;
 
 
-		NaiveAllocator(Device& device);
+		NaiveAllocator(Device& device, uint32_t memoryType);
 
 
-		RawAllocationResult AllocateRaw(size_t size, const MemoryTypeCriteria& criteria) noexcept;
+		RawAllocationResult AllocateRaw(size_t size) noexcept;
 
 
-		AllocationResult Allocate(size_t size, const MemoryTypeCriteria& criteria) noexcept override;
-		void             Free(AllocationView&& address) noexcept override;
+		AllocationResult Allocate(const AllocationRequest& allocationRequest) noexcept override;
+		void             Free(Allocation&& address) noexcept override;
 
 	private:
-		std::map<VkDeviceMemory, Allocation> mAllocations;
+		std::map<VkDeviceMemory, MemoryPool> mAllocations;
 	};
 }

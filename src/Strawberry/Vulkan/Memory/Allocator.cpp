@@ -9,11 +9,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Allocator::Allocator(Device& device)
-		: mDevice(device) {}
+	AllocationRequest::AllocationRequest(VkMemoryRequirements& requirements)
+		: size(requirements.size)
+		, alignment(requirements.alignment) {}
 
 
-	void Allocator::Free(Allocation&& allocation) const
+	Allocator::Allocator(Device& device, uint32_t memoryType)
+		: mDevice(device)
+		, mMemoryType(memoryType) {}
+
+
+	void Allocator::Free(MemoryPool&& allocation) const
 	{
 		vkFreeMemory(*GetDevice(), allocation.Memory(), nullptr);
 	}
@@ -25,21 +31,19 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Allocation::Allocation(Allocator& allocator, VkDeviceMemory memory, size_t size, VkMemoryPropertyFlags memoryType)
+	MemoryPool::MemoryPool(Allocator& allocator, VkDeviceMemory memory, size_t size)
 		: mAllocator(allocator)
 		, mMemory(memory)
-		, mSize(size)
-		, mMemoryProperties(memoryType) {}
+		, mSize(size) {}
 
 
-	Allocation::Allocation(Allocation&& other) noexcept
+	MemoryPool::MemoryPool(MemoryPool&& other) noexcept
 		: mAllocator(std::move(other.mAllocator))
 		, mMemory(std::exchange(other.mMemory, VK_NULL_HANDLE))
-		, mSize(std::exchange(other.mSize, 0))
-		, mMemoryProperties(std::exchange(other.mMemoryProperties, {})) {}
+		, mSize(std::exchange(other.mSize, 0)) {}
 
 
-	Allocation& Allocation::operator=(Allocation&& other) noexcept
+	MemoryPool& MemoryPool::operator=(MemoryPool&& other) noexcept
 	{
 		if (this != &other)
 		{
@@ -51,53 +55,57 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Allocation::~Allocation()
+	MemoryPool::~MemoryPool()
 	{
 		if (mAllocator) mAllocator->Free(std::move(*this));
 	}
 
 
-	AllocationView Allocation::AllocateView(size_t offset, size_t size)
+	Allocation MemoryPool::AllocateView(Allocator& allocator, size_t offset, size_t size)
 	{
-		return {*this, offset, size};
+		return {allocator, *this, offset, size};
 	}
 
 
-	Core::ReflexivePointer<Allocator> Allocation::GetAllocator() const noexcept
+	Core::ReflexivePointer<Allocator> MemoryPool::GetAllocator() const noexcept
 	{
 		return mAllocator;
 	}
 
 
-	VkDeviceMemory Allocation::Memory() const noexcept
+	VkDeviceMemory MemoryPool::Memory() const noexcept
 	{
 		return mMemory;
 	}
 
 
-	size_t Allocation::Size() const noexcept
+	size_t MemoryPool::Size() const noexcept
 	{
 		return mSize;
 	}
 
 
-	VkMemoryPropertyFlags Allocation::Properties() const
+	VkMemoryPropertyFlags MemoryPool::Properties() const
 	{
-		return mMemoryProperties;
+		return mAllocator->GetDevice()->GetPhysicalDevices()[0]->GetMemoryProperties().memoryTypes[mAllocator->MemoryType()].propertyFlags;
 	}
 
 
-	uint8_t* Allocation::GetMappedAddress() const noexcept
+	uint8_t* MemoryPool::GetMappedAddress() const noexcept
 	{
-		Core::Assert(mMemoryProperties & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-		void* mappedAddress = nullptr;
-		Core::AssertEQ(vkMapMemory(*mAllocator->GetDevice(), mMemory, 0, VK_WHOLE_SIZE, 0, &mappedAddress), VK_SUCCESS);
-		mMappedAddress = static_cast<uint8_t*>(mappedAddress);
+		if (!mMappedAddress)
+		[[unlikely]]
+		{
+			Core::Assert(Properties() & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+			void* mappedAddress = nullptr;
+			Core::AssertEQ(vkMapMemory(*mAllocator->GetDevice(), mMemory, 0, VK_WHOLE_SIZE, 0, &mappedAddress), VK_SUCCESS);
+			mMappedAddress = static_cast<uint8_t*>(mappedAddress);
+		}
 		return mMappedAddress.Value();
 	}
 
 
-	void Allocation::Flush() const noexcept
+	void MemoryPool::Flush() const noexcept
 	{
 		VkMappedMemoryRange range
 		{
@@ -111,61 +119,91 @@ namespace Strawberry::Vulkan
 	}
 
 
-	void Allocation::Overwrite(const Core::IO::DynamicByteBuffer& bytes) const noexcept
+	void MemoryPool::Overwrite(const Core::IO::DynamicByteBuffer& bytes) const noexcept
 	{
 		Core::Assert(bytes.Size() <= Size());
 		std::memcpy(GetMappedAddress(), bytes.Data(), bytes.Size());
 
-		if (!(mMemoryProperties & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT))
+		if (!(Properties() & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT))
 		{
 			Flush();
 		}
 	}
 
 
-	AllocationView::AllocationView(Allocation& allocation, size_t offset, size_t size)
-		: mAllocation(allocation)
+	Allocation::Allocation(Allocator& allocator, MemoryPool& allocation, size_t offset, size_t size)
+		: mAllocator(allocator)
+		, mRawAllocation(allocation)
 		, mOffset(offset)
 		, mSize(size) {}
 
 
-	Core::ReflexivePointer<Allocator> AllocationView::GetAllocator() const noexcept
+	Allocation::Allocation(Allocation&& other) noexcept
+		: mAllocator(std::move(other.mAllocator))
+		, mRawAllocation(std::move(other.mRawAllocation))
+		, mOffset(other.mOffset)
+		, mSize(other.mSize) {}
+
+
+	Allocation& Allocation::operator=(Allocation&& other) noexcept
 	{
-		return mAllocation->GetAllocator();
+		if (this != &other)
+		[[likely]]
+		{
+			std::destroy_at(this);
+			std::construct_at(this, std::move(other));
+		}
+		return *this;
 	}
 
 
-	VkDeviceMemory AllocationView::Memory() const noexcept
+	Allocation::~Allocation()
 	{
-		return mAllocation->Memory();
+		Core::AssertImplication(!mAllocator, !mRawAllocation);
+		if (mAllocator)
+		{
+			mAllocator->Free(std::move(*this));
+		}
 	}
 
 
-	size_t AllocationView::Offset() const noexcept
+	Core::ReflexivePointer<Allocator> Allocation::GetAllocator() const noexcept
+	{
+		return mRawAllocation->GetAllocator();
+	}
+
+
+	VkDeviceMemory Allocation::Memory() const noexcept
+	{
+		return mRawAllocation->Memory();
+	}
+
+
+	size_t Allocation::Offset() const noexcept
 	{
 		return mOffset;
 	}
 
 
-	size_t AllocationView::Size() const noexcept
+	size_t Allocation::Size() const noexcept
 	{
 		return mSize;
 	}
 
 
-	VkMemoryPropertyFlags AllocationView::Properties() const
+	VkMemoryPropertyFlags Allocation::Properties() const
 	{
-		return mAllocation->Properties();
+		return mRawAllocation->Properties();
 	}
 
 
-	uint8_t* AllocationView::GetMappedAddress() const noexcept
+	uint8_t* Allocation::GetMappedAddress() const noexcept
 	{
-		return mAllocation->GetMappedAddress() + mOffset;
+		return mRawAllocation->GetMappedAddress() + mOffset;
 	}
 
 
-	void AllocationView::Flush() const noexcept
+	void Allocation::Flush() const noexcept
 	{
 		VkMappedMemoryRange range
 		{
@@ -179,7 +217,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	void AllocationView::Overwrite(const Core::IO::DynamicByteBuffer& bytes) const noexcept
+	void Allocation::Overwrite(const Core::IO::DynamicByteBuffer& bytes) const noexcept
 	{
 		Core::Assert(bytes.Size() <= Size());
 		std::memcpy(GetMappedAddress(), bytes.Data(), bytes.Size());

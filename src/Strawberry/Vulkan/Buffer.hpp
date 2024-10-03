@@ -25,9 +25,8 @@ namespace Strawberry::Vulkan
 	class Buffer
 	{
 	public:
-		Buffer(Allocator* allocator, const MemoryTypeCriteria& criteria, size_t size, VkBufferUsageFlags usage);
+		Buffer(Allocator* allocator, size_t size, VkBufferUsageFlags usage);
 		Buffer(Allocator*                         allocator,
-		       const MemoryTypeCriteria&          memoryCriteria,
 		       const Core::IO::DynamicByteBuffer& bytes,
 		       VkBufferUsageFlags                 usage);
 		Buffer(const Buffer& rhs)            = delete;
@@ -56,9 +55,9 @@ namespace Strawberry::Vulkan
 		[[nodiscard]] uint64_t GetSize() const;
 
 	private:
-		uint64_t       mSize;
-		VkBuffer       mBuffer;
-		AllocationView mMemory;
-		VkDevice       mDevice;
+		uint64_t   mSize;
+		VkBuffer   mBuffer;
+		Allocation mMemory;
+		VkDevice   mDevice;
 	};
 }

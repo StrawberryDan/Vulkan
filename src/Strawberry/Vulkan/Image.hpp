@@ -32,7 +32,6 @@ namespace Strawberry::Vulkan
 
 	public:
 		Image(Allocator*                allocator,
-		      const MemoryTypeCriteria& memoryCriteria,
 		      uint32_t                  extent,
 		      VkFormat                  format,
 		      VkImageUsageFlags         usage,
@@ -42,7 +41,6 @@ namespace Strawberry::Vulkan
 		      VkImageLayout             initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
 
 		Image(Allocator*                allocator,
-		      const MemoryTypeCriteria& memoryCriteria,
 		      Core::Math::Vec2u         extent,
 		      VkFormat                  format,
 		      VkImageUsageFlags         usage,
@@ -52,7 +50,6 @@ namespace Strawberry::Vulkan
 		      VkImageLayout             initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
 
 		Image(Allocator*                allocator,
-		      const MemoryTypeCriteria& memoryCriteria,
 		      Core::Math::Vec3u         extent,
 		      VkFormat                  format,
 		      VkImageUsageFlags         usage,
@@ -94,7 +91,7 @@ namespace Strawberry::Vulkan
 
 	private:
 		VkImage           mImage;
-		AllocationView    mMemory;
+		Allocation    mMemory;
 		VkDevice          mDevice;
 		VkFormat          mFormat;
 		Core::Math::Vec3u mSize;

@@ -26,10 +26,7 @@ namespace Strawberry::Vulkan
 	class AllocationError
 	{
 	public:
-		struct OutOfHostMemory {};
-
-
-		struct OutOfDeviceMemory {};
+		struct OutOfMemory {};
 
 
 		struct MemoryTypeUnavailable {};
@@ -55,52 +52,73 @@ namespace Strawberry::Vulkan
 		}
 
 	private:
-		using Info = Core::Variant<OutOfHostMemory, OutOfDeviceMemory, MemoryTypeUnavailable>;
+		using Info = Core::Variant<OutOfMemory, MemoryTypeUnavailable>;
 		Info mInfo;
 	};
 
 
+	class MemoryPool;
 	class Allocation;
-	class AllocationView;
 
 
-	using AllocationResult = Core::Result<AllocationView, AllocationError>;
+	using AllocationResult = Core::Result<Allocation, AllocationError>;
+
+
+	struct AllocationRequest
+	{
+		AllocationRequest(size_t size, size_t alignment)
+			: size(size)
+			, alignment(alignment) {}
+
+
+		AllocationRequest(VkMemoryRequirements& requirements);
+
+		size_t size;
+		size_t alignment;
+	};
 
 
 	class Allocator
 			: public Core::EnableReflexivePointer
 	{
 	public:
-		explicit Allocator(Device& device);
+		explicit Allocator(Device& device, uint32_t memoryType);
 
 
-		virtual AllocationResult Allocate(size_t size, const MemoryTypeCriteria& criteria) noexcept = 0;
-		void                     Free(Allocation&& allocation) const;
-		virtual void             Free(AllocationView&& address) noexcept = 0;
+		virtual AllocationResult Allocate(const AllocationRequest& allocationRequest) noexcept = 0;
+		void                     Free(MemoryPool&& allocation) const;
+		virtual void             Free(Allocation&& address) noexcept = 0;
 		virtual                  ~Allocator() = default;
 
 
 		[[nodiscard]] Core::ReflexivePointer<Device> GetDevice() const noexcept;
 
+
+		[[nodiscard]] uint32_t MemoryType() const noexcept
+		{
+			return mMemoryType;
+		}
+
 	private:
 		Core::ReflexivePointer<Device> mDevice;
+		uint32_t                       mMemoryType;
 	};
 
 
-	class Allocation
+	class MemoryPool final
 			: public Core::EnableReflexivePointer
 	{
 	public:
-		Allocation() = default;
-		Allocation(Allocator& allocator, VkDeviceMemory memory, size_t size, VkMemoryPropertyFlags memoryType);
-		Allocation(const Allocation&)            = delete;
-		Allocation& operator=(const Allocation&) = delete;
-		Allocation(Allocation&& other) noexcept;
-		Allocation& operator=(Allocation&& other) noexcept;
-		~Allocation() override;
+		MemoryPool() = default;
+		MemoryPool(Allocator& allocator, VkDeviceMemory memory, size_t size);
+		MemoryPool(const MemoryPool&)            = delete;
+		MemoryPool& operator=(const MemoryPool&) = delete;
+		MemoryPool(MemoryPool&& other) noexcept;
+		MemoryPool& operator=(MemoryPool&& other) noexcept;
+		~MemoryPool() override;
 
 
-		AllocationView AllocateView(size_t offset, size_t size);
+		Allocation AllocateView(Allocator& allocator, size_t offset, size_t size);
 
 
 		Core::ReflexivePointer<Allocator> GetAllocator() const noexcept;
@@ -114,19 +132,30 @@ namespace Strawberry::Vulkan
 		void Overwrite(const Core::IO::DynamicByteBuffer& bytes) const noexcept;
 
 	private:
-		Core::ReflexivePointer<Allocator> mAllocator        = nullptr;
-		VkDeviceMemory                    mMemory           = VK_NULL_HANDLE;
-		size_t                            mSize             = 0;
-		VkMemoryPropertyFlags             mMemoryProperties = 0;
+		Core::ReflexivePointer<Allocator> mAllocator = nullptr;
+		VkDeviceMemory                    mMemory    = VK_NULL_HANDLE;
+		size_t                            mSize      = 0;
 		mutable Core::Optional<uint8_t*>  mMappedAddress;
 	};
 
 
-	class AllocationView
+	class Allocation
 	{
 	public:
-		AllocationView() = default;
-		AllocationView(Allocation& allocation, size_t offset, size_t size);
+		Allocation() = default;
+		Allocation(Allocator& allocator, MemoryPool& allocation, size_t offset, size_t size);
+		Allocation(const Allocation&)            = delete;
+		Allocation& operator=(const Allocation&) = delete;
+		Allocation(Allocation&& other) noexcept;
+		Allocation& operator=(Allocation&& other) noexcept;
+		~Allocation();
+
+
+		explicit operator bool() const noexcept
+		{
+			Core::AssertImplication(!mAllocator, mRawAllocation);
+			return mAllocator;
+		}
 
 
 		[[nodiscard]] Core::ReflexivePointer<Allocator> GetAllocator() const noexcept;
@@ -141,8 +170,9 @@ namespace Strawberry::Vulkan
 		void Overwrite(const Core::IO::DynamicByteBuffer& bytes) const noexcept;
 
 	private:
-		Core::ReflexivePointer<Allocation> mAllocation = nullptr;
-		size_t                             mOffset     = 0;
-		size_t                             mSize       = 0;
+		Core::ReflexivePointer<Allocator>  mAllocator     = nullptr;
+		Core::ReflexivePointer<MemoryPool> mRawAllocation = nullptr;
+		size_t                             mOffset        = 0;
+		size_t                             mSize          = 0;
 	};
 }

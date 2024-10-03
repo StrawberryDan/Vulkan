@@ -9,40 +9,30 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	NaiveAllocator::NaiveAllocator(Device& device)
-		: Allocator(device) {}
+	NaiveAllocator::NaiveAllocator(Device& device, uint32_t memoryType)
+		: Allocator(device, memoryType) {}
 
 
-	NaiveAllocator::RawAllocationResult NaiveAllocator::AllocateRaw(size_t size, const MemoryTypeCriteria& criteria) noexcept
+	NaiveAllocator::RawAllocationResult NaiveAllocator::AllocateRaw(size_t size) noexcept
 	{
-		auto physicalDevice       = GetDevice()->GetPhysicalDevices()[0];
-		auto memoryTypeCandidates = physicalDevice->SearchMemoryTypes(criteria);
+		const auto physicalDevice       = GetDevice()->GetPhysicalDevices()[0];
 
 
-		if (memoryTypeCandidates.empty())
-		{
-			return AllocationError::MemoryTypeUnavailable();
-		}
-		auto chosenMemoryType = memoryTypeCandidates[0];
-
-
-		VkMemoryAllocateInfo allocateInfo
+		const VkMemoryAllocateInfo allocateInfo
 		{
 			.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
 			.pNext = nullptr,
 			.allocationSize = size,
-			.memoryTypeIndex = chosenMemoryType.index,
+			.memoryTypeIndex = MemoryType(),
 		};
 
-		Address address;
-		VkResult   allocationResult = vkAllocateMemory(*GetDevice(), &allocateInfo, nullptr, &address.deviceMemory);
+		Address  address;
 
-		switch (allocationResult)
+		switch (VkResult allocationResult = vkAllocateMemory(*GetDevice(), &allocateInfo, nullptr, &address.deviceMemory))
 		{
 			case VK_ERROR_OUT_OF_HOST_MEMORY:
-				return RawAllocationResult::Err(AllocationError::OutOfHostMemory());
 			case VK_ERROR_OUT_OF_DEVICE_MEMORY:
-				return RawAllocationResult::Err(AllocationError::OutOfDeviceMemory());
+				return RawAllocationResult::Err(AllocationError::OutOfMemory());
 			case VK_SUCCESS:
 				break;
 			default:
@@ -50,17 +40,17 @@ namespace Strawberry::Vulkan
 		}
 
 
-		return Allocation(*this, address.deviceMemory, size, chosenMemoryType.properties);
+		return MemoryPool(*this, address.deviceMemory, size);
 	}
 
 
-	AllocationResult NaiveAllocator::Allocate(size_t size, const MemoryTypeCriteria& criteria) noexcept
+	AllocationResult NaiveAllocator::Allocate(const AllocationRequest& allocationRequest) noexcept
 	{
-		if (auto allocation = AllocateRaw(size, criteria))
+		if (auto allocation = AllocateRaw(allocationRequest.size))
 		{
-			auto address = allocation->Memory();
+			auto address        = allocation->Memory();
 			auto allocationIter = mAllocations.emplace(address, allocation.Unwrap()).first;
-			return allocationIter->second.AllocateView(0, size);
+			return allocationIter->second.AllocateView(*this, 0, allocationRequest.size);
 		}
 		else
 		{
@@ -69,7 +59,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	void NaiveAllocator::Free(AllocationView&& address) noexcept
+	void NaiveAllocator::Free(Allocation&& address) noexcept
 	{
 		// Free memory
 		mAllocations.erase(address.Memory());

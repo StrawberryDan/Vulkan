@@ -18,7 +18,6 @@
 namespace Strawberry::Vulkan
 {
 	Image::Image(Allocator*                allocator,
-	             const MemoryTypeCriteria& memoryCriteria,
 	             uint32_t                  extent,
 	             VkFormat                  format,
 	             VkImageUsageFlags         usage,
@@ -54,13 +53,12 @@ namespace Strawberry::Vulkan
 		VkMemoryRequirements memoryRequirements;
 		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
 
-		mMemory = allocator->Allocate(memoryRequirements.size, memoryCriteria).Unwrap();
+		mMemory = allocator->Allocate(AllocationRequest(memoryRequirements.size, memoryRequirements.alignment)).Unwrap();
 		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.Memory(), mMemory.Offset()), VK_SUCCESS);
 	}
 
 
 	Image::Image(Allocator*                allocator,
-	             const MemoryTypeCriteria& memoryCriteria,
 	             Core::Math::Vec2u         extent,
 	             VkFormat                  format,
 	             VkImageUsageFlags         usage,
@@ -96,13 +94,12 @@ namespace Strawberry::Vulkan
 		VkMemoryRequirements memoryRequirements;
 		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
 
-		mMemory = allocator->Allocate(memoryRequirements.size, memoryCriteria).Unwrap();
+		mMemory = allocator->Allocate(AllocationRequest(memoryRequirements.size, memoryRequirements.alignment)).Unwrap();
 		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.Memory(), mMemory.Offset()), VK_SUCCESS);
 	}
 
 
 	Image::Image(Allocator*            allocator,
-	             const MemoryTypeCriteria& memoryCriteria,
 	             Core::Math::Vec3u     extent,
 	             VkFormat              format,
 	             VkImageUsageFlags     usage,
@@ -142,7 +139,7 @@ namespace Strawberry::Vulkan
 		VkMemoryRequirements memoryRequirements;
 		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
 
-		mMemory = allocator->Allocate(memoryRequirements.size, memoryCriteria).Unwrap();
+		mMemory = allocator->Allocate(AllocationRequest(memoryRequirements.size, memoryRequirements.alignment)).Unwrap();
 		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.Memory(), mMemory.Offset()), VK_SUCCESS);
 	}
 
