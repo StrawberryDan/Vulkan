@@ -157,6 +157,15 @@ namespace Strawberry::Vulkan
 		virtual                  ~Allocator() = default;
 
 
+		size_t Capacity() const noexcept
+		{
+			return mMemoryPool.Size();
+		}
+
+
+		virtual size_t SpaceAvailable() const noexcept = 0;
+
+
 		[[nodiscard]] Core::ReflexivePointer<Device> GetDevice() const noexcept;
 
 
@@ -172,7 +181,7 @@ namespace Strawberry::Vulkan
 		}
 
 	private:
-		MemoryPool                     mMemoryPool;
+		MemoryPool mMemoryPool;
 	};
 
 

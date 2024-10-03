@@ -85,14 +85,22 @@ namespace Strawberry::Vulkan
 
 		Core::AssertEQ(priorRegion.size + proceedingRegion.size + allocationRequest.size, region->size);
 
+		mSpaceAllocated += result.Size();
 		return result;
 	}
 
 
 	void FreeListAllocator::Free(Allocation&& address) noexcept
 	{
+		mSpaceAllocated -= address.Size();
 		RegionID freshBlock = AddFreeRegion(FreeRegion{.offset = address.Offset(), .size = address.Size()});
 		ExpandBlock(freshBlock);
+	}
+
+
+	size_t FreeListAllocator::SpaceAvailable() const noexcept
+	{
+		return Capacity() - mSpaceAllocated;
 	}
 
 

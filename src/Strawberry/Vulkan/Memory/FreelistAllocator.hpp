@@ -24,6 +24,8 @@ namespace Strawberry::Vulkan
 		AllocationResult Allocate(const AllocationRequest& allocationRequest) noexcept override;
 		void             Free(Allocation&& address) noexcept override;
 
+		size_t SpaceAvailable() const noexcept override;
+
 	private:
 		struct FreeRegion
 		{
@@ -31,7 +33,10 @@ namespace Strawberry::Vulkan
 			size_t    size;
 		};
 
+
 		using RegionID = uint64_t;
+
+		size_t mSpaceAllocated = 0;
 
 		RegionID                       mNextRegionID = 0;
 		std::map<RegionID, FreeRegion> mRegions;
@@ -40,9 +45,9 @@ namespace Strawberry::Vulkan
 
 		RegionID   AddFreeRegion(FreeRegion region);
 		FreeRegion RemoveRegion(RegionID id);
-		void ExpandBlock(RegionID id);
-		bool AreBlocksContiguouse(RegionID a, RegionID b) const noexcept;
-		void MergeBlocks(const std::list<RegionID>& regions) noexcept;
+		void       ExpandBlock(RegionID id);
+		bool       AreBlocksContiguouse(RegionID a, RegionID b) const noexcept;
+		void       MergeBlocks(const std::list<RegionID>& regions) noexcept;
 
 
 		decltype(mRegionsByOffset)::const_iterator RegionIDFromOffset(size_t offset);
