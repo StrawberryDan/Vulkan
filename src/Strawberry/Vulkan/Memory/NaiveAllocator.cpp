@@ -40,7 +40,7 @@ namespace Strawberry::Vulkan
 		}
 
 
-		return MemoryPool(*this, address.deviceMemory, size);
+		return MemoryPool(*GetDevice(), *physicalDevice, MemoryType(), address.deviceMemory, size);
 	}
 
 

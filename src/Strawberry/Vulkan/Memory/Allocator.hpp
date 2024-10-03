@@ -110,7 +110,7 @@ namespace Strawberry::Vulkan
 	{
 	public:
 		MemoryPool() = default;
-		MemoryPool(Allocator& allocator, VkDeviceMemory memory, size_t size);
+		MemoryPool(Device& device, PhysicalDevice& physicalDevice, uint32_t memoryTypeIndex, VkDeviceMemory memory, size_t size);
 		MemoryPool(const MemoryPool&)            = delete;
 		MemoryPool& operator=(const MemoryPool&) = delete;
 		MemoryPool(MemoryPool&& other) noexcept;
@@ -121,21 +121,22 @@ namespace Strawberry::Vulkan
 		Allocation AllocateView(Allocator& allocator, size_t offset, size_t size);
 
 
-		Core::ReflexivePointer<Allocator> GetAllocator() const noexcept;
-		VkDeviceMemory                    Memory() const noexcept;
-		size_t                            Size() const noexcept;
-		VkMemoryPropertyFlags             Properties() const;
-		uint8_t*                          GetMappedAddress() const noexcept;
+		VkDeviceMemory        Memory() const noexcept;
+		size_t                Size() const noexcept;
+		VkMemoryPropertyFlags Properties() const;
+		uint8_t*              GetMappedAddress() const noexcept;
 
 
 		void Flush() const noexcept;
 		void Overwrite(const Core::IO::DynamicByteBuffer& bytes) const noexcept;
 
 	private:
-		Core::ReflexivePointer<Allocator> mAllocator = nullptr;
-		VkDeviceMemory                    mMemory    = VK_NULL_HANDLE;
-		size_t                            mSize      = 0;
-		mutable Core::Optional<uint8_t*>  mMappedAddress;
+		Core::ReflexivePointer<Device>         mDevice          = nullptr;
+		Core::ReflexivePointer<PhysicalDevice> mPhysicalDevice  = nullptr;
+		uint32_t                               mMemoryTypeIndex = -1;
+		VkDeviceMemory                         mMemory          = VK_NULL_HANDLE;
+		size_t                                 mSize            = 0;
+		mutable Core::Optional<uint8_t*>       mMappedAddress   = Core::NullOpt;
 	};
 
 

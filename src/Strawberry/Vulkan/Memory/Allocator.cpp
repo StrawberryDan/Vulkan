@@ -31,14 +31,18 @@ namespace Strawberry::Vulkan
 	}
 
 
-	MemoryPool::MemoryPool(Allocator& allocator, VkDeviceMemory memory, size_t size)
-		: mAllocator(allocator)
+	MemoryPool::MemoryPool(Device& device, PhysicalDevice& physicalDevice, uint32_t memoryTypeIndex, VkDeviceMemory memory, size_t size)
+		: mDevice(device)
+		, mPhysicalDevice(physicalDevice)
+		, mMemoryTypeIndex(memoryTypeIndex)
 		, mMemory(memory)
 		, mSize(size) {}
 
 
 	MemoryPool::MemoryPool(MemoryPool&& other) noexcept
-		: mAllocator(std::move(other.mAllocator))
+		: mDevice(std::move(other.mDevice))
+		, mPhysicalDevice(std::move(other.mPhysicalDevice))
+		, mMemoryTypeIndex(std::exchange(other.mMemoryTypeIndex, -1))
 		, mMemory(std::exchange(other.mMemory, VK_NULL_HANDLE))
 		, mSize(std::exchange(other.mSize, 0)) {}
 
@@ -57,19 +61,13 @@ namespace Strawberry::Vulkan
 
 	MemoryPool::~MemoryPool()
 	{
-		if (mAllocator) mAllocator->Free(std::move(*this));
+		// TODO if (mAllocator) mAllocator->Free(std::move(*this));
 	}
 
 
 	Allocation MemoryPool::AllocateView(Allocator& allocator, size_t offset, size_t size)
 	{
 		return {allocator, *this, offset, size};
-	}
-
-
-	Core::ReflexivePointer<Allocator> MemoryPool::GetAllocator() const noexcept
-	{
-		return mAllocator;
 	}
 
 
@@ -87,7 +85,7 @@ namespace Strawberry::Vulkan
 
 	VkMemoryPropertyFlags MemoryPool::Properties() const
 	{
-		return mAllocator->GetDevice()->GetPhysicalDevices()[0]->GetMemoryProperties().memoryTypes[mAllocator->MemoryType()].propertyFlags;
+		return mPhysicalDevice->GetMemoryProperties().memoryTypes[mMemoryTypeIndex].propertyFlags;
 	}
 
 
@@ -98,7 +96,7 @@ namespace Strawberry::Vulkan
 		{
 			Core::Assert(Properties() & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 			void* mappedAddress = nullptr;
-			Core::AssertEQ(vkMapMemory(*mAllocator->GetDevice(), mMemory, 0, VK_WHOLE_SIZE, 0, &mappedAddress), VK_SUCCESS);
+			Core::AssertEQ(vkMapMemory(*mDevice, mMemory, 0, VK_WHOLE_SIZE, 0, &mappedAddress), VK_SUCCESS);
 			mMappedAddress = static_cast<uint8_t*>(mappedAddress);
 		}
 		return mMappedAddress.Value();
@@ -115,7 +113,7 @@ namespace Strawberry::Vulkan
 			.offset = 0,
 			.size = VK_WHOLE_SIZE
 		};
-		Core::AssertEQ(vkFlushMappedMemoryRanges(*mAllocator->GetDevice(), 1, &range), VK_SUCCESS);
+		Core::AssertEQ(vkFlushMappedMemoryRanges(*mDevice, 1, &range), VK_SUCCESS);
 	}
 
 
@@ -169,7 +167,7 @@ namespace Strawberry::Vulkan
 
 	Core::ReflexivePointer<Allocator> Allocation::GetAllocator() const noexcept
 	{
-		return mRawAllocation->GetAllocator();
+		return mAllocator;
 	}
 
 
