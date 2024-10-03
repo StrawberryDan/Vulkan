@@ -109,6 +109,9 @@ namespace Strawberry::Vulkan
 			: public Core::EnableReflexivePointer
 	{
 	public:
+		static Core::Result<MemoryPool, AllocationError> Allocate(Device& device, PhysicalDevice& physicalDevice, uint32_t memoryTypeIndex, size_t size);
+
+
 		MemoryPool() = default;
 		MemoryPool(Device& device, PhysicalDevice& physicalDevice, uint32_t memoryTypeIndex, VkDeviceMemory memory, size_t size);
 		MemoryPool(const MemoryPool&)            = delete;

@@ -31,6 +31,32 @@ namespace Strawberry::Vulkan
 	}
 
 
+	Core::Result<MemoryPool, AllocationError> MemoryPool::Allocate(Device& device, PhysicalDevice& physicalDevice, uint32_t memoryTypeIndex, size_t size)
+	{
+		const VkMemoryAllocateInfo allocateInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+			.pNext = nullptr,
+			.allocationSize = size,
+			.memoryTypeIndex = memoryTypeIndex,
+		};
+
+		Address  address;
+		switch (VkResult allocationResult = vkAllocateMemory(device, &allocateInfo, nullptr, &address.deviceMemory))
+		{
+			case VK_ERROR_OUT_OF_HOST_MEMORY:
+			case VK_ERROR_OUT_OF_DEVICE_MEMORY:
+				return AllocationError::OutOfMemory();
+			case VK_SUCCESS:
+				break;
+			default:
+				Core::Unreachable();
+		}
+
+		return MemoryPool(device, physicalDevice, memoryTypeIndex, address.deviceMemory, size);
+	}
+
+
 	MemoryPool::MemoryPool(Device& device, PhysicalDevice& physicalDevice, uint32_t memoryTypeIndex, VkDeviceMemory memory, size_t size)
 		: mDevice(device)
 		, mPhysicalDevice(physicalDevice)
@@ -61,7 +87,10 @@ namespace Strawberry::Vulkan
 
 	MemoryPool::~MemoryPool()
 	{
-		// TODO if (mAllocator) mAllocator->Free(std::move(*this));
+		if (mMemory != VK_NULL_HANDLE)
+		{
+			vkFreeMemory(*mDevice, mMemory, nullptr);
+		}
 	}
 
 
