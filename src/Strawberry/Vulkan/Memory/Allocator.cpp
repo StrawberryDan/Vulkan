@@ -14,9 +14,9 @@ namespace Strawberry::Vulkan
 		, alignment(requirements.alignment) {}
 
 
-	Allocator::Allocator(Device& device, uint32_t memoryType)
+	Allocator::Allocator(Device& device, MemoryPool&& memoryPool)
 		: mDevice(device)
-		, mMemoryType(memoryType) {}
+		, mMemoryPool(std::move(memoryPool)) {}
 
 
 	void Allocator::Free(MemoryPool&& allocation) const
@@ -31,7 +31,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Core::Result<MemoryPool, AllocationError> MemoryPool::Allocate(Device& device, PhysicalDevice& physicalDevice, uint32_t memoryTypeIndex, size_t size)
+	Core::Result<MemoryPool, AllocationError> MemoryPool::Allocate(Device& device, const PhysicalDevice& physicalDevice, uint32_t memoryTypeIndex, size_t size)
 	{
 		const VkMemoryAllocateInfo allocateInfo
 		{
@@ -57,7 +57,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	MemoryPool::MemoryPool(Device& device, PhysicalDevice& physicalDevice, uint32_t memoryTypeIndex, VkDeviceMemory memory, size_t size)
+	MemoryPool::MemoryPool(Device& device, const PhysicalDevice& physicalDevice, uint32_t memoryTypeIndex, VkDeviceMemory memory, size_t size)
 		: mDevice(device)
 		, mPhysicalDevice(physicalDevice)
 		, mMemoryTypeIndex(memoryTypeIndex)
@@ -97,18 +97,6 @@ namespace Strawberry::Vulkan
 	Allocation MemoryPool::AllocateView(Allocator& allocator, size_t offset, size_t size)
 	{
 		return {allocator, *this, offset, size};
-	}
-
-
-	VkDeviceMemory MemoryPool::Memory() const noexcept
-	{
-		return mMemory;
-	}
-
-
-	size_t MemoryPool::Size() const noexcept
-	{
-		return mSize;
 	}
 
 

@@ -23,6 +23,10 @@
 
 namespace Strawberry::Vulkan
 {
+	class Allocator;
+	class Allocation;
+
+
 	class AllocationError
 	{
 	public:
@@ -57,8 +61,58 @@ namespace Strawberry::Vulkan
 	};
 
 
-	class MemoryPool;
-	class Allocation;
+	class MemoryPool final
+			: public Core::EnableReflexivePointer
+	{
+	public:
+		static Core::Result<MemoryPool, AllocationError> Allocate(Device& device, const PhysicalDevice& physicalDevice, uint32_t memoryTypeIndex, size_t size);
+
+
+		MemoryPool() = default;
+		MemoryPool(Device& device, const PhysicalDevice& physicalDevice, uint32_t memoryTypeIndex, VkDeviceMemory memory, size_t size);
+		MemoryPool(const MemoryPool&)            = delete;
+		MemoryPool& operator=(const MemoryPool&) = delete;
+		MemoryPool(MemoryPool&& other) noexcept;
+		MemoryPool& operator=(MemoryPool&& other) noexcept;
+		~MemoryPool() override;
+
+
+		Allocation AllocateView(Allocator& allocator, size_t offset, size_t size);
+
+
+		VkDeviceMemory Memory() const noexcept
+		{
+			return mMemory;
+		}
+
+
+		uint32_t MemoryTypeIndex() const noexcept
+		{
+			return mMemoryTypeIndex;
+		}
+
+
+		size_t Size() const noexcept
+		{
+			return mSize;
+		}
+
+
+		VkMemoryPropertyFlags Properties() const;
+		uint8_t*              GetMappedAddress() const noexcept;
+
+
+		void Flush() const noexcept;
+		void Overwrite(const Core::IO::DynamicByteBuffer& bytes) const noexcept;
+
+	private:
+		Core::ReflexivePointer<Device>         mDevice          = nullptr;
+		Core::ReflexivePointer<PhysicalDevice> mPhysicalDevice  = nullptr;
+		uint32_t                               mMemoryTypeIndex = -1;
+		VkDeviceMemory                         mMemory          = VK_NULL_HANDLE;
+		size_t                                 mSize            = 0;
+		mutable Core::Optional<uint8_t*>       mMappedAddress   = Core::NullOpt;
+	};
 
 
 	using AllocationResult = Core::Result<Allocation, AllocationError>;
@@ -82,7 +136,7 @@ namespace Strawberry::Vulkan
 			: public Core::EnableReflexivePointer
 	{
 	public:
-		explicit Allocator(Device& device, uint32_t memoryType);
+		explicit Allocator(Device& device, MemoryPool&& memoryPool);
 
 
 		virtual AllocationResult Allocate(const AllocationRequest& allocationRequest) noexcept = 0;
@@ -94,52 +148,20 @@ namespace Strawberry::Vulkan
 		[[nodiscard]] Core::ReflexivePointer<Device> GetDevice() const noexcept;
 
 
-		[[nodiscard]] uint32_t MemoryType() const noexcept
+		[[nodiscard]] uint32_t MemoryTypeIndex() const noexcept
 		{
-			return mMemoryType;
+			return mMemoryPool.MemoryTypeIndex();
+		}
+
+	protected:
+		MemoryPool& GetMemoryPool()
+		{
+			return mMemoryPool;
 		}
 
 	private:
 		Core::ReflexivePointer<Device> mDevice;
-		uint32_t                       mMemoryType;
-	};
-
-
-	class MemoryPool final
-			: public Core::EnableReflexivePointer
-	{
-	public:
-		static Core::Result<MemoryPool, AllocationError> Allocate(Device& device, PhysicalDevice& physicalDevice, uint32_t memoryTypeIndex, size_t size);
-
-
-		MemoryPool() = default;
-		MemoryPool(Device& device, PhysicalDevice& physicalDevice, uint32_t memoryTypeIndex, VkDeviceMemory memory, size_t size);
-		MemoryPool(const MemoryPool&)            = delete;
-		MemoryPool& operator=(const MemoryPool&) = delete;
-		MemoryPool(MemoryPool&& other) noexcept;
-		MemoryPool& operator=(MemoryPool&& other) noexcept;
-		~MemoryPool() override;
-
-
-		Allocation AllocateView(Allocator& allocator, size_t offset, size_t size);
-
-
-		VkDeviceMemory        Memory() const noexcept;
-		size_t                Size() const noexcept;
-		VkMemoryPropertyFlags Properties() const;
-		uint8_t*              GetMappedAddress() const noexcept;
-
-
-		void Flush() const noexcept;
-		void Overwrite(const Core::IO::DynamicByteBuffer& bytes) const noexcept;
-
-	private:
-		Core::ReflexivePointer<Device>         mDevice          = nullptr;
-		Core::ReflexivePointer<PhysicalDevice> mPhysicalDevice  = nullptr;
-		uint32_t                               mMemoryTypeIndex = -1;
-		VkDeviceMemory                         mMemory          = VK_NULL_HANDLE;
-		size_t                                 mSize            = 0;
-		mutable Core::Optional<uint8_t*>       mMappedAddress   = Core::NullOpt;
+		MemoryPool                     mMemoryPool;
 	};
 
 

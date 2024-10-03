@@ -6,12 +6,10 @@
 
 namespace Strawberry::Vulkan
 {
-	FreeListAllocator::FreeListAllocator(Device& device, uint32_t memoryType, std::uintptr_t size)
-		: Allocator(device, memoryType)
-		, mMemoryPoolAllocator(device, memoryType)
-		, mMemoryPool(mMemoryPoolAllocator.AllocateRaw(size).Unwrap())
+	FreeListAllocator::FreeListAllocator(Device& device, MemoryPool&& memoryPool)
+		: Allocator(device, std::move(memoryPool))
 	{
-		AddFreeRegion(FreeRegion{.offset = 0, .size = size});
+		AddFreeRegion(FreeRegion{.offset = 0, .size = GetMemoryPool().Size()});
 	}
 
 
@@ -66,7 +64,7 @@ namespace Strawberry::Vulkan
 		unsigned int alignedAddress      = AlignedAddress(region->offset, region->size, allocationRequest.alignment).Unwrap();
 		unsigned int alignmentDifference = alignedAddress - region->offset;
 		// Create allocation in segment of region.
-		Allocation result = mMemoryPool.AllocateView(*this, alignedAddress, allocationRequest.size);
+		Allocation result = GetMemoryPool().AllocateView(*this, alignedAddress, allocationRequest.size);
 
 		// Track skipped padding
 		const FreeRegion priorRegion{.offset = region->offset, .size = alignmentDifference};

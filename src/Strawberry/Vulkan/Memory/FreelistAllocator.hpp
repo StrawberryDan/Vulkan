@@ -4,7 +4,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Straberry Vulkan
 #include "Strawberry/Vulkan/Memory/Allocator.hpp"
-#include "Strawberry/Vulkan/Memory/NaiveAllocator.hpp"
 // Standard Library
 #include <cstdint>
 #include <list>
@@ -19,7 +18,7 @@ namespace Strawberry::Vulkan
 			: public Allocator
 	{
 	public:
-		FreeListAllocator(Device& device, uint32_t memoryType, std::uintptr_t size);
+		FreeListAllocator(Device& device, MemoryPool&& memoryPool);
 
 
 		AllocationResult Allocate(const AllocationRequest& allocationRequest) noexcept override;
@@ -31,10 +30,6 @@ namespace Strawberry::Vulkan
 			uintptr_t offset;
 			size_t    size;
 		};
-
-
-		NaiveAllocator mMemoryPoolAllocator;
-		MemoryPool     mMemoryPool;
 
 		using RegionID = uint64_t;
 
