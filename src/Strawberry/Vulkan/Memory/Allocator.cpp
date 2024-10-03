@@ -14,9 +14,8 @@ namespace Strawberry::Vulkan
 		, alignment(requirements.alignment) {}
 
 
-	Allocator::Allocator(Device& device, MemoryPool&& memoryPool)
-		: mDevice(device)
-		, mMemoryPool(std::move(memoryPool)) {}
+	Allocator::Allocator(MemoryPool&& memoryPool)
+		: mMemoryPool(std::move(memoryPool)) {}
 
 
 	void Allocator::Free(MemoryPool&& allocation) const
@@ -27,7 +26,7 @@ namespace Strawberry::Vulkan
 
 	Core::ReflexivePointer<Device> Allocator::GetDevice() const noexcept
 	{
-		return mDevice;
+		return mMemoryPool.GetDevice();
 	}
 
 

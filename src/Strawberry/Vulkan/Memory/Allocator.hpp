@@ -80,6 +80,18 @@ namespace Strawberry::Vulkan
 		Allocation AllocateView(Allocator& allocator, size_t offset, size_t size);
 
 
+		Core::ReflexivePointer<Device> GetDevice() const noexcept
+		{
+			return mDevice;
+		}
+
+
+		Core::ReflexivePointer<PhysicalDevice> GetPhysicalDevice() const noexcept
+		{
+			return mPhysicalDevice;
+		}
+
+
 		VkDeviceMemory Memory() const noexcept
 		{
 			return mMemory;
@@ -136,7 +148,7 @@ namespace Strawberry::Vulkan
 			: public Core::EnableReflexivePointer
 	{
 	public:
-		explicit Allocator(Device& device, MemoryPool&& memoryPool);
+		explicit Allocator(MemoryPool&& memoryPool);
 
 
 		virtual AllocationResult Allocate(const AllocationRequest& allocationRequest) noexcept = 0;
@@ -160,7 +172,6 @@ namespace Strawberry::Vulkan
 		}
 
 	private:
-		Core::ReflexivePointer<Device> mDevice;
 		MemoryPool                     mMemoryPool;
 	};
 

@@ -18,7 +18,7 @@ namespace Strawberry::Vulkan
 			: public Allocator
 	{
 	public:
-		FreeListAllocator(Device& device, MemoryPool&& memoryPool);
+		FreeListAllocator(MemoryPool&& memoryPool);
 
 
 		AllocationResult Allocate(const AllocationRequest& allocationRequest) noexcept override;

@@ -11,7 +11,6 @@
 #include "Strawberry/Vulkan/GraphicsPipeline.hpp"
 #include "Strawberry/Vulkan/Image.hpp"
 #include "Strawberry/Vulkan/Instance.hpp"
-#include "Strawberry/Vulkan/Memory/NaiveAllocator.hpp"
 #include "Strawberry/Vulkan/Queue.hpp"
 #include "Strawberry/Vulkan/RenderPass.hpp"
 #include "Strawberry/Vulkan/Sampler.hpp"
@@ -123,8 +122,11 @@ void BasicRendering()
 	auto hostVisibleMemoryType = gpu.SearchMemoryTypes(MemoryTypeCriteria::HostVisible())[0].index;
 	auto deviceLocalMemoryType = gpu.SearchMemoryTypes(MemoryTypeCriteria::DeviceLocal())[0].index;
 
-	FreeListAllocator hostVisibleAllocator(device, hostVisibleMemoryType, 128 * 1024 * 1024);
-	FreeListAllocator deviceLocalAllocator(device, deviceLocalMemoryType, 128 * 1024 * 1024);
+	auto hostVisibleMemoryPool   = MemoryPool::Allocate(device, gpu, hostVisibleMemoryType, 128 * 1024 * 1024).Unwrap();
+	auto deviceVisibleMemoryPool = MemoryPool::Allocate(device, gpu, deviceLocalMemoryType, 128 * 1024 * 1024).Unwrap();
+
+	FreeListAllocator hostVisibleAllocator(std::move(hostVisibleMemoryPool));
+	FreeListAllocator deviceLocalAllocator(std::move(deviceVisibleMemoryPool));
 
 
 	Buffer buffer(&hostVisibleAllocator,

@@ -6,8 +6,8 @@
 
 namespace Strawberry::Vulkan
 {
-	FreeListAllocator::FreeListAllocator(Device& device, MemoryPool&& memoryPool)
-		: Allocator(device, std::move(memoryPool))
+	FreeListAllocator::FreeListAllocator(MemoryPool&& memoryPool)
+		: Allocator(std::move(memoryPool))
 	{
 		AddFreeRegion(FreeRegion{.offset = 0, .size = GetMemoryPool().Size()});
 	}
