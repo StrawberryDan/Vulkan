@@ -18,6 +18,7 @@
 #include "Strawberry/Vulkan/Shader.hpp"
 #include "Strawberry/Vulkan/Surface.hpp"
 #include "Strawberry/Vulkan/Swapchain.hpp"
+#include "Strawberry/Vulkan/Memory/FreelistAllocator.hpp"
 #include "Strawberry/Window/Window.hpp"
 
 
@@ -119,11 +120,14 @@ void BasicRendering()
 	Vulkan::CommandBuffer commandBuffer = commandPool.Create<CommandBuffer>();
 
 
-	NaiveAllocator allocator(device);
+	auto hostVisibleMemoryType = gpu.SearchMemoryTypes(MemoryTypeCriteria::HostVisible())[0].index;
+	auto deviceLocalMemoryType = gpu.SearchMemoryTypes(MemoryTypeCriteria::DeviceLocal())[0].index;
+
+	FreeListAllocator hostVisibleAllocator(device, hostVisibleMemoryType, 128 * 1024 * 1024);
+	FreeListAllocator deviceLocalAllocator(device, deviceLocalMemoryType, 128 * 1024 * 1024);
 
 
-	Buffer buffer(&allocator,
-	              MemoryTypeCriteria::HostVisible(),
+	Buffer buffer(&hostVisibleAllocator,
 	              6 * sizeof(float) * 3,
 	              VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 	Core::IO::DynamicByteBuffer vertices;
@@ -136,13 +140,13 @@ void BasicRendering()
 	buffer.SetData(vertices);
 
 
-	auto framebuffer = renderPass.Create<Framebuffer>(&allocator, Core::Math::Vec2u(1920, 1080));
+	auto framebuffer = renderPass.Create<Framebuffer>(&deviceLocalAllocator, Core::Math::Vec2u(1920, 1080));
 
 
 	auto   [size, channels, bytes] = Core::IO::DynamicByteBuffer::FromImage("data/dio.png").Unwrap();
-	Buffer textureBuffer(&allocator, MemoryTypeCriteria::HostVisible(), bytes.Size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+	Buffer textureBuffer(&hostVisibleAllocator, bytes.Size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
 	textureBuffer.SetData(bytes);
-	Image texture(&allocator, MemoryTypeCriteria::DeviceLocal(), size, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
+	Image texture(&deviceLocalAllocator, size, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
 	commandBuffer.Begin(true);
 	commandBuffer.PipelineBarrier(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
 	                              VK_PIPELINE_STAGE_TRANSFER_BIT,
