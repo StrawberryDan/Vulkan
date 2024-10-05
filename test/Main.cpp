@@ -17,6 +17,7 @@
 #include "Strawberry/Vulkan/Shader.hpp"
 #include "Strawberry/Vulkan/Surface.hpp"
 #include "Strawberry/Vulkan/Swapchain.hpp"
+#include "Strawberry/Vulkan/Memory/BuddyAllocator.hpp"
 #include "Strawberry/Vulkan/Memory/FreelistAllocator.hpp"
 #include "Strawberry/Window/Window.hpp"
 
@@ -125,8 +126,8 @@ void BasicRendering()
 	auto hostVisibleMemoryPool   = MemoryPool::Allocate(device, gpu, hostVisibleMemoryType, 128 * 1024 * 1024).Unwrap();
 	auto deviceVisibleMemoryPool = MemoryPool::Allocate(device, gpu, deviceLocalMemoryType, 128 * 1024 * 1024).Unwrap();
 
-	FreeListAllocator hostVisibleAllocator(std::move(hostVisibleMemoryPool));
-	FreeListAllocator deviceLocalAllocator(std::move(deviceVisibleMemoryPool));
+	BuddyAllocator hostVisibleAllocator(std::move(hostVisibleMemoryPool));
+	BuddyAllocator deviceLocalAllocator(std::move(deviceVisibleMemoryPool));
 
 
 	Buffer buffer(&hostVisibleAllocator,
