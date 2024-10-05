@@ -219,7 +219,7 @@ namespace Strawberry::Vulkan
 				.colorAttachmentCount = static_cast<uint32_t>(subpass.mColorAttachments.size()),
 				.pColorAttachments = subpass.mColorAttachments.data(),
 				.pResolveAttachments = nullptr,
-				.pDepthStencilAttachment = subpass.mDepthStencilAttachment.AsPtr().ValueOr(nullptr),
+				.pDepthStencilAttachment = subpass.mDepthStencilAttachment.AsPtr().UnwrapOr(nullptr),
 				.preserveAttachmentCount = 0,
 				.pPreserveAttachments = nullptr,
 			});
