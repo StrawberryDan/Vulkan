@@ -41,7 +41,7 @@ namespace Strawberry::Vulkan
 			.memoryTypeIndex = memoryTypeIndex,
 		};
 
-		Address  address;
+		Address address;
 		switch (VkResult allocationResult = vkAllocateMemory(device, &allocateInfo, nullptr, &address.deviceMemory))
 		{
 			case VK_ERROR_OUT_OF_HOST_MEMORY:
