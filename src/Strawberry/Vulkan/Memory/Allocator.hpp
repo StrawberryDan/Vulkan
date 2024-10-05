@@ -181,6 +181,12 @@ namespace Strawberry::Vulkan
 			return mMemoryPool;
 		}
 
+
+		const MemoryPool& GetMemoryPool() const
+		{
+			return mMemoryPool;
+		}
+
 	private:
 		MemoryPool mMemoryPool;
 	};
