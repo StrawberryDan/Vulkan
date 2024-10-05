@@ -35,7 +35,7 @@ namespace Strawberry::Vulkan
 				if (block->allocated || block->size < allocationRequest.size)
 					continue;
 
-				if ((block->size == mMinAllocation || block->size < 2 * allocationRequest.size) && !block->allocatedChildren)
+				if ((block->size < 2 * allocationRequest.size || block->size == mMinAllocation) && !block->allocatedChildren)
 				{
 					return cursor;
 				}
