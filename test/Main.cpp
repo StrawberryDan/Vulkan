@@ -126,8 +126,8 @@ void BasicRendering()
 	auto hostVisibleMemoryPool   = MemoryPool::Allocate(device, gpu, hostVisibleMemoryType, 128 * 1024 * 1024).Unwrap();
 	auto deviceVisibleMemoryPool = MemoryPool::Allocate(device, gpu, deviceLocalMemoryType, 128 * 1024 * 1024).Unwrap();
 
-	BuddyAllocator hostVisibleAllocator(std::move(hostVisibleMemoryPool));
-	BuddyAllocator deviceLocalAllocator(std::move(deviceVisibleMemoryPool));
+	BuddyAllocator hostVisibleAllocator(std::move(hostVisibleMemoryPool), 1024);
+	BuddyAllocator deviceLocalAllocator(std::move(deviceVisibleMemoryPool), 1024);
 
 
 	Buffer buffer(&hostVisibleAllocator,

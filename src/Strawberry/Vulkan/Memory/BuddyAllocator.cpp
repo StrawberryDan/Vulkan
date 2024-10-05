@@ -5,11 +5,14 @@
 
 namespace Strawberry::Vulkan
 {
-	BuddyAllocator::BuddyAllocator(MemoryPool&& memoryPool)
+	BuddyAllocator::BuddyAllocator(MemoryPool&& memoryPool, size_t minAllocation)
 		: Allocator(std::move(memoryPool))
+		, mMinAllocation(minAllocation)
 	{
 		Core::Assert(std::has_single_bit(GetMemoryPool().Size()));
 		Core::Assert(GetMemoryPool().Size() > 2 * MIN_BLOCK_SIZE);
+		Core::Assert(std::has_single_bit(minAllocation));
+		Core::Assert(minAllocation > MIN_BLOCK_SIZE);
 
 		mBlocks.emplace(0, Block(0, GetMemoryPool().Size()));
 	}
@@ -32,12 +35,12 @@ namespace Strawberry::Vulkan
 				if (block->allocated || block->size < allocationRequest.size)
 					continue;
 
-				if (block->size < 2 * allocationRequest.size && !block->allocatedChildren)
+				if ((block->size == mMinAllocation || block->size < 2 * allocationRequest.size) && !block->allocatedChildren)
 				{
 					return cursor;
 				}
 
-				if (block->size > MIN_BLOCK_SIZE)
+				if (block->size > mMinAllocation)
 				{
 					if (!block->HasChildren())
 						SplitBlock(cursor);
