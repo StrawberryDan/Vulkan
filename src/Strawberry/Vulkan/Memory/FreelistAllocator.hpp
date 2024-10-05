@@ -46,7 +46,7 @@ namespace Strawberry::Vulkan
 		RegionID   AddFreeRegion(FreeRegion region);
 		FreeRegion RemoveRegion(RegionID id);
 		void       ExpandBlock(RegionID id);
-		bool       AreBlocksContiguouse(RegionID a, RegionID b) const noexcept;
+		bool       AreBlocksContiguous(RegionID a, RegionID b) const noexcept;
 		void       MergeBlocks(const std::list<RegionID>& regions) noexcept;
 
 

@@ -150,7 +150,7 @@ namespace Strawberry::Vulkan
 		{
 			RegionID a = *forwardCursor;
 			RegionID b = *std::next(forwardCursor);
-			if (AreBlocksContiguouse(a, b))
+			if (AreBlocksContiguous(a, b))
 			{
 				contiguousBlocks.emplace_back(b);
 			}
@@ -165,7 +165,7 @@ namespace Strawberry::Vulkan
 		{
 			RegionID a = *std::prev(backwardCursor);
 			RegionID b = *backwardCursor;
-			if (AreBlocksContiguouse(b, a))
+			if (AreBlocksContiguous(b, a))
 			{
 				contiguousBlocks.emplace_front(b);
 			}
@@ -182,7 +182,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	bool FreeListAllocator::AreBlocksContiguouse(RegionID a, RegionID b) const noexcept
+	bool FreeListAllocator::AreBlocksContiguous(RegionID a, RegionID b) const noexcept
 	{
 		return mRegions.at(a).offset + mRegions.at(a).size == mRegions.at(b).offset;
 	}
