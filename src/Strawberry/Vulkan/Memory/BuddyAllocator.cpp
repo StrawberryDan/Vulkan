@@ -114,6 +114,7 @@ namespace Strawberry::Vulkan
 
 				if (block->offset == address.Offset())
 				{
+					Core::Assert(block->allocated);
 					return cursor.Value();
 				}
 
