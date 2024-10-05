@@ -139,8 +139,9 @@ namespace Strawberry::Vulkan
 
 		AllocationRequest(VkMemoryRequirements& requirements);
 
-		size_t size;
-		size_t alignment;
+		size_t   size;
+		size_t   alignment;
+		uint32_t memoryTypeMask = 0xFFFFFFFF;
 	};
 
 

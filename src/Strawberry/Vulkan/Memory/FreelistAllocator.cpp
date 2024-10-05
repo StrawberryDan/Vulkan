@@ -15,6 +15,8 @@ namespace Strawberry::Vulkan
 
 	AllocationResult FreeListAllocator::Allocate(const AllocationRequest& allocationRequest) noexcept
 	{
+		// Make sure that this is one of the valid memory types for this allocation.
+		Core::Assert(allocationRequest.memoryTypeMask & (1 << MemoryTypeIndex()));
 		// Function for calculating the next aligned address at a postition.
 		auto AlignedAddress = [](unsigned int offset, unsigned int size, unsigned int alignment) -> Core::Optional<unsigned int>
 		{

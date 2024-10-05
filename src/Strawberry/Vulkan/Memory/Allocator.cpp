@@ -11,7 +11,8 @@ namespace Strawberry::Vulkan
 {
 	AllocationRequest::AllocationRequest(VkMemoryRequirements& requirements)
 		: size(requirements.size)
-		, alignment(requirements.alignment) {}
+		, alignment(requirements.alignment)
+		, memoryTypeMask(requirements.memoryTypeBits) {}
 
 
 	Allocator::Allocator(MemoryPool&& memoryPool)

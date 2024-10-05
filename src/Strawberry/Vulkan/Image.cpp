@@ -94,7 +94,7 @@ namespace Strawberry::Vulkan
 		VkMemoryRequirements memoryRequirements;
 		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
 
-		mMemory = allocator->Allocate(AllocationRequest(memoryRequirements.size, memoryRequirements.alignment)).Unwrap();
+		mMemory = allocator->Allocate(AllocationRequest(memoryRequirements)).Unwrap();
 		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.Memory(), mMemory.Offset()), VK_SUCCESS);
 	}
 

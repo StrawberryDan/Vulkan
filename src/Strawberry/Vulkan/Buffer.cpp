@@ -36,7 +36,7 @@ namespace Strawberry::Vulkan
 		vkGetBufferMemoryRequirements(mDevice, mBuffer, &memoryRequirements);
 
 
-		mMemory = allocator->Allocate(AllocationRequest(memoryRequirements.size, memoryRequirements.alignment)).Unwrap();
+		mMemory = allocator->Allocate(AllocationRequest(memoryRequirements)).Unwrap();
 		Core::AssertEQ(vkBindBufferMemory(mDevice, mBuffer, mMemory.Memory(), mMemory.Offset()), VK_SUCCESS);
 	}
 
