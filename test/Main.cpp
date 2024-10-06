@@ -149,7 +149,10 @@ void BasicRendering()
 	auto   [size, channels, bytes] = Core::IO::DynamicByteBuffer::FromImage("data/dio.png").Unwrap();
 	Buffer textureBuffer(&hostVisibleAllocator, bytes.Size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
 	textureBuffer.SetData(bytes);
-	Image texture(&deviceLocalAllocator, size, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
+	Image texture = Image::Builder(&deviceLocalAllocator)
+	                .WithExtent(size).WithFormat(VK_FORMAT_R8G8B8A8_SRGB)
+	                .WithUsage(VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT).Build();
+
 	commandBuffer.Begin(true);
 	commandBuffer.PipelineBarrier(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
 	                              VK_PIPELINE_STAGE_TRANSFER_BIT,
@@ -187,7 +190,7 @@ void BasicRendering()
 		{
 			if (auto text = event->Value<Window::Events::Text>())
 			{
-				std::u8string c = Core::ToUTF8(text->codepoint).Unwrap();
+				std::string c = Core::ToUTF8(text->codepoint).Unwrap();
 				std::cout << (const char*) c.data() << std::endl;
 			}
 		}

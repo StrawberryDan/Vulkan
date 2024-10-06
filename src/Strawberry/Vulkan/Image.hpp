@@ -31,32 +31,132 @@ namespace Strawberry::Vulkan
 		friend class CommandBuffer;
 
 	public:
-		Image(Allocator*                allocator,
-		      uint32_t                  extent,
-		      VkFormat                  format,
-		      VkImageUsageFlags         usage,
-		      uint32_t                  mipLevels     = 1,
-		      uint32_t                  arrayLayers   = 1,
-		      VkImageTiling             tiling        = VK_IMAGE_TILING_OPTIMAL,
-		      VkImageLayout             initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
+		class Builder
+		{
+		public:
+			Builder(Allocator* allocator)
+				: allocator(allocator) {}
 
-		Image(Allocator*                allocator,
-		      Core::Math::Vec2u         extent,
-		      VkFormat                  format,
-		      VkImageUsageFlags         usage,
-		      uint32_t                  mipLevels     = 1,
-		      uint32_t                  arrayLayers   = 1,
-		      VkImageTiling             tiling        = VK_IMAGE_TILING_OPTIMAL,
-		      VkImageLayout             initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
 
-		Image(Allocator*                allocator,
-		      Core::Math::Vec3u         extent,
-		      VkFormat                  format,
-		      VkImageUsageFlags         usage,
-		      uint32_t                  mipLevels     = 1,
-		      uint32_t                  arrayLayers   = 1,
-		      VkImageTiling             tiling        = VK_IMAGE_TILING_OPTIMAL,
-		      VkImageLayout             initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
+			Image Build()
+			{
+				return extent->Visit(Core::Overload(
+					[&](unsigned x)
+					{
+						return Image(allocator.Unwrap(), x, format.Unwrap(), usage.Unwrap(), mipLevels, arrayLayers, tiling, initialLayout);
+					},
+					[&](Core::Math::Vec2u dims)
+					{
+						return Image(allocator.Unwrap(), dims, format.Unwrap(), usage.Unwrap(), mipLevels, arrayLayers, tiling, initialLayout);
+					},
+					[&](Core::Math::Vec3u dims)
+					{
+						return Image(allocator.Unwrap(), dims, format.Unwrap(), usage.Unwrap(), mipLevels, arrayLayers, tiling, initialLayout);
+					}
+				));
+			}
+
+
+			Builder&& WithExtent(unsigned extent)
+			{
+				this->extent = extent;
+				return std::move(*this);
+			}
+
+
+			Builder&& WithExtent(Core::Math::Vec2u extent)
+			{
+				this->extent = extent;
+				return std::move(*this);
+			}
+
+
+			Builder&& WithExtent(Core::Math::Vec3u extent)
+			{
+				this->extent = extent;
+				return std::move(*this);
+			}
+
+
+			Builder&& WithFormat(VkFormat format)
+			{
+				this->format = format;
+				return std::move(*this);
+			}
+
+
+			Builder&& WithUsage(VkImageUsageFlags usage)
+			{
+				this->usage = usage;
+				return std::move(*this);
+			}
+
+
+			Builder&& WithMipLevels(uint32_t mipLevels)
+			{
+				this->mipLevels = mipLevels;
+				return std::move(*this);
+			}
+
+
+			Builder&& WithArrayLayers(uint32_t arrayLayers)
+			{
+				this->arrayLayers = arrayLayers;
+				return std::move(*this);
+			}
+
+
+			Builder&& WithTiling(VkImageTiling tiling)
+			{
+				this->tiling = tiling;
+				return std::move(*this);
+			}
+
+
+			Builder&& WithInitialLayout(VkImageLayout layout)
+			{
+				this->initialLayout = layout;
+				return std::move(*this);
+			}
+
+		private:
+			Core::Optional<Allocator*>                                                    allocator;
+			Core::Optional<Core::Variant<unsigned, Core::Math::Vec2u, Core::Math::Vec3u>> extent;
+			Core::Optional<VkFormat>                                                      format;
+			Core::Optional<VkImageUsageFlags>                                             usage;
+			uint32_t                                                                      mipLevels     = 1;
+			uint32_t                                                                      arrayLayers   = 1;
+			VkImageTiling                                                                 tiling        = VK_IMAGE_TILING_OPTIMAL;
+			VkImageLayout                                                                 initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		};
+
+
+		Image(Allocator*        allocator,
+		      uint32_t          extent,
+		      VkFormat          format,
+		      VkImageUsageFlags usage,
+		      uint32_t          mipLevels     = 1,
+		      uint32_t          arrayLayers   = 1,
+		      VkImageTiling     tiling        = VK_IMAGE_TILING_OPTIMAL,
+		      VkImageLayout     initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
+
+		Image(Allocator*        allocator,
+		      Core::Math::Vec2u extent,
+		      VkFormat          format,
+		      VkImageUsageFlags usage,
+		      uint32_t          mipLevels     = 1,
+		      uint32_t          arrayLayers   = 1,
+		      VkImageTiling     tiling        = VK_IMAGE_TILING_OPTIMAL,
+		      VkImageLayout     initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
+
+		Image(Allocator*        allocator,
+		      Core::Math::Vec3u extent,
+		      VkFormat          format,
+		      VkImageUsageFlags usage,
+		      uint32_t          mipLevels     = 1,
+		      uint32_t          arrayLayers   = 1,
+		      VkImageTiling     tiling        = VK_IMAGE_TILING_OPTIMAL,
+		      VkImageLayout     initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
 
 		Image(const Device&     device,
 		      VkImage           imageHandle,
@@ -91,7 +191,7 @@ namespace Strawberry::Vulkan
 
 	private:
 		VkImage           mImage;
-		Allocation    mMemory;
+		Allocation        mMemory;
 		VkDevice          mDevice;
 		VkFormat          mFormat;
 		Core::Math::Vec3u mSize;
