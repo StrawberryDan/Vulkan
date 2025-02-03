@@ -17,7 +17,7 @@ namespace Strawberry::Vulkan
 		static constexpr size_t MIN_BLOCK_SIZE = 64;
 
 
-		BuddyAllocator(MemoryPool&& memoryPool, size_t minAllocation);
+		BuddyAllocator(MemoryPool&& memoryPool, size_t minGranularity);
 
 
 		AllocationResult Allocate(const AllocationRequest& allocationRequest) noexcept override;
@@ -74,6 +74,6 @@ namespace Strawberry::Vulkan
 		BlockIndex::Inner                  mNextBlockIndex = 1;
 		std::map<BlockIndex::Inner, Block> mBlocks;
 		size_t                             mSpaceAllocated = 0;
-		size_t                             mMinAllocation;
+		size_t                             mMinGranularity;
 	};
 }
