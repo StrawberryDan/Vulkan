@@ -25,8 +25,10 @@ namespace Strawberry::Vulkan
 	class Buffer
 	{
 	public:
-		Buffer(Allocator* allocator, size_t size, VkBufferUsageFlags usage);
-		Buffer(Allocator*                         allocator,
+		Buffer(const Device& device, 
+			   Allocator* allocator, size_t size, VkBufferUsageFlags usage);
+		Buffer(const Device& device, 
+			   Allocator*                         allocator,
 		       const Core::IO::DynamicByteBuffer& bytes,
 		       VkBufferUsageFlags                 usage);
 		Buffer(const Buffer& rhs)            = delete;

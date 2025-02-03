@@ -32,8 +32,9 @@ namespace Strawberry::Vulkan
 	public:
 		struct OutOfMemory {};
 
-
 		struct MemoryTypeUnavailable {};
+
+		struct RequestTooLarge {};
 
 
 		template<typename T>
@@ -133,16 +134,18 @@ namespace Strawberry::Vulkan
 
 	struct AllocationRequest
 	{
-		AllocationRequest(size_t size, size_t alignment)
-			: size(size)
+		AllocationRequest(const Device& device, size_t size, size_t alignment)
+			: device(device)
+			, size(size)
 			, alignment(alignment) {}
 
 
 		AllocationRequest(VkMemoryRequirements& requirements);
 
-		size_t   size;
-		size_t   alignment;
-		uint32_t memoryTypeMask = 0xFFFFFFFF;
+		Core::ReflexivePointer<Device> device;
+		size_t                         size;
+		size_t                         alignment;
+		uint32_t                       memoryTypeMask = 0xFFFFFFFF;
 	};
 
 
@@ -150,46 +153,9 @@ namespace Strawberry::Vulkan
 			: public Core::EnableReflexivePointer
 	{
 	public:
-		explicit Allocator(MemoryPool&& memoryPool);
-
-
 		virtual AllocationResult Allocate(const AllocationRequest& allocationRequest) noexcept = 0;
-		void                     Free(MemoryPool&& allocation) const;
 		virtual void             Free(Allocation&& address) noexcept = 0;
 		virtual                  ~Allocator() = default;
-
-
-		size_t Capacity() const noexcept
-		{
-			return mMemoryPool.Size();
-		}
-
-
-		virtual size_t SpaceAvailable() const noexcept = 0;
-
-
-		[[nodiscard]] Core::ReflexivePointer<Device> GetDevice() const noexcept;
-
-
-		[[nodiscard]] uint32_t MemoryTypeIndex() const noexcept
-		{
-			return mMemoryPool.MemoryTypeIndex();
-		}
-
-	protected:
-		MemoryPool& GetMemoryPool()
-		{
-			return mMemoryPool;
-		}
-
-
-		const MemoryPool& GetMemoryPool() const
-		{
-			return mMemoryPool;
-		}
-
-	private:
-		MemoryPool mMemoryPool;
 	};
 
 
@@ -197,7 +163,7 @@ namespace Strawberry::Vulkan
 	{
 	public:
 		Allocation() = default;
-		Allocation(Allocator& allocator, MemoryPool& allocation, size_t offset, size_t size);
+		Allocation(const Device& device, Allocator& allocator, MemoryPool& allocation, size_t offset, size_t size);
 		Allocation(const Allocation&)            = delete;
 		Allocation& operator=(const Allocation&) = delete;
 		Allocation(Allocation&& other) noexcept;
@@ -213,6 +179,7 @@ namespace Strawberry::Vulkan
 
 
 		[[nodiscard]] Core::ReflexivePointer<Allocator> GetAllocator() const noexcept;
+		[[nodiscard]] Address                           Address() const noexcept;
 		[[nodiscard]] VkDeviceMemory                    Memory() const noexcept;
 		[[nodiscard]] size_t                            Offset() const noexcept;
 		[[nodiscard]] size_t                            Size() const noexcept;
@@ -224,6 +191,7 @@ namespace Strawberry::Vulkan
 		void Overwrite(const Core::IO::DynamicByteBuffer& bytes) const noexcept;
 
 	private:
+		VkDevice                           mDevice        = VK_NULL_HANDLE;
 		Core::ReflexivePointer<Allocator>  mAllocator     = nullptr;
 		Core::ReflexivePointer<MemoryPool> mRawAllocation = nullptr;
 		size_t                             mOffset        = 0;

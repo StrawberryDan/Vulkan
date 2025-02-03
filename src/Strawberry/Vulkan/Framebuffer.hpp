@@ -54,9 +54,9 @@ namespace Strawberry::Vulkan
 		Image&                 GetStencilAttachment();
 
 	private:
-		Image     CreateDepthImage(Allocator* allocator);
+		Image     CreateDepthImage(const Device& device, Allocator* allocator);
 		ImageView CreateDepthImageView();
-		Image     CreateStencilImage(Allocator* allocator);
+		Image     CreateStencilImage(const Device& device, Allocator* allocator);
 		ImageView CreateStencilImageView();
 
 	private:

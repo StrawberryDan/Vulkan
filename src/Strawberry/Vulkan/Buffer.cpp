@@ -15,9 +15,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Buffer::Buffer(Allocator* allocator, size_t size, VkBufferUsageFlags usage)
+	Buffer::Buffer(const Device& device, Allocator* allocator, size_t size, VkBufferUsageFlags usage)
 		: mSize(size)
-		, mDevice(*allocator->GetDevice())
+		, mDevice(device)
 	{
 		VkBufferCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
@@ -41,10 +41,11 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Buffer::Buffer(Allocator*                         allocator,
+	Buffer::Buffer(const Device& device,
+				   Allocator*                         allocator,
 	               const Core::IO::DynamicByteBuffer& bytes,
 	               VkBufferUsageFlags                 usage)
-		: Buffer(allocator, bytes.Size(), usage)
+		: Buffer(device, allocator, bytes.Size(), usage)
 	{
 		Core::Assert(usage & VK_BUFFER_USAGE_TRANSFER_DST_BIT);
 		SetData(bytes);

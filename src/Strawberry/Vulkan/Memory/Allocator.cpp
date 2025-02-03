@@ -15,22 +15,6 @@ namespace Strawberry::Vulkan
 		, memoryTypeMask(requirements.memoryTypeBits) {}
 
 
-	Allocator::Allocator(MemoryPool&& memoryPool)
-		: mMemoryPool(std::move(memoryPool)) {}
-
-
-	void Allocator::Free(MemoryPool&& allocation) const
-	{
-		vkFreeMemory(*GetDevice(), allocation.Memory(), nullptr);
-	}
-
-
-	Core::ReflexivePointer<Device> Allocator::GetDevice() const noexcept
-	{
-		return mMemoryPool.GetDevice();
-	}
-
-
 	Core::Result<MemoryPool, AllocationError> MemoryPool::Allocate(Device& device, const PhysicalDevice& physicalDevice, uint32_t memoryTypeIndex, size_t size)
 	{
 		const VkMemoryAllocateInfo allocateInfo
@@ -96,7 +80,7 @@ namespace Strawberry::Vulkan
 
 	Allocation MemoryPool::AllocateView(Allocator& allocator, size_t offset, size_t size)
 	{
-		return {allocator, *this, offset, size};
+		return {*mDevice, allocator, *this, offset, size};
 	}
 
 
@@ -146,15 +130,17 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Allocation::Allocation(Allocator& allocator, MemoryPool& allocation, size_t offset, size_t size)
-		: mAllocator(allocator)
+	Allocation::Allocation(const Device& device, Allocator& allocator, MemoryPool& allocation, size_t offset, size_t size)
+		: mDevice(device)
+		, mAllocator(allocator)
 		, mRawAllocation(allocation)
 		, mOffset(offset)
 		, mSize(size) {}
 
 
 	Allocation::Allocation(Allocation&& other) noexcept
-		: mAllocator(std::move(other.mAllocator))
+		: mDevice(std::exchange(other.mDevice, VK_NULL_HANDLE))
+		, mAllocator(std::move(other.mAllocator))
 		, mRawAllocation(std::move(other.mRawAllocation))
 		, mOffset(other.mOffset)
 		, mSize(other.mSize) {}
@@ -185,6 +171,15 @@ namespace Strawberry::Vulkan
 	Core::ReflexivePointer<Allocator> Allocation::GetAllocator() const noexcept
 	{
 		return mAllocator;
+	}
+
+
+	Address Allocation::Address() const noexcept
+	{
+		return {
+			.deviceMemory = mRawAllocation->Memory(),
+			.offset = Offset()
+		};
 	}
 
 
@@ -228,7 +223,7 @@ namespace Strawberry::Vulkan
 			.offset = Offset(),
 			.size = Size()
 		};
-		Core::AssertEQ(vkFlushMappedMemoryRanges(*GetAllocator()->GetDevice(), 1, &range), VK_SUCCESS);
+		Core::AssertEQ(vkFlushMappedMemoryRanges(mDevice, 1, &range), VK_SUCCESS);
 	}
 
 

@@ -7,16 +7,16 @@
 namespace Strawberry::Vulkan
 {
 	FreeListAllocator::FreeListAllocator(MemoryPool&& memoryPool)
-		: Allocator(std::move(memoryPool))
+		: mMemoryPool(std::move(memoryPool))
 	{
-		AddFreeRegion(FreeRegion{.offset = 0, .size = GetMemoryPool().Size()});
+		AddFreeRegion(FreeRegion{.offset = 0, .size = mMemoryPool.Size()});
 	}
 
 
 	AllocationResult FreeListAllocator::Allocate(const AllocationRequest& allocationRequest) noexcept
 	{
 		// Make sure that this is one of the valid memory types for this allocation.
-		Core::Assert(allocationRequest.memoryTypeMask & (1 << MemoryTypeIndex()));
+		Core::Assert(allocationRequest.memoryTypeMask & (1 << mMemoryPool.MemoryTypeIndex()));
 		// Function for calculating the next aligned address at a postition.
 		auto AlignedAddress = [](unsigned int offset, unsigned int size, unsigned int alignment) -> Core::Optional<unsigned int>
 		{
@@ -31,26 +31,13 @@ namespace Strawberry::Vulkan
 		// Find a suitable region.
 		Core::Optional<FreeRegion> region = [&]()-> Core::Optional<FreeRegion>
 		{
-			// Find the first region which may be large enough;
-			auto smallestCandidateRegion = std::lower_bound(mRegionsBySize.begin(), mRegionsBySize.end(), allocationRequest.size,
-			                                                [this](const RegionID& a, const size_t& b)
-			                                                {
-				                                                return mRegions.at(a).size < b;
-			                                                });
-			// If no region is large enough, return an error.
-			if (smallestCandidateRegion == mRegionsBySize.end())
+			for (auto [offset, region] : mRegions)
 			{
-				return Core::NullOpt;
-			}
-
-
-			for (; smallestCandidateRegion != mRegionsBySize.end(); ++smallestCandidateRegion)
-			{
-				if (Core::Optional<unsigned int> alignedAddress = AlignedAddress(mRegions.at(*smallestCandidateRegion).offset,
-				                                                                 mRegions.at(*smallestCandidateRegion).size,
+				if (Core::Optional<unsigned int> alignedAddress = AlignedAddress(region.offset,
+				                                                                 region.size,
 				                                                                 allocationRequest.alignment))
 				{
-					return RemoveRegion(*smallestCandidateRegion);
+					return RemoveRegion(offset);
 				}
 			}
 
@@ -66,7 +53,7 @@ namespace Strawberry::Vulkan
 		unsigned int alignedAddress      = AlignedAddress(region->offset, region->size, allocationRequest.alignment).Unwrap();
 		unsigned int alignmentDifference = alignedAddress - region->offset;
 		// Create allocation in segment of region.
-		Allocation result = GetMemoryPool().AllocateView(*this, alignedAddress, allocationRequest.size);
+		Allocation result = mMemoryPool.AllocateView(*this, alignedAddress, allocationRequest.size);
 
 		// Track skipped padding
 		const FreeRegion priorRegion{.offset = region->offset, .size = alignmentDifference};
@@ -87,69 +74,42 @@ namespace Strawberry::Vulkan
 
 		Core::AssertEQ(priorRegion.size + proceedingRegion.size + allocationRequest.size, region->size);
 
-		mSpaceAllocated += result.Size();
 		return result;
 	}
 
 
 	void FreeListAllocator::Free(Allocation&& address) noexcept
 	{
-		mSpaceAllocated -= address.Size();
-		RegionID freshBlock = AddFreeRegion(FreeRegion{.offset = address.Offset(), .size = address.Size()});
-		ExpandBlock(freshBlock);
+		AddFreeRegion(FreeRegion{.offset = address.Offset(), .size = address.Size()});
+		ExpandBlock(address.Offset());
 	}
 
 
-	size_t FreeListAllocator::SpaceAvailable() const noexcept
+	void FreeListAllocator::AddFreeRegion(FreeRegion region)
 	{
-		return Capacity() - mSpaceAllocated;
+		// Insert region into list
+		mRegions.emplace(region.offset, region);
 	}
 
 
-	FreeListAllocator::RegionID FreeListAllocator::AddFreeRegion(FreeRegion region)
+	FreeListAllocator::FreeRegion FreeListAllocator::RemoveRegion(Offset offset)
 	{
-		// Insert with new id.
-		const RegionID newID = mNextRegionID++;
-		mRegions.emplace(newID, region);
-
-		// Insert id into size list
-		const auto sizePos = std::lower_bound(mRegionsBySize.begin(), mRegionsBySize.end(), region.size, [this](RegionID region, size_t size)
-		{
-			return mRegions.at(region).size < size;
-		});
-		mRegionsBySize.emplace(sizePos, newID);
-
-		// Insert id into offset list
-		const auto offsetPos = std::lower_bound(mRegionsByOffset.begin(), mRegionsByOffset.end(), region.offset, [this](RegionID region, size_t offset)
-		{
-			return mRegions.at(region).offset < offset;
-		});
-		mRegionsByOffset.emplace(offsetPos, newID);
-		// Return result.
-		return newID;
-	}
-
-
-	FreeListAllocator::FreeRegion FreeListAllocator::RemoveRegion(RegionID id)
-	{
-		mRegionsBySize.erase(FindInSizeList(id));
-		mRegionsByOffset.erase(FindInOffsetList(id));
-		FreeRegion region = mRegions.at(id);
-		mRegions.erase(id);
+		FreeRegion region = mRegions.at(offset);
+		mRegions.erase(offset);
 		return region;
 	}
 
 
-	void FreeListAllocator::ExpandBlock(RegionID id)
+	void FreeListAllocator::ExpandBlock(Offset id)
 	{
-		auto offsetPosition = FindInOffsetList(id);
+		auto offsetPosition = mRegions.find(id);
 
-		std::list<RegionID> contiguousBlocks{*offsetPosition};
-		auto                forwardCursor = offsetPosition;
-		for (; std::next(forwardCursor) != mRegionsByOffset.end(); ++forwardCursor)
+		std::list<Offset> contiguousBlocks{id};
+		auto              forwardCursor = offsetPosition;
+		for (; std::next(forwardCursor) != mRegions.end(); ++forwardCursor)
 		{
-			RegionID a = *forwardCursor;
-			RegionID b = *std::next(forwardCursor);
+			Offset a = forwardCursor->first;
+			Offset b = std::next(forwardCursor)->first;
 			if (AreBlocksContiguous(a, b))
 			{
 				contiguousBlocks.emplace_back(b);
@@ -161,10 +121,10 @@ namespace Strawberry::Vulkan
 		}
 
 		auto backwardCursor = std::make_reverse_iterator(offsetPosition);
-		for (; backwardCursor != mRegionsByOffset.rend(); ++backwardCursor)
+		for (; backwardCursor != mRegions.rend(); ++backwardCursor)
 		{
-			RegionID a = *std::prev(backwardCursor);
-			RegionID b = *backwardCursor;
+			Offset a = std::prev(backwardCursor)->first;
+			Offset b = backwardCursor->first;
 			if (AreBlocksContiguous(b, a))
 			{
 				contiguousBlocks.emplace_front(b);
@@ -182,21 +142,21 @@ namespace Strawberry::Vulkan
 	}
 
 
-	bool FreeListAllocator::AreBlocksContiguous(RegionID a, RegionID b) const noexcept
+	bool FreeListAllocator::AreBlocksContiguous(Offset a, Offset b) const noexcept
 	{
 		return mRegions.at(a).offset + mRegions.at(a).size == mRegions.at(b).offset;
 	}
 
 
-	void FreeListAllocator::MergeBlocks(const std::list<RegionID>& regions) noexcept
+	void FreeListAllocator::MergeBlocks(const std::list<Offset>& regions) noexcept
 	{
-		auto offsets = regions | std::views::transform([this](RegionID id)
+		auto offsets = regions | std::views::transform([this](Offset id)
 		{
 			return mRegions.at(id).offset;
 		});
 		uintptr_t minOffset = *std::ranges::min_element(offsets);
 
-		size_t sumSizes = std::ranges::fold_left_first(regions | std::views::transform([this](RegionID id)
+		size_t sumSizes = std::ranges::fold_left_first(regions | std::views::transform([this](Offset id)
 		{
 			return mRegions.at(id).size;
 		}), std::plus()).value();
@@ -209,32 +169,5 @@ namespace Strawberry::Vulkan
 		}
 
 		AddFreeRegion(accumulator);
-	}
-
-
-	decltype(FreeListAllocator::mRegionsByOffset)::const_iterator FreeListAllocator::RegionIDFromOffset(size_t offset)
-	{
-		return std::lower_bound(mRegionsByOffset.begin(), mRegionsByOffset.end(), offset, [this](RegionID a, size_t offset)
-		{
-			return mRegions.at(a).offset < offset;
-		});
-	}
-
-
-	decltype(FreeListAllocator::mRegionsBySize)::const_iterator FreeListAllocator::FindInSizeList(RegionID id) const
-	{
-		return std::lower_bound(mRegionsBySize.begin(), mRegionsBySize.end(), id, [this](RegionID a, RegionID b)
-		{
-			return mRegions.at(a).size < mRegions.at(b).size;
-		});
-	}
-
-
-	decltype(FreeListAllocator::mRegionsByOffset)::const_iterator FreeListAllocator::FindInOffsetList(RegionID id) const
-	{
-		return std::lower_bound(mRegionsByOffset.begin(), mRegionsByOffset.end(), id, [this](RegionID a, RegionID b)
-		{
-			return mRegions.at(a).offset < mRegions.at(b).offset;
-		});
 	}
 }

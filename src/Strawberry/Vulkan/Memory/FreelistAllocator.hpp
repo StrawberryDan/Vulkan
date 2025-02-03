@@ -24,7 +24,7 @@ namespace Strawberry::Vulkan
 		AllocationResult Allocate(const AllocationRequest& allocationRequest) noexcept override;
 		void             Free(Allocation&& address) noexcept override;
 
-		size_t SpaceAvailable() const noexcept override;
+		const MemoryPool& Memory() const noexcept { return mMemoryPool; }
 
 	private:
 		struct FreeRegion
@@ -34,24 +34,27 @@ namespace Strawberry::Vulkan
 		};
 
 
-		using RegionID = uint64_t;
+		using Offset = uint64_t;
 
-		size_t mSpaceAllocated = 0;
+		MemoryPool mMemoryPool;
 
-		RegionID                       mNextRegionID = 0;
-		std::map<RegionID, FreeRegion> mRegions;
-		std::list<RegionID>            mRegionsByOffset;
-		std::list<RegionID>            mRegionsBySize;
-
-		RegionID   AddFreeRegion(FreeRegion region);
-		FreeRegion RemoveRegion(RegionID id);
-		void       ExpandBlock(RegionID id);
-		bool       AreBlocksContiguous(RegionID a, RegionID b) const noexcept;
-		void       MergeBlocks(const std::list<RegionID>& regions) noexcept;
+		// The container of all the regions of free memory
+		std::map<Offset, FreeRegion> mRegions;
+		// Associates the 
+		std::list<Offset>          mRegionsBySize;
 
 
-		decltype(mRegionsByOffset)::const_iterator RegionIDFromOffset(size_t offset);
-		decltype(mRegionsBySize)::const_iterator   FindInSizeList(RegionID id) const;
-		decltype(mRegionsByOffset)::const_iterator FindInOffsetList(RegionID id) const;
+		// Functions for managing the list of regions.
+		//
+		// Add a new free region to the list
+		void       AddFreeRegion(FreeRegion region);
+		// Remove the region associate with the given ID
+		FreeRegion RemoveRegion(Offset id);
+		// Expand the given block to fill empty space
+		void       ExpandBlock(Offset id);
+		// Checks if 2 blocks are adjacent to eachother without any gap. Region A must be to the left of region B.
+		bool       AreBlocksContiguous(Offset a, Offset b) const noexcept;
+		// Marge the given list to regions into a single block
+		void       MergeBlocks(const std::list<Offset>& regions) noexcept;
 	};
 }

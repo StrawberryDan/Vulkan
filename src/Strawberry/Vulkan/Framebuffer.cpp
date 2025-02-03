@@ -20,15 +20,16 @@ namespace Strawberry::Vulkan
 	Framebuffer::Framebuffer(const RenderPass& renderPass, Allocator* allocator, Core::Math::Vec2u size)
 		: mRenderPass(renderPass)
 		, mSize(size)
-		, mDepthAttachment(CreateDepthImage(allocator))
+		, mDepthAttachment(CreateDepthImage(*renderPass.GetDevice(), allocator))
 		, mDepthAttachmentView(CreateDepthImageView())
-		, mStencilAttachment(CreateStencilImage(allocator))
+		, mStencilAttachment(CreateStencilImage(*renderPass.GetDevice(), allocator))
 		, mStencilAttachmentView(CreateStencilImageView())
 	{
 		const auto COLOR_ATTACHMENT_COUNT = mRenderPass->mColorAttachmentFormats.size();
 		for (int i = 0; i < COLOR_ATTACHMENT_COUNT; i++)
 		{
-			mColorAttachments.emplace_back(allocator,
+			mColorAttachments.emplace_back(*renderPass.GetDevice(),
+										   allocator,
 			                               mSize,
 			                               renderPass.mColorAttachmentFormats[i],
 			                               VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
@@ -139,9 +140,10 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Image Framebuffer::CreateDepthImage(Allocator* allocator)
+	Image Framebuffer::CreateDepthImage(const Device& device, Allocator* allocator)
 	{
-		return Image(allocator,
+		return Image(device, 
+					 allocator,
 		             mSize,
 		             VK_FORMAT_D32_SFLOAT,
 		             VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
@@ -164,9 +166,9 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Image Framebuffer::CreateStencilImage(Allocator* allocator)
+	Image Framebuffer::CreateStencilImage(const Device& device, Allocator* allocator)
 	{
-		return Image(allocator, mSize, VK_FORMAT_S8_UINT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
+		return Image(device, allocator, mSize, VK_FORMAT_S8_UINT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
 	}
 
 

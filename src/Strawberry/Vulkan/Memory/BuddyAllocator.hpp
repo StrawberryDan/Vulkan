@@ -18,12 +18,14 @@ namespace Strawberry::Vulkan
 
 
 		BuddyAllocator(MemoryPool&& memoryPool, size_t minGranularity);
+		BuddyAllocator(BuddyAllocator&&) = default;
+
+
+		const MemoryPool& Memory() const noexcept { return mMemoryPool; }
 
 
 		AllocationResult Allocate(const AllocationRequest& allocationRequest) noexcept override;
 		void             Free(Allocation&& address) noexcept override;
-
-		size_t SpaceAvailable() const noexcept override;
 
 	private:
 		using BlockIndex = Core::NonMax<unsigned int>;
@@ -71,6 +73,7 @@ namespace Strawberry::Vulkan
 		std::pair<BlockIndex, BlockIndex> SplitBlock(BlockIndex index);
 
 
+		MemoryPool                         mMemoryPool;
 		BlockIndex::Inner                  mNextBlockIndex = 1;
 		std::map<BlockIndex::Inner, Block> mBlocks;
 		size_t                             mSpaceAllocated = 0;

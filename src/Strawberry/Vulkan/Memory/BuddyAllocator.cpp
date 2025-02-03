@@ -6,15 +6,15 @@
 namespace Strawberry::Vulkan
 {
 	BuddyAllocator::BuddyAllocator(MemoryPool&& memoryPool, size_t minAllocation)
-		: Allocator(std::move(memoryPool))
+		: mMemoryPool(std::move(memoryPool))
 		, mMinGranularity(minAllocation)
 	{
-		Core::Assert(std::has_single_bit(GetMemoryPool().Size()));
-		Core::Assert(GetMemoryPool().Size() > 2 * MIN_BLOCK_SIZE);
+		Core::Assert(std::has_single_bit(mMemoryPool.Size()));
+		Core::Assert(mMemoryPool.Size() > 2 * MIN_BLOCK_SIZE);
 		Core::Assert(std::has_single_bit(minAllocation));
 		Core::Assert(minAllocation > MIN_BLOCK_SIZE);
 
-		mBlocks.emplace(0, Block(0, GetMemoryPool().Size()));
+		mBlocks.emplace(0, Block(0, mMemoryPool.Size()));
 	}
 
 
@@ -65,7 +65,7 @@ namespace Strawberry::Vulkan
 
 		block->allocated         = true;
 		block->allocatedChildren = true;
-		Allocation allocation    = GetMemoryPool().AllocateView(*this, block->offset, block->size);
+		Allocation allocation    = mMemoryPool.AllocateView(*this, block->offset, block->size);
 		mSpaceAllocated += block->size;
 
 
@@ -168,12 +168,6 @@ namespace Strawberry::Vulkan
 
 			cursor = block->parent;
 		}
-	}
-
-
-	size_t BuddyAllocator::SpaceAvailable() const noexcept
-	{
-		return GetMemoryPool().Size() - mSpaceAllocated;
 	}
 
 

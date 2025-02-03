@@ -3,6 +3,7 @@
 #include "Strawberry/Core/Timing/Clock.hpp"
 #include "Strawberry/Core/UTF.hpp"
 #include "Strawberry/Vulkan/Memory/Allocator.hpp"
+#include "Strawberry/Vulkan/Memory/PolicyAllocator.hpp"
 #include "Strawberry/Vulkan/Buffer.hpp"
 #include "Strawberry/Vulkan/CommandBuffer.hpp"
 #include "Strawberry/Vulkan/CommandPool.hpp"
@@ -119,18 +120,15 @@ void BasicRendering()
 	Vulkan::CommandPool   commandPool   = queue->Create<CommandPool>(true);
 	Vulkan::CommandBuffer commandBuffer = commandPool.Create<CommandBuffer>();
 
-
 	auto hostVisibleMemoryType = gpu.SearchMemoryTypes(MemoryTypeCriteria::HostVisible())[0].index;
 	auto deviceLocalMemoryType = gpu.SearchMemoryTypes(MemoryTypeCriteria::DeviceLocal())[0].index;
 
-	auto hostVisibleMemoryPool   = MemoryPool::Allocate(device, gpu, hostVisibleMemoryType, 128 * 1024 * 1024).Unwrap();
-	auto deviceVisibleMemoryPool = MemoryPool::Allocate(device, gpu, deviceLocalMemoryType, 128 * 1024 * 1024).Unwrap();
-
-	BuddyAllocator hostVisibleAllocator(std::move(hostVisibleMemoryPool), 1024);
-	BuddyAllocator deviceLocalAllocator(std::move(deviceVisibleMemoryPool), 1024);
+	BasicAllocator hostVisibleAllocator(device, gpu, hostVisibleMemoryType);
+	BasicAllocator deviceLocalAllocator(device, gpu, deviceLocalMemoryType);
 
 
-	Buffer buffer(&hostVisibleAllocator,
+	Buffer buffer(device, 
+				  &hostVisibleAllocator,
 	              6 * sizeof(float) * 3,
 	              VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 	Core::IO::DynamicByteBuffer vertices;
@@ -147,9 +145,9 @@ void BasicRendering()
 
 
 	auto   [size, channels, bytes] = Core::IO::DynamicByteBuffer::FromImage("data/dio.png").Unwrap();
-	Buffer textureBuffer(&hostVisibleAllocator, bytes.Size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+	Buffer textureBuffer(device, &hostVisibleAllocator, bytes.Size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
 	textureBuffer.SetData(bytes);
-	Image texture = Image::Builder(&deviceLocalAllocator)
+	Image texture = Image::Builder(device, &deviceLocalAllocator)
 	                .WithExtent(size).WithFormat(VK_FORMAT_R8G8B8A8_SRGB)
 	                .WithUsage(VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT).Build();
 
