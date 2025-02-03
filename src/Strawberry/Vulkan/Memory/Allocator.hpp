@@ -52,7 +52,7 @@ namespace Strawberry::Vulkan
 		[[nodiscard]] T GetInfo() const noexcept
 		{
 			Core::Assert(IsType<T>());
-			return mInfo.Value<T>();
+			return mInfo.Ref<T>();
 		}
 
 	private:
@@ -61,6 +61,7 @@ namespace Strawberry::Vulkan
 	};
 
 
+	// Class representing a block of allocated Vulkan Memory.
 	class MemoryPool final
 			: public Core::EnableReflexivePointer
 	{
