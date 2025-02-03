@@ -219,7 +219,7 @@ namespace Strawberry::Vulkan
 			State() == CommandBufferState::Invalid);
 		Core::AssertEQ(vkResetCommandBuffer(mCommandBuffer, 0), VK_SUCCESS);
 		mState = CommandBufferState::Initial;
-		for (const auto& secondaryBuffer: mRecordedSecondaryBuffers) secondaryBuffer->mExecutionFenceOrParentBuffer = nullptr;
+		for (const auto& secondaryBuffer: mRecordedSecondaryBuffers) secondaryBuffer->mExecutionFenceOrParentBuffer = Core::ReflexivePointer<CommandBuffer>(nullptr);
 		mRecordedSecondaryBuffers.clear();
 	}
 
@@ -475,7 +475,7 @@ namespace Strawberry::Vulkan
 			case VK_COMMAND_BUFFER_LEVEL_PRIMARY:
 				return Fence(device);
 			case VK_COMMAND_BUFFER_LEVEL_SECONDARY:
-				return nullptr;
+				return Core::ReflexivePointer<CommandBuffer>(nullptr);
 			default:
 				Core::Unreachable();
 		}

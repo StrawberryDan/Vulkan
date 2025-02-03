@@ -188,7 +188,7 @@ void BasicRendering()
 
 		while (auto event = window.NextEvent())
 		{
-			if (auto text = event->Value<Window::Events::Text>())
+			if (auto text = event->Ptr<Window::Events::Text>())
 			{
 				std::string c = Core::ToUTF8(text->codepoint).Unwrap();
 				std::cout << (const char*) c.data() << std::endl;
