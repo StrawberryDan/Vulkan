@@ -3,6 +3,7 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 #include "Strawberry/Vulkan/Memory/MemoryTypeCriteria.hpp"
+#include "Strawberry/Vulkan/Memory/Memory.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Types/ReflexivePointer.hpp"
 #include "Strawberry/Core/Types/Optional.hpp"
@@ -20,14 +21,6 @@ namespace Strawberry::Vulkan
 	class Instance;
 
 
-	struct MemoryType
-	{
-		uint32_t              index;
-		size_t                heapSize;
-		VkMemoryPropertyFlags properties;
-	};
-
-
 	class PhysicalDevice
 			: public Core::EnableReflexivePointer
 	{
@@ -35,7 +28,6 @@ namespace Strawberry::Vulkan
 		friend class Surface;
 		friend class Device;
 		friend class Swapchain;
-
 
 	public:
 		PhysicalDevice(const PhysicalDevice&)            = delete;
@@ -59,10 +51,8 @@ namespace Strawberry::Vulkan
 		std::vector<uint32_t>   SearchQueueFamilies(VkQueueFlags flagBits) const;
 		std::vector<MemoryType> SearchMemoryTypes(const MemoryTypeCriteria& memoryCriteria) const;
 
-
 	protected:
 		PhysicalDevice(const Instance& instance, VkPhysicalDevice rawHandle);
-
 
 	private:
 		VkPhysicalDevice mPhysicalDevice;

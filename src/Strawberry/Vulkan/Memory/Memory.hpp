@@ -13,6 +13,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
+	struct MemoryTypeIndex
+	{
+		VkPhysicalDevice physicalDevice;
+		unsigned         memoryTypeIndex;
+
+
+		VkMemoryPropertyFlags GetProperties() const noexcept;
+	};
+
+
+	struct MemoryType
+	{
+		MemoryTypeIndex       index;
+		size_t                heapSize;
+		VkMemoryPropertyFlags properties;
+	};
+
+
 	struct Address
 	{
 		VkDeviceMemory deviceMemory = VK_NULL_HANDLE;

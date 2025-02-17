@@ -28,9 +28,9 @@ namespace Strawberry::Vulkan
 
 
 		uint32_t formatCount = 0;
-		vkGetPhysicalDeviceSurfaceFormatsKHR(mQueue->GetDevice()->GetPhysicalDevices()[0]->mPhysicalDevice, surface.mSurface, &formatCount, nullptr);
+		vkGetPhysicalDeviceSurfaceFormatsKHR(mQueue->GetDevice()->GetPhysicalDevice().mPhysicalDevice, surface.mSurface, &formatCount, nullptr);
 		std::vector<VkSurfaceFormatKHR> deviceFormats(formatCount);;
-		vkGetPhysicalDeviceSurfaceFormatsKHR(mQueue->GetDevice()->GetPhysicalDevices()[0]->mPhysicalDevice,
+		vkGetPhysicalDeviceSurfaceFormatsKHR(mQueue->GetDevice()->GetPhysicalDevice().mPhysicalDevice,
 		                                     surface.mSurface,
 		                                     &formatCount,
 		                                     deviceFormats.data());

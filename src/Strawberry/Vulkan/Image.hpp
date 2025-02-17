@@ -34,9 +34,9 @@ namespace Strawberry::Vulkan
 		class Builder
 		{
 		public:
-			Builder(const Device& device, Allocator* allocator)
-				: device(device)
-				, allocator(allocator) {}
+			Builder(Allocator& allocator)
+				: allocator(allocator)
+			{}
 
 
 			Image Build()
@@ -44,15 +44,15 @@ namespace Strawberry::Vulkan
 				return extent->Visit(Core::Overload(
 					[&](unsigned x)
 					{
-						return Image(*device, allocator.Unwrap(), x, format.Unwrap(), usage.Unwrap(), mipLevels, arrayLayers, tiling, initialLayout);
+						return Image(*allocator, x, format.Unwrap(), usage.Unwrap(), mipLevels, arrayLayers, tiling, initialLayout);
 					},
 					[&](Core::Math::Vec2u dims)
 					{
-						return Image(*device, allocator.Unwrap(), dims, format.Unwrap(), usage.Unwrap(), mipLevels, arrayLayers, tiling, initialLayout);
+						return Image(*allocator, dims, format.Unwrap(), usage.Unwrap(), mipLevels, arrayLayers, tiling, initialLayout);
 					},
 					[&](Core::Math::Vec3u dims)
 					{
-						return Image(*device, allocator.Unwrap(), dims, format.Unwrap(), usage.Unwrap(), mipLevels, arrayLayers, tiling, initialLayout);
+						return Image(*allocator, dims, format.Unwrap(), usage.Unwrap(), mipLevels, arrayLayers, tiling, initialLayout);
 					}
 				));
 			}
@@ -121,8 +121,7 @@ namespace Strawberry::Vulkan
 			}
 
 		private:
-			Core::ReflexivePointer<Device>                                                device;
-			Core::Optional<Allocator*>                                                    allocator;
+			Core::ReflexivePointer<Allocator>                                             allocator;
 			Core::Optional<Core::Variant<unsigned, Core::Math::Vec2u, Core::Math::Vec3u>> extent;
 			Core::Optional<VkFormat>                                                      format;
 			Core::Optional<VkImageUsageFlags>                                             usage;
@@ -133,8 +132,7 @@ namespace Strawberry::Vulkan
 		};
 
 
-		Image(const Device&    device,
-			  Allocator*        allocator,
+		Image(Allocator&        allocator,
 		      uint32_t          extent,
 		      VkFormat          format,
 		      VkImageUsageFlags usage,
@@ -143,8 +141,7 @@ namespace Strawberry::Vulkan
 		      VkImageTiling     tiling        = VK_IMAGE_TILING_OPTIMAL,
 		      VkImageLayout     initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
 
-		Image(const Device&    device,
-			  Allocator*        allocator,
+		Image(Allocator&        allocator,
 		      Core::Math::Vec2u extent,
 		      VkFormat          format,
 		      VkImageUsageFlags usage,
@@ -153,8 +150,7 @@ namespace Strawberry::Vulkan
 		      VkImageTiling     tiling        = VK_IMAGE_TILING_OPTIMAL,
 		      VkImageLayout     initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
 
-		Image(const Device&    device,
-			  Allocator*        allocator,
+		Image(Allocator&        allocator,
 		      Core::Math::Vec3u extent,
 		      VkFormat          format,
 		      VkImageUsageFlags usage,

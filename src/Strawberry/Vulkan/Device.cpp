@@ -1,9 +1,10 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
-#include "Device.hpp"
 // Strawberry Graphics
+#include "Device.hpp"
 #include "Instance.hpp"
+#include "Memory/Allocator.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Assert.hpp"
 #include "Strawberry/Core/Types/Optional.hpp"
@@ -22,10 +23,8 @@ namespace Strawberry::Vulkan
 {
 	Device::Device(const PhysicalDevice& physicalDevice, std::vector<QueueCreateInfo> queueCreateInfo)
 		: mDevice{}
-		, mPhysicalDevices{physicalDevice.GetReflexivePointer()}
+		, mPhysicalDevice(physicalDevice)
 	{
-		mPhysicalDevices.emplace_back(physicalDevice);
-
 		// Describes Queues
 		std::vector<VkDeviceQueueCreateInfo> queues;
 		std::vector<std::vector<float>>      queuePriorities;
@@ -56,7 +55,7 @@ namespace Strawberry::Vulkan
 
 
 		// Enumerate Extension Properties of Physical Device
-		auto extensionProperties = mPhysicalDevices[0]->GetExtensionProperties();
+		auto extensionProperties = GetPhysicalDevice().GetExtensionProperties();
 
 
 		// Add portability subset if available
@@ -100,7 +99,7 @@ namespace Strawberry::Vulkan
 
 	Device::Device(Device&& rhs) noexcept
 		: mDevice(std::exchange(rhs.mDevice, nullptr))
-		, mPhysicalDevices(std::move(rhs.mPhysicalDevices))
+		, mPhysicalDevice(std::move(rhs.mPhysicalDevice))
 		, mQueues(std::move(rhs.mQueues)) {}
 
 
@@ -135,13 +134,13 @@ namespace Strawberry::Vulkan
 
 	Core::ReflexivePointer<Instance> Device::GetInstance() const
 	{
-		return mPhysicalDevices[0]->GetInstance();
+		return GetPhysicalDevice().GetInstance();
 	}
 
 
-	const std::vector<Core::ReflexivePointer<PhysicalDevice>>& Device::GetPhysicalDevices() const
+	const PhysicalDevice& Device::GetPhysicalDevice() const
 	{
-		return mPhysicalDevices;
+		return *mPhysicalDevice;
 	}
 
 

@@ -43,13 +43,6 @@ namespace Strawberry::Vulkan
 		operator VkRenderPass() const noexcept;
 
 
-		template<std::movable T, typename... Args>
-		T Create(const Args&... args) const
-		{
-			return T(*this, std::forward<const Args&>(args)...);
-		}
-
-
 		Core::ReflexivePointer<Device> GetDevice() const;
 
 	protected:

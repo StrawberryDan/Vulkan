@@ -13,7 +13,7 @@ namespace Strawberry::Vulkan
 {
 	struct MemoryTypeCriteria
 	{
-		uint32_t              typeMask;
+		size_t                minimumSize = 0;
 		VkMemoryPropertyFlags requiredProperties;
 		VkMemoryPropertyFlags preferredProperties;
 
@@ -21,5 +21,13 @@ namespace Strawberry::Vulkan
 		static MemoryTypeCriteria Null();
 		static MemoryTypeCriteria DeviceLocal();
 		static MemoryTypeCriteria HostVisible();
+
+
+		MemoryTypeCriteria WithMinimumSize(size_t minimumSize) const
+		{
+			MemoryTypeCriteria criteria = *this;
+			criteria.minimumSize = minimumSize;
+			return criteria;
+		}
 	};
 }

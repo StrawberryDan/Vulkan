@@ -26,12 +26,12 @@ namespace Strawberry::Vulkan
 
 
 	class Framebuffer
-			: public Core::EnableReflexivePointer
+	: public Core::EnableReflexivePointer
 	{
 		friend class CommandBuffer;
 
 	public:
-		Framebuffer(const RenderPass& mRenderPass, Allocator* allocator, Core::Math::Vec2u size);
+		Framebuffer(const RenderPass& mRenderPass, Allocator& allocator, Core::Math::Vec2u size);
 		Framebuffer(const Framebuffer& rhs)            = delete;
 		Framebuffer& operator=(const Framebuffer& rhs) = delete;
 		Framebuffer(Framebuffer&& rhs) noexcept;
@@ -54,12 +54,12 @@ namespace Strawberry::Vulkan
 		Image&                 GetStencilAttachment();
 
 	private:
-		Image     CreateDepthImage(const Device& device, Allocator* allocator);
+		Image     CreateDepthImage(const Device& device, Allocator& allocator);
 		ImageView CreateDepthImageView();
-		Image     CreateStencilImage(const Device& device, Allocator* allocator);
+		Image     CreateStencilImage(const Device& device, Allocator& allocator);
 		ImageView CreateStencilImageView();
 
-	private:
+
 		VkFramebuffer                      mFramebuffer;
 		Core::ReflexivePointer<RenderPass> mRenderPass;
 		Core::Math::Vec2u                  mSize;

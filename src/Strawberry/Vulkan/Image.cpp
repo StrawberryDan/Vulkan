@@ -17,8 +17,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Image::Image(const Device&             device, 
-				 Allocator*                allocator,
+	Image::Image(Allocator&                allocator,
 	             uint32_t                  extent,
 	             VkFormat                  format,
 	             VkImageUsageFlags         usage,
@@ -27,7 +26,7 @@ namespace Strawberry::Vulkan
 	             VkImageTiling             tiling,
 	             VkImageLayout             initialLayout) noexcept
 		: mImage(nullptr)
-		, mDevice(device)
+		, mDevice(*allocator.GetDevice())
 		, mFormat(format)
 		, mSize(static_cast<int>(extent), 1, 1)
 	{
@@ -54,13 +53,12 @@ namespace Strawberry::Vulkan
 		VkMemoryRequirements memoryRequirements;
 		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
 
-		mMemory = allocator->Allocate(AllocationRequest(device, memoryRequirements.size, memoryRequirements.alignment)).Unwrap();
+		mMemory = allocator.Allocate(AllocationRequest(memoryRequirements)).Unwrap();
 		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.Memory(), mMemory.Offset()), VK_SUCCESS);
 	}
 
 
-	Image::Image(const Device&             device,
-			     Allocator*                allocator,
+	Image::Image(Allocator&                allocator,
 	             Core::Math::Vec2u         extent,
 	             VkFormat                  format,
 	             VkImageUsageFlags         usage,
@@ -69,7 +67,7 @@ namespace Strawberry::Vulkan
 	             VkImageTiling             tiling,
 	             VkImageLayout             initialLayout) noexcept
 		: mImage(nullptr)
-		, mDevice(device)
+		, mDevice(*allocator.GetDevice())
 		, mFormat(format)
 		, mSize(extent[0], extent[1], 1)
 	{
@@ -96,13 +94,12 @@ namespace Strawberry::Vulkan
 		VkMemoryRequirements memoryRequirements;
 		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
 
-		mMemory = allocator->Allocate(AllocationRequest(memoryRequirements)).Unwrap();
+		mMemory = allocator.Allocate(AllocationRequest(memoryRequirements)).Unwrap();
 		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.Memory(), mMemory.Offset()), VK_SUCCESS);
 	}
 
 
-	Image::Image(const Device&         device,
-			     Allocator*            allocator,
+	Image::Image(Allocator&            allocator,
 	             Core::Math::Vec3u     extent,
 	             VkFormat              format,
 	             VkImageUsageFlags     usage,
@@ -111,7 +108,7 @@ namespace Strawberry::Vulkan
 	             VkImageTiling         tiling,
 	             VkImageLayout         initialLayout) noexcept
 		: mImage(nullptr)
-		, mDevice(device)
+		, mDevice(*allocator.GetDevice())
 		, mFormat(format)
 		, mSize(extent)
 	{
@@ -142,7 +139,7 @@ namespace Strawberry::Vulkan
 		VkMemoryRequirements memoryRequirements;
 		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
 
-		mMemory = allocator->Allocate(AllocationRequest(device, memoryRequirements.size, memoryRequirements.alignment)).Unwrap();
+		mMemory = allocator.Allocate(AllocationRequest(memoryRequirements)).Unwrap();
 		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.Memory(), mMemory.Offset()), VK_SUCCESS);
 	}
 

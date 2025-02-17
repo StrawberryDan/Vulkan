@@ -165,7 +165,9 @@ namespace Strawberry::Vulkan
 		viableMemoryTypes.reserve(typeCount / 2);
 		for (uint32_t type: memoryTypes)
 		{
-			if (requiredProperties == (types[type].propertyFlags & requiredProperties))
+			const bool hasRequiredProperties = requiredProperties == (types[type].propertyFlags & requiredProperties);
+			const bool isLargeEnough = mMemoryProperties->memoryHeaps[types[type].heapIndex].size >= memoryCriteria.minimumSize;
+			if (hasRequiredProperties && isLargeEnough)
 			{
 				viableMemoryTypes.emplace_back(type);
 			}
@@ -173,9 +175,7 @@ namespace Strawberry::Vulkan
 
 
 		std::vector<uint32_t> preferredMemoryTypes;
-		// Assume that half of the viable types are preferred.
-		// This is probably a sensible assumption.
-		preferredMemoryTypes.reserve(typeCount / 4);
+		preferredMemoryTypes.reserve(typeCount);
 		for (uint32_t type: viableMemoryTypes)
 		{
 			if (preferredProperties == (types[type].propertyFlags & preferredProperties))
@@ -196,7 +196,7 @@ namespace Strawberry::Vulkan
 				| std::ranges::views::transform([&](uint32_t type)
 				{
 					return MemoryType{
-						.index = type,
+						.index = MemoryTypeIndex{ .physicalDevice = mPhysicalDevice, .memoryTypeIndex = type },
 						.heapSize = heaps[types[type].heapIndex].size,
 						.properties = types[type].propertyFlags,
 					};

@@ -4,8 +4,8 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
-#include "PhysicalDevice.hpp"
-#include "Queue.hpp"
+#include "Strawberry/Vulkan/PhysicalDevice.hpp"
+#include "Strawberry/Vulkan/Queue.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Types/ReflexivePointer.hpp"
 #include "Strawberry/Core/Types/Optional.hpp"
@@ -22,6 +22,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
+	class Allocator;
 	class Instance;
 	class GraphicsPipeline;
 
@@ -49,14 +50,12 @@ namespace Strawberry::Vulkan
 
 
 		[[nodiscard]] Core::ReflexivePointer<Instance>                           GetInstance() const;
-		[[nodiscard]] const std::vector<Core::ReflexivePointer<PhysicalDevice>>& GetPhysicalDevices() const;
-
-
-		[[nodiscard]] Core::ReflexivePointer<Queue> GetQueue(uint32_t family, uint32_t index);
+		[[nodiscard]] const PhysicalDevice&                                      GetPhysicalDevice() const;
+		[[nodiscard]] Core::ReflexivePointer<Queue>                              GetQueue(uint32_t family, uint32_t index);
 
 	private:
 		VkDevice                                            mDevice;
-		std::vector<Core::ReflexivePointer<PhysicalDevice>> mPhysicalDevices;
+		Core::ReflexivePointer<PhysicalDevice>              mPhysicalDevice;
 
 
 		std::map<uint32_t, std::vector<Queue>> mQueues;

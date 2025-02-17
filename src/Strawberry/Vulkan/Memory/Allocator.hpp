@@ -4,7 +4,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Strawberry Vulkan
 #include "Strawberry/Vulkan/Memory/Memory.hpp"
-#include "Strawberry/Vulkan/Device.hpp"
+#include "Strawberry/Vulkan/Memory/AllocationRequest.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Types/ReflexivePointer.hpp"
 #include "Strawberry/Core/Types/Variant.hpp"
@@ -19,8 +19,6 @@
 //======================================================================================================================
 //  Class Declaration
 //----------------------------------------------------------------------------------------------------------------------
-
-
 namespace Strawberry::Vulkan
 {
 	class Allocator;
@@ -67,11 +65,11 @@ namespace Strawberry::Vulkan
 			: public Core::EnableReflexivePointer
 	{
 	public:
-		static Core::Result<MemoryPool, AllocationError> Allocate(Device& device, const PhysicalDevice& physicalDevice, uint32_t memoryTypeIndex, size_t size);
+		static Core::Result<MemoryPool, AllocationError> Allocate(Device& device, MemoryTypeIndex memoryTypeIndex, size_t size);
 
 
 		MemoryPool() = default;
-		MemoryPool(Device& device, const PhysicalDevice& physicalDevice, uint32_t memoryTypeIndex, VkDeviceMemory memory, size_t size);
+		MemoryPool(Device& device, MemoryTypeIndex memoryTypeIndex, VkDeviceMemory memory, size_t size);
 		MemoryPool(const MemoryPool&)            = delete;
 		MemoryPool& operator=(const MemoryPool&) = delete;
 		MemoryPool(MemoryPool&& other) noexcept;
@@ -88,19 +86,13 @@ namespace Strawberry::Vulkan
 		}
 
 
-		Core::ReflexivePointer<PhysicalDevice> GetPhysicalDevice() const noexcept
-		{
-			return mPhysicalDevice;
-		}
-
-
 		VkDeviceMemory Memory() const noexcept
 		{
 			return mMemory;
 		}
 
 
-		uint32_t MemoryTypeIndex() const noexcept
+		MemoryTypeIndex GetMemoryTypeIndex() const noexcept
 		{
 			return mMemoryTypeIndex;
 		}
@@ -121,8 +113,7 @@ namespace Strawberry::Vulkan
 
 	private:
 		Core::ReflexivePointer<Device>         mDevice          = nullptr;
-		Core::ReflexivePointer<PhysicalDevice> mPhysicalDevice  = nullptr;
-		uint32_t                               mMemoryTypeIndex = -1;
+		MemoryTypeIndex                        mMemoryTypeIndex = {};
 		VkDeviceMemory                         mMemory          = VK_NULL_HANDLE;
 		size_t                                 mSize            = 0;
 		mutable Core::Optional<uint8_t*>       mMappedAddress   = Core::NullOpt;
@@ -132,30 +123,25 @@ namespace Strawberry::Vulkan
 	using AllocationResult = Core::Result<Allocation, AllocationError>;
 
 
-	struct AllocationRequest
-	{
-		AllocationRequest(const Device& device, size_t size, size_t alignment)
-			: device(device)
-			, size(size)
-			, alignment(alignment) {}
-
-
-		AllocationRequest(VkMemoryRequirements& requirements);
-
-		Core::ReflexivePointer<Device> device;
-		size_t                         size;
-		size_t                         alignment;
-		uint32_t                       memoryTypeMask = 0xFFFFFFFF;
-	};
-
-
 	class Allocator
 			: public Core::EnableReflexivePointer
 	{
 	public:
+		Allocator(const Device& device)
+			: mDevice(device) {}
+
+
 		virtual AllocationResult Allocate(const AllocationRequest& allocationRequest) noexcept = 0;
 		virtual void             Free(Allocation&& address) noexcept = 0;
 		virtual                  ~Allocator() = default;
+
+
+
+		Core::ReflexivePointer<Device> GetDevice() const { return mDevice; }
+
+
+	private:
+		Core::ReflexivePointer<Device> mDevice;
 	};
 
 

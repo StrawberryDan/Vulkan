@@ -9,20 +9,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	AllocationRequest::AllocationRequest(VkMemoryRequirements& requirements)
-		: size(requirements.size)
-		, alignment(requirements.alignment)
-		, memoryTypeMask(requirements.memoryTypeBits) {}
-
-
-	Core::Result<MemoryPool, AllocationError> MemoryPool::Allocate(Device& device, const PhysicalDevice& physicalDevice, uint32_t memoryTypeIndex, size_t size)
+	Core::Result<MemoryPool, AllocationError> MemoryPool::Allocate(Device& device, MemoryTypeIndex memoryTypeIndex, size_t size)
 	{
 		const VkMemoryAllocateInfo allocateInfo
 		{
 			.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
 			.pNext = nullptr,
 			.allocationSize = size,
-			.memoryTypeIndex = memoryTypeIndex,
+			.memoryTypeIndex = memoryTypeIndex.memoryTypeIndex,
 		};
 
 		Address address;
@@ -37,13 +31,12 @@ namespace Strawberry::Vulkan
 				Core::Unreachable();
 		}
 
-		return MemoryPool(device, physicalDevice, memoryTypeIndex, address.deviceMemory, size);
+		return MemoryPool(device, memoryTypeIndex, address.deviceMemory, size);
 	}
 
 
-	MemoryPool::MemoryPool(Device& device, const PhysicalDevice& physicalDevice, uint32_t memoryTypeIndex, VkDeviceMemory memory, size_t size)
+	MemoryPool::MemoryPool(Device& device, MemoryTypeIndex memoryTypeIndex, VkDeviceMemory memory, size_t size)
 		: mDevice(device)
-		, mPhysicalDevice(physicalDevice)
 		, mMemoryTypeIndex(memoryTypeIndex)
 		, mMemory(memory)
 		, mSize(size) {}
@@ -51,8 +44,7 @@ namespace Strawberry::Vulkan
 
 	MemoryPool::MemoryPool(MemoryPool&& other) noexcept
 		: mDevice(std::move(other.mDevice))
-		, mPhysicalDevice(std::move(other.mPhysicalDevice))
-		, mMemoryTypeIndex(std::exchange(other.mMemoryTypeIndex, -1))
+		, mMemoryTypeIndex(std::exchange(other.mMemoryTypeIndex, {}))
 		, mMemory(std::exchange(other.mMemory, VK_NULL_HANDLE))
 		, mSize(std::exchange(other.mSize, 0)) {}
 
@@ -86,7 +78,7 @@ namespace Strawberry::Vulkan
 
 	VkMemoryPropertyFlags MemoryPool::Properties() const
 	{
-		return mPhysicalDevice->GetMemoryProperties().memoryTypes[mMemoryTypeIndex].propertyFlags;
+		return mMemoryTypeIndex.GetProperties();
 	}
 
 
