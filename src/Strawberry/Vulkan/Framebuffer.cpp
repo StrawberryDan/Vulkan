@@ -35,9 +35,9 @@ namespace Strawberry::Vulkan
 			VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
 		mColorAttachmentViews.emplace_back(
 		mColorAttachments.back().Create<ImageView::Builder>()
-		.WithType(VK_IMAGE_VIEW_TYPE_2D)
-		.WithFormat(VK_FORMAT_R32G32B32A32_SFLOAT)
-		.Build()
+			.WithType(VK_IMAGE_VIEW_TYPE_2D)
+			.WithFormat(renderPass.mColorAttachmentFormats[i])
+			.Build()
 		);
 	}
 
