@@ -49,9 +49,9 @@ namespace Strawberry::Vulkan
 		operator VkDevice() const;
 
 
-		[[nodiscard]] Core::ReflexivePointer<Instance>                           GetInstance() const;
-		[[nodiscard]] const PhysicalDevice&                                      GetPhysicalDevice() const;
-		[[nodiscard]] Core::ReflexivePointer<Queue>                              GetQueue(uint32_t family, uint32_t index);
+		[[nodiscard]] Core::ReflexivePointer<Instance>      GetInstance() const;
+		[[nodiscard]] const PhysicalDevice&                 GetPhysicalDevice() const;
+		[[nodiscard]] Queue&                                GetQueue(uint32_t family, uint32_t index);
 
 	private:
 		VkDevice                                            mDevice;

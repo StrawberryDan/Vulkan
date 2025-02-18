@@ -144,8 +144,8 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Core::ReflexivePointer<Queue> Device::GetQueue(uint32_t family, uint32_t index)
+	Queue& Device::GetQueue(uint32_t family, uint32_t index)
 	{
-		return mQueues[family][index].GetReflexivePointer();
+		return mQueues[family][index];
 	}
 }
