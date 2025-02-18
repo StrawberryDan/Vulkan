@@ -255,4 +255,10 @@ namespace Strawberry::Vulkan
 
 		return mPhysicalDevices.Value();
 	}
+
+
+	const PhysicalDevice& Instance::GetPreferredPhysicalDevice() const
+	{
+		return GetPhysicalDevices()[0];
+	}
 }
