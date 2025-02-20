@@ -90,7 +90,6 @@ if (NOT TARGET StrawberryVulkan)
 
 	add_executable(StrawberryVulkanTest test/Main.cpp)
 	target_link_libraries(StrawberryVulkanTest PRIVATE StrawberryVulkan)
-	set_target_properties(StrawberryVulkanTest PROPERTIES CXX_STANDARD 23)
 	add_target_shaders(TARGET StrawberryVulkanTest SHADERS
 		${CMAKE_CURRENT_SOURCE_DIR}/test/Mesh.vert
 		${CMAKE_CURRENT_SOURCE_DIR}/test/SolidColor.frag
