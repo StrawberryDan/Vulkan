@@ -83,7 +83,7 @@ namespace Strawberry::Vulkan
 		Core::AssertEQ(vkGetSwapchainImagesKHR(*queue.GetDevice(), mSwapchain, &imageCount, imageHandles.data()), VK_SUCCESS);
 		for (VkImage handle: imageHandles)
 		{
-			mImages.emplace_back(*queue.GetDevice(), handle, mSize.AsType<unsigned int>().WithAdditionalValues(1), mFormat.format);
+			mImages.emplace_back(*queue.GetDevice(), handle, mSize.AsType<unsigned int>().AppendedWith(1), mFormat.format);
 		}
 	}
 
