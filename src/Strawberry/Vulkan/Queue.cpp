@@ -54,7 +54,6 @@ namespace Strawberry::Vulkan
 	{
 		Core::AssertEQ(commandBuffer.Level(), VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
-
 		WaitUntilIdle();
 
 		VkCommandBuffer handle = commandBuffer;
@@ -76,7 +75,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	void Queue::WaitUntilIdle()
+	void Queue::WaitUntilIdle() const
 	{
 		vkQueueWaitIdle(mQueue);
 	}

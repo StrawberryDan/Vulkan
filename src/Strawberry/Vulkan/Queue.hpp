@@ -47,7 +47,7 @@ namespace Strawberry::Vulkan
 
 
 		void Submit(const CommandBuffer& commandBuffer);
-		void WaitUntilIdle();
+		void WaitUntilIdle() const;
 
 
 		Core::ReflexivePointer<Device> GetDevice() const;
