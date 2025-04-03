@@ -7,6 +7,7 @@
 // Strawberry Vulkan
 #include "Memory/Allocator.hpp"
 // Strawberry Core
+#include "Strawberry/Core/Types/Overload.hpp"
 #include "Strawberry/Core/Types/Optional.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
 #include "Strawberry/Core/Types/ReflexivePointer.hpp"
