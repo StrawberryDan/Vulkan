@@ -59,7 +59,7 @@ namespace Strawberry::Vulkan
 
 	private:
 		// Handle to pipeline
-		VkPipeline mPipeline = nullptr;
+		VkPipeline mPipeline = VK_NULL_HANDLE;
 		// Our Layout
 		Core::ReflexivePointer<PipelineLayout> mPipelineLayout;
 		// Our RenderPass
