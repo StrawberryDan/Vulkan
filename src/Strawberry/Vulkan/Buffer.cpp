@@ -17,8 +17,8 @@ namespace Strawberry::Vulkan
 {
 	Buffer::Buffer(Allocator& allocator, size_t size, VkBufferUsageFlags usage)
 		: mAllocator(allocator)
-		, mSize(size)
-		, mDevice(*allocator.GetDevice())
+		  , mSize(size)
+		  , mDevice(*allocator.GetDevice())
 	{
 		VkBufferCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
@@ -42,9 +42,9 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Buffer::Buffer(Allocator&                         allocator,
-	               const Core::IO::DynamicByteBuffer& bytes,
-	               VkBufferUsageFlags                 usage)
+	Buffer::Buffer(Allocator& allocator,
+				   const Core::IO::DynamicByteBuffer& bytes,
+				   VkBufferUsageFlags usage)
 		: Buffer(allocator, bytes.Size(), usage)
 	{
 		Core::Assert(usage & VK_BUFFER_USAGE_TRANSFER_DST_BIT);
@@ -53,9 +53,13 @@ namespace Strawberry::Vulkan
 
 
 	Buffer::Buffer(Buffer&& rhs) noexcept
-		: mBuffer(std::exchange(rhs.mBuffer, nullptr))
-		, mMemory(std::move(rhs.mMemory))
-		, mDevice(std::exchange(rhs.mDevice, nullptr)) {}
+		: mAllocator(std::move(rhs.mAllocator))
+		  , mSize(std::exchange(rhs.mSize, 0))
+		  , mBuffer(std::exchange(rhs.mBuffer, nullptr))
+		  , mMemory(std::move(rhs.mMemory))
+		  , mDevice(std::exchange(rhs.mDevice, nullptr))
+	{
+	}
 
 
 	Buffer& Buffer::operator=(Buffer&& rhs) noexcept
