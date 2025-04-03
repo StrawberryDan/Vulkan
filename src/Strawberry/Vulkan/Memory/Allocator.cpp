@@ -9,7 +9,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Core::Result<MemoryPool, AllocationError> MemoryPool::Allocate(Device& device, MemoryTypeIndex memoryTypeIndex, size_t size)
+	Core::Result<MemoryPool, AllocationError> MemoryPool::Allocate(Device& device, MemoryTypeIndex memoryTypeIndex,
+																   size_t size)
 	{
 		const VkMemoryAllocateInfo allocateInfo
 		{
@@ -22,13 +23,13 @@ namespace Strawberry::Vulkan
 		Address address;
 		switch (VkResult allocationResult = vkAllocateMemory(device, &allocateInfo, nullptr, &address.deviceMemory))
 		{
-			case VK_ERROR_OUT_OF_HOST_MEMORY:
-			case VK_ERROR_OUT_OF_DEVICE_MEMORY:
-				return AllocationError::OutOfMemory();
-			case VK_SUCCESS:
-				break;
-			default:
-				Core::Unreachable();
+		case VK_ERROR_OUT_OF_HOST_MEMORY:
+		case VK_ERROR_OUT_OF_DEVICE_MEMORY:
+			return AllocationError::OutOfMemory();
+		case VK_SUCCESS:
+			break;
+		default:
+			Core::Unreachable();
 		}
 
 		return MemoryPool(device, memoryTypeIndex, address.deviceMemory, size);
@@ -37,16 +38,22 @@ namespace Strawberry::Vulkan
 
 	MemoryPool::MemoryPool(Device& device, MemoryTypeIndex memoryTypeIndex, VkDeviceMemory memory, size_t size)
 		: mDevice(device)
-		, mMemoryTypeIndex(memoryTypeIndex)
-		, mMemory(memory)
-		, mSize(size) {}
+		  , mMemoryTypeIndex(memoryTypeIndex)
+		  , mMemory(memory)
+		  , mSize(size)
+	{
+	}
 
 
 	MemoryPool::MemoryPool(MemoryPool&& other) noexcept
-		: mDevice(std::move(other.mDevice))
-		, mMemoryTypeIndex(std::exchange(other.mMemoryTypeIndex, {}))
-		, mMemory(std::exchange(other.mMemory, VK_NULL_HANDLE))
-		, mSize(std::exchange(other.mSize, 0)) {}
+		: EnableReflexivePointer(std::move(other))
+		  , mDevice(std::move(other.mDevice))
+		  , mMemoryTypeIndex(std::exchange(other.mMemoryTypeIndex, {}))
+		  , mMemory(std::exchange(other.mMemory, VK_NULL_HANDLE))
+		  , mSize(std::exchange(other.mSize, 0))
+		  , mMappedAddress(std::move(other.mMappedAddress))
+	{
+	}
 
 
 	MemoryPool& MemoryPool::operator=(MemoryPool&& other) noexcept
@@ -122,20 +129,25 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Allocation::Allocation(const Device& device, Allocator& allocator, MemoryPool& allocation, size_t offset, size_t size)
+	Allocation::Allocation(const Device& device, Allocator& allocator, MemoryPool& allocation, size_t offset,
+						   size_t size)
 		: mDevice(device)
-		, mAllocator(allocator)
-		, mRawAllocation(allocation)
-		, mOffset(offset)
-		, mSize(size) {}
+		  , mAllocator(allocator)
+		  , mRawAllocation(allocation)
+		  , mOffset(offset)
+		  , mSize(size)
+	{
+	}
 
 
 	Allocation::Allocation(Allocation&& other) noexcept
 		: mDevice(std::exchange(other.mDevice, VK_NULL_HANDLE))
-		, mAllocator(std::move(other.mAllocator))
-		, mRawAllocation(std::move(other.mRawAllocation))
-		, mOffset(other.mOffset)
-		, mSize(other.mSize) {}
+		  , mAllocator(std::move(other.mAllocator))
+		  , mRawAllocation(std::move(other.mRawAllocation))
+		  , mOffset(other.mOffset)
+		  , mSize(other.mSize)
+	{
+	}
 
 
 	Allocation& Allocation::operator=(Allocation&& other) noexcept
