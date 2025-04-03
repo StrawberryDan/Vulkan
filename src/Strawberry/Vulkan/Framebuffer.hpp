@@ -43,6 +43,8 @@ namespace Strawberry::Vulkan
 
 
 		[[nodiscard]] Core::ReflexivePointer<RenderPass> GetRenderPass() const;
+		[[nodiscard]] Core::ReflexivePointer<Device> GetDevice() const;
+		[[nodiscard]] Core::ReflexivePointer<PhysicalDevice> GetPhysicalDevice() const;
 
 
 		[[nodiscard]] Core::Math::Vec2u GetSize() const;
