@@ -57,6 +57,7 @@ namespace Strawberry::Vulkan
 
 	VkDescriptorSetLayout PipelineLayout::GetSetLayout(uint32_t index)
 	{
+		Core::Assert(index < mSetLayouts.size());
 		return mSetLayouts[index];
 	}
 
