@@ -32,7 +32,8 @@ namespace Strawberry::Vulkan
 
 
 	DescriptorPool::DescriptorPool(DescriptorPool&& rhs) noexcept
-		: mDescriptorPool(std::exchange(rhs.mDescriptorPool, VK_NULL_HANDLE))
+		: EnableReflexivePointer(std::move(rhs))
+		, mDescriptorPool(std::exchange(rhs.mDescriptorPool, VK_NULL_HANDLE))
 		, mDevice(std::move(rhs.mDevice))
 		, mFlags(std::exchange(rhs.mFlags, 0)) {}
 
