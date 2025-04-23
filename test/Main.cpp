@@ -113,7 +113,7 @@ void BasicRendering()
 								})
 								.WithMultisample(VK_SAMPLE_COUNT_1_BIT)
 								.Build();
-	auto                  queue         = device.GetQueue(queueFamily, 0);
+	auto                  queue         = device.GetQueue(queueFamily, 0).GetReflexivePointer();
 	Vulkan::Swapchain     swapchain     = queue->Create<Swapchain>(surface, Core::Math::Vec2i(1920, 1080), VK_PRESENT_MODE_IMMEDIATE_KHR);
 	Vulkan::CommandPool   commandPool   = queue->Create<CommandPool>(true);
 	Vulkan::CommandBuffer commandBuffer = commandPool.Create<CommandBuffer>();
