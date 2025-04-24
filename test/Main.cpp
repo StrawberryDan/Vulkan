@@ -43,25 +43,28 @@ void BasicRendering()
 	};
 
 
-	Window::Window        window("StrawberryGraphics Test", Core::Math::Vec2i(1920, 1080));
-	Instance              instance;
-	const PhysicalDevice& gpu         = instance.GetPhysicalDevices()[0];
-	uint32_t              queueFamily = gpu.SearchQueueFamilies(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT)[0];
+	Window::Window window("StrawberryGraphics Test", Core::Math::Vec2i(1920, 1080));
+	Instance instance;
+	const PhysicalDevice& gpu = instance.GetPhysicalDevices()[0];
+	uint32_t queueFamily = gpu.SearchQueueFamilies(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT)[0];
 
 
-	Device  device(gpu, {}, {QueueCreateInfo{queueFamily, 1}});
-	Surface surface    = window.Create<Surface>(device);
-	RenderPass      renderPass = RenderPass::Builder(device)
-							.WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT,
+	Device device(gpu, {}, {QueueCreateInfo{queueFamily, 1}});
+	Surface surface = window.Create<Surface>(device);
+	RenderPass renderPass = RenderPass::Builder(device)
+							.WithColorAttachment(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
+												 VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+												 VK_FORMAT_R32G32B32A32_SFLOAT,
 												 VK_ATTACHMENT_LOAD_OP_CLEAR,
 												 VK_ATTACHMENT_STORE_OP_STORE,
-												 VK_IMAGE_LAYOUT_GENERAL,
-												 VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
-							.WithSubpass(SubpassDescription().WithColorAttachment(0))
+												 VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+							.WithSubpass(SubpassDescription().WithColorAttachment(0, VK_IMAGE_LAYOUT_GENERAL))
 							.Build();
-	auto           vertexShader   = Shader::Compile(device, Core::IO::DynamicByteBuffer(meshVertexShader, sizeof(meshVertexShader))).Unwrap();
-	auto           fragmentShader = Shader::Compile(device, Core::IO::DynamicByteBuffer(textureFragShader, sizeof(textureFragShader))).Unwrap();
-	PipelineLayout layout         = PipelineLayout::Builder(device)
+	auto vertexShader = Shader::Compile(device, Core::IO::DynamicByteBuffer(meshVertexShader, sizeof(meshVertexShader)))
+		.Unwrap();
+	auto fragmentShader = Shader::Compile(
+		device, Core::IO::DynamicByteBuffer(textureFragShader, sizeof(textureFragShader))).Unwrap();
+	PipelineLayout layout = PipelineLayout::Builder(device)
 							.WithPushConstantRange(16 * sizeof(float), 0, VK_SHADER_STAGE_VERTEX_BIT)
 							.WithPushConstantRange(3 * sizeof(float), 16 * sizeof(float), VK_SHADER_STAGE_FRAGMENT_BIT)
 							.WithDescriptorSet({
@@ -95,9 +98,15 @@ void BasicRendering()
 									}
 								)
 								.WithInputAssembly(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
-								.WithViewport({VkViewport{.x = 0, .y = 0, .width = 1920.0, .height = 1080.0, .minDepth = 0.0, .maxDepth = 1.0}},
+								.WithViewport({
+												  VkViewport{
+													  .x = 0, .y = 0, .width = 1920.0, .height = 1080.0,
+													  .minDepth = 0.0, .maxDepth = 1.0
+												  }
+											  },
 											  {VkRect2D{.offset = {0, 0}, .extent = {1920, 1080}}})
-								.WithRasterization(VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE, VK_FRONT_FACE_COUNTER_CLOCKWISE)
+								.WithRasterization(VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE,
+												   VK_FRONT_FACE_COUNTER_CLOCKWISE)
 								.WithColorBlending({
 									VkPipelineColorBlendAttachmentState{
 										.blendEnable = VK_TRUE,
@@ -107,22 +116,26 @@ void BasicRendering()
 										.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
 										.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
 										.alphaBlendOp = VK_BLEND_OP_ADD,
-										.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
+										.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
+										VK_COLOR_COMPONENT_B_BIT |
 										VK_COLOR_COMPONENT_A_BIT
 									}
 								})
 								.WithMultisample(VK_SAMPLE_COUNT_1_BIT)
 								.Build();
-	auto                  queue         = device.GetQueue(queueFamily, 0).GetReflexivePointer();
-	Vulkan::Swapchain     swapchain     = queue->Create<Swapchain>(surface, Core::Math::Vec2i(1920, 1080), VK_PRESENT_MODE_IMMEDIATE_KHR);
-	Vulkan::CommandPool   commandPool   = queue->Create<CommandPool>(true);
+	auto queue = device.GetQueue(queueFamily, 0).GetReflexivePointer();
+	Vulkan::Swapchain swapchain = queue->Create<Swapchain>(surface, Core::Math::Vec2i(1920, 1080),
+														   VK_PRESENT_MODE_IMMEDIATE_KHR);
+	Vulkan::CommandPool commandPool = queue->Create<CommandPool>(true);
 	Vulkan::CommandBuffer commandBuffer = commandPool.Create<CommandBuffer>();
 
 	auto hostVisibleMemoryType = gpu.SearchMemoryTypes(MemoryTypeCriteria::HostVisible())[0].index;
 	auto deviceLocalMemoryType = gpu.SearchMemoryTypes(MemoryTypeCriteria::DeviceLocal())[0].index;
 
-	FreeListAllocator hostVisibleAllocator(MemoryPool::Allocate(device, hostVisibleMemoryType, 128 * 1024 * 1024).Unwrap());
-	FreeListAllocator deviceLocalAllocator(MemoryPool::Allocate(device, deviceLocalMemoryType, 128 * 1024 * 1024).Unwrap());
+	FreeListAllocator hostVisibleAllocator(
+		MemoryPool::Allocate(device, hostVisibleMemoryType, 128 * 1024 * 1024).Unwrap());
+	FreeListAllocator deviceLocalAllocator(
+		MemoryPool::Allocate(device, deviceLocalMemoryType, 128 * 1024 * 1024).Unwrap());
 
 
 	Buffer buffer(hostVisibleAllocator,
@@ -141,39 +154,50 @@ void BasicRendering()
 	auto framebuffer = Framebuffer(renderPass, deviceLocalAllocator, Core::Math::Vec2u(1920, 1080));
 
 
-	auto   [size, channels, bytes] = Core::IO::DynamicByteBuffer::FromImage("data/dio.png").Unwrap();
+	auto [size, channels, bytes] = Core::IO::DynamicByteBuffer::FromImage("data/dio.png").Unwrap();
 	Buffer textureBuffer(hostVisibleAllocator, bytes.Size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
 	textureBuffer.SetData(bytes);
 	Image texture = Image::Builder(deviceLocalAllocator)
 					.WithExtent(size).WithFormat(VK_FORMAT_R8G8B8A8_SRGB)
-					.WithUsage(VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT).Build();
+					.WithUsage(
+						VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT).
+					Build();
 
 	commandBuffer.Begin(true);
 	commandBuffer.PipelineBarrier(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
 								  VK_PIPELINE_STAGE_TRANSFER_BIT,
 								  0,
-								  {ImageMemoryBarrier(texture, VK_IMAGE_ASPECT_COLOR_BIT).ToLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)});
+								  {
+									  ImageMemoryBarrier(texture, VK_IMAGE_ASPECT_COLOR_BIT).ToLayout(
+										  VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
+								  });
 	commandBuffer.CopyBufferToImage(textureBuffer, texture);
 	commandBuffer.PipelineBarrier(VK_PIPELINE_STAGE_TRANSFER_BIT,
 								  VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
 								  0,
 								  {
-									  ImageMemoryBarrier(texture, VK_IMAGE_ASPECT_COLOR_BIT).FromLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL).ToLayout(
+									  ImageMemoryBarrier(texture, VK_IMAGE_ASPECT_COLOR_BIT).FromLayout(
+										  VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL).ToLayout(
 										  VK_IMAGE_LAYOUT_GENERAL)
 								  });
 	commandBuffer.End();
 	queue->Submit(commandBuffer);
 	queue->WaitUntilIdle();
-	ImageView textureView = texture.Create<ImageView::Builder>()
+	ImageView textureView = texture.Create<ImageView::Builder>(VK_IMAGE_ASPECT_COLOR_BIT)
 								   .WithType(VK_IMAGE_VIEW_TYPE_2D)
 								   .WithFormat(VK_FORMAT_R8G8B8A8_SRGB)
 								   .Build();
 	Sampler sampler(device, VK_FILTER_NEAREST, VK_FILTER_NEAREST);
 
 
-	Core::Clock            clock;
-	Vulkan::DescriptorPool descriptorPool(device, 0, 1, {VkDescriptorPoolSize{.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, .descriptorCount = 1}});
-	Vulkan::DescriptorSet  textureDescriptorSet(descriptorPool, layout.GetSetLayout(0));
+	Core::Clock clock;
+	Vulkan::DescriptorPool descriptorPool(device, 0, 1, {
+											  VkDescriptorPoolSize{
+												  .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+												  .descriptorCount = 1
+											  }
+										  });
+	Vulkan::DescriptorSet textureDescriptorSet(descriptorPool, layout.GetSetLayout(0));
 
 
 	while (!window.CloseRequested())
@@ -186,7 +210,7 @@ void BasicRendering()
 			if (auto text = event->Ptr<Window::Events::Text>())
 			{
 				std::string c = Core::ToUTF8(text->codepoint).Unwrap();
-				std::cout << (const char*) c.data() << std::endl;
+				std::cout << (const char*)c.data() << std::endl;
 			}
 		}
 
@@ -204,7 +228,17 @@ void BasicRendering()
 		commandBuffer.PipelineBarrier(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
 									  VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
 									  0,
-									  {ImageMemoryBarrier(framebuffer.GetColorAttachment(0), VK_IMAGE_ASPECT_COLOR_BIT).ToLayout(VK_IMAGE_LAYOUT_GENERAL)});
+									  {
+										  ImageMemoryBarrier(framebuffer.GetAttachment(0), VK_IMAGE_ASPECT_COLOR_BIT).
+										  ToLayout(VK_IMAGE_LAYOUT_GENERAL)
+									  });
+		commandBuffer.PipelineBarrier(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+									  VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+									  0,
+									  {
+										  ImageMemoryBarrier(framebuffer.GetAttachment(0), VK_IMAGE_ASPECT_COLOR_BIT).
+										  ToLayout(VK_IMAGE_LAYOUT_GENERAL)
+									  });
 		commandBuffer.BeginRenderPass(renderPass, framebuffer);
 		commandBuffer.BindPipeline(pipeline);
 		commandBuffer.BindVertexBuffer(0, buffer);
@@ -216,8 +250,11 @@ void BasicRendering()
 		commandBuffer.PipelineBarrier(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
 									  VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
 									  0,
-									  {ImageMemoryBarrier(renderTarget, VK_IMAGE_ASPECT_COLOR_BIT).ToLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)});
-		commandBuffer.BlitImage(framebuffer.GetColorAttachment(0),
+									  {
+										  ImageMemoryBarrier(renderTarget, VK_IMAGE_ASPECT_COLOR_BIT).ToLayout(
+											  VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
+									  });
+		commandBuffer.BlitImage(framebuffer.GetAttachment(0),
 								VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
 								renderTarget,
 								VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
@@ -227,7 +264,8 @@ void BasicRendering()
 									  VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
 									  0,
 									  {
-										  ImageMemoryBarrier(renderTarget, VK_IMAGE_ASPECT_COLOR_BIT).FromLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL).ToLayout(
+										  ImageMemoryBarrier(renderTarget, VK_IMAGE_ASPECT_COLOR_BIT).FromLayout(
+											  VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL).ToLayout(
 											  VK_IMAGE_LAYOUT_PRESENT_SRC_KHR)
 									  });
 		commandBuffer.End();
