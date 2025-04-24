@@ -50,8 +50,8 @@ namespace Strawberry::Vulkan
 		[[nodiscard]] Core::Math::Vec2u GetSize() const;
 
 
-		[[nodiscard]] uint32_t GetColorAttachmentCount() const;
-		Image&                 GetColorAttachment(uint32_t index);
+		[[nodiscard]] uint32_t GetAttachmentCount() const;
+		Image&                 GetAttachment(uint32_t index);
 		Image&                 GetDepthAttachment();
 		Image&                 GetStencilAttachment();
 
@@ -67,13 +67,7 @@ namespace Strawberry::Vulkan
 		Core::Math::Vec2u                  mSize;
 
 
-		std::vector<Image>     mColorAttachments;
-		std::vector<ImageView> mColorAttachmentViews;
-
-
-		Image     mDepthAttachment;
-		ImageView mDepthAttachmentView;
-		Image     mStencilAttachment;
-		ImageView mStencilAttachmentView;
+		std::vector<Image>     mAttachments;
+		std::vector<ImageView> mAttachmentViews;
 	};
 }

@@ -51,7 +51,8 @@ namespace Strawberry::Vulkan
 	private:
 		VkRenderPass                   mRenderPass;
 		Core::ReflexivePointer<Device> mDevice;
-		std::vector<VkFormat>          mColorAttachmentFormats;
+		std::vector<VkFormat>          mAttachmentFormats;
+		std::vector<VkImageUsageFlags> mAttachmentUsages;
 		std::vector<VkClearValue>      mClearColors;
 	};
 
@@ -64,9 +65,9 @@ namespace Strawberry::Vulkan
 		SubpassDescription() = default;
 
 
-		SubpassDescription& WithInputAttachment(uint32_t index);
-		SubpassDescription& WithColorAttachment(uint32_t index);
-		SubpassDescription& WithDepthStencilAttachment(uint32_t index);
+		SubpassDescription& WithInputAttachment(uint32_t index, VkImageLayout layout);
+		SubpassDescription& WithColorAttachment(uint32_t index, VkImageLayout layout);
+		SubpassDescription& WithDepthStencilAttachment(uint32_t index, VkImageLayout layout);
 
 	private:
 		std::vector<VkAttachmentReference>    mInputAttachments;
@@ -81,30 +82,22 @@ namespace Strawberry::Vulkan
 		Builder(const Device& device);
 
 
-		Builder& WithColorAttachment(VkFormat            format,
-		                             VkAttachmentLoadOp  loadOp,
-		                             VkAttachmentStoreOp storeOp,
-		                             VkImageLayout       initialLayout,
-		                             VkImageLayout       finalLayout,
-		                             Core::Math::Vec4f   clearColor     = Core::Math::Vec4f(0.0f, 0.0f, 0.0f, 0.0f),
-		                             VkAttachmentLoadOp  stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-		                             VkAttachmentStoreOp stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE);
-		Builder& WithDepthAttachment(VkFormat            format,
-		                             VkAttachmentLoadOp  loadOp,
-		                             VkAttachmentStoreOp storeOp,
-		                             VkImageLayout       initialLayout,
-		                             VkImageLayout       finalLayout,
-		                             float               clearValue     = 0.0f,
-		                             VkAttachmentLoadOp  stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-		                             VkAttachmentStoreOp stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE);
-		Builder& WithStencilAttachment(VkFormat            format,
-		                               VkAttachmentLoadOp  loadOp,
-		                               VkAttachmentStoreOp storeOp,
-		                               VkImageLayout       initialLayout,
-		                               VkImageLayout       finalLayout,
-		                               uint32_t            clearValue     = 0,
-		                               VkAttachmentLoadOp  stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-		                               VkAttachmentStoreOp stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE);
+		Builder& WithColorAttachment(VkImageUsageFlags usage,
+									 VkFormat            format,
+									 VkAttachmentLoadOp  loadOp,
+									 VkAttachmentStoreOp storeOp,
+									 VkImageLayout       initialLayout,
+									 VkImageLayout       finalLayout,
+									 Core::Math::Vec4f   clearColor     = Core::Math::Vec4f(0.0f, 0.0f, 0.0f, 0.0f),
+									 VkAttachmentLoadOp  stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE, VkAttachmentStoreOp stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE);
+		Builder& WithDepthStencilAttachment(VkImageUsageFlags usage,
+									 VkFormat            format,
+									 VkAttachmentLoadOp  loadOp,
+									 VkAttachmentStoreOp storeOp,
+									 VkImageLayout       initialLayout,
+									 VkImageLayout       finalLayout,
+									 float               clearValue     = 1.0f,
+									 VkAttachmentLoadOp  stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE, VkAttachmentStoreOp stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE);
 
 
 		Builder& WithSubpass(const SubpassDescription& subpass);
@@ -123,9 +116,16 @@ namespace Strawberry::Vulkan
 	private:
 		Core::ReflexivePointer<Device> mDevice;
 
-		std::vector<VkAttachmentDescription> mAttachments;
-		std::vector<SubpassDescription>      mSubpasses;
-		std::vector<VkSubpassDependency>     mDependencies;
-		std::vector<VkClearValue>            mClearColors;
+
+		struct Attachment
+		{
+			VkImageUsageFlags usage;
+			VkClearValue clearColor;
+			VkAttachmentDescription description;
+		};
+
+		std::vector<Attachment> mAttachments;
+		std::vector<SubpassDescription> mSubpasses;
+		std::vector<VkSubpassDependency> mDependencies;
 	};
 } // Vulkan

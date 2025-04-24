@@ -77,7 +77,7 @@ namespace Strawberry::Vulkan
 			.flags = 0,
 			.imageType = VK_IMAGE_TYPE_2D,
 			.format = format,
-			.extent = VkExtent3D{static_cast<uint32_t>(extent[0]), static_cast<uint32_t>(extent[1]), 1},
+			.extent = VkExtent3D{(extent[0]), (extent[1]), 1},
 			.mipLevels = mipLevels,
 			.arrayLayers = arrayLayers,
 			.samples = VK_SAMPLE_COUNT_1_BIT,
@@ -152,7 +152,8 @@ namespace Strawberry::Vulkan
 
 
 	Image::Image(Image&& rhs) noexcept
-		: mImage(std::exchange(rhs.mImage, nullptr))
+		: EnableReflexivePointer(std::move(rhs))
+		, mImage(std::exchange(rhs.mImage, nullptr))
 		, mMemory(std::move(rhs.mMemory))
 		, mDevice(std::exchange(rhs.mDevice, nullptr))
 		, mFormat(std::exchange(rhs.mFormat, VK_FORMAT_MAX_ENUM))

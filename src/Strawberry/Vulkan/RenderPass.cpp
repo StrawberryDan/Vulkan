@@ -20,7 +20,7 @@ namespace Strawberry::Vulkan
 	RenderPass::RenderPass(RenderPass&& rhs) noexcept
 		: mRenderPass(std::exchange(rhs.mRenderPass, nullptr))
 		, mDevice(std::move(rhs.mDevice))
-		, mColorAttachmentFormats(std::move(rhs.mColorAttachmentFormats))
+		, mAttachmentFormats(std::move(rhs.mAttachmentFormats))
 		, mClearColors(std::move(rhs.mClearColors)) {}
 
 
@@ -57,31 +57,31 @@ namespace Strawberry::Vulkan
 	}
 
 
-	SubpassDescription& SubpassDescription::WithInputAttachment(uint32_t index)
+	SubpassDescription& SubpassDescription::WithInputAttachment(uint32_t index, VkImageLayout layout)
 	{
 		mInputAttachments.emplace_back(VkAttachmentReference{
 			.attachment = index,
-			.layout = VK_IMAGE_LAYOUT_GENERAL,
+			.layout = layout,
 		});
 		return *this;
 	}
 
 
-	SubpassDescription& SubpassDescription::WithColorAttachment(uint32_t index)
+	SubpassDescription& SubpassDescription::WithColorAttachment(uint32_t index, VkImageLayout layout)
 	{
 		mColorAttachments.emplace_back(VkAttachmentReference{
 			.attachment = index,
-			.layout = VK_IMAGE_LAYOUT_GENERAL,
+			.layout = layout,
 		});
 		return *this;
 	}
 
 
-	SubpassDescription& SubpassDescription::WithDepthStencilAttachment(uint32_t index)
+	SubpassDescription& SubpassDescription::WithDepthStencilAttachment(uint32_t index, VkImageLayout layout)
 	{
 		mDepthStencilAttachment = VkAttachmentReference{
 			.attachment = index,
-			.layout = VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL
+			.layout = layout
 		};
 		return *this;
 	}
@@ -91,79 +91,64 @@ namespace Strawberry::Vulkan
 		: mDevice(device) {}
 
 
-	RenderPass::Builder& RenderPass::Builder::WithColorAttachment(VkFormat            format,
-	                                                              VkAttachmentLoadOp  loadOp,
-	                                                              VkAttachmentStoreOp storeOp,
-	                                                              VkImageLayout       initialLayout,
-	                                                              VkImageLayout       finalLayout,
-	                                                              Core::Math::Vec4f   clearColor,
-	                                                              VkAttachmentLoadOp  stencilLoadOp,
-	                                                              VkAttachmentStoreOp stencilStoreOp)
+	RenderPass::Builder& RenderPass::Builder::WithColorAttachment(VkImageUsageFlags usage,
+																  VkFormat            format,
+																  VkAttachmentLoadOp  loadOp,
+																  VkAttachmentStoreOp storeOp,
+																  VkImageLayout       initialLayout,
+																  VkImageLayout       finalLayout,
+																  Core::Math::Vec4f   clearColor,
+																  VkAttachmentLoadOp  stencilLoadOp, VkAttachmentStoreOp stencilStoreOp)
 	{
-		mAttachments.emplace_back(VkAttachmentDescription{
-			.flags = 0,
-			.format = format,
-			.samples = VK_SAMPLE_COUNT_1_BIT,
-			.loadOp = loadOp,
-			.storeOp = storeOp,
-			.stencilLoadOp = stencilLoadOp,
-			.stencilStoreOp = stencilStoreOp,
-			.initialLayout = initialLayout,
-			.finalLayout = finalLayout,
-		});
-
-		mClearColors.emplace_back(VkClearValue{.color{.float32{clearColor[0], clearColor[1], clearColor[2], clearColor[3]}}});
+		mAttachments.emplace_back(
+			Attachment{
+				.usage = usage,
+				.clearColor = VkClearValue{
+					.color{.float32{clearColor[0], clearColor[1], clearColor[2], clearColor[3]}}},
+				.description =
+				{
+					.flags = 0,
+					.format = format,
+					.samples = VK_SAMPLE_COUNT_1_BIT,
+					.loadOp = loadOp,
+					.storeOp = storeOp,
+					.stencilLoadOp = stencilLoadOp,
+					.stencilStoreOp = stencilStoreOp,
+					.initialLayout = initialLayout,
+					.finalLayout = finalLayout,
+				}});
 
 		return *this;
 	}
 
 
-	RenderPass::Builder& RenderPass::Builder::WithDepthAttachment(VkFormat            format,
-	                                                              VkAttachmentLoadOp  loadOp,
-	                                                              VkAttachmentStoreOp storeOp,
-	                                                              VkImageLayout       initialLayout,
-	                                                              VkImageLayout       finalLayout,
-	                                                              float               clearValue,
-	                                                              VkAttachmentLoadOp  stencilLoadOp,
-	                                                              VkAttachmentStoreOp stencilStoreOp)
+	RenderPass::Builder& RenderPass::Builder::WithDepthStencilAttachment(VkImageUsageFlags usage,
+																  VkFormat            format,
+																  VkAttachmentLoadOp  loadOp,
+																  VkAttachmentStoreOp storeOp,
+																  VkImageLayout       initialLayout,
+																  VkImageLayout       finalLayout,
+																  float               clearValue,
+																  VkAttachmentLoadOp  stencilLoadOp,
+																  VkAttachmentStoreOp stencilStoreOp)
 	{
-		mAttachments.emplace_back(VkAttachmentDescription{
-			.flags = 0,
-			.format = format,
-			.samples = VK_SAMPLE_COUNT_1_BIT,
-			.loadOp = loadOp,
-			.storeOp = storeOp,
-			.stencilLoadOp = stencilLoadOp,
-			.stencilStoreOp = stencilStoreOp,
-			.initialLayout = initialLayout,
-			.finalLayout = finalLayout,
-		});
-		mClearColors.emplace_back(VkClearValue{.depthStencil{.depth = clearValue}});
-		return *this;
-	}
+		Attachment attachment {
+			.usage = usage,
+			.clearColor = VkClearValue{.depthStencil{.depth = clearValue, .stencil = 0}},
+			.description = VkAttachmentDescription{
+				.flags = 0,
+				.format = format,
+				.samples = VK_SAMPLE_COUNT_1_BIT,
+				.loadOp = loadOp,
+				.storeOp = storeOp,
+				.stencilLoadOp = stencilLoadOp,
+				.stencilStoreOp = stencilStoreOp,
+				.initialLayout = initialLayout,
+				.finalLayout = finalLayout,
+		}};
 
+		mAttachments.emplace_back(std::move(attachment));
 
-	RenderPass::Builder& RenderPass::Builder::WithStencilAttachment(VkFormat            format,
-	                                                                VkAttachmentLoadOp  loadOp,
-	                                                                VkAttachmentStoreOp storeOp,
-	                                                                VkImageLayout       initialLayout,
-	                                                                VkImageLayout       finalLayout,
-	                                                                uint32_t            clearValue,
-	                                                                VkAttachmentLoadOp  stencilLoadOp,
-	                                                                VkAttachmentStoreOp stencilStoreOp)
-	{
-		mAttachments.emplace_back(VkAttachmentDescription{
-			.flags = 0,
-			.format = format,
-			.samples = VK_SAMPLE_COUNT_1_BIT,
-			.loadOp = loadOp,
-			.storeOp = storeOp,
-			.stencilLoadOp = stencilLoadOp,
-			.stencilStoreOp = stencilStoreOp,
-			.initialLayout = initialLayout,
-			.finalLayout = finalLayout,
-		});
-		mClearColors.emplace_back(VkClearValue{.depthStencil{.stencil = clearValue}});
 		return *this;
 	}
 
@@ -198,14 +183,18 @@ namespace Strawberry::Vulkan
 	RenderPass RenderPass::Builder::Build()
 	{
 		RenderPass renderPass(*mDevice);
-		std::transform(mAttachments.begin(),
-		               mAttachments.end(),
-		               std::back_inserter(renderPass.mColorAttachmentFormats),
-		               [](const VkAttachmentDescription& x)
-		               {
-			               return x.format;
-		               });
-		renderPass.mClearColors = mClearColors;
+
+		renderPass.mAttachmentFormats = mAttachments |
+			std::views::transform([](auto&& x){ return x.description.format; }) |
+				std::ranges::to<std::vector>();
+
+		renderPass.mAttachmentUsages = mAttachments |
+			std::views::transform([](auto&& x){ return x.usage; }) |
+				std::ranges::to<std::vector>();
+
+		renderPass.mClearColors = mAttachments |
+			std::views::transform([](auto&& x) { return x.clearColor; }) |
+			std::ranges::to<std::vector>();
 
 
 		std::vector<VkSubpassDescription> mSubpassDescriptions;
@@ -225,13 +214,18 @@ namespace Strawberry::Vulkan
 			});
 		}
 
+		std::vector<VkAttachmentDescription> attachmentDescriptions;
+		attachmentDescriptions = mAttachments |
+			std::views::transform([](auto&& x) { return x.description; }) |
+			std::ranges::to<std::vector>();
+
 
 		VkRenderPassCreateInfo renderPassCreateInfo{
 			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
-			.attachmentCount = static_cast<uint32_t>(mAttachments.size()),
-			.pAttachments = mAttachments.data(),
+			.attachmentCount = static_cast<uint32_t>(attachmentDescriptions.size()),
+			.pAttachments = attachmentDescriptions.data(),
 			.subpassCount = static_cast<uint32_t>(mSubpassDescriptions.size()),
 			.pSubpasses = mSubpassDescriptions.data(),
 			.dependencyCount = static_cast<uint32_t>(mDependencies.size()),

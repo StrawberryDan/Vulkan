@@ -69,8 +69,11 @@ namespace Strawberry::Vulkan
 	}
 
 
-	ImageView::Builder::Builder(const Image& image)
-		: mImage(&image) {}
+	ImageView::Builder::Builder(const Image& image, VkImageAspectFlags aspectFlags)
+		: mImage(&image)
+	{
+		mSubresourceRange.aspectMask = aspectFlags;
+	}
 
 
 	ImageView::Builder& ImageView::Builder::WithType(VkImageViewType type)
