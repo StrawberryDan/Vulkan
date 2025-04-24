@@ -49,7 +49,7 @@ void BasicRendering()
 	uint32_t              queueFamily = gpu.SearchQueueFamilies(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT)[0];
 
 
-	Device  device(gpu, {QueueCreateInfo{queueFamily, 1}});
+	Device  device(gpu, {}, {QueueCreateInfo{queueFamily, 1}});
 	Surface surface    = window.Create<Surface>(device);
 	RenderPass      renderPass = RenderPass::Builder(device)
 							.WithColorAttachment(VK_FORMAT_R32G32B32A32_SFLOAT,

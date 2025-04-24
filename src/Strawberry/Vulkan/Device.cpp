@@ -21,7 +21,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Device::Device(const PhysicalDevice& physicalDevice, std::vector<QueueCreateInfo> queueCreateInfo)
+	Device::Device(const PhysicalDevice& physicalDevice, const VkPhysicalDeviceFeatures& features, std::vector<QueueCreateInfo> queueCreateInfo)
 		: mDevice{}
 		, mPhysicalDevice(physicalDevice)
 	{
@@ -50,9 +50,6 @@ namespace Strawberry::Vulkan
 			"VK_KHR_dynamic_rendering",
 			"VK_KHR_swapchain"
 		};
-		// Select Features
-		VkPhysicalDeviceFeatures features{};
-
 
 		// Enumerate Extension Properties of Physical Device
 		auto extensionProperties = GetPhysicalDevice().GetExtensionProperties();
