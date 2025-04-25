@@ -233,6 +233,14 @@ namespace Strawberry::Vulkan
 		std::vector<VkPipelineShaderStageCreateInfo> stages;
 		for (auto& [stage, shader]: mStages)
 		{
+			VkSpecializationInfo info
+			{
+				.mapEntryCount = static_cast<uint32_t>(mShaderSpecializationEntries.size()),
+				.pMapEntries = mShaderSpecializationEntries.data(),
+				.dataSize = mShaderSpecializationData.Size(),
+				.pData = mShaderSpecializationData.Data()
+			};
+
 			stages.emplace_back(VkPipelineShaderStageCreateInfo{
 				.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
 				.pNext = nullptr,
@@ -240,7 +248,7 @@ namespace Strawberry::Vulkan
 				.stage = stage,
 				.module = shader,
 				.pName = "main",
-				.pSpecializationInfo = nullptr,
+				.pSpecializationInfo = mShaderSpecializationEntries.size() > 0 ? &info : nullptr,
 			});
 		}
 

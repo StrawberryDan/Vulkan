@@ -91,6 +91,29 @@ namespace Strawberry::Vulkan
 		Builder& WithDynamicState(const std::vector<VkDynamicState>& states);
 
 
+		template <typename T, typename... Ts>
+		Builder& WithShaderSpecializationConstants(T t, Ts... ts)
+		{
+			VkSpecializationMapEntry entry
+			{
+				.constantID = static_cast<uint32_t>(mShaderSpecializationEntries.size()),
+				.offset = static_cast<uint32_t>(mShaderSpecializationData.Size()),
+				.size = sizeof(T),
+			};
+			mShaderSpecializationEntries.emplace_back(entry);
+
+			mShaderSpecializationData.Push(std::forward<T>(t));
+
+
+			if constexpr(sizeof...(ts) > 0)
+			{
+				return WithShaderSpecializationConstants(std::forward<Ts...>(ts)...);
+			}
+
+			return *this;
+		}
+
+
 		[[nodiscard]] GraphicsPipeline Build();
 
 	private:
@@ -100,6 +123,8 @@ namespace Strawberry::Vulkan
 
 
 		std::map<VkShaderStageFlagBits, Shader> mStages;
+		std::vector<VkSpecializationMapEntry> mShaderSpecializationEntries;
+		Core::IO::DynamicByteBuffer mShaderSpecializationData;
 
 
 		Core::Optional<VkPipelineVertexInputStateCreateInfo>   mVertexInputStateCreateInfo;
