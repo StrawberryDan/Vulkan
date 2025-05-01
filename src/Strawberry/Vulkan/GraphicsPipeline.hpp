@@ -107,7 +107,7 @@ namespace Strawberry::Vulkan
 
 			if constexpr(sizeof...(ts) > 0)
 			{
-				return WithShaderSpecializationConstants(std::forward<Ts...>(ts)...);
+				return WithShaderSpecializationConstants(std::forward<Ts>(ts)...);
 			}
 
 			return *this;

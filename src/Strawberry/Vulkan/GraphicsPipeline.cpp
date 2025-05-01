@@ -229,18 +229,19 @@ namespace Strawberry::Vulkan
 		Core::Assert(mColorBlendStateCreateInfo.HasValue());
 
 
+		VkSpecializationInfo specializationInfo
+		{
+			.mapEntryCount = static_cast<uint32_t>(mShaderSpecializationEntries.size()),
+			.pMapEntries = mShaderSpecializationEntries.data(),
+			.dataSize = mShaderSpecializationData.Size(),
+			.pData = mShaderSpecializationData.Data()
+		};
+
+
 		// Create Shader Stages
 		std::vector<VkPipelineShaderStageCreateInfo> stages;
 		for (auto& [stage, shader]: mStages)
 		{
-			VkSpecializationInfo info
-			{
-				.mapEntryCount = static_cast<uint32_t>(mShaderSpecializationEntries.size()),
-				.pMapEntries = mShaderSpecializationEntries.data(),
-				.dataSize = mShaderSpecializationData.Size(),
-				.pData = mShaderSpecializationData.Data()
-			};
-
 			stages.emplace_back(VkPipelineShaderStageCreateInfo{
 				.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
 				.pNext = nullptr,
@@ -248,7 +249,7 @@ namespace Strawberry::Vulkan
 				.stage = stage,
 				.module = shader,
 				.pName = "main",
-				.pSpecializationInfo = mShaderSpecializationEntries.size() > 0 ? &info : nullptr,
+				.pSpecializationInfo = mShaderSpecializationEntries.empty() ? nullptr : &specializationInfo,
 			});
 		}
 
@@ -287,34 +288,34 @@ namespace Strawberry::Vulkan
 
 
 		// Create the Pipeline
-		std::vector<VkGraphicsPipelineCreateInfo> createInfos{
-			VkGraphicsPipelineCreateInfo{
-				.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-				.pNext = nullptr,
-				.flags = 0,
-				.stageCount = static_cast<uint32_t>(stages.size()),
-				.pStages = stages.data(),
-				.pVertexInputState = mVertexInputStateCreateInfo.AsPtr().UnwrapOr(nullptr),
-				.pInputAssemblyState = mInputAssemblyStateCreateInfo.AsPtr().UnwrapOr(nullptr),
-				.pTessellationState = mTessellationStateCreateInfo.AsPtr().UnwrapOr(nullptr),
-				.pViewportState = mViewportStateCreateInfo.AsPtr().UnwrapOr(nullptr),
-				.pRasterizationState = mRasterizationStateCreateInfo.AsPtr().UnwrapOr(nullptr),
-				.pMultisampleState = mMultisampleStateCreateInfo.AsPtr().UnwrapOr(nullptr),
-				.pDepthStencilState = mDepthStencilStateCreateInfo.AsPtr().UnwrapOr(nullptr),
-				.pColorBlendState = mColorBlendStateCreateInfo.AsPtr().UnwrapOr(nullptr),
-				.pDynamicState = mDynamicStateCreateInfo.AsPtr().UnwrapOr(nullptr),
-				.layout = *mPipelineLayout,
-				.renderPass = mRenderPass->mRenderPass,
-				.subpass = mSubpass,
-				.basePipelineHandle = nullptr,
-				.basePipelineIndex = 0,
-			}
+		VkGraphicsPipelineCreateInfo createInfo {
+			.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.stageCount = static_cast<uint32_t>(stages.size()),
+			.pStages = stages.data(),
+			.pVertexInputState = mVertexInputStateCreateInfo.AsPtr().UnwrapOr(nullptr),
+			.pInputAssemblyState = mInputAssemblyStateCreateInfo.AsPtr().UnwrapOr(nullptr),
+			.pTessellationState = mTessellationStateCreateInfo.AsPtr().UnwrapOr(nullptr),
+			.pViewportState = mViewportStateCreateInfo.AsPtr().UnwrapOr(nullptr),
+			.pRasterizationState = mRasterizationStateCreateInfo.AsPtr().UnwrapOr(nullptr),
+			.pMultisampleState = mMultisampleStateCreateInfo.AsPtr().UnwrapOr(nullptr),
+			.pDepthStencilState = mDepthStencilStateCreateInfo.AsPtr().UnwrapOr(nullptr),
+			.pColorBlendState = mColorBlendStateCreateInfo.AsPtr().UnwrapOr(nullptr),
+			.pDynamicState = mDynamicStateCreateInfo.AsPtr().UnwrapOr(nullptr),
+			.layout = *mPipelineLayout,
+			.renderPass = mRenderPass->mRenderPass,
+			.subpass = mSubpass,
+			.basePipelineHandle = nullptr,
+			.basePipelineIndex = 0,
 		};
+
+
 		VkPipeline handle = VK_NULL_HANDLE;
 		Core::AssertEQ(vkCreateGraphicsPipelines(*mRenderPass->mDevice,
 		                                         nullptr,
-		                                         createInfos.size(),
-		                                         createInfos.data(),
+		                                         1,
+		                                         &createInfo,
 		                                         nullptr,
 		                                         &handle),
 		               VK_SUCCESS);
