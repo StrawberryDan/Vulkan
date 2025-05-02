@@ -37,8 +37,8 @@ namespace Strawberry::Vulkan
 		Instance& operator=(Instance&&) noexcept;
 
 
-		const std::vector<PhysicalDevice>& GetPhysicalDevices() const;
-		const PhysicalDevice& GetPreferredPhysicalDevice() const;
+		const std::vector<PhysicalDevice>& GetPhysicalDevices();
+		const PhysicalDevice& GetPreferredPhysicalDevice();
 
 
 		template<std::movable T, typename... Args> requires (std::constructible_from<T, const Instance&, Args...>)

@@ -55,8 +55,10 @@ namespace Strawberry::Vulkan
 
 		uint32_t GetFamilyIndex() const;
 
+
 	protected:
-		explicit Queue(const Device& device, uint32_t family, uint32_t index);
+		explicit Queue(Device& device, uint32_t family, uint32_t index);
+
 
 	private:
 		VkQueue                        mQueue;

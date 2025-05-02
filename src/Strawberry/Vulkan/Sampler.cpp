@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Sampler::Sampler(const Device& device, VkFilter magFilter, VkFilter minFilter, bool normaliseCoords)
+	Sampler::Sampler(Device& device, VkFilter magFilter, VkFilter minFilter, bool normaliseCoords)
 		: mDevice(device)
 	{
 		VkSamplerCreateInfo createInfo{

@@ -21,7 +21,7 @@ namespace Strawberry::Vulkan
 	class Sampler
 	{
 	public:
-		Sampler(const Device& device, VkFilter magFilter, VkFilter minFilter, bool normaliseCoords = true);
+		Sampler(Device& device, VkFilter magFilter, VkFilter minFilter, bool normaliseCoords = true);
 		Sampler(const Sampler& rhs)            = delete;
 		Sampler& operator=(const Sampler& rhs) = delete;
 		Sampler(Sampler&& rhs) noexcept;

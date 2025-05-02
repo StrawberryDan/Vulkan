@@ -51,7 +51,7 @@ namespace Strawberry::Vulkan
 		friend class Queue;
 
 	public:
-		explicit CommandBuffer(const CommandPool& commandPool, VkCommandBufferLevel level = VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+		explicit CommandBuffer(CommandPool& commandPool, VkCommandBufferLevel level = VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
 
 		CommandBuffer(const CommandBuffer& rhs)            = delete;

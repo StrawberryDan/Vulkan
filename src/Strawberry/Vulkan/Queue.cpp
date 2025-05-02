@@ -15,7 +15,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Queue::Queue(const Device& device, uint32_t family, uint32_t index)
+	Queue::Queue(Device& device, uint32_t family, uint32_t index)
 		: mFamilyIndex(family)
 		, mDevice(device)
 	{

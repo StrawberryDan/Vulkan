@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	CommandBuffer::CommandBuffer(const CommandPool& commandPool, VkCommandBufferLevel level)
+	CommandBuffer::CommandBuffer(CommandPool& commandPool, VkCommandBufferLevel level)
 		: mCommandBuffer{}
 		, mCommandPool(commandPool)
 		, mExecutionFenceOrParentBuffer(ConstructExecutionFence(*commandPool.mQueue->GetDevice(), level))

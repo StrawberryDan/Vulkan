@@ -57,8 +57,10 @@ namespace Strawberry::Vulkan
 			return T(*this, std::forward<const Args&>(args)...);
 		}
 
+
 	private:
 		GraphicsPipeline(VkPipeline handle, PipelineLayout& layout, RenderPass& renderPass);
+
 
 	private:
 		// Handle to pipeline
@@ -73,7 +75,7 @@ namespace Strawberry::Vulkan
 	class GraphicsPipeline::Builder
 	{
 	public:
-		explicit Builder(const PipelineLayout& layout, const RenderPass& renderPass, uint32_t subpass = 0);
+		explicit Builder(PipelineLayout& layout, RenderPass& renderPass, uint32_t subpass = 0);
 
 
 		Builder& WithShaderStage(VkShaderStageFlagBits stage, Shader shader);

@@ -225,7 +225,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	const std::vector<PhysicalDevice>& Instance::GetPhysicalDevices() const
+	const std::vector<PhysicalDevice>& Instance::GetPhysicalDevices()
 	{
 		static const auto deviceSort = [](PhysicalDevice& a, PhysicalDevice& b) -> bool
 		{
@@ -257,8 +257,8 @@ namespace Strawberry::Vulkan
 	}
 
 
-	const PhysicalDevice& Instance::GetPreferredPhysicalDevice() const
+	const PhysicalDevice& Instance::GetPreferredPhysicalDevice()
 	{
-		return GetPhysicalDevices()[0];
+		return GetPhysicalDevices().front();
 	}
 }

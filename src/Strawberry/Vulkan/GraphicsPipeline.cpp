@@ -48,7 +48,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	GraphicsPipeline::Builder::Builder(const PipelineLayout& layout, const RenderPass& renderPass, uint32_t subpass)
+	GraphicsPipeline::Builder::Builder(PipelineLayout& layout, RenderPass& renderPass, uint32_t subpass)
 		: mRenderPass(renderPass)
 		, mSubpass(subpass)
 		, mPipelineLayout(layout) {}

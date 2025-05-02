@@ -26,7 +26,7 @@ namespace Strawberry::Vulkan
 		friend class DescriptorSet;
 
 	public:
-		DescriptorPool(const Device& device, VkDescriptorPoolCreateFlags flags, uint32_t maxSets, std::vector<VkDescriptorPoolSize> poolSizes);
+		DescriptorPool(Device& device, VkDescriptorPoolCreateFlags flags, uint32_t maxSets, std::vector<VkDescriptorPoolSize> poolSizes);
 		DescriptorPool(const DescriptorPool& rhs)            = default;
 		DescriptorPool& operator=(const DescriptorPool& rhs) = default;
 		DescriptorPool(DescriptorPool&& rhs) noexcept;

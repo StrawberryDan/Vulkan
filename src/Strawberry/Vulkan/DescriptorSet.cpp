@@ -17,7 +17,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	DescriptorSet::DescriptorSet(const DescriptorPool& descriptorPool, VkDescriptorSetLayout layout)
+	DescriptorSet::DescriptorSet(DescriptorPool& descriptorPool, VkDescriptorSetLayout layout)
 		: mDescriptorSet(VK_NULL_HANDLE)
 		, mDescriptorPool(descriptorPool)
 	{

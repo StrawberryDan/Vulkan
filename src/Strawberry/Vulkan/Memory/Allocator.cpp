@@ -129,6 +129,11 @@ namespace Strawberry::Vulkan
 	}
 
 
+	Allocator::Allocator(Device& device)
+		: mDevice(device)
+	{}
+
+
 	Allocation::Allocation(const Device& device, Allocator& allocator, MemoryPool& allocation, size_t offset,
 						   size_t size)
 		: mDevice(device)

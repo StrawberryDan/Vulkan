@@ -127,8 +127,7 @@ namespace Strawberry::Vulkan
 			: public Core::EnableReflexivePointer
 	{
 	public:
-		Allocator(const Device& device)
-			: mDevice(device) {}
+		Allocator(Device& device);
 
 
 		virtual AllocationResult Allocate(const AllocationRequest& allocationRequest) noexcept = 0;

@@ -27,7 +27,7 @@ namespace Strawberry::Vulkan
 		friend class CommandBuffer;
 
 	public:
-		CommandPool(const Queue& queue, bool resetBit = true);
+		CommandPool(Queue& queue, bool resetBit = true);
 		CommandPool(const CommandPool& rhs)            = delete;
 		CommandPool& operator=(const CommandPool& rhs) = delete;
 		CommandPool(CommandPool&& rhs) noexcept;

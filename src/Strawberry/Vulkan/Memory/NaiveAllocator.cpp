@@ -3,7 +3,7 @@
 
 namespace Strawberry::Vulkan
 {
-	NaiveAllocator::NaiveAllocator(const Device& device, MemoryTypeIndex memoryType)
+	NaiveAllocator::NaiveAllocator(Device& device, MemoryTypeIndex memoryType)
 		: Allocator(device)
 		  , mMemoryTypeIndex(memoryType)
 	{

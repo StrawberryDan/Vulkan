@@ -28,7 +28,7 @@ namespace Strawberry::Vulkan
 		friend class CommandBuffer;
 
 	public:
-		DescriptorSet(const DescriptorPool& descriptorPool, VkDescriptorSetLayout layout);
+		DescriptorSet(DescriptorPool& descriptorPool, VkDescriptorSetLayout layout);
 		DescriptorSet(const DescriptorSet& rhs)            = default;
 		DescriptorSet& operator=(const DescriptorSet& rhs) = default;
 		DescriptorSet(DescriptorSet&& rhs) noexcept;

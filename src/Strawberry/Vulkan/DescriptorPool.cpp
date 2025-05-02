@@ -12,7 +12,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	DescriptorPool::DescriptorPool(const Device& device, VkDescriptorPoolCreateFlags flags, uint32_t maxSets, std::vector<VkDescriptorPoolSize> poolSizes)
+	DescriptorPool::DescriptorPool(Device& device, VkDescriptorPoolCreateFlags flags, uint32_t maxSets, std::vector<VkDescriptorPoolSize> poolSizes)
 		: mDescriptorPool(VK_NULL_HANDLE)
 		, mDevice(device)
 		, mFlags(flags)

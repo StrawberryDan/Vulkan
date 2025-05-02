@@ -15,7 +15,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Core::Optional<Shader> Shader::Compile(const Device& device, const std::filesystem::path& file)
+	Core::Optional<Shader> Shader::Compile(Device& device, const std::filesystem::path& file)
 	{
 		if (auto bytes = Core::IO::DynamicByteBuffer::FromFile(file))
 		{
@@ -26,7 +26,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Core::Optional<Shader> Shader::Compile(const Device& device, const Core::IO::DynamicByteBuffer& bytes)
+	Core::Optional<Shader> Shader::Compile(Device& device, const Core::IO::DynamicByteBuffer& bytes)
 	{
 		VkShaderModuleCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
@@ -81,7 +81,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Shader::Shader(const Device& device, VkShaderModule module)
+	Shader::Shader(Device& device, VkShaderModule module)
 		: mShaderModule(module)
 		, mDevice(device) {}
 }

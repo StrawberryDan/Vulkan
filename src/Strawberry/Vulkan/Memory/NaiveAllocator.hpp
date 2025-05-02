@@ -10,7 +10,7 @@ namespace Strawberry::Vulkan
 		: public Allocator
 	{
 	public:
-		NaiveAllocator(const Device& device, MemoryTypeIndex memoryType);
+		NaiveAllocator(Device& device, MemoryTypeIndex memoryType);
 
 		AllocationResult Allocate(const AllocationRequest& allocationRequest) noexcept override;
 		void             Free(Allocation&& address) noexcept override;

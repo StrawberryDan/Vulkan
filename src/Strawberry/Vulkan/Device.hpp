@@ -50,13 +50,12 @@ namespace Strawberry::Vulkan
 
 
 		[[nodiscard]] Core::ReflexivePointer<Instance>      GetInstance() const;
-		[[nodiscard]] PhysicalDevice&                       GetPhysicalDevice();
 		[[nodiscard]] const PhysicalDevice&                 GetPhysicalDevice() const;
 		[[nodiscard]] Queue&                                GetQueue(uint32_t family, uint32_t index);
 
 	private:
 		VkDevice                                            mDevice;
-		Core::ReflexivePointer<PhysicalDevice>              mPhysicalDevice;
+		Core::ReflexivePointer<const PhysicalDevice>        mPhysicalDevice;
 
 
 		std::map<uint32_t, std::vector<Queue>> mQueues;

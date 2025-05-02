@@ -40,7 +40,7 @@ namespace Strawberry::Vulkan
 		friend class CommandBuffer;
 
 	public:
-		Swapchain(const Queue& queue, const Surface& surface, Core::Math::Vec2i extents, VkPresentModeKHR presentMode);
+		Swapchain(Queue& queue, Surface& surface, Core::Math::Vec2i extents, VkPresentModeKHR presentMode);
 		Swapchain(const Swapchain& rhs)            = delete;
 		Swapchain& operator=(const Swapchain& rhs) = delete;
 		Swapchain(Swapchain&& rhs) noexcept;

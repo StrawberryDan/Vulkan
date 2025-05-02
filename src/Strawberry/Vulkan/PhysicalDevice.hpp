@@ -52,7 +52,7 @@ namespace Strawberry::Vulkan
 		std::vector<MemoryType> SearchMemoryTypes(const MemoryTypeCriteria& memoryCriteria) const;
 
 	protected:
-		PhysicalDevice(const Instance& instance, VkPhysicalDevice rawHandle);
+		PhysicalDevice(Instance& instance, VkPhysicalDevice rawHandle);
 
 	private:
 		VkPhysicalDevice mPhysicalDevice;

@@ -15,7 +15,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	CommandPool::CommandPool(const Queue& queue, bool resetBit)
+	CommandPool::CommandPool(Queue& queue, bool resetBit)
 		: mQueue(queue)
 	{
 		VkCommandPoolCreateInfo createInfo{

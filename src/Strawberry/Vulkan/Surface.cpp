@@ -12,7 +12,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Surface::Surface(const Window::Window& window, const Device& device)
+	Surface::Surface(Window::Window& window, Device& device)
 		: mDevice(device)
 	{
 		Core::AssertEQ(glfwCreateWindowSurface(device.GetInstance()->mInstance, window.mHandle, nullptr, &mSurface), GLFW_NO_ERROR);

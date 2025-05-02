@@ -62,7 +62,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	PipelineLayout::Builder::Builder(const Device& device)
+	PipelineLayout::Builder::Builder(Device& device)
 		: mDevice(device) {}
 
 

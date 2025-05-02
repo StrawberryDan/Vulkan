@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Swapchain::Swapchain(const Queue& queue, const Surface& surface, Core::Math::Vec2i extents, VkPresentModeKHR presentMode)
+	Swapchain::Swapchain(Queue& queue, Surface& surface, Core::Math::Vec2i extents, VkPresentModeKHR presentMode)
 		: mQueue(queue)
 		, mSize(extents)
 	{

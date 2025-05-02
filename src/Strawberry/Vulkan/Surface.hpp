@@ -32,7 +32,7 @@ namespace Strawberry::Vulkan
 		friend class Swapchain;
 
 	public:
-		explicit Surface(const Window::Window& window, const Device& device);
+		explicit Surface(Window::Window& window, Device& device);
 		Surface(const Surface& rhs)            = delete;
 		Surface& operator=(const Surface& rhs) = delete;
 		Surface(Surface&& rhs) noexcept;

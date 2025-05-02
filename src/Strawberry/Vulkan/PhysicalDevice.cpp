@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	PhysicalDevice::PhysicalDevice(const Instance& instance, VkPhysicalDevice rawHandle)
+	PhysicalDevice::PhysicalDevice(Instance& instance, VkPhysicalDevice rawHandle)
 		: mPhysicalDevice(rawHandle)
 		, mInstance(instance) {}
 

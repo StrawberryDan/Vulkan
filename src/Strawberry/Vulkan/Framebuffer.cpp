@@ -17,9 +17,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Framebuffer::Framebuffer(const RenderPass& renderPass, Allocator& allocator, Core::Math::Vec2u size)
+	Framebuffer::Framebuffer(RenderPass& renderPass, Allocator& allocator, Core::Math::Vec2u size)
 		: mRenderPass(renderPass)
-		  , mSize(size)
+		, mSize(size)
 	{
 		const auto ATTACHMENT_COUNT = mRenderPass->mAttachmentFormats.size();
 		for (int i = 0; i < ATTACHMENT_COUNT; i++)
@@ -126,7 +126,7 @@ namespace Strawberry::Vulkan
 		return GetRenderPass()->GetDevice();
 	}
 
-	Core::ReflexivePointer<PhysicalDevice> Framebuffer::GetPhysicalDevice() const
+	Core::ReflexivePointer<const PhysicalDevice> Framebuffer::GetPhysicalDevice() const
 	{
 		return GetDevice()->GetPhysicalDevice().GetReflexivePointer();
 	}

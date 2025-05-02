@@ -25,8 +25,8 @@ namespace Strawberry::Vulkan
 	class Shader
 	{
 	public:
-		static Core::Optional<Shader> Compile(const Device& device, const std::filesystem::path& file);
-		static Core::Optional<Shader> Compile(const Device& device, const Core::IO::DynamicByteBuffer& bytes);
+		static Core::Optional<Shader> Compile(Device& device, const std::filesystem::path& file);
+		static Core::Optional<Shader> Compile(Device& device, const Core::IO::DynamicByteBuffer& bytes);
 
 
 		Shader(const Shader& rhs)            = delete;
@@ -38,8 +38,9 @@ namespace Strawberry::Vulkan
 
 		operator VkShaderModule() const;
 
+
 	protected:
-		Shader(const Device& device, VkShaderModule module);
+		Shader(Device& device, VkShaderModule module);
 
 	private:
 		VkShaderModule                 mShaderModule;

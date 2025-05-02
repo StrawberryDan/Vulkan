@@ -32,6 +32,7 @@ namespace Strawberry::Vulkan
 	public:
 		class Builder;
 
+
 	public:
 		RenderPass(const RenderPass& rhs)            = delete;
 		RenderPass& operator=(const RenderPass& rhs) = delete;
@@ -46,7 +47,8 @@ namespace Strawberry::Vulkan
 		Core::ReflexivePointer<Device> GetDevice() const;
 
 	protected:
-		RenderPass(const Device& device);
+		RenderPass(Device& device);
+
 
 	private:
 		VkRenderPass                   mRenderPass;
@@ -79,7 +81,7 @@ namespace Strawberry::Vulkan
 	class RenderPass::Builder
 	{
 	public:
-		Builder(const Device& device);
+		Builder(Device& device);
 
 
 		Builder& WithColorAttachment(VkImageUsageFlags usage,

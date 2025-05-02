@@ -13,7 +13,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	RenderPass::RenderPass(const Device& device)
+	RenderPass::RenderPass(Device& device)
 		: mDevice(device) {}
 
 
@@ -87,7 +87,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	RenderPass::Builder::Builder(const Device& device)
+	RenderPass::Builder::Builder(Device& device)
 		: mDevice(device) {}
 
 
