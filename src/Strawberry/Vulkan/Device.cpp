@@ -135,6 +135,12 @@ namespace Strawberry::Vulkan
 	}
 
 
+	PhysicalDevice& Device::GetPhysicalDevice()
+	{
+		return *mPhysicalDevice;
+	}
+
+
 	const PhysicalDevice& Device::GetPhysicalDevice() const
 	{
 		return *mPhysicalDevice;
