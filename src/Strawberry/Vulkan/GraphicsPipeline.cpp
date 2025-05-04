@@ -121,17 +121,8 @@ namespace Strawberry::Vulkan
 	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithViewport(const std::vector<VkViewport>& viewports,
 																	   const std::vector<VkRect2D>& scissors)
 	{
-		VkPipelineViewportStateCreateInfo createInfo{
-			.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = 0,
-			.viewportCount = static_cast<uint32_t>(viewports.size()),
-			.pViewports = viewports.data(),
-			.scissorCount = static_cast<uint32_t>(scissors.size()),
-			.pScissors = scissors.data()
-		};
-
-		mViewportStateCreateInfo = createInfo;
+		mViewports.append_range(viewports);
+		mScissorRegions.append_range(scissors);
 		return *this;
 	}
 
@@ -208,18 +199,33 @@ namespace Strawberry::Vulkan
 	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithColorBlending(
 		std::vector<VkPipelineColorBlendAttachmentState> attachments)
 	{
-		VkPipelineColorBlendStateCreateInfo createInfo{
-			.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = 0,
-			.logicOpEnable = VK_FALSE,
-			.logicOp = {},
-			.attachmentCount = static_cast<uint32_t>(attachments.size()),
-			.pAttachments = attachments.data(),
-			.blendConstants = {0.0f, 0.0f, 0.0f, 0.0f}
-		};
+		mColorBlendingAttachmentStates.append_range(attachments);
+		return *this;
+	}
 
-		mColorBlendStateCreateInfo = createInfo;
+
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithColorBlending(
+		const VkPipelineColorBlendAttachmentState& attachment)
+	{
+		mColorBlendingAttachmentStates.emplace_back(attachment);
+		return *this;
+	}
+
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithAlphaColorBlending()
+	{
+		mColorBlendingAttachmentStates.emplace_back(
+			VkPipelineColorBlendAttachmentState{
+				.blendEnable = VK_TRUE,
+				.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
+				.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
+				.colorBlendOp = VK_BLEND_OP_ADD,
+				.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
+				.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
+				.alphaBlendOp = VK_BLEND_OP_ADD,
+				.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
+				VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT
+			}
+		);
 		return *this;
 	}
 
@@ -252,12 +258,11 @@ namespace Strawberry::Vulkan
 	{
 		// Input Assembly MUST be specified.
 		Core::Assert(mInputAssemblyStateCreateInfo.HasValue());
-		// Viewport State MUST be specified
-		Core::Assert(mViewportStateCreateInfo.HasValue());
+		// At least one viewport and once scissor region must be specified
+		Core::Assert(!mViewports.empty());
+		Core::Assert(!mScissorRegions.empty());
 		// Rasterization State MUST be specified.
 		Core::Assert(mRasterizationStateCreateInfo.HasValue());
-		// Color Blend State MUST be specified
-		Core::Assert(mColorBlendStateCreateInfo.HasValue());
 
 
 		VkSpecializationInfo specializationInfo
@@ -318,6 +323,29 @@ namespace Strawberry::Vulkan
 		}
 
 
+		VkPipelineColorBlendStateCreateInfo colorBlendCreateInfo{
+			.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.logicOpEnable = VK_FALSE,
+			.logicOp = {},
+			.attachmentCount = static_cast<uint32_t>(mColorBlendingAttachmentStates.size()),
+			.pAttachments = mColorBlendingAttachmentStates.data(),
+			.blendConstants = {0.0f, 0.0f, 0.0f, 0.0f}
+		};
+
+
+		VkPipelineViewportStateCreateInfo viewportStateCreateInfo {
+			.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.viewportCount = static_cast<uint32_t>(mViewports.size()),
+			.pViewports = mViewports.data(),
+			.scissorCount = static_cast<uint32_t>(mScissorRegions.size()),
+			.pScissors = mScissorRegions.data()
+		};
+
+
 		// Create the Pipeline
 		VkGraphicsPipelineCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
@@ -328,11 +356,11 @@ namespace Strawberry::Vulkan
 			.pVertexInputState = mVertexInputStateCreateInfo.AsPtr().UnwrapOr(nullptr),
 			.pInputAssemblyState = mInputAssemblyStateCreateInfo.AsPtr().UnwrapOr(nullptr),
 			.pTessellationState = mTessellationStateCreateInfo.AsPtr().UnwrapOr(nullptr),
-			.pViewportState = mViewportStateCreateInfo.AsPtr().UnwrapOr(nullptr),
+			.pViewportState = &viewportStateCreateInfo,
 			.pRasterizationState = mRasterizationStateCreateInfo.AsPtr().UnwrapOr(nullptr),
 			.pMultisampleState = mMultisampleStateCreateInfo.AsPtr().UnwrapOr(nullptr),
 			.pDepthStencilState = mDepthStencilStateCreateInfo.AsPtr().UnwrapOr(nullptr),
-			.pColorBlendState = mColorBlendStateCreateInfo.AsPtr().UnwrapOr(nullptr),
+			.pColorBlendState = &colorBlendCreateInfo,
 			.pDynamicState = mDynamicStateCreateInfo.AsPtr().UnwrapOr(nullptr),
 			.layout = *mPipelineLayout,
 			.renderPass = mRenderPass->mRenderPass,

@@ -92,6 +92,8 @@ namespace Strawberry::Vulkan
 		Builder& WithMultisample(VkSampleCountFlagBits samples);
 		Builder& WithDepthStencil(VkPipelineDepthStencilStateCreateInfo createInfo);
 		Builder& WithColorBlending(std::vector<VkPipelineColorBlendAttachmentState> attachments);
+		Builder& WithColorBlending(const VkPipelineColorBlendAttachmentState& attachment);
+		Builder& WithAlphaColorBlending();
 		Builder& WithDynamicState(const std::vector<VkDynamicState>& states);
 
 
@@ -134,11 +136,14 @@ namespace Strawberry::Vulkan
 		Core::Optional<VkPipelineVertexInputStateCreateInfo>   mVertexInputStateCreateInfo;
 		Core::Optional<VkPipelineInputAssemblyStateCreateInfo> mInputAssemblyStateCreateInfo;
 		Core::Optional<VkPipelineTessellationStateCreateInfo>  mTessellationStateCreateInfo;
-		Core::Optional<VkPipelineViewportStateCreateInfo>      mViewportStateCreateInfo;
 		Core::Optional<VkPipelineRasterizationStateCreateInfo> mRasterizationStateCreateInfo;
 		Core::Optional<VkPipelineMultisampleStateCreateInfo>   mMultisampleStateCreateInfo;
 		Core::Optional<VkPipelineDepthStencilStateCreateInfo>  mDepthStencilStateCreateInfo;
-		Core::Optional<VkPipelineColorBlendStateCreateInfo>    mColorBlendStateCreateInfo;
 		Core::Optional<VkPipelineDynamicStateCreateInfo>       mDynamicStateCreateInfo;
+
+
+		std::vector<VkPipelineColorBlendAttachmentState>       mColorBlendingAttachmentStates;
+		std::vector<VkViewport>                                mViewports;
+		std::vector<VkRect2D>                                  mScissorRegions;
 	};
 }
