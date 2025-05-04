@@ -28,6 +28,12 @@ namespace Strawberry::Vulkan
 		static Core::Optional<Shader> Compile(Device& device, const std::filesystem::path& file);
 		static Core::Optional<Shader> Compile(Device& device, const Core::IO::DynamicByteBuffer& bytes);
 
+		template <size_t S>
+		static Core::Optional<Shader> Compile(Device& device, const uint8_t (&bytes)[S])
+		{
+			return Compile(device, Core::IO::DynamicByteBuffer(bytes, S));
+		}
+
 
 		Shader(const Shader& rhs)            = delete;
 		Shader& operator=(const Shader& rhs) = delete;
