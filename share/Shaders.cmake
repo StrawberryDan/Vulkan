@@ -12,7 +12,7 @@ function(add_target_shader TARGET SOURCE)
 	file(CHMOD ${GRAPHICS_SOURCE_DIR}/share PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_WRITE WORLD_EXECUTE)
 	add_custom_command(OUTPUT ${SOURCE}.bin
 			COMMAND ${Python3_EXECUTABLE} ${GRAPHICS_SOURCE_DIR}/share/compile_shader.py ${Vulkan_GLSLC_EXECUTABLE} ${SOURCE} ${SOURCE}.bin
-			DEPENDS ${SOURCE}
+			DEPENDS ${SOURCE} ${ARGN}
 	)
 
 	target_sources(${TARGET} PUBLIC ${SOURCE}.bin)
@@ -24,12 +24,12 @@ function(add_target_shaders)
 			ARG
 			""
 			"TARGET"
-			"SHADERS"
+			"SHADERS;LIBRARIES"
 			${ARGN}
 	)
 
 
 	foreach (SHADER ${ARG_SHADERS})
-		add_target_shader(${ARG_TARGET} ${SHADER})
+		add_target_shader(${ARG_TARGET} ${SHADER} ${ARG_LIBRARIES})
 	endforeach ()
 endfunction()
