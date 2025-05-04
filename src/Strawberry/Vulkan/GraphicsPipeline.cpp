@@ -68,22 +68,21 @@ namespace Strawberry::Vulkan
 		return *this;
 	}
 
-
-	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithVertexInput(
-		const std::vector<VkVertexInputBindingDescription>& bindings,
-		const std::vector<VkVertexInputAttributeDescription>& attributes)
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithInputBinding(uint32_t binding, uint32_t stride,
+		VkVertexInputRate inputRate)
 	{
-		VkPipelineVertexInputStateCreateInfo createInfo{
-			.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = 0,
-			.vertexBindingDescriptionCount = static_cast<uint32_t>(bindings.size()),
-			.pVertexBindingDescriptions = bindings.data(),
-			.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributes.size()),
-			.pVertexAttributeDescriptions = attributes.data()
-		};
+		mVertexInputBindings.emplace_back(VkVertexInputBindingDescription{
+			.binding = binding, .stride = stride, .inputRate = inputRate
+		});
+		return *this;
+	}
 
-		mVertexInputStateCreateInfo = createInfo;
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithInputAttribute(uint32_t location, uint32_t binding,
+		uint32_t offset, VkFormat format)
+	{
+		mVertexInputAttributes.emplace_back(VkVertexInputAttributeDescription{
+			.location = location, .binding = binding, .format = format, .offset = offset
+		});
 		return *this;
 	}
 
@@ -304,21 +303,6 @@ namespace Strawberry::Vulkan
 		}
 
 
-		// Use default vertex input if none specified
-		if (!mVertexInputStateCreateInfo)
-		{
-			mVertexInputStateCreateInfo = VkPipelineVertexInputStateCreateInfo{
-				.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-				.pNext = nullptr,
-				.flags = 0,
-				.vertexBindingDescriptionCount = 0,
-				.pVertexBindingDescriptions = nullptr,
-				.vertexAttributeDescriptionCount = 0,
-				.pVertexAttributeDescriptions = nullptr
-			};
-		}
-
-
 		// Use default multisampling if now specified.
 		if (!mMultisampleStateCreateInfo)
 		{
@@ -360,6 +344,17 @@ namespace Strawberry::Vulkan
 		};
 
 
+		VkPipelineVertexInputStateCreateInfo inputStateCreateInfo {
+			.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.vertexBindingDescriptionCount = static_cast<uint32_t>(mVertexInputBindings.size()),
+			.pVertexBindingDescriptions = mVertexInputBindings.data(),
+			.vertexAttributeDescriptionCount = static_cast<uint32_t>(mVertexInputAttributes.size()),
+			.pVertexAttributeDescriptions = mVertexInputAttributes.data()
+		};
+
+
 		// Create the Pipeline
 		VkGraphicsPipelineCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
@@ -367,7 +362,7 @@ namespace Strawberry::Vulkan
 			.flags = 0,
 			.stageCount = static_cast<uint32_t>(stages.size()),
 			.pStages = stages.data(),
-			.pVertexInputState = mVertexInputStateCreateInfo.AsPtr().UnwrapOr(nullptr),
+			.pVertexInputState = &inputStateCreateInfo,
 			.pInputAssemblyState = mInputAssemblyStateCreateInfo.AsPtr().UnwrapOr(nullptr),
 			.pTessellationState = mTessellationStateCreateInfo.AsPtr().UnwrapOr(nullptr),
 			.pViewportState = &viewportStateCreateInfo,

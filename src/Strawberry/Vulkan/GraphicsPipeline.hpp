@@ -81,8 +81,8 @@ namespace Strawberry::Vulkan
 		Builder& WithShaderStage(VkShaderStageFlagBits stage, Shader shader);
 
 
-		Builder& WithVertexInput(const std::vector<VkVertexInputBindingDescription>&   bindings,
-		                         const std::vector<VkVertexInputAttributeDescription>& attributes);
+		Builder& WithInputBinding(uint32_t binding, uint32_t stride, VkVertexInputRate inputRate = VK_VERTEX_INPUT_RATE_VERTEX);
+		Builder& WithInputAttribute(uint32_t location, uint32_t binding, uint32_t offset, VkFormat format);
 		Builder& WithInputAssembly(VkPrimitiveTopology topology);
 		Builder& WithTesselation(uint32_t controlPoints);
 		Builder& WithViewport(const std::vector<VkViewport>& viewports, const std::vector<VkRect2D>& scissors);
@@ -134,7 +134,6 @@ namespace Strawberry::Vulkan
 		Core::IO::DynamicByteBuffer mShaderSpecializationData;
 
 
-		Core::Optional<VkPipelineVertexInputStateCreateInfo>   mVertexInputStateCreateInfo;
 		Core::Optional<VkPipelineInputAssemblyStateCreateInfo> mInputAssemblyStateCreateInfo;
 		Core::Optional<VkPipelineTessellationStateCreateInfo>  mTessellationStateCreateInfo;
 		Core::Optional<VkPipelineRasterizationStateCreateInfo> mRasterizationStateCreateInfo;
@@ -143,8 +142,10 @@ namespace Strawberry::Vulkan
 		Core::Optional<VkPipelineDynamicStateCreateInfo>       mDynamicStateCreateInfo;
 
 
-		std::vector<VkPipelineColorBlendAttachmentState>       mColorBlendingAttachmentStates;
-		std::vector<VkViewport>                                mViewports;
-		std::vector<VkRect2D>                                  mScissorRegions;
+		std::vector<VkVertexInputBindingDescription>     mVertexInputBindings;
+		std::vector<VkVertexInputAttributeDescription>   mVertexInputAttributes;
+		std::vector<VkPipelineColorBlendAttachmentState> mColorBlendingAttachmentStates;
+		std::vector<VkViewport>                          mViewports;
+		std::vector<VkRect2D>                            mScissorRegions;
 	};
 }
