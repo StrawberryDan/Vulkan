@@ -15,6 +15,8 @@
 #include <cmath>
 #include <utility>
 
+#include "Framebuffer.hpp"
+
 
 //======================================================================================================================
 //  Class Definitions
@@ -23,8 +25,10 @@ namespace Strawberry::Vulkan
 {
 	GraphicsPipeline::GraphicsPipeline(GraphicsPipeline&& rhs) noexcept
 		: mPipeline(std::exchange(rhs.mPipeline, nullptr))
-		, mPipelineLayout(std::exchange(rhs.mPipelineLayout, nullptr))
-		, mRenderPass(std::move(rhs.mRenderPass)) {}
+		  , mPipelineLayout(std::exchange(rhs.mPipelineLayout, nullptr))
+		  , mRenderPass(std::move(rhs.mRenderPass))
+	{
+	}
 
 
 	GraphicsPipeline& GraphicsPipeline::operator=(GraphicsPipeline&& rhs) noexcept
@@ -50,8 +54,10 @@ namespace Strawberry::Vulkan
 
 	GraphicsPipeline::Builder::Builder(PipelineLayout& layout, RenderPass& renderPass, uint32_t subpass)
 		: mRenderPass(renderPass)
-		, mSubpass(subpass)
-		, mPipelineLayout(layout) {}
+		  , mSubpass(subpass)
+		  , mPipelineLayout(layout)
+	{
+	}
 
 
 	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithShaderStage(VkShaderStageFlagBits stage, Shader shader)
@@ -63,8 +69,9 @@ namespace Strawberry::Vulkan
 	}
 
 
-	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithVertexInput(const std::vector<VkVertexInputBindingDescription>&   bindings,
-	                                                                      const std::vector<VkVertexInputAttributeDescription>& attributes)
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithVertexInput(
+		const std::vector<VkVertexInputBindingDescription>& bindings,
+		const std::vector<VkVertexInputAttributeDescription>& attributes)
 	{
 		VkPipelineVertexInputStateCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
@@ -111,7 +118,8 @@ namespace Strawberry::Vulkan
 	}
 
 
-	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithViewport(const std::vector<VkViewport> viewports, const std::vector<VkRect2D> scissors)
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithViewport(const std::vector<VkViewport>& viewports,
+																	   const std::vector<VkRect2D>& scissors)
 	{
 		VkPipelineViewportStateCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
@@ -127,8 +135,27 @@ namespace Strawberry::Vulkan
 		return *this;
 	}
 
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithViewport(const Framebuffer& framebuffer)
+	{
+		return WithViewport(
+			{
+				VkViewport{
+					.x = 0, .y = 0, .width = framebuffer.GetSize().AsType<float>()[0],
+					.height = framebuffer.GetSize().AsType<float>()[1], .minDepth = 0.0, .maxDepth = 1.0
+				}
+			},
+			{
+				VkRect2D{
+					.offset = VkOffset2D{.x = 0, .y = 0},
+					.extent = VkExtent2D{.width = framebuffer.GetSize()[0], .height = framebuffer.GetSize()[1]}
+				}
+			}
+		);
+	}
 
-	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithRasterization(VkPolygonMode polygonMode, VkCullModeFlags cullMode, VkFrontFace frontFace)
+
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithRasterization(
+		VkPolygonMode polygonMode, VkCullModeFlags cullMode, VkFrontFace frontFace)
 	{
 		VkPipelineRasterizationStateCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
@@ -170,14 +197,16 @@ namespace Strawberry::Vulkan
 	}
 
 
-	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithDepthStencil(VkPipelineDepthStencilStateCreateInfo createInfo)
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithDepthStencil(
+		VkPipelineDepthStencilStateCreateInfo createInfo)
 	{
 		mDepthStencilStateCreateInfo = createInfo;
 		return *this;
 	}
 
 
-	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithColorBlending(std::vector<VkPipelineColorBlendAttachmentState> attachments)
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithColorBlending(
+		std::vector<VkPipelineColorBlendAttachmentState> attachments)
 	{
 		VkPipelineColorBlendStateCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
@@ -213,8 +242,10 @@ namespace Strawberry::Vulkan
 
 	GraphicsPipeline::GraphicsPipeline(VkPipeline handle, PipelineLayout& layout, RenderPass& renderPass)
 		: mPipeline(handle)
-		, mPipelineLayout(layout)
-		, mRenderPass(renderPass) {}
+		  , mPipelineLayout(layout)
+		  , mRenderPass(renderPass)
+	{
+	}
 
 
 	GraphicsPipeline GraphicsPipeline::Builder::Build()
@@ -240,7 +271,7 @@ namespace Strawberry::Vulkan
 
 		// Create Shader Stages
 		std::vector<VkPipelineShaderStageCreateInfo> stages;
-		for (auto& [stage, shader]: mStages)
+		for (auto& [stage, shader] : mStages)
 		{
 			stages.emplace_back(VkPipelineShaderStageCreateInfo{
 				.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
@@ -288,7 +319,7 @@ namespace Strawberry::Vulkan
 
 
 		// Create the Pipeline
-		VkGraphicsPipelineCreateInfo createInfo {
+		VkGraphicsPipelineCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -313,12 +344,12 @@ namespace Strawberry::Vulkan
 
 		VkPipeline handle = VK_NULL_HANDLE;
 		Core::AssertEQ(vkCreateGraphicsPipelines(*mRenderPass->mDevice,
-		                                         nullptr,
-		                                         1,
-		                                         &createInfo,
-		                                         nullptr,
-		                                         &handle),
-		               VK_SUCCESS);
+												 nullptr,
+												 1,
+												 &createInfo,
+												 nullptr,
+												 &handle),
+					   VK_SUCCESS);
 
 		return GraphicsPipeline(handle, *mPipelineLayout, *mRenderPass);
 	}

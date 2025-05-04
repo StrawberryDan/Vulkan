@@ -85,7 +85,9 @@ namespace Strawberry::Vulkan
 		                         const std::vector<VkVertexInputAttributeDescription>& attributes);
 		Builder& WithInputAssembly(VkPrimitiveTopology topology);
 		Builder& WithTesselation(uint32_t controlPoints);
-		Builder& WithViewport(const std::vector<VkViewport> viewports, const std::vector<VkRect2D> scissors);
+		Builder& WithViewport(const std::vector<VkViewport>& viewports, const std::vector<VkRect2D>& scissors);
+		// Set the viewport and scissor regions to cover an entire frame buffer.
+		Builder& WithViewport(const Framebuffer& framebuffer);
 		Builder& WithRasterization(VkPolygonMode polygonMode, VkCullModeFlags cullMode, VkFrontFace frontFace);
 		Builder& WithMultisample(VkSampleCountFlagBits samples);
 		Builder& WithDepthStencil(VkPipelineDepthStencilStateCreateInfo createInfo);
