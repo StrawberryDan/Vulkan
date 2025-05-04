@@ -91,6 +91,7 @@ namespace Strawberry::Vulkan
 		Builder& WithRasterization(VkPolygonMode polygonMode, VkCullModeFlags cullMode, VkFrontFace frontFace);
 		Builder& WithMultisample(VkSampleCountFlagBits samples);
 		Builder& WithDepthStencil(VkPipelineDepthStencilStateCreateInfo createInfo);
+		Builder& WithDepthTesting();
 		Builder& WithColorBlending(std::vector<VkPipelineColorBlendAttachmentState> attachments);
 		Builder& WithColorBlending(const VkPipelineColorBlendAttachmentState& attachment);
 		Builder& WithAlphaColorBlending();

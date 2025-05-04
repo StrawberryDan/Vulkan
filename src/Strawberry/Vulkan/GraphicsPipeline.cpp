@@ -195,6 +195,20 @@ namespace Strawberry::Vulkan
 		return *this;
 	}
 
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithDepthTesting()
+	{
+		return WithDepthStencil({
+			.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.depthTestEnable = VK_TRUE,
+			.depthWriteEnable = VK_TRUE,
+			.depthCompareOp = VK_COMPARE_OP_LESS,
+			.depthBoundsTestEnable = VK_FALSE,
+			.stencilTestEnable = VK_FALSE,
+		});
+	}
+
 
 	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithColorBlending(
 		std::vector<VkPipelineColorBlendAttachmentState> attachments)
