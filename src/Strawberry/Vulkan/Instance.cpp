@@ -93,8 +93,10 @@ namespace Strawberry::Vulkan
 
 		std::vector<const char*> extensions =
 		{
+#ifdef STRAWBERRY_DEBUG
 			VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
 			VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
+#endif
 #if __APPLE__
 			VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME,
 #endif
@@ -148,12 +150,24 @@ namespace Strawberry::Vulkan
 			.pfnUserCallback = DebugUtilsCallback,
 			.pUserData = nullptr,
 		};
+
+		std::vector<VkValidationFeatureEnableEXT> enabledValidationFeatures { VK_VALIDATION_FEATURE_ENABLE_DEBUG_PRINTF_EXT };
+
+		VkValidationFeaturesEXT validationFeatures
+		{
+			.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT,
+			.pNext = nullptr,
+			.enabledValidationFeatureCount = static_cast<uint32_t>(enabledValidationFeatures.size()),
+			.pEnabledValidationFeatures = enabledValidationFeatures.data(),
+			.disabledValidationFeatureCount = 0,
+			.pDisabledValidationFeatures = nullptr
+		};
 #endif
 
 		VkInstanceCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
 #if STRAWBERRY_DEBUG
-			.pNext = &messengerCreateInfo,
+			.pNext = &validationFeatures,
 #else
 			.pNext = nullptr,
 #endif

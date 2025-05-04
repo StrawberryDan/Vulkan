@@ -48,7 +48,10 @@ namespace Strawberry::Vulkan
 		std::vector<const char*> extensions
 		{
 			"VK_KHR_dynamic_rendering",
-			"VK_KHR_swapchain"
+			"VK_KHR_swapchain",
+#ifdef STRAWBERRY_DEBUG
+			"VK_KHR_shader_non_semantic_info",
+#endif
 		};
 
 		// Enumerate Extension Properties of Physical Device
