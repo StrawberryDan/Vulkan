@@ -125,19 +125,31 @@ namespace Strawberry::Vulkan
 		return *this;
 	}
 
-	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithViewport(const Framebuffer& framebuffer)
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithViewport(const Framebuffer& framebuffer, bool negateY)
 	{
 		return WithViewport(
 			{
 				VkViewport{
-					.x = 0, .y = 0, .width = framebuffer.GetSize().AsType<float>()[0],
-					.height = framebuffer.GetSize().AsType<float>()[1], .minDepth = 0.0, .maxDepth = 1.0
+					.x = 0,
+					.y = negateY ? static_cast<float>(framebuffer.GetSize()[1]) : 0,
+					.width = framebuffer.GetSize().AsType<float>()[0],
+					.height = negateY ? -static_cast<float>(framebuffer.GetSize()[1]) : static_cast<float>(framebuffer.GetSize()[1]),
+					.minDepth = 0.0,
+					.maxDepth = 1.0
 				}
 			},
 			{
 				VkRect2D{
-					.offset = VkOffset2D{.x = 0, .y = 0},
-					.extent = VkExtent2D{.width = framebuffer.GetSize()[0], .height = framebuffer.GetSize()[1]}
+					.offset = VkOffset2D
+					{
+						.x = 0,
+						.y = 0
+					},
+					.extent = VkExtent2D
+					{
+						.width = framebuffer.GetSize()[0],
+						.height = framebuffer.GetSize()[1]
+					}
 				}
 			}
 		);
