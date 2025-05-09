@@ -66,6 +66,7 @@ if (NOT TARGET StrawberryVulkan)
 		src/Strawberry/Vulkan/PhysicalDevice.hpp
 		src/Strawberry/Vulkan/PipelineLayout.cpp
 		src/Strawberry/Vulkan/PipelineLayout.hpp
+		src/Strawberry/Vulkan/Projection.hpp
 		src/Strawberry/Vulkan/Queue.cpp
 		src/Strawberry/Vulkan/Queue.hpp
 		src/Strawberry/Vulkan/RenderPass.cpp
