@@ -50,7 +50,7 @@ void BasicRendering()
 
 
 	Device device(gpu, {}, {QueueCreateInfo{queueFamily, 1}});
-	Surface surface = window.Create<Surface>(device);
+	Surface surface(window, device);
 	RenderPass renderPass = RenderPass::Builder(device)
 							.WithColorAttachment(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
 												 VK_IMAGE_USAGE_TRANSFER_DST_BIT,
@@ -80,23 +80,8 @@ void BasicRendering()
 	GraphicsPipeline pipeline = GraphicsPipeline::Builder(layout, renderPass, 0)
 								.WithShaderStage(VK_SHADER_STAGE_VERTEX_BIT, std::move(vertexShader))
 								.WithShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT, std::move(fragmentShader))
-								.WithVertexInput(
-									{
-										VkVertexInputBindingDescription{
-											.binding = 0,
-											.stride = 3 * sizeof(float),
-											.inputRate = VK_VERTEX_INPUT_RATE_VERTEX
-										}
-									},
-									{
-										VkVertexInputAttributeDescription{
-											.location = 0,
-											.binding = 0,
-											.format = VK_FORMAT_R32G32B32_SFLOAT,
-											.offset = 0,
-										}
-									}
-								)
+								.WithInputBinding(0, 3 * sizeof(float))
+								.WithInputAttribute(0, 0, 0, VK_FORMAT_R32G32B32_SFLOAT)
 								.WithInputAssembly(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
 								.WithViewport({
 												  VkViewport{
@@ -124,10 +109,10 @@ void BasicRendering()
 								.WithMultisample(VK_SAMPLE_COUNT_1_BIT)
 								.Build();
 	auto queue = device.GetQueue(queueFamily, 0).GetReflexivePointer();
-	Vulkan::Swapchain swapchain = queue->Create<Swapchain>(surface, Core::Math::Vec2i(1920, 1080),
+	Vulkan::Swapchain swapchain(*queue, surface, Core::Math::Vec2i(1920, 1080),
 														   VK_PRESENT_MODE_IMMEDIATE_KHR);
-	Vulkan::CommandPool commandPool = queue->Create<CommandPool>(true);
-	Vulkan::CommandBuffer commandBuffer = commandPool.Create<CommandBuffer>();
+	Vulkan::CommandPool commandPool(*queue, true);
+	Vulkan::CommandBuffer commandBuffer(commandPool);
 
 	auto hostVisibleMemoryType = gpu.SearchMemoryTypes(MemoryTypeCriteria::HostVisible())[0].index;
 	auto deviceLocalMemoryType = gpu.SearchMemoryTypes(MemoryTypeCriteria::DeviceLocal())[0].index;
