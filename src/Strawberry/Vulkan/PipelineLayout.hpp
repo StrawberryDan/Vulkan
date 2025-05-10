@@ -49,10 +49,9 @@ namespace Strawberry::Vulkan
 		Builder(Builder&&);
 		Builder& operator=(const Builder&) = delete;
 		Builder& operator=(Builder&&);
-		~Builder();
 
 
-		Builder& WithDescriptorSet(const std::vector<VkDescriptorSetLayoutBinding>& bindings);
+		Builder& WithDescriptor(unsigned int set, VkDescriptorType type, VkShaderStageFlags shaderStages, unsigned int count = 1);
 
 
 		Builder& WithPushConstantRange(uint32_t size, uint32_t offset, VkShaderStageFlags stageFlags);
@@ -60,10 +59,12 @@ namespace Strawberry::Vulkan
 
 		PipelineLayout Build();
 
+
 	private:
 		Core::ReflexivePointer<Device> mDevice;
 
-		std::vector<VkDescriptorSetLayout> mSetLayouts;
+		// Maps set indices to a list of bindings.
+		std::map<unsigned int, std::vector<VkDescriptorSetLayoutBinding>> mBindings;
 		std::vector<VkPushConstantRange>   mPushConstantRanges;
 	};
 }

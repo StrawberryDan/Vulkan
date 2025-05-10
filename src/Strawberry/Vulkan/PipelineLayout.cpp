@@ -68,7 +68,7 @@ namespace Strawberry::Vulkan
 
 	PipelineLayout::Builder::Builder(Builder&& rhs)
 		: mDevice(std::move(rhs.mDevice))
-		, mSetLayouts(std::move(rhs.mSetLayouts))
+		, mBindings(std::move(rhs.mBindings))
 		, mPushConstantRanges(std::move(rhs.mPushConstantRanges)) {}
 
 
@@ -84,30 +84,19 @@ namespace Strawberry::Vulkan
 	}
 
 
-	PipelineLayout::Builder::~Builder()
+	PipelineLayout::Builder& PipelineLayout::Builder::WithDescriptor(
+		unsigned int set,
+		VkDescriptorType type,
+		VkShaderStageFlags shaderStages,
+		unsigned int count)
 	{
-		for (auto layout: mSetLayouts)
-		{
-			vkDestroyDescriptorSetLayout(*mDevice, layout, nullptr);
-		}
-	}
-
-
-	PipelineLayout::Builder& PipelineLayout::Builder::WithDescriptorSet(const std::vector<VkDescriptorSetLayoutBinding>& bindings)
-	{
-		VkDescriptorSetLayoutCreateInfo createInfo{
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = 0,
-			.bindingCount = static_cast<uint32_t>(bindings.size()),
-			.pBindings = bindings.data()
-		};
-
-		VkDescriptorSetLayout handle = VK_NULL_HANDLE;
-		Core::AssertEQ(
-			vkCreateDescriptorSetLayout(*mDevice, &createInfo, nullptr, &handle),
-			VK_SUCCESS);
-		mSetLayouts.emplace_back(handle);
+		mBindings[set].emplace_back(
+			VkDescriptorSetLayoutBinding{
+			.binding = static_cast<uint32_t>(mBindings[set].size()),
+			.descriptorType = type,
+			.descriptorCount = count,
+			.stageFlags = shaderStages,
+			.pImmutableSamplers = nullptr});
 
 		return *this;
 	}
@@ -129,13 +118,32 @@ namespace Strawberry::Vulkan
 
 	PipelineLayout PipelineLayout::Builder::Build()
 	{
+		std::vector<VkDescriptorSetLayout> layouts;
+
+		for (const auto& [set, bindings] : mBindings)
+		{
+			VkDescriptorSetLayoutCreateInfo createInfo{
+				.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+				.pNext = nullptr,
+				.flags = 0,
+				.bindingCount = static_cast<uint32_t>(bindings.size()),
+				.pBindings = bindings.data()
+			};
+
+			VkDescriptorSetLayout handle = VK_NULL_HANDLE;
+			Core::AssertEQ(
+				vkCreateDescriptorSetLayout(*mDevice, &createInfo, nullptr, &handle),
+				VK_SUCCESS);
+			layouts.emplace_back(handle);
+		}
+
 		VkPipelineLayoutCreateInfo createInfo
 		{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
-			.setLayoutCount = static_cast<uint32_t>(mSetLayouts.size()),
-			.pSetLayouts = mSetLayouts.data(),
+			.setLayoutCount = static_cast<uint32_t>(layouts.size()),
+			.pSetLayouts = layouts.data(),
 			.pushConstantRangeCount = static_cast<uint32_t>(mPushConstantRanges.size()),
 			.pPushConstantRanges = mPushConstantRanges.data()
 		};
@@ -147,6 +155,6 @@ namespace Strawberry::Vulkan
 			VK_SUCCESS);
 
 
-		return PipelineLayout(handle, mDevice, std::move(mSetLayouts));
+		return PipelineLayout(handle, mDevice, std::move(layouts));
 	}
 }

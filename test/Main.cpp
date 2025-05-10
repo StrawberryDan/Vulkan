@@ -67,15 +67,7 @@ void BasicRendering()
 	PipelineLayout layout = PipelineLayout::Builder(device)
 							.WithPushConstantRange(16 * sizeof(float), 0, VK_SHADER_STAGE_VERTEX_BIT)
 							.WithPushConstantRange(3 * sizeof(float), 16 * sizeof(float), VK_SHADER_STAGE_FRAGMENT_BIT)
-							.WithDescriptorSet({
-								VkDescriptorSetLayoutBinding{
-									.binding = 0,
-									.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-									.descriptorCount = 1,
-									.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
-									.pImmutableSamplers = nullptr,
-								}
-							})
+							.WithDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
 							.Build();
 	GraphicsPipeline pipeline = GraphicsPipeline::Builder(layout, renderPass, 0)
 								.WithShaderStage(VK_SHADER_STAGE_VERTEX_BIT, std::move(vertexShader))
