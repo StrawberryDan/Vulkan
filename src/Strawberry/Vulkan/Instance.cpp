@@ -183,9 +183,7 @@ namespace Strawberry::Vulkan
 			.ppEnabledExtensionNames = extensions.data(),
 		};
 
-
-		VkResult result = vkCreateInstance(&createInfo, nullptr, &mInstance);
-		Core::Assert(result == VK_SUCCESS);
+		Core::AssertEQ(vkCreateInstance(&createInfo, nullptr, &mInstance), VK_SUCCESS);
 
 #if STRAWBERRY_DEBUG
 		vkCreateDebugReportCallbackEXT = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(

@@ -116,10 +116,13 @@ namespace Strawberry::Vulkan
 
 			mExtensionProperties.Emplace(extensionPropertyCount);
 			std::vector<VkExtensionProperties> extensionProperties(extensionPropertyCount);
-			vkEnumerateDeviceExtensionProperties(mPhysicalDevice,
-			                                     nullptr,
-			                                     &extensionPropertyCount,
-			                                     mExtensionProperties->data());
+			Core::AssertEQ(
+				vkEnumerateDeviceExtensionProperties(
+					mPhysicalDevice,
+					nullptr,
+					&extensionPropertyCount,
+					mExtensionProperties->data()),
+				VK_SUCCESS);
 		}
 
 		return mExtensionProperties.Value();

@@ -104,7 +104,9 @@ namespace Strawberry::Vulkan
 		};
 
 		VkDescriptorSetLayout handle = VK_NULL_HANDLE;
-		vkCreateDescriptorSetLayout(*mDevice, &createInfo, nullptr, &handle);
+		Core::AssertEQ(
+			vkCreateDescriptorSetLayout(*mDevice, &createInfo, nullptr, &handle),
+			VK_SUCCESS);
 		mSetLayouts.emplace_back(handle);
 
 		return *this;
@@ -140,7 +142,9 @@ namespace Strawberry::Vulkan
 
 
 		VkPipelineLayout handle = VK_NULL_HANDLE;
-		vkCreatePipelineLayout(*mDevice, &createInfo, nullptr, &handle);
+		Core::AssertEQ(
+			vkCreatePipelineLayout(*mDevice, &createInfo, nullptr, &handle),
+			VK_SUCCESS);
 
 
 		return PipelineLayout(handle, mDevice, std::move(mSetLayouts));

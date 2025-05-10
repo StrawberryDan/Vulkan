@@ -77,7 +77,9 @@ namespace Strawberry::Vulkan
 
 	void Queue::WaitUntilIdle() const
 	{
-		vkQueueWaitIdle(mQueue);
+		Core::AssertEQ(
+			vkQueueWaitIdle(mQueue),
+			VK_SUCCESS);
 	}
 
 

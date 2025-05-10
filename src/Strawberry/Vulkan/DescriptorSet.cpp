@@ -55,7 +55,9 @@ namespace Strawberry::Vulkan
 	{
 		if (mDescriptorSet && mDescriptorPool && mDescriptorPool->mFlags & VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT)
 		{
-			vkFreeDescriptorSets(*mDescriptorPool->GetDevice(), mDescriptorPool->mDescriptorPool, 1, &mDescriptorSet);
+			Core::AssertEQ(
+				vkFreeDescriptorSets(*mDescriptorPool->GetDevice(), mDescriptorPool->mDescriptorPool, 1, &mDescriptorSet),
+				VK_SUCCESS);
 		}
 	}
 

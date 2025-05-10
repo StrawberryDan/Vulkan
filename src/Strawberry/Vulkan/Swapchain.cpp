@@ -28,12 +28,17 @@ namespace Strawberry::Vulkan
 
 
 		uint32_t formatCount = 0;
-		vkGetPhysicalDeviceSurfaceFormatsKHR(mQueue->GetDevice()->GetPhysicalDevice().mPhysicalDevice, surface.mSurface, &formatCount, nullptr);
+		Core::AssertEQ(
+			vkGetPhysicalDeviceSurfaceFormatsKHR(mQueue->GetDevice()->GetPhysicalDevice().mPhysicalDevice, surface.mSurface, &formatCount, nullptr),
+			VK_SUCCESS);
 		std::vector<VkSurfaceFormatKHR> deviceFormats(formatCount);;
-		vkGetPhysicalDeviceSurfaceFormatsKHR(mQueue->GetDevice()->GetPhysicalDevice().mPhysicalDevice,
-		                                     surface.mSurface,
-		                                     &formatCount,
-		                                     deviceFormats.data());
+		Core::AssertEQ(
+			vkGetPhysicalDeviceSurfaceFormatsKHR(
+				mQueue->GetDevice()->GetPhysicalDevice().mPhysicalDevice,
+				surface.mSurface,
+				&formatCount,
+				deviceFormats.data()),
+		    VK_SUCCESS);
 
 		std::erase_if(deviceFormats,
 		              [&](const VkSurfaceFormatKHR& x) -> bool

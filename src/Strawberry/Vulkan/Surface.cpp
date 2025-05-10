@@ -48,7 +48,9 @@ namespace Strawberry::Vulkan
 	VkSurfaceCapabilitiesKHR Surface::GetCapabilities() const
 	{
 		VkSurfaceCapabilitiesKHR capabilities;
-		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(mDevice->GetPhysicalDevice().mPhysicalDevice, mSurface, &capabilities);
+		Core::AssertEQ(
+			vkGetPhysicalDeviceSurfaceCapabilitiesKHR(mDevice->GetPhysicalDevice().mPhysicalDevice, mSurface, &capabilities),
+			VK_SUCCESS);
 		return capabilities;
 	}
 }

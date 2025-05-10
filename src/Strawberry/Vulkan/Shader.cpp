@@ -44,6 +44,7 @@ namespace Strawberry::Vulkan
 		}
 		else
 		{
+			Core::Logging::Error("Failed to compile shader!");
 			return Core::NullOpt;
 		}
 	}
