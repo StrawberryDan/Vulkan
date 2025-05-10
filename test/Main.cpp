@@ -60,10 +60,10 @@ void BasicRendering()
 												 VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
 							.WithSubpass(SubpassDescription().WithColorAttachment(0, VK_IMAGE_LAYOUT_GENERAL))
 							.Build();
-	auto vertexShader = Shader::Compile(device, Core::IO::DynamicByteBuffer(meshVertexShader, sizeof(meshVertexShader)))
+	auto vertexShader = Shader::Compile(device, meshVertexShader)
 		.Unwrap();
 	auto fragmentShader = Shader::Compile(
-		device, Core::IO::DynamicByteBuffer(textureFragShader, sizeof(textureFragShader))).Unwrap();
+		device, textureFragShader).Unwrap();
 	PipelineLayout layout = PipelineLayout::Builder(device)
 							.WithPushConstantRange(16 * sizeof(float), 0, VK_SHADER_STAGE_VERTEX_BIT)
 							.WithPushConstantRange(3 * sizeof(float), 16 * sizeof(float), VK_SHADER_STAGE_FRAGMENT_BIT)
@@ -109,10 +109,10 @@ void BasicRendering()
 								.WithMultisample(VK_SAMPLE_COUNT_1_BIT)
 								.Build();
 	auto queue = device.GetQueue(queueFamily, 0).GetReflexivePointer();
-	Vulkan::Swapchain swapchain(*queue, surface, Core::Math::Vec2i(1920, 1080),
+	Swapchain swapchain(*queue, surface, Core::Math::Vec2i(1920, 1080),
 														   VK_PRESENT_MODE_IMMEDIATE_KHR);
-	Vulkan::CommandPool commandPool(*queue, true);
-	Vulkan::CommandBuffer commandBuffer(commandPool);
+	CommandPool commandPool(*queue, true);
+	CommandBuffer commandBuffer(commandPool);
 
 	auto hostVisibleMemoryType = gpu.SearchMemoryTypes(MemoryTypeCriteria::HostVisible())[0].index;
 	auto deviceLocalMemoryType = gpu.SearchMemoryTypes(MemoryTypeCriteria::DeviceLocal())[0].index;
@@ -176,13 +176,14 @@ void BasicRendering()
 
 
 	Core::Clock clock;
-	Vulkan::DescriptorPool descriptorPool(device, 0, 1, {
+	DescriptorPool descriptorPool(device, 0, 1, {
 											  VkDescriptorPoolSize{
 												  .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 												  .descriptorCount = 1
 											  }
 										  });
 	Vulkan::DescriptorSet textureDescriptorSet(descriptorPool, layout.GetSetLayout(0));
+	DescriptorSet textureDescriptorSet(descriptorPool, layout.GetSetLayout(0));
 
 
 	while (!window.CloseRequested())
