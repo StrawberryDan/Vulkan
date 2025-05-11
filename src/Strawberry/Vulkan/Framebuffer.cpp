@@ -47,7 +47,7 @@ namespace Strawberry::Vulkan
 				}
 			}();
 
-			ImageView view = mAttachments.back().Create<ImageView::Builder>(aspectFlags)
+			ImageView view = ImageView::Builder(mAttachments.back(), aspectFlags)
 										 .WithType(VK_IMAGE_VIEW_TYPE_2D)
 										 .WithFormat(renderPass.mAttachmentFormats[i])
 										 .Build();

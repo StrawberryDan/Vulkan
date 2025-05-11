@@ -169,7 +169,7 @@ void BasicRendering()
 	commandBuffer.End();
 	queue->Submit(commandBuffer);
 	queue->WaitUntilIdle();
-	ImageView textureView = texture.Create<ImageView::Builder>(VK_IMAGE_ASPECT_COLOR_BIT)
+	ImageView textureView = ImageView::Builder(texture, VK_IMAGE_ASPECT_COLOR_BIT)
 								   .WithType(VK_IMAGE_VIEW_TYPE_2D)
 								   .WithFormat(VK_FORMAT_R8G8B8A8_SRGB)
 								   .Build();
@@ -205,9 +205,6 @@ void BasicRendering()
 
 	while (!window.CloseRequested())
 	{
-
-
-
 		CommandBuffer computeCommandBuffer(commandPool);
 		computeCommandBuffer.Begin();
 		computeCommandBuffer.BindPipeline(computePipeline);

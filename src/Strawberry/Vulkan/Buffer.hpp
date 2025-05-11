@@ -45,13 +45,6 @@ namespace Strawberry::Vulkan
 		VkDevice GetDevice() const;
 
 
-		template<std::movable T, typename... Args>
-		T Create(const Args&... args) const
-		{
-			return T(*this, std::forward<const Args&>(args)...);
-		}
-
-
 		void SetData(const Core::IO::DynamicByteBuffer& bytes);
 
 		[[nodiscard]]       uint8_t* GetData();

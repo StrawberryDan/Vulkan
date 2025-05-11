@@ -172,13 +172,6 @@ namespace Strawberry::Vulkan
 		~Image();
 
 
-		template<std::movable T, typename... Args>
-		T Create(const Args&... args) const
-		{
-			return T(*this, std::forward<const Args&>(args)...);
-		}
-
-
 		VkImage Release();
 
 
