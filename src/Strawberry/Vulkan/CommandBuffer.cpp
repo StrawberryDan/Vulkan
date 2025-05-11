@@ -6,6 +6,7 @@
 #include "Buffer.hpp"
 #include "Image.hpp"
 #include "GraphicsPipeline.hpp"
+#include "ComputePipeline.hpp"
 #include "Framebuffer.hpp"
 #include "Fence.hpp"
 #include "Device.hpp"
@@ -226,10 +227,40 @@ namespace Strawberry::Vulkan
 
 	void CommandBuffer::BindPipeline(const GraphicsPipeline& pipeline)
 	{
-		Core::Assert(State() == CommandBufferState::Recording);
-		vkCmdBindPipeline(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.mPipeline);
+		Core::AssertEQ(State(),CommandBufferState::Recording);
+		vkCmdBindPipeline(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 	}
 
+	void CommandBuffer::BindPipeline(const ComputePipeline& pipeline)
+	{
+		Core::AssertEQ(State(), CommandBufferState::Recording);
+		vkCmdBindPipeline(mCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
+	}
+
+	void CommandBuffer::Dispatch(size_t x)
+	{
+		vkCmdDispatch(mCommandBuffer, x, 1, 1);
+	}
+
+	void CommandBuffer::Dispatch(size_t x, size_t y)
+	{
+		vkCmdDispatch(mCommandBuffer, x, y, 1);
+	}
+
+	void CommandBuffer::Dispatch(size_t x, size_t y, size_t z)
+	{
+		vkCmdDispatch(mCommandBuffer, x, y, z);
+	}
+
+	void CommandBuffer::Dispatch(Core::Math::Vec2u xy)
+	{
+		vkCmdDispatch(mCommandBuffer, xy[0], xy[1], 1);
+	}
+
+	void CommandBuffer::Dispatch(Core::Math::Vec3u xyz)
+	{
+		vkCmdDispatch(mCommandBuffer, xyz[0], xyz[1], xyz[2]);
+	}
 
 	void CommandBuffer::BindVertexBuffer(uint32_t binding, Buffer& buffer, VkDeviceSize offset)
 	{
@@ -422,6 +453,38 @@ namespace Strawberry::Vulkan
 		                        nullptr);
 	}
 
+	void CommandBuffer::BindDescriptorSet(
+		const ComputePipeline& pipeline,
+		uint32_t set,
+		const DescriptorSet& descriptorSet)
+	{
+		Core::Assert(State() == CommandBufferState::Recording);
+		vkCmdBindDescriptorSets(mCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline.GetLayout(), set, 1, &descriptorSet.mDescriptorSet, 0, nullptr);
+	}
+
+	void CommandBuffer::BindDescriptorSets(const ComputePipeline& pipeline, uint32_t firstSet,
+		std::vector<DescriptorSet*> sets)
+	{
+		Core::Assert(State() == CommandBufferState::Recording);
+
+		std::vector<VkDescriptorSet> setHandles;
+		sets.reserve(sets.size());
+		std::transform(sets.begin(),
+					   sets.end(),
+					   std::back_inserter(setHandles),
+					   [](DescriptorSet* set)
+					   {
+						   return set->mDescriptorSet;
+					   });
+		vkCmdBindDescriptorSets(mCommandBuffer,
+								VK_PIPELINE_BIND_POINT_COMPUTE,
+								pipeline.GetLayout(),
+								firstSet,
+								setHandles.size(),
+								setHandles.data(),
+								0,
+								nullptr);
+	}
 
 	void CommandBuffer::BeginRenderPass(const RenderPass& renderPass, Framebuffer& framebuffer, VkSubpassContents contents)
 	{

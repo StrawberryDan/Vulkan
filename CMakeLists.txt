@@ -31,6 +31,8 @@ if (NOT TARGET StrawberryVulkan)
 		src/Strawberry/Vulkan/CommandBuffer.hpp
 		src/Strawberry/Vulkan/CommandPool.cpp
 		src/Strawberry/Vulkan/CommandPool.hpp
+		src/Strawberry/Vulkan/ComputePipeline.cpp
+		src/Strawberry/Vulkan/ComputePipeline.hpp
 		src/Strawberry/Vulkan/DescriptorPool.cpp
 		src/Strawberry/Vulkan/DescriptorPool.hpp
 		src/Strawberry/Vulkan/DescriptorSet.cpp
@@ -96,5 +98,6 @@ if (NOT TARGET StrawberryVulkan)
 	add_target_shaders(TARGET StrawberryVulkanTest SHADERS
 		${CMAKE_CURRENT_SOURCE_DIR}/test/Mesh.vert
 		${CMAKE_CURRENT_SOURCE_DIR}/test/SolidColor.frag
+		${CMAKE_CURRENT_SOURCE_DIR}/test/Pattern.comp
 		${CMAKE_CURRENT_SOURCE_DIR}/test/Texture.frag)
 endif()

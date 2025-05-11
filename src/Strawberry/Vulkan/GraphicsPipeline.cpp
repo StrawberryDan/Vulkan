@@ -51,6 +51,11 @@ namespace Strawberry::Vulkan
 		}
 	}
 
+	GraphicsPipeline::operator struct VkPipeline_T*() const
+	{
+		return mPipeline;
+	}
+
 
 	GraphicsPipeline::Builder::Builder(PipelineLayout& layout, RenderPass& renderPass, uint32_t subpass)
 		: mRenderPass(renderPass)

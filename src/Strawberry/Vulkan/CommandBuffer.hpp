@@ -25,6 +25,7 @@ namespace Strawberry::Vulkan
 {
 	class CommandPool;
 	class Buffer;
+	class ComputePipeline;
 	class GraphicsPipeline;
 	class Framebuffer;
 	class RenderPass;
@@ -73,7 +74,7 @@ namespace Strawberry::Vulkan
 		VkCommandBufferLevel Level() const noexcept;
 
 
-		void Begin(bool oneTimeSubmit);
+		void Begin(bool oneTimeSubmit = false);
 		void Begin(bool oneTimeSubmit, const RenderPass& renderPass, uint32_t subpass);
 		void Begin(bool oneTimeSubmit, const RenderPass& renderPass, uint32_t subpass, const Framebuffer& framebuffer);
 		void End();
@@ -81,6 +82,15 @@ namespace Strawberry::Vulkan
 
 
 		void BindPipeline(const GraphicsPipeline& pipeline);
+		void BindPipeline(const ComputePipeline& pipeline);
+
+
+		void Dispatch(size_t x);
+		void Dispatch(size_t x, size_t y);
+		void Dispatch(size_t x, size_t y, size_t z);
+
+		void Dispatch(Core::Math::Vec2u xy);
+		void Dispatch(Core::Math::Vec3u xyz);
 
 
 		void BeginRenderPass(const RenderPass& renderPass, Framebuffer& framebuffer, VkSubpassContents contents = VK_SUBPASS_CONTENTS_INLINE);
@@ -118,6 +128,10 @@ namespace Strawberry::Vulkan
 
 		void BindDescriptorSet(const GraphicsPipeline& pipeline, uint32_t set, const DescriptorSet& descriptorSet);
 		void BindDescriptorSets(const GraphicsPipeline& pipeline, uint32_t firstSet, std::vector<DescriptorSet*> sets);
+
+		void BindDescriptorSet(const ComputePipeline& pipeline, uint32_t set, const DescriptorSet& descriptorSet);
+		void BindDescriptorSets(const ComputePipeline& pipeline, uint32_t firstSet, std::vector<DescriptorSet*> sets);
+
 
 	private:
 		static Core::Variant<Fence, Core::ReflexivePointer<CommandBuffer>> ConstructExecutionFence(const Device& device, VkCommandBufferLevel level);

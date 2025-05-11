@@ -5,7 +5,8 @@
 #include "Device.hpp"
 // Vulkan
 #include <vulkan/vulkan.h>
-
+// Standard Library
+#include <map>
 
 //======================================================================================================================
 //  Class Declaration

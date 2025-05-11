@@ -48,14 +48,10 @@ namespace Strawberry::Vulkan
 		~GraphicsPipeline();
 
 
+		operator VkPipeline() const;
+
+
 		Core::ReflexivePointer<PipelineLayout> GetLayout() const noexcept { return mPipelineLayout; }
-
-
-		template<std::movable T, typename... Args>
-		T Create(const Args&... args) const
-		{
-			return T(*this, std::forward<const Args&>(args)...);
-		}
 
 
 	private:
