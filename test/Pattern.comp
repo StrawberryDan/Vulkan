@@ -1,0 +1,24 @@
+#version 460
+
+
+layout(set = 0, binding = 0) buffer _Output
+{
+    uint pixels[];
+};
+
+
+void main()
+{
+    uint pixelIndex = gl_GlobalInvocationID.x;
+
+    bool off = pixelIndex % 2 == 0;
+
+    if (off)
+    {
+        pixels[pixelIndex] = 255;
+    }
+    else
+    {
+        pixels[pixelIndex] = 0;
+    }
+}

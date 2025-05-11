@@ -6,6 +6,7 @@
 #include "Strawberry/Vulkan/Buffer.hpp"
 #include "Strawberry/Vulkan/CommandBuffer.hpp"
 #include "Strawberry/Vulkan/CommandPool.hpp"
+#include "Strawberry/Vulkan/ComputePipeline.hpp"
 #include "Strawberry/Vulkan/Device.hpp"
 #include "Strawberry/Vulkan/Framebuffer.hpp"
 #include "Strawberry/Vulkan/GraphicsPipeline.hpp"
@@ -43,10 +44,17 @@ void BasicRendering()
 	};
 
 
+	uint8_t computeShaderCode[] =
+{
+#include "Pattern.comp.bin"
+};
+
+
 	Window::Window window("StrawberryGraphics Test", Core::Math::Vec2i(1920, 1080));
 	Instance instance;
 	const PhysicalDevice& gpu = instance.GetPhysicalDevices()[0];
 	uint32_t queueFamily = gpu.SearchQueueFamilies(VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT)[0];
+	uint32_t computeQueueFamily = gpu.SearchQueueFamilies(VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT)[0];
 
 
 	Device device(gpu, {}, {QueueCreateInfo{queueFamily, 1}});
@@ -101,6 +109,7 @@ void BasicRendering()
 								.WithMultisample(VK_SAMPLE_COUNT_1_BIT)
 								.Build();
 	auto queue = device.GetQueue(queueFamily, 0).GetReflexivePointer();
+	auto computeQueue = device.GetQueue(computeQueueFamily, 0).GetReflexivePointer();
 	Swapchain swapchain(*queue, surface, Core::Math::Vec2i(1920, 1080),
 														   VK_PRESENT_MODE_IMMEDIATE_KHR);
 	CommandPool commandPool(*queue, true);
@@ -174,12 +183,49 @@ void BasicRendering()
 												  .descriptorCount = 1
 											  }
 										  });
-	Vulkan::DescriptorSet textureDescriptorSet(descriptorPool, layout.GetSetLayout(0));
 	DescriptorSet textureDescriptorSet(descriptorPool, layout.GetSetLayout(0));
+
+
+	Shader computeShader = Shader::Compile(device, computeShaderCode).Unwrap();
+
+
+	PipelineLayout computePipelineLayout = PipelineLayout::Builder(device)
+		.WithDescriptor(0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT)
+		.Build();
+
+	ComputePipeline computePipeline = ComputePipeline::Builder(device, computePipelineLayout, std::move(computeShader))
+		.Build();
+
+
+	DescriptorPool computeDescriptorPool(device, 0, 1, { VkDescriptorPoolSize { .type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, .descriptorCount = 1}});
+	DescriptorSet computeDescriptorSet(computeDescriptorPool, computePipelineLayout.GetSetLayout(0));
+	Buffer computeBuffer(hostVisibleAllocator, sizeof(uint32_t) * 256 * 256, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
+	computeDescriptorSet.SetStorageBuffer(0, 0, computeBuffer);
 
 
 	while (!window.CloseRequested())
 	{
+
+
+
+		CommandBuffer computeCommandBuffer(commandPool);
+		computeCommandBuffer.Begin();
+		computeCommandBuffer.BindPipeline(computePipeline);
+		computeCommandBuffer.BindDescriptorSet(computePipeline, 0, computeDescriptorSet);
+		computeCommandBuffer.Dispatch(256 * 256);
+		computeCommandBuffer.End();
+		computeQueue->Submit(std::move(computeCommandBuffer));
+		computeQueue->WaitUntilIdle();
+
+		auto computeData = computeBuffer.GetData();
+		uint32_t* computeDataAsInts = reinterpret_cast<::uint32_t*>(computeData);
+		for (int i = 0; i < 256 * 256; i++)
+		{
+			bool off = i % 2 == 0;
+			Core::AssertEQ(computeDataAsInts[i], off ? 255 : 0);
+		}
+
+
 		Image& renderTarget = *swapchain.WaitForNextImage().Unwrap();
 		Window::PollInput();
 
