@@ -101,6 +101,15 @@ namespace Strawberry::Vulkan
 		mMemory.Overwrite(bytes);
 	}
 
+	uint8_t* Buffer::GetData()
+	{
+		return mMemory.GetMappedAddress();
+	}
+
+	const uint8_t* Buffer::GetData() const
+	{
+		return mMemory.GetMappedAddress();
+	}
 
 	uint64_t Buffer::GetSize() const
 	{

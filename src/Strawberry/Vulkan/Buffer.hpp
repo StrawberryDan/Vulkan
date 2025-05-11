@@ -54,7 +54,8 @@ namespace Strawberry::Vulkan
 
 		void SetData(const Core::IO::DynamicByteBuffer& bytes);
 
-
+		[[nodiscard]]       uint8_t* GetData();
+		[[nodiscard]] const uint8_t* GetData() const;
 		[[nodiscard]] uint64_t GetSize() const;
 
 	private:
