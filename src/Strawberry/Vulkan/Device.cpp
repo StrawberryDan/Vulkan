@@ -25,6 +25,8 @@ namespace Strawberry::Vulkan
 		: mDevice{}
 		, mPhysicalDevice(physicalDevice)
 	{
+		ZoneScoped;
+
 		// Describes Queues
 		std::vector<VkDeviceQueueCreateInfo> queues;
 		std::vector<std::vector<float>>      queuePriorities;
@@ -117,6 +119,9 @@ namespace Strawberry::Vulkan
 
 	Device::~Device()
 	{
+		ZoneScoped;
+
+		WaitUntilIdle();
 		mQueues.clear();
 		if (mDevice)
 		{
@@ -129,6 +134,14 @@ namespace Strawberry::Vulkan
 	Device::operator VkDevice() const
 	{
 		return mDevice;
+	}
+
+
+	void Device::WaitUntilIdle() const
+	{
+		ZoneScoped;
+
+		Core::AssertEQ(vkDeviceWaitIdle(mDevice), VK_SUCCESS);
 	}
 
 

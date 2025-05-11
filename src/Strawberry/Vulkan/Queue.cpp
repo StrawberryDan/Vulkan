@@ -43,6 +43,8 @@ namespace Strawberry::Vulkan
 
 	Queue::~Queue()
 	{
+		ZoneScoped;
+
 		if (mQueue)
 		{
 			WaitUntilIdle();
@@ -52,6 +54,8 @@ namespace Strawberry::Vulkan
 
 	void Queue::Submit(const CommandBuffer& commandBuffer)
 	{
+		ZoneScoped;
+
 		Core::AssertEQ(commandBuffer.Level(), VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
 		WaitUntilIdle();
@@ -77,6 +81,8 @@ namespace Strawberry::Vulkan
 
 	void Queue::WaitUntilIdle() const
 	{
+		ZoneScoped;
+
 		Core::AssertEQ(
 			vkQueueWaitIdle(mQueue),
 			VK_SUCCESS);
