@@ -82,6 +82,26 @@ namespace Strawberry::Vulkan
 		return {*mDevice, allocator, *this, offset, size};
 	}
 
+	Core::ReflexivePointer<Device> MemoryPool::GetDevice() const noexcept
+	{
+		return mDevice;
+	}
+
+	VkDeviceMemory MemoryPool::Memory() const noexcept
+	{
+		return mMemory;
+	}
+
+	MemoryTypeIndex MemoryPool::GetMemoryTypeIndex() const noexcept
+	{
+		return mMemoryTypeIndex;
+	}
+
+	size_t MemoryPool::Size() const noexcept
+	{
+		return mSize;
+	}
+
 
 	VkMemoryPropertyFlags MemoryPool::Properties() const
 	{
@@ -138,7 +158,7 @@ namespace Strawberry::Vulkan
 						   size_t size)
 		: mDevice(device)
 		  , mAllocator(allocator)
-		  , mRawAllocation(allocation)
+		  , mMemoryPool(allocation)
 		  , mOffset(offset)
 		  , mSize(size)
 	{
@@ -148,7 +168,7 @@ namespace Strawberry::Vulkan
 	Allocation::Allocation(Allocation&& other) noexcept
 		: mDevice(std::exchange(other.mDevice, VK_NULL_HANDLE))
 		  , mAllocator(std::move(other.mAllocator))
-		  , mRawAllocation(std::move(other.mRawAllocation))
+		  , mMemoryPool(std::move(other.mMemoryPool))
 		  , mOffset(other.mOffset)
 		  , mSize(other.mSize)
 	{
@@ -169,13 +189,24 @@ namespace Strawberry::Vulkan
 
 	Allocation::~Allocation()
 	{
-		Core::AssertImplication(!mAllocator, !mRawAllocation);
+		Core::AssertImplication(!mAllocator, !mMemoryPool);
 		if (mAllocator)
 		{
 			mAllocator->Free(std::move(*this));
 		}
 	}
 
+	Allocation::operator bool() const noexcept
+	{
+		Core::AssertImplication(!mAllocator, mMemoryPool);
+		return mAllocator;
+	}
+
+
+	VkDevice Allocation::GetDevice() const noexcept
+	{
+		return mDevice;
+	}
 
 	Core::ReflexivePointer<Allocator> Allocation::GetAllocator() const noexcept
 	{
@@ -186,7 +217,7 @@ namespace Strawberry::Vulkan
 	Address Allocation::Address() const noexcept
 	{
 		return {
-			.deviceMemory = mRawAllocation->Memory(),
+			.deviceMemory = mMemoryPool->Memory(),
 			.offset = Offset()
 		};
 	}
@@ -194,7 +225,7 @@ namespace Strawberry::Vulkan
 
 	VkDeviceMemory Allocation::Memory() const noexcept
 	{
-		return mRawAllocation->Memory();
+		return mMemoryPool->Memory();
 	}
 
 
@@ -212,13 +243,13 @@ namespace Strawberry::Vulkan
 
 	VkMemoryPropertyFlags Allocation::Properties() const
 	{
-		return mRawAllocation->Properties();
+		return mMemoryPool->Properties();
 	}
 
 
 	uint8_t* Allocation::GetMappedAddress() const noexcept
 	{
-		return mRawAllocation->GetMappedAddress() + mOffset;
+		return mMemoryPool->GetMappedAddress() + mOffset;
 	}
 
 

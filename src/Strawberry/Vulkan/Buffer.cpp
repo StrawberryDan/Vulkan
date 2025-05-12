@@ -18,7 +18,6 @@ namespace Strawberry::Vulkan
 	Buffer::Buffer(Allocator& allocator, size_t size, VkBufferUsageFlags usage)
 		: mAllocator(allocator)
 		  , mSize(size)
-		  , mDevice(*allocator.GetDevice())
 	{
 		VkBufferCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
@@ -31,14 +30,14 @@ namespace Strawberry::Vulkan
 			.pQueueFamilyIndices = nullptr,
 		};
 
-		Core::AssertEQ(vkCreateBuffer(mDevice, &createInfo, nullptr, &mBuffer), VK_SUCCESS);
+		Core::AssertEQ(vkCreateBuffer(*mAllocator->GetDevice(), &createInfo, nullptr, &mBuffer), VK_SUCCESS);
 
 		VkMemoryRequirements memoryRequirements;
-		vkGetBufferMemoryRequirements(mDevice, mBuffer, &memoryRequirements);
+		vkGetBufferMemoryRequirements(*mAllocator->GetDevice(), mBuffer, &memoryRequirements);
 
 
 		mMemory = allocator.Allocate(AllocationRequest(memoryRequirements)).Unwrap();
-		Core::AssertEQ(vkBindBufferMemory(mDevice, mBuffer, mMemory.Memory(), mMemory.Offset()), VK_SUCCESS);
+		Core::AssertEQ(vkBindBufferMemory(GetDevice(), mBuffer, mMemory.Memory(), mMemory.Offset()), VK_SUCCESS);
 	}
 
 
@@ -57,7 +56,6 @@ namespace Strawberry::Vulkan
 		  , mSize(std::exchange(rhs.mSize, 0))
 		  , mBuffer(std::exchange(rhs.mBuffer, nullptr))
 		  , mMemory(std::move(rhs.mMemory))
-		  , mDevice(std::exchange(rhs.mDevice, nullptr))
 	{
 	}
 
@@ -78,7 +76,7 @@ namespace Strawberry::Vulkan
 	{
 		if (mBuffer)
 		{
-			vkDestroyBuffer(mDevice, mBuffer, nullptr);
+			vkDestroyBuffer(GetDevice(), mBuffer, nullptr);
 		}
 	}
 
@@ -91,7 +89,7 @@ namespace Strawberry::Vulkan
 
 	VkDevice Buffer::GetDevice() const
 	{
-		return *mAllocator->GetDevice();
+		return mMemory.GetDevice();
 	}
 
 

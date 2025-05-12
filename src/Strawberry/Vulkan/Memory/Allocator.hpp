@@ -25,19 +25,17 @@ namespace Strawberry::Vulkan
 	class Allocation;
 
 
+	// Variant class representation an allocation error.
 	class AllocationError
 	{
 	public:
+		// Error for when the device could not find any memory to allocate.
 		struct OutOfMemory {};
-
-		struct MemoryTypeUnavailable {};
-
-		struct RequestTooLarge {};
 
 
 		template<typename T>
-		AllocationError(T info)
-			: mInfo(info) {}
+		AllocationError(T&& info)
+			: mInfo(std::forward<T>(info)) {}
 
 
 		template<typename T>
@@ -54,8 +52,9 @@ namespace Strawberry::Vulkan
 			return mInfo.Ref<T>();
 		}
 
+
 	private:
-		using Info = Core::Variant<OutOfMemory, MemoryTypeUnavailable>;
+		using Info = Core::Variant<OutOfMemory>;
 		Info mInfo;
 	};
 
@@ -80,28 +79,10 @@ namespace Strawberry::Vulkan
 		Allocation AllocateView(Allocator& allocator, size_t offset, size_t size);
 
 
-		Core::ReflexivePointer<Device> GetDevice() const noexcept
-		{
-			return mDevice;
-		}
-
-
-		VkDeviceMemory Memory() const noexcept
-		{
-			return mMemory;
-		}
-
-
-		MemoryTypeIndex GetMemoryTypeIndex() const noexcept
-		{
-			return mMemoryTypeIndex;
-		}
-
-
-		size_t Size() const noexcept
-		{
-			return mSize;
-		}
+		Core::ReflexivePointer<Device> GetDevice() const noexcept;
+		VkDeviceMemory Memory() const noexcept;
+		MemoryTypeIndex GetMemoryTypeIndex() const noexcept;
+		size_t Size() const noexcept;
 
 
 		VkMemoryPropertyFlags Properties() const;
@@ -156,13 +137,10 @@ namespace Strawberry::Vulkan
 		~Allocation();
 
 
-		explicit operator bool() const noexcept
-		{
-			Core::AssertImplication(!mAllocator, mRawAllocation);
-			return mAllocator;
-		}
+		explicit operator bool() const noexcept;
 
 
+		[[nodiscard]] VkDevice                          GetDevice() const noexcept;
 		[[nodiscard]] Core::ReflexivePointer<Allocator> GetAllocator() const noexcept;
 		[[nodiscard]] Address                           Address() const noexcept;
 		[[nodiscard]] VkDeviceMemory                    Memory() const noexcept;
@@ -175,11 +153,12 @@ namespace Strawberry::Vulkan
 		void Flush() const noexcept;
 		void Overwrite(const Core::IO::DynamicByteBuffer& bytes) const noexcept;
 
+
 	private:
-		VkDevice                           mDevice        = VK_NULL_HANDLE;
-		Core::ReflexivePointer<Allocator>  mAllocator     = nullptr;
-		Core::ReflexivePointer<MemoryPool> mRawAllocation = nullptr;
-		size_t                             mOffset        = 0;
-		size_t                             mSize          = 0;
+		VkDevice                           mDevice     = VK_NULL_HANDLE;
+		Core::ReflexivePointer<Allocator>  mAllocator  = nullptr;
+		Core::ReflexivePointer<MemoryPool> mMemoryPool = nullptr;
+		size_t                             mOffset     = 0;
+		size_t                             mSize       = 0;
 	};
 }
