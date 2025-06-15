@@ -126,6 +126,9 @@ namespace Strawberry::Vulkan
 		void ClearColorImage(Image& image, VkImageLayout layout, Core::Math::Vec4f clearColor = {0.0f, 0.0f, 0.0f, 1.0f});
 
 
+		void BlitToSwapchain(Swapchain& swapchain, Framebuffer& framebuffer);
+
+
 		void BindDescriptorSet(const GraphicsPipeline& pipeline, uint32_t set, const DescriptorSet& descriptorSet);
 		void BindDescriptorSets(const GraphicsPipeline& pipeline, uint32_t firstSet, std::vector<DescriptorSet*> sets);
 

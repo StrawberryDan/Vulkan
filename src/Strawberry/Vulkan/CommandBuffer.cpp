@@ -1,18 +1,19 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
+#include "Buffer.hpp"
 #include "CommandBuffer.hpp"
 #include "CommandPool.hpp"
-#include "Buffer.hpp"
-#include "Image.hpp"
-#include "GraphicsPipeline.hpp"
 #include "ComputePipeline.hpp"
-#include "Framebuffer.hpp"
-#include "Fence.hpp"
-#include "Device.hpp"
-#include "RenderPass.hpp"
-#include "Queue.hpp"
 #include "DescriptorSet.hpp"
+#include "Device.hpp"
+#include "Fence.hpp"
+#include "Framebuffer.hpp"
+#include "GraphicsPipeline.hpp"
+#include "Image.hpp"
+#include "Queue.hpp"
+#include "RenderPass.hpp"
+#include "Swapchain.hpp"
 // GLFW3
 #include "GLFW/glfw3.h"
 // Strawberry Core
@@ -22,6 +23,7 @@
 #include <algorithm>
 #include <memory>
 #include <vector>
+
 
 
 //======================================================================================================================
@@ -420,6 +422,39 @@ namespace Strawberry::Vulkan
 		};
 
 		vkCmdClearColorImage(mCommandBuffer, image.mImage, layout, &vulkanClearColor, 1, &range);
+	}
+
+	void CommandBuffer::BlitToSwapchain(Swapchain& swapchain, Framebuffer& framebuffer)
+	{
+		// Get next presentation image
+		Image* nextSwapchainImage = swapchain.GetNextImage().Unwrap();
+		// Prepare framebuffer for copy
+		PipelineBarrier(
+			VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+			VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+			0,
+			{Vulkan::ImageMemoryBarrier(*nextSwapchainImage, VK_IMAGE_ASPECT_COLOR_BIT)
+				.FromLayout(VK_IMAGE_LAYOUT_UNDEFINED).ToLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)});
+		// Blit other buffers here
+		// ...
+		// ...
+		BlitImage(
+			framebuffer.GetAttachment(0),
+			VK_IMAGE_LAYOUT_GENERAL,
+			*nextSwapchainImage,
+			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+			VK_IMAGE_ASPECT_COLOR_BIT,
+			VK_FILTER_NEAREST);
+		// Prepare for presentation
+		PipelineBarrier(
+			VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+			VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+			0,
+			{
+				Vulkan::ImageMemoryBarrier(*nextSwapchainImage, VK_IMAGE_ASPECT_COLOR_BIT).
+				FromLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL).ToLayout(
+				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR)
+			});
 	}
 
 
