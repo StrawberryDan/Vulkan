@@ -94,6 +94,7 @@ namespace Strawberry::Vulkan
 
 
 		void BeginRenderPass(const RenderPass& renderPass, Framebuffer& framebuffer, VkSubpassContents contents = VK_SUBPASS_CONTENTS_INLINE);
+		void NextSubpass(VkSubpassContents contents);
 		void EndRenderPass();
 
 

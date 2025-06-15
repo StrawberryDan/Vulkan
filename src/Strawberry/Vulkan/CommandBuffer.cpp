@@ -543,6 +543,11 @@ namespace Strawberry::Vulkan
 		vkCmdBeginRenderPass(mCommandBuffer, &beginInfo, contents);
 	}
 
+	void CommandBuffer::NextSubpass(VkSubpassContents contents)
+	{
+		vkCmdNextSubpass(mCommandBuffer, contents);
+	}
+
 
 	void CommandBuffer::EndRenderPass()
 	{
