@@ -116,7 +116,7 @@ namespace Strawberry::Vulkan
 		                     const std::vector<Barrier>& barriers);
 
 
-		void CopyBufferToImage(const Buffer& buffer, Image& image);
+		void CopyBufferToImage(const Buffer& buffer, Image& image, uint32_t arrayLayer = 0);
 		void CopyImageToImage(const Image& source, VkImageLayout srcLayout, const Image& dest, VkImageLayout destLayout, VkImageAspectFlags aspect);
 		void BlitImage(const Image&       source,
 		               VkImageLayout      srcLayout,

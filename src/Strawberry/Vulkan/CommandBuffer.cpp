@@ -325,15 +325,16 @@ namespace Strawberry::Vulkan
 	}
 
 
-	void CommandBuffer::CopyBufferToImage(const Buffer& buffer, Image& image)
+	void CommandBuffer::CopyBufferToImage(const Buffer& buffer, Image& image, uint32_t arrayLayer)
 	{
 		Core::Assert(State() == CommandBufferState::Recording);
 
 		// Setup copy
-		VkImageSubresourceLayers subresource{
+		VkImageSubresourceLayers subresource
+		{
 			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
 			.mipLevel = 0,
-			.baseArrayLayer = 0,
+			.baseArrayLayer = arrayLayer,
 			.layerCount = 1,
 		};
 		VkBufferImageCopy region{
