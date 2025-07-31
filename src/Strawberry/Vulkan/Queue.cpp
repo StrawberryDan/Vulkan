@@ -58,8 +58,6 @@ namespace Strawberry::Vulkan
 
 		Core::AssertEQ(commandBuffer.Level(), VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
-		WaitUntilIdle();
-
 		VkCommandBuffer handle = commandBuffer;
 		VkSubmitInfo    submitInfo{
 			.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
@@ -76,6 +74,7 @@ namespace Strawberry::Vulkan
 		commandBuffer.mExecutionFenceOrParentBuffer.Ptr<Fence>()->Reset();
 		commandBuffer.MoveIntoPendingState();
 		Core::AssertEQ(vkQueueSubmit(mQueue, 1, &submitInfo, commandBuffer.mExecutionFenceOrParentBuffer.Ptr<Fence>()->mFence), VK_SUCCESS);
+		commandBuffer.mExecutionFenceOrParentBuffer.Ptr<Fence>()->Wait();
 	}
 
 
