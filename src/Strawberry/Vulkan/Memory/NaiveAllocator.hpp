@@ -7,7 +7,7 @@
 namespace Strawberry::Vulkan
 {
 	class NaiveAllocator
-		: public Allocator
+		: public SingleAllocator
 	{
 	public:
 		NaiveAllocator(Device& device, MemoryTypeIndex memoryType);
@@ -16,7 +16,6 @@ namespace Strawberry::Vulkan
 		void             Free(Allocation&& address) noexcept override;
 
 	private:
-		MemoryTypeIndex mMemoryTypeIndex;
 		std::unordered_map<Address, MemoryPool> mMemoryPools;
 	};
 }

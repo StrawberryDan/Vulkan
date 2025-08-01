@@ -26,11 +26,11 @@ namespace Strawberry::Vulkan
 	{
 	public:
 		// Allocate a buffer with the given size and usage from the given allocator.
-		Buffer(Allocator& allocator,
+		Buffer(SingleAllocator& allocator,
 			size_t size,
 			VkBufferUsageFlags usage);
 		// Allocate a buffer from the given allocator, and copy the data given, with the set usage flags.
-		Buffer(Allocator& allocator,
+		Buffer(SingleAllocator& allocator,
 		       const Core::IO::DynamicByteBuffer& bytes,
 		       VkBufferUsageFlags                 usage);
 
@@ -61,8 +61,6 @@ namespace Strawberry::Vulkan
 		[[nodiscard]] uint64_t GetSize() const;
 
 	private:
-		// Pointer to the allocator that allocated us.
-		Core::ReflexivePointer<Allocator> mAllocator;
 		// The amount of space allocated to this buffer.
 		uint64_t                          mSize;
 		// The handle for this buffer.

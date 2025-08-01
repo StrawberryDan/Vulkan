@@ -17,7 +17,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Framebuffer::Framebuffer(RenderPass& renderPass, Allocator& allocator, Core::Math::Vec2u size)
+	Framebuffer::Framebuffer(RenderPass& renderPass, SingleAllocator& allocator, Core::Math::Vec2u size)
 		: mRenderPass(renderPass)
 		, mSize(size)
 	{

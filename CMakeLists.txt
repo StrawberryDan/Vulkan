@@ -56,12 +56,15 @@ if (NOT TARGET StrawberryVulkan)
 		src/Strawberry/Vulkan/Memory/AllocationRequest.hpp
 		src/Strawberry/Vulkan/Memory/Allocator.cpp
 		src/Strawberry/Vulkan/Memory/Allocator.hpp
+		src/Strawberry/Vulkan/Memory/ChainAllocator.hpp
+		src/Strawberry/Vulkan/Memory/FallbackAllocator.hpp
 		src/Strawberry/Vulkan/Memory/FreelistAllocator.cpp
 		src/Strawberry/Vulkan/Memory/FreelistAllocator.hpp
 		src/Strawberry/Vulkan/Memory/Memory.cpp
 		src/Strawberry/Vulkan/Memory/Memory.hpp
 		src/Strawberry/Vulkan/Memory/MemoryTypeCriteria.cpp
 		src/Strawberry/Vulkan/Memory/MemoryTypeCriteria.hpp
+		src/Strawberry/Vulkan/Memory/MotherAllocator.hpp
 		src/Strawberry/Vulkan/Memory/NaiveAllocator.cpp
 		src/Strawberry/Vulkan/Memory/NaiveAllocator.hpp
 		src/Strawberry/Vulkan/PhysicalDevice.cpp

@@ -17,7 +17,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Image::Image(Allocator&                allocator,
+	Image::Image(SingleAllocator&                allocator,
 	             uint32_t                  extent,
 	             VkFormat                  format,
 	             VkImageUsageFlags         usage,
@@ -58,7 +58,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Image::Image(Allocator&                allocator,
+	Image::Image(SingleAllocator&                allocator,
 	             Core::Math::Vec2u         extent,
 	             VkFormat                  format,
 	             VkImageUsageFlags         usage,
@@ -99,7 +99,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Image::Image(Allocator&            allocator,
+	Image::Image(SingleAllocator&            allocator,
 	             Core::Math::Vec3u     extent,
 	             VkFormat              format,
 	             VkImageUsageFlags     usage,

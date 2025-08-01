@@ -35,7 +35,7 @@ namespace Strawberry::Vulkan
 		class Builder
 		{
 		public:
-			Builder(Allocator& allocator)
+			Builder(SingleAllocator& allocator)
 				: allocator(allocator)
 			{}
 
@@ -122,7 +122,7 @@ namespace Strawberry::Vulkan
 			}
 
 		private:
-			Core::ReflexivePointer<Allocator>                                             allocator;
+			Core::ReflexivePointer<SingleAllocator>                                             allocator;
 			Core::Optional<Core::Variant<unsigned, Core::Math::Vec2u, Core::Math::Vec3u>> extent;
 			Core::Optional<VkFormat>                                                      format;
 			Core::Optional<VkImageUsageFlags>                                             usage;
@@ -133,7 +133,7 @@ namespace Strawberry::Vulkan
 		};
 
 
-		Image(Allocator&        allocator,
+		Image(SingleAllocator&        allocator,
 		      uint32_t          extent,
 		      VkFormat          format,
 		      VkImageUsageFlags usage,
@@ -142,7 +142,7 @@ namespace Strawberry::Vulkan
 		      VkImageTiling     tiling        = VK_IMAGE_TILING_OPTIMAL,
 		      VkImageLayout     initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
 
-		Image(Allocator&        allocator,
+		Image(SingleAllocator&        allocator,
 		      Core::Math::Vec2u extent,
 		      VkFormat          format,
 		      VkImageUsageFlags usage,
@@ -151,7 +151,7 @@ namespace Strawberry::Vulkan
 		      VkImageTiling     tiling        = VK_IMAGE_TILING_OPTIMAL,
 		      VkImageLayout     initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
 
-		Image(Allocator&        allocator,
+		Image(SingleAllocator&        allocator,
 		      Core::Math::Vec3u extent,
 		      VkFormat          format,
 		      VkImageUsageFlags usage,

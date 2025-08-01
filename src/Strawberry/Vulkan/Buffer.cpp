@@ -15,9 +15,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Buffer::Buffer(Allocator& allocator, size_t size, VkBufferUsageFlags usage)
-		: mAllocator(allocator)
-		  , mSize(size)
+	Buffer::Buffer(SingleAllocator& allocator, size_t size, VkBufferUsageFlags usage)
+		: mSize(size)
 	{
 		VkBufferCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
@@ -30,10 +29,10 @@ namespace Strawberry::Vulkan
 			.pQueueFamilyIndices = nullptr,
 		};
 
-		Core::AssertEQ(vkCreateBuffer(*mAllocator->GetDevice(), &createInfo, nullptr, &mBuffer), VK_SUCCESS);
+		Core::AssertEQ(vkCreateBuffer(*allocator.GetDevice(), &createInfo, nullptr, &mBuffer), VK_SUCCESS);
 
 		VkMemoryRequirements memoryRequirements;
-		vkGetBufferMemoryRequirements(*mAllocator->GetDevice(), mBuffer, &memoryRequirements);
+		vkGetBufferMemoryRequirements(*allocator.GetDevice(), mBuffer, &memoryRequirements);
 
 
 		mMemory = allocator.Allocate(AllocationRequest(memoryRequirements)).Unwrap();
@@ -41,7 +40,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Buffer::Buffer(Allocator& allocator,
+	Buffer::Buffer(SingleAllocator& allocator,
 				   const Core::IO::DynamicByteBuffer& bytes,
 				   VkBufferUsageFlags usage)
 		: Buffer(allocator, bytes.Size(), usage)
@@ -52,8 +51,7 @@ namespace Strawberry::Vulkan
 
 
 	Buffer::Buffer(Buffer&& rhs) noexcept
-		: mAllocator(std::move(rhs.mAllocator))
-		  , mSize(std::exchange(rhs.mSize, 0))
+		: mSize(std::exchange(rhs.mSize, 0))
 		  , mBuffer(std::exchange(rhs.mBuffer, nullptr))
 		  , mMemory(std::move(rhs.mMemory))
 	{

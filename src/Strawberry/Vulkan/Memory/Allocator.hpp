@@ -32,6 +32,9 @@ namespace Strawberry::Vulkan
 		// Error for when the device could not find any memory to allocate.
 		struct OutOfMemory {};
 
+		// Error for when an allocator cannot service a request because it is larger than this allocator can support.
+		struct InsufficientPoolSize {};
+
 
 		template<typename T>
 		AllocationError(T&& info)
@@ -45,6 +48,13 @@ namespace Strawberry::Vulkan
 		}
 
 
+		template <typename... Ts>
+		[[nodiscard]] bool IsAnyOf() const noexcept
+		{
+			return (... || mInfo.IsType<Ts>());
+		}
+
+
 		template<typename T>
 		[[nodiscard]] T GetInfo() const noexcept
 		{
@@ -54,7 +64,7 @@ namespace Strawberry::Vulkan
 
 
 	private:
-		using Info = Core::Variant<OutOfMemory>;
+		using Info = Core::Variant<OutOfMemory, InsufficientPoolSize>;
 		Info mInfo;
 	};
 
@@ -111,7 +121,6 @@ namespace Strawberry::Vulkan
 		Allocator(Device& device);
 
 
-		virtual AllocationResult Allocate(const AllocationRequest& allocationRequest) noexcept = 0;
 		virtual void             Free(Allocation&& address) noexcept = 0;
 		virtual                  ~Allocator() = default;
 
@@ -122,6 +131,55 @@ namespace Strawberry::Vulkan
 
 	private:
 		Core::ReflexivePointer<Device> mDevice;
+	};
+
+
+	class SingleAllocator
+		: public Allocator
+	{
+	public:
+		SingleAllocator(Device& device, MemoryTypeIndex memoryTypeIndex)
+			: Allocator(device)
+			, mMemoryTypeIndex(memoryTypeIndex)
+		{}
+
+		virtual AllocationResult Allocate(const AllocationRequest& allocationRequest) noexcept = 0;
+
+
+		const MemoryTypeIndex GetMemoryTypeIndex() const noexcept { return mMemoryTypeIndex; }
+
+
+	private:
+		MemoryTypeIndex mMemoryTypeIndex;
+	};
+
+
+	class PoolAllocator
+		: public SingleAllocator
+	{
+	public:
+		PoolAllocator(MemoryPool&& memoryPool)
+			: SingleAllocator(*memoryPool.GetDevice(), memoryPool.GetMemoryTypeIndex())
+			, mMemoryPool(std::move(memoryPool))
+		{}
+
+
+		const MemoryPool& Memory() const noexcept { return mMemoryPool; }
+		      MemoryPool& Memory()       noexcept { return mMemoryPool; }
+
+
+	private:
+		MemoryPool mMemoryPool;
+	};
+
+
+	class MultiAllocator
+		: public Allocator
+	{
+	public:
+		using Allocator::Allocator;
+
+		virtual AllocationResult Allocate(const AllocationRequest& allocationResult, const MemoryTypeCriteria& memoryTypeCriteria) noexcept = 0;
 	};
 
 

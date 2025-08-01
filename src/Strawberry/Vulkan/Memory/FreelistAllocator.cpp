@@ -7,18 +7,22 @@
 namespace Strawberry::Vulkan
 {
 	FreeListAllocator::FreeListAllocator(MemoryPool&& memoryPool)
-		: Allocator(*memoryPool.GetDevice())
-		, mMemoryPool(std::move(memoryPool))
+		: PoolAllocator(std::move(memoryPool))
 	{
-		AddFreeRegion(FreeRegion{.offset = 0, .size = mMemoryPool.Size()});
+		AddFreeRegion(FreeRegion{.offset = 0, .size = Memory().Size()});
 	}
 
 
 	AllocationResult FreeListAllocator::Allocate(const AllocationRequest& allocationRequest) noexcept
 	{
+		if (Memory().Size() < allocationRequest.size) [[unlikely]]
+		{
+			return AllocationError::InsufficientPoolSize{};
+		}
+
 		// Make sure that this is one of the valid memory types for this allocation.
-		Core::Assert(allocationRequest.typeMask & (1 << mMemoryPool.GetMemoryTypeIndex().memoryTypeIndex));
-		// Function for calculating the next aligned address at a postition.
+		Core::Assert(allocationRequest.typeMask & (1 << Memory().GetMemoryTypeIndex().memoryTypeIndex));
+		// Function for calculating the next aligned address at a position.
 		auto AlignedAddress = [](unsigned int offset, unsigned int size, unsigned int alignment) -> Core::Optional<unsigned int>
 		{
 			unsigned int offsetDifference;
@@ -53,8 +57,8 @@ namespace Strawberry::Vulkan
 
 		unsigned int alignedAddress      = AlignedAddress(region->offset, region->size, allocationRequest.alignment).Unwrap();
 		unsigned int alignmentDifference = alignedAddress - region->offset;
-		// Create allocation in segment of region.
-		Allocation result = mMemoryPool.AllocateView(*this, alignedAddress, allocationRequest.size);
+		// Create allocation in the segment of the region.
+		Allocation result = Memory().AllocateView(*this, alignedAddress, allocationRequest.size);
 
 		// Track skipped padding
 		const FreeRegion priorRegion{.offset = region->offset, .size = alignmentDifference};

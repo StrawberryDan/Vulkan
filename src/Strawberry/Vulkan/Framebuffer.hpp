@@ -31,7 +31,7 @@ namespace Strawberry::Vulkan
 		friend class CommandBuffer;
 
 	public:
-		Framebuffer(RenderPass& mRenderPass, Allocator& allocator, Core::Math::Vec2u size);
+		Framebuffer(RenderPass& mRenderPass, SingleAllocator& allocator, Core::Math::Vec2u size);
 		Framebuffer(const Framebuffer& rhs)            = delete;
 		Framebuffer& operator=(const Framebuffer& rhs) = delete;
 		Framebuffer(Framebuffer&& rhs) noexcept;

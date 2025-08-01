@@ -8,6 +8,8 @@
 #include <cstdint>
 #include <list>
 
+#include "ChainAllocator.hpp"
+
 
 //======================================================================================================================
 //  Class Declaration
@@ -15,7 +17,7 @@
 namespace Strawberry::Vulkan
 {
 	class FreeListAllocator
-			: public Allocator
+			: public PoolAllocator
 	{
 	public:
 		FreeListAllocator(MemoryPool&& memoryPool);
@@ -23,8 +25,6 @@ namespace Strawberry::Vulkan
 
 		AllocationResult Allocate(const AllocationRequest& allocationRequest) noexcept override;
 		void             Free(Allocation&& address) noexcept override;
-
-		const MemoryPool& Memory() const noexcept { return mMemoryPool; }
 
 	private:
 		struct FreeRegion
@@ -35,8 +35,6 @@ namespace Strawberry::Vulkan
 
 
 		using Offset = uint64_t;
-
-		MemoryPool mMemoryPool;
 
 		// The container of all the regions of free memory
 		std::map<Offset, FreeRegion> mRegions;
