@@ -105,7 +105,7 @@ namespace Strawberry::Vulkan
 		// Append glfw extensions
 		uint32_t     glfwExtensionCount = 0;
 		const char** glfwExtensions     = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-		Core::Assert(glfwExtensions != nullptr);
+		Core::AssertNEQ(glfwExtensions, nullptr);
 
 		for (int i = 0; i < glfwExtensionCount; i++)
 		{
