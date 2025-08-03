@@ -195,12 +195,13 @@ namespace Strawberry::Vulkan
 
 		switch (result)
 		{
+			case VK_SUBOPTIMAL_KHR:
+				Core::Logging::Warning("Suboptimal result in Swapchain::WaitForNextImageIndex()");
 			case VK_SUCCESS:
 				mNextImageIndex = imageIndex;
 				return imageIndex;
 			case VK_TIMEOUT:
 			case VK_NOT_READY:
-			case VK_SUBOPTIMAL_KHR:
 				return {};
 			default:
 				Core::Unreachable();
@@ -244,6 +245,8 @@ namespace Strawberry::Vulkan
 
 		switch (presentResult)
 		{
+			case VK_SUBOPTIMAL_KHR:
+				Core::Logging::Warning("Suboptimal result in Swapchain::Present()");
 			case VK_SUCCESS:
 				break;
 			case VK_ERROR_OUT_OF_DATE_KHR:
