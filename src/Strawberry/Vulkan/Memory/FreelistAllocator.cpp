@@ -161,10 +161,10 @@ namespace Strawberry::Vulkan
 		});
 		uintptr_t minOffset = *std::ranges::min_element(offsets);
 
-		size_t sumSizes = std::ranges::fold_left_first(regions | std::views::transform([this](Offset id)
+		size_t sumSizes = std::ranges::fold_left(regions | std::views::transform([this](Offset id)
 		{
 			return mRegions.at(id).size;
-		}), std::plus()).value();
+		}), 0, std::plus());
 
 		FreeRegion accumulator{.offset = minOffset, .size = sumSizes};
 
