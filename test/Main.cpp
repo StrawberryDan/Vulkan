@@ -1,6 +1,5 @@
 #include "Strawberry/Core/IO/Logging.hpp"
 #include "Strawberry/Core/Math/Matrix.hpp"
-#include "Strawberry/Core/Timing/Clock.hpp"
 #include "Strawberry/Core/UTF.hpp"
 #include "Strawberry/Vulkan/Memory/Allocator.hpp"
 #include "Strawberry/Vulkan/Buffer.hpp"
@@ -175,8 +174,6 @@ void BasicRendering()
 								   .Build();
 	Sampler sampler(device, VK_FILTER_NEAREST, VK_FILTER_NEAREST);
 
-
-	Core::Clock clock;
 	DescriptorPool descriptorPool(device, 0, 1, {
 											  VkDescriptorPoolSize{
 												  .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
@@ -236,10 +233,11 @@ void BasicRendering()
 		}
 
 
+		const double clock = 0.0;
 		Core::Math::Mat4f MVPMatrix;
-		Core::Math::Vec3f Color((std::sin(*clock) + 1.0f) / 2.0f,
-								(std::cos(0.25 * *clock) + 1.0f) / 2.0f,
-								(std::cos(0.5 * *clock) + 1.0f) / 2.0f);
+		Core::Math::Vec3f Color((std::sin(clock) + 1.0f) / 2.0f,
+								(std::cos(0.25 * clock) + 1.0f) / 2.0f,
+								(std::cos(0.5 * clock) + 1.0f) / 2.0f);
 
 
 		textureDescriptorSet.SetUniformTexture(0, 0, sampler, textureView, VK_IMAGE_LAYOUT_GENERAL);
@@ -295,7 +293,6 @@ void BasicRendering()
 
 
 		swapchain.Present();
-		window.SwapBuffers();
 	}
 }
 
