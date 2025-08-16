@@ -14,8 +14,8 @@ namespace Strawberry::Vulkan
 	struct MemoryTypeCriteria
 	{
 		size_t                minimumSize = 0;
-		VkMemoryPropertyFlags requiredProperties;
-		VkMemoryPropertyFlags preferredProperties;
+		VkMemoryPropertyFlags requiredProperties = 0;
+		VkMemoryPropertyFlags preferredProperties = 0;
 
 
 		static MemoryTypeCriteria Null();
@@ -23,11 +23,10 @@ namespace Strawberry::Vulkan
 		static MemoryTypeCriteria HostVisible();
 
 
-		MemoryTypeCriteria WithMinimumSize(size_t minimumSize) const
+		MemoryTypeCriteria& WithMinimumSize(size_t minimumSize)
 		{
-			MemoryTypeCriteria criteria = *this;
-			criteria.minimumSize = minimumSize;
-			return criteria;
+			this->minimumSize = minimumSize;
+			return *this;
 		}
 	};
 }
