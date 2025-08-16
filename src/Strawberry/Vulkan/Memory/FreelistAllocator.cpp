@@ -23,10 +23,10 @@ namespace Strawberry::Vulkan
 		// Make sure that this is one of the valid memory types for this allocation.
 		Core::Assert(allocationRequest.typeMask & (1 << Memory().GetMemoryTypeIndex().memoryTypeIndex));
 		// Function for calculating the next aligned address at a position.
-		auto AlignedAddress = [](unsigned int offset, unsigned int size, unsigned int alignment) -> Core::Optional<unsigned int>
+		auto AlignedAddress = [](uintptr_t offset, size_t size, size_t alignment) -> Core::Optional<uintptr_t>
 		{
-			unsigned int offsetDifference;
-			unsigned int modulo = offset % alignment;
+			uintptr_t offsetDifference;
+			uintptr_t modulo = offset % alignment;
 			if (modulo == 0) offsetDifference = 0;
 			else offsetDifference             = alignment - modulo;
 			if (offset + offsetDifference >= size) return Core::NullOpt;
@@ -38,7 +38,7 @@ namespace Strawberry::Vulkan
 		{
 			for (auto [offset, region] : mRegions)
 			{
-				if (Core::Optional<unsigned int> alignedAddress = AlignedAddress(region.offset,
+				if (Core::Optional<uintptr_t> alignedAddress = AlignedAddress(region.offset,
 				                                                                 region.size,
 				                                                                 allocationRequest.alignment))
 				{
@@ -55,8 +55,8 @@ namespace Strawberry::Vulkan
 			return AllocationError::OutOfMemory();
 		}
 
-		unsigned int alignedAddress      = AlignedAddress(region->offset, region->size, allocationRequest.alignment).Unwrap();
-		unsigned int alignmentDifference = alignedAddress - region->offset;
+		uintptr_t alignedAddress = AlignedAddress(region->offset, region->size, allocationRequest.alignment).Unwrap();
+		uintptr_t alignmentDifference = alignedAddress - region->offset;
 		// Create allocation in the segment of the region.
 		Allocation result = Memory().AllocateView(*this, alignedAddress, allocationRequest.size);
 
