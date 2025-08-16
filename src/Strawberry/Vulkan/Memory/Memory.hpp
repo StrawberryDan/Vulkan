@@ -19,6 +19,9 @@ namespace Strawberry::Vulkan
 		unsigned         memoryTypeIndex;
 
 
+		std::strong_ordering operator<=>(const MemoryTypeIndex&) const noexcept = default;
+
+
 		VkMemoryPropertyFlags GetProperties() const noexcept;
 	};
 
