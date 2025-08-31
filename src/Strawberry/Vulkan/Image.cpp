@@ -17,147 +17,139 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Image::Image(SingleAllocator&                allocator,
-	             uint32_t                  extent,
-	             VkFormat                  format,
-	             VkImageUsageFlags         usage,
-	             uint32_t                  mipLevels,
-	             uint32_t                  arrayLayers,
-	             VkImageTiling             tiling,
-	             VkImageLayout             initialLayout) noexcept
-		: mImage(nullptr)
-		, mDevice(*allocator.GetDevice())
-		, mFormat(format)
-		, mSize(static_cast<int>(extent), 1, 1)
+	Image::Builder::Builder(Device& device, MemoryTypeCriteria memoryTypeCriteria)
+		: Builder(device.GetAllocator(), memoryTypeCriteria)
 	{
-		VkImageCreateInfo createInfo{
-			.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = 0,
-			.imageType = VK_IMAGE_TYPE_1D,
-			.format = format,
-			.extent = VkExtent3D{extent, 1, 1},
-			.mipLevels = mipLevels,
-			.arrayLayers = arrayLayers,
-			.samples = VK_SAMPLE_COUNT_1_BIT,
-			.tiling = tiling,
-			.usage = usage,
-			.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
-			.queueFamilyIndexCount = 0,
-			.pQueueFamilyIndices = nullptr,
-			.initialLayout = initialLayout
-		};
-		Core::AssertEQ(vkCreateImage(mDevice, &createInfo, nullptr, &mImage), VK_SUCCESS);
 
+	}
 
-		VkMemoryRequirements memoryRequirements;
-		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
-
-		mMemory = allocator.Allocate(AllocationRequest(memoryRequirements)).Unwrap();
-		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.Memory(), mMemory.Offset()), VK_SUCCESS);
+	Image::Builder&& Image::Builder::WithExtent(unsigned extent)
+	{
+		this->mImageType = VK_IMAGE_TYPE_1D;
+		this->mExtent = Core::Math::Vec3u(extent, 1, 1);
+		return std::move(*this);
 	}
 
 
-	Image::Image(SingleAllocator&                allocator,
-	             Core::Math::Vec2u         extent,
-	             VkFormat                  format,
-	             VkImageUsageFlags         usage,
-	             uint32_t                  mipLevels,
-	             uint32_t                  arrayLayers,
-	             VkImageTiling             tiling,
-	             VkImageLayout             initialLayout) noexcept
-		: mImage(nullptr)
-		, mDevice(*allocator.GetDevice())
-		, mFormat(format)
-		, mSize(extent[0], extent[1], 1)
+	Image::Builder&& Image::Builder::WithExtent(Core::Math::Vec2u extent)
 	{
-		VkImageCreateInfo createInfo{
-			.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = 0,
-			.imageType = VK_IMAGE_TYPE_2D,
-			.format = format,
-			.extent = VkExtent3D{(extent[0]), (extent[1]), 1},
-			.mipLevels = mipLevels,
-			.arrayLayers = arrayLayers,
-			.samples = VK_SAMPLE_COUNT_1_BIT,
-			.tiling = tiling,
-			.usage = usage,
-			.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
-			.queueFamilyIndexCount = 0,
-			.pQueueFamilyIndices = nullptr,
-			.initialLayout = initialLayout
-		};
-		Core::AssertEQ(vkCreateImage(mDevice, &createInfo, nullptr, &mImage), VK_SUCCESS);
-
-
-		VkMemoryRequirements memoryRequirements;
-		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
-
-		mMemory = allocator.Allocate(AllocationRequest(memoryRequirements)).Unwrap();
-		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.Memory(), mMemory.Offset()), VK_SUCCESS);
+		this->mImageType = VK_IMAGE_TYPE_2D;
+		this->mExtent = Core::Math::Vec3u(extent[0], extent[1], 1);
+		return std::move(*this);
 	}
 
 
-	Image::Image(SingleAllocator&            allocator,
-	             Core::Math::Vec3u     extent,
-	             VkFormat              format,
-	             VkImageUsageFlags     usage,
-	             uint32_t              mipLevels,
-	             uint32_t              arrayLayers,
-	             VkImageTiling         tiling,
-	             VkImageLayout         initialLayout) noexcept
-		: mImage(nullptr)
-		, mDevice(*allocator.GetDevice())
-		, mFormat(format)
-		, mSize(extent)
+	Image::Builder&& Image::Builder::WithExtent(Core::Math::Vec3u extent)
 	{
+		this->mImageType = VK_IMAGE_TYPE_3D;
+		this->mExtent = extent;
+		return std::move(*this);
+	}
+
+
+	Image::Builder&& Image::Builder::WithFormat(VkFormat format)
+	{
+		this->mFormat = format;
+		return std::move(*this);
+	}
+
+
+	Image::Builder&& Image::Builder::WithUsage(VkImageUsageFlags usage)
+	{
+		this->mUsage = usage;
+		return std::move(*this);
+	}
+
+
+	Image::Builder&& Image::Builder::WithMipLevels(uint32_t mipLevels)
+	{
+		this->mMipLevels = mipLevels;
+		return std::move(*this);
+	}
+
+
+	Image::Builder&& Image::Builder::WithArrayLayers(uint32_t arrayLayers)
+	{
+		this->mArrayLayers = arrayLayers;
+		return std::move(*this);
+	}
+
+
+	Image::Builder&& Image::Builder::WithTiling(VkImageTiling tiling)
+	{
+		this->mTiling = tiling;
+		return std::move(*this);
+	}
+
+
+	Image::Builder&& Image::Builder::WithInitialLayout(VkImageLayout layout)
+	{
+		this->mInitialLayout = layout;
+		return std::move(*this);
+	}
+
+
+	Image Image::Builder::Build()
+	{
+		const Device& device = GetDevice();
+
+		VkImage imageHandle = VK_NULL_HANDLE;;
+
 		VkImageCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
-			.imageType = VK_IMAGE_TYPE_3D,
-			.format = format,
+			.imageType = mImageType.Value(),
+			.format = mFormat.Value(),
 			.extent = VkExtent3D{
-				static_cast<uint32_t>(extent[0]),
-				static_cast<uint32_t>(extent[1]),
-				static_cast<uint32_t>(extent[2])
+				static_cast<uint32_t>(mExtent.Value()[0]),
+				static_cast<uint32_t>(mExtent.Value()[1]),
+				static_cast<uint32_t>(mExtent.Value()[2])
 			},
-			.mipLevels = mipLevels,
-			.arrayLayers = arrayLayers,
+			.mipLevels = mMipLevels,
+			.arrayLayers = mArrayLayers,
 			.samples = VK_SAMPLE_COUNT_1_BIT,
-			.tiling = tiling,
-			.usage = usage,
+			.tiling = mTiling,
+			.usage = mUsage.Value(),
 			.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
 			.queueFamilyIndexCount = 0,
 			.pQueueFamilyIndices = nullptr,
-			.initialLayout = initialLayout
+			.initialLayout = mInitialLayout
 		};
-		Core::AssertEQ(vkCreateImage(mDevice, &createInfo, nullptr, &mImage), VK_SUCCESS);
+		Core::AssertEQ(vkCreateImage(device, &createInfo, nullptr, &imageHandle), VK_SUCCESS);
 
 
 		VkMemoryRequirements memoryRequirements;
-		vkGetImageMemoryRequirements(mDevice, mImage, &memoryRequirements);
+		vkGetImageMemoryRequirements(device, imageHandle, &memoryRequirements);
+		Allocation memory = mAllocationSource.Visit(
+			[&](Allocation& allocation) { return AllocationResult(std::move(allocation)); },
+			[&](SingleAllocator* allocator) { return allocator->Allocate(memoryRequirements); },
+			[&](MultiAllocator* allocator) { return allocator->Allocate(memoryRequirements, mMemoryTypeCriteria); }
+		).Unwrap();
 
-		mMemory = allocator.Allocate(AllocationRequest(memoryRequirements)).Unwrap();
-		Core::AssertEQ(vkBindImageMemory(mDevice, mImage, mMemory.Memory(), mMemory.Offset()), VK_SUCCESS);
+		Core::AssertEQ(vkBindImageMemory(device, imageHandle, memory.Memory(), memory.Offset()), VK_SUCCESS);
+
+
+		return Image(imageHandle, std::move(memory), mExtent.Value(), mFormat.Value());
 	}
 
-
-	Image::Image(const Device& device, VkImage imageHandle, Core::Math::Vec3u extent, VkFormat format)
-		: mImage(imageHandle)
-		, mDevice(device)
-		, mFormat(format)
-		, mSize(extent) {}
-
-
-	Image::Image(Image&& rhs) noexcept
-		: EnableReflexivePointer(std::move(rhs))
-		, mImage(std::exchange(rhs.mImage, nullptr))
-		, mMemory(std::move(rhs.mMemory))
-		, mDevice(std::exchange(rhs.mDevice, nullptr))
-		, mFormat(std::exchange(rhs.mFormat, VK_FORMAT_MAX_ENUM))
-		, mSize(std::exchange(rhs.mSize, Core::Math::Vec3u())) {}
+	const Device& Image::Builder::GetDevice() const
+	{
+		return mAllocationSource.Visit(
+			[&](const Allocation& allocation) -> const Device&
+			{
+				return allocation.GetDevice();
+			},
+			[&](const SingleAllocator* allocator) -> const Device&
+			{
+				return allocator->GetDevice();
+			},
+			[&](const MultiAllocator* allocator) -> const Device&
+			{
+				return allocator->GetDevice();
+			}
+		);
+	}
 
 
 	Image& Image::operator=(Image&& rhs) noexcept
@@ -176,17 +168,21 @@ namespace Strawberry::Vulkan
 	{
 		if (mImage)
 		{
-			vkDestroyImage(mDevice, mImage, nullptr);
+			vkDestroyImage(GetDevice(), mImage, nullptr);
 		}
 	}
 
 
 	VkImage Image::Release()
 	{
-		mDevice = VK_NULL_HANDLE;
 		return std::exchange(mImage, VK_NULL_HANDLE);
 	}
 
+
+	const Device& Image::GetDevice() const
+	{
+		return mMemory.GetDevice();
+	}
 
 	VkFormat Image::GetFormat() const
 	{
@@ -196,6 +192,26 @@ namespace Strawberry::Vulkan
 
 	Core::Math::Vec3u Image::GetSize() const
 	{
-		return mSize;
+		return mExtent;
 	}
+
+	Image::Image(VkImage imageHandle, Allocation &&allocation, Core::Math::Vec3u extent, VkFormat format)
+		: mImage(imageHandle)
+		, mMemory(std::move(allocation))
+		, mFormat(format)
+		, mExtent(extent)
+	{}
+
+	Image::Image(VkImage imageHandle, Core::Math::Vec3u extent, VkFormat format)
+		: mImage(imageHandle)
+		, mFormat(format)
+		, mExtent(extent) {}
+
+
+	Image::Image(Image&& rhs) noexcept
+		: EnableReflexivePointer(std::move(rhs))
+		, mImage(std::exchange(rhs.mImage, nullptr))
+		, mMemory(std::move(rhs.mMemory))
+		, mFormat(std::exchange(rhs.mFormat, VK_FORMAT_MAX_ENUM))
+		, mExtent(std::exchange(rhs.mExtent, Core::Math::Vec3u())) {}
 }

@@ -17,18 +17,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Framebuffer::Framebuffer(RenderPass& renderPass, SingleAllocator& allocator, Core::Math::Vec2u size)
+	Framebuffer::Framebuffer(RenderPass& renderPass, Core::Math::Vec2u size)
 		: mRenderPass(renderPass)
 		, mSize(size)
 	{
 		const auto ATTACHMENT_COUNT = mRenderPass->mAttachmentFormats.size();
 		for (int i = 0; i < ATTACHMENT_COUNT; i++)
 		{
-			Image image(
-				allocator,
-				mSize,
-				renderPass.mAttachmentFormats[i],
-				renderPass.mAttachmentUsages[i]);
+			Image image = Image::Builder(renderPass.GetDevice(), MemoryTypeCriteria::DeviceLocal())
+				.WithExtent(mSize)
+				.WithFormat(renderPass.mAttachmentFormats[i])
+				.WithUsage(renderPass.mAttachmentUsages[i])
+				.Build();
 
 			mAttachments.emplace_back(std::move(image));
 
@@ -121,14 +121,19 @@ namespace Strawberry::Vulkan
 		return mRenderPass;
 	}
 
-	Core::ReflexivePointer<Device> Framebuffer::GetDevice() const
+	Device& Framebuffer::GetDevice()
 	{
 		return GetRenderPass()->GetDevice();
 	}
 
-	Core::ReflexivePointer<const PhysicalDevice> Framebuffer::GetPhysicalDevice() const
+	const Device& Framebuffer::GetDevice() const
 	{
-		return GetDevice()->GetPhysicalDevice().GetReflexivePointer();
+		return GetRenderPass()->GetDevice();
+	}
+
+	const PhysicalDevice& Framebuffer::GetPhysicalDevice() const
+	{
+		return GetDevice().GetPhysicalDevice();
 	}
 
 	Core::Math::Vec2u Framebuffer::GetSize() const
@@ -139,7 +144,7 @@ namespace Strawberry::Vulkan
 
 	uint32_t Framebuffer::GetAttachmentCount() const
 	{
-		return mAttachments.size();
+		return static_cast<uint32_t>(mAttachments.size());
 	}
 
 

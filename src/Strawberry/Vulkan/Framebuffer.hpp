@@ -26,12 +26,13 @@ namespace Strawberry::Vulkan
 
 
 	class Framebuffer
-	: public Core::EnableReflexivePointer
+		: public Core::EnableReflexivePointer
 	{
 		friend class CommandBuffer;
 
+
 	public:
-		Framebuffer(RenderPass& mRenderPass, SingleAllocator& allocator, Core::Math::Vec2u size);
+		Framebuffer(RenderPass& mRenderPass, Core::Math::Vec2u size);
 		Framebuffer(const Framebuffer& rhs)            = delete;
 		Framebuffer& operator=(const Framebuffer& rhs) = delete;
 		Framebuffer(Framebuffer&& rhs) noexcept;
@@ -43,8 +44,9 @@ namespace Strawberry::Vulkan
 
 
 		[[nodiscard]] Core::ReflexivePointer<RenderPass>           GetRenderPass() const;
-		[[nodiscard]] Core::ReflexivePointer<Device>               GetDevice() const;
-		[[nodiscard]] Core::ReflexivePointer<const PhysicalDevice> GetPhysicalDevice() const;
+		[[nodiscard]]       Device&                                GetDevice();
+		[[nodiscard]] const Device&                                GetDevice() const;
+		[[nodiscard]] const PhysicalDevice&                        GetPhysicalDevice() const;
 
 
 		[[nodiscard]] Core::Math::Vec2u GetSize() const;

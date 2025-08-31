@@ -88,9 +88,9 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Core::ReflexivePointer<Device> Queue::GetDevice() const
+	Device& Queue::GetDevice()
 	{
-		return mDevice;
+		return *mDevice;
 	}
 
 

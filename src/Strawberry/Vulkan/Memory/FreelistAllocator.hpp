@@ -26,6 +26,7 @@ namespace Strawberry::Vulkan
 		AllocationResult Allocate(const AllocationRequest& allocationRequest) noexcept override;
 		void             Free(Allocation&& address) noexcept override;
 
+
 	private:
 		struct FreeRegion
 		{
@@ -39,7 +40,7 @@ namespace Strawberry::Vulkan
 		// The container of all the regions of free memory
 		std::map<Offset, FreeRegion> mRegions;
 		// Associates the 
-		std::list<Offset>          mRegionsBySize;
+		std::list<Offset>            mRegionsBySize;
 
 
 		// Functions for managing the list of regions.

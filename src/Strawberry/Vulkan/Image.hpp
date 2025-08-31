@@ -30,140 +30,63 @@ namespace Strawberry::Vulkan
 	{
 		friend class ImageView;
 		friend class CommandBuffer;
+		friend class Swapchain;
+
 
 	public:
 		class Builder
 		{
 		public:
-			Builder(SingleAllocator& allocator)
-				: allocator(allocator)
+			Builder(Device& device, MemoryTypeCriteria memoryTypeCriteria);
+
+
+			Builder(Allocation&& allocation)
+				: mAllocationSource(std::move(allocation))
 			{}
 
 
-			Image Build()
-			{
-				return extent->Visit(Core::Overload(
-					[&](unsigned x)
-					{
-						return Image(*allocator, x, format.Unwrap(), usage.Unwrap(), mipLevels, arrayLayers, tiling, initialLayout);
-					},
-					[&](Core::Math::Vec2u dims)
-					{
-						return Image(*allocator, dims, format.Unwrap(), usage.Unwrap(), mipLevels, arrayLayers, tiling, initialLayout);
-					},
-					[&](Core::Math::Vec3u dims)
-					{
-						return Image(*allocator, dims, format.Unwrap(), usage.Unwrap(), mipLevels, arrayLayers, tiling, initialLayout);
-					}
-				));
-			}
+			Builder(SingleAllocator& allocator)
+				: mAllocationSource(&allocator)
+			{}
 
 
-			Builder&& WithExtent(unsigned extent)
-			{
-				this->extent = extent;
-				return std::move(*this);
-			}
+			Builder(MultiAllocator& allocator, MemoryTypeCriteria memoryTypeCriteria)
+				: mAllocationSource(&allocator)
+				, mMemoryTypeCriteria(memoryTypeCriteria)
+			{}
 
 
-			Builder&& WithExtent(Core::Math::Vec2u extent)
-			{
-				this->extent = extent;
-				return std::move(*this);
-			}
+			Builder&& WithExtent(unsigned extent);
+			Builder&& WithExtent(Core::Math::Vec2u extent);
+			Builder&& WithExtent(Core::Math::Vec3u extent);
+			Builder&& WithFormat(VkFormat format);
+			Builder&& WithUsage(VkImageUsageFlags usage);
+			Builder&& WithMipLevels(uint32_t mipLevels);
+			Builder&& WithArrayLayers(uint32_t arrayLayers);
+			Builder&& WithTiling(VkImageTiling tiling);
+			Builder&& WithInitialLayout(VkImageLayout layout);
 
 
-			Builder&& WithExtent(Core::Math::Vec3u extent)
-			{
-				this->extent = extent;
-				return std::move(*this);
-			}
+			Image Build();
 
-
-			Builder&& WithFormat(VkFormat format)
-			{
-				this->format = format;
-				return std::move(*this);
-			}
-
-
-			Builder&& WithUsage(VkImageUsageFlags usage)
-			{
-				this->usage = usage;
-				return std::move(*this);
-			}
-
-
-			Builder&& WithMipLevels(uint32_t mipLevels)
-			{
-				this->mipLevels = mipLevels;
-				return std::move(*this);
-			}
-
-
-			Builder&& WithArrayLayers(uint32_t arrayLayers)
-			{
-				this->arrayLayers = arrayLayers;
-				return std::move(*this);
-			}
-
-
-			Builder&& WithTiling(VkImageTiling tiling)
-			{
-				this->tiling = tiling;
-				return std::move(*this);
-			}
-
-
-			Builder&& WithInitialLayout(VkImageLayout layout)
-			{
-				this->initialLayout = layout;
-				return std::move(*this);
-			}
 
 		private:
-			Core::ReflexivePointer<SingleAllocator>                                             allocator;
-			Core::Optional<Core::Variant<unsigned, Core::Math::Vec2u, Core::Math::Vec3u>> extent;
-			Core::Optional<VkFormat>                                                      format;
-			Core::Optional<VkImageUsageFlags>                                             usage;
-			uint32_t                                                                      mipLevels     = 1;
-			uint32_t                                                                      arrayLayers   = 1;
-			VkImageTiling                                                                 tiling        = VK_IMAGE_TILING_OPTIMAL;
-			VkImageLayout                                                                 initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+			const Device& GetDevice() const;
+
+
+			mutable Core::Variant<Allocation, SingleAllocator*, MultiAllocator*> mAllocationSource;
+			MemoryTypeCriteria mMemoryTypeCriteria;
+
+
+			Core::Optional<VkImageType>       mImageType;
+			Core::Optional<Core::Math::Vec3u> mExtent;
+			Core::Optional<VkFormat>          mFormat;
+			Core::Optional<VkImageUsageFlags> mUsage;
+			uint32_t                          mMipLevels     = 1;
+			uint32_t                          mArrayLayers   = 1;
+			VkImageTiling                     mTiling        = VK_IMAGE_TILING_OPTIMAL;
+			VkImageLayout                     mInitialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		};
-
-
-		Image(SingleAllocator&        allocator,
-		      uint32_t          extent,
-		      VkFormat          format,
-		      VkImageUsageFlags usage,
-		      uint32_t          mipLevels     = 1,
-		      uint32_t          arrayLayers   = 1,
-		      VkImageTiling     tiling        = VK_IMAGE_TILING_OPTIMAL,
-		      VkImageLayout     initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
-
-		Image(SingleAllocator&        allocator,
-		      Core::Math::Vec2u extent,
-		      VkFormat          format,
-		      VkImageUsageFlags usage,
-		      uint32_t          mipLevels     = 1,
-		      uint32_t          arrayLayers   = 1,
-		      VkImageTiling     tiling        = VK_IMAGE_TILING_OPTIMAL,
-		      VkImageLayout     initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
-
-		Image(SingleAllocator&        allocator,
-		      Core::Math::Vec3u extent,
-		      VkFormat          format,
-		      VkImageUsageFlags usage,
-		      uint32_t          mipLevels     = 1,
-		      uint32_t          arrayLayers   = 1,
-		      VkImageTiling     tiling        = VK_IMAGE_TILING_OPTIMAL,
-		      VkImageLayout     initialLayout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
-
-		Image(const Device&     device,
-		      VkImage           imageHandle,
-		      Core::Math::Vec3u extent,
-		      VkFormat          format);
 
 		Image(const Image& rhs)            = delete;
 		Image& operator=(const Image& rhs) = delete;
@@ -181,14 +104,25 @@ namespace Strawberry::Vulkan
 		}
 
 
+		[[nodiscard]] const Device&     GetDevice() const;
 		[[nodiscard]] VkFormat          GetFormat() const;
 		[[nodiscard]] Core::Math::Vec3u GetSize() const;
 
+
 	private:
+		Image(VkImage imageHandle,
+			  Allocation&& allocation,
+			  Core::Math::Vec3u extent,
+			  VkFormat format);
+
+		Image(VkImage           imageHandle,
+			  Core::Math::Vec3u extent,
+			  VkFormat          format);
+
+
 		VkImage           mImage;
 		Allocation        mMemory;
-		VkDevice          mDevice;
 		VkFormat          mFormat;
-		Core::Math::Vec3u mSize;
+		Core::Math::Vec3u mExtent;
 	};
 }

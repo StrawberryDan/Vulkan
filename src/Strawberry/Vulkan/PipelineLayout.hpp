@@ -27,13 +27,18 @@ namespace Strawberry::Vulkan
 		~PipelineLayout();
 
 
+		Core::ReflexivePointer<Device> GetDevice() const;
+
+
 		operator VkPipelineLayout() const;
 
 
 		VkDescriptorSetLayout GetSetLayout(uint32_t index);
 
+
 	protected:
 		PipelineLayout(VkPipelineLayout handle, Core::ReflexivePointer<Device> device, std::vector<VkDescriptorSetLayout> setLayouts);
+
 
 	private:
 		VkPipelineLayout                   mHandle;

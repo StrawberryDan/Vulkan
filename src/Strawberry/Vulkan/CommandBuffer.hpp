@@ -85,9 +85,9 @@ namespace Strawberry::Vulkan
 		void BindPipeline(const ComputePipeline& pipeline);
 
 
-		void Dispatch(size_t x);
-		void Dispatch(size_t x, size_t y);
-		void Dispatch(size_t x, size_t y, size_t z);
+		void Dispatch(uint32_t x);
+		void Dispatch(uint32_t x, uint32_t y);
+		void Dispatch(uint32_t x, uint32_t y, uint32_t z);
 
 		void Dispatch(Core::Math::Vec2u xy);
 		void Dispatch(Core::Math::Vec3u xyz);

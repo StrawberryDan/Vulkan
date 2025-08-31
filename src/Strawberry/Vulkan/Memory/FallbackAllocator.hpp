@@ -14,9 +14,9 @@ namespace Strawberry::Vulkan
 	{
 	public:
 		FallbackAllocator(T&& allocator)
-			: SingleAllocator(*allocator.GetDevice(), allocator.GetMemoryTypeIndex())
+			: SingleAllocator(allocator.GetDevice(), allocator.GetMemoryTypeIndex())
 			, mMainAllocator(std::move(allocator))
-			, mFallbackAllocator(*mMainAllocator.GetDevice(), mMainAllocator.GetMemoryTypeIndex())
+			, mFallbackAllocator(mMainAllocator.GetDevice(), mMainAllocator.GetMemoryTypeIndex())
 		{}
 
 

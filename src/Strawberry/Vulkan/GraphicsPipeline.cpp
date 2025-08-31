@@ -56,6 +56,11 @@ namespace Strawberry::Vulkan
 		return mPipeline;
 	}
 
+	const PipelineLayout& GraphicsPipeline::GetLayout() const noexcept
+	{
+		return *mPipelineLayout;
+	}
+
 
 	GraphicsPipeline::Builder::Builder(PipelineLayout& layout, RenderPass& renderPass, uint32_t subpass)
 		: mRenderPass(renderPass)
@@ -275,6 +280,17 @@ namespace Strawberry::Vulkan
 		return *this;
 	}
 
+
+	Device& GraphicsPipeline::GetDevice() noexcept
+	{
+		return mRenderPass->GetDevice();
+	}
+
+
+	const Device& GraphicsPipeline::GetDevice() const noexcept
+	{
+		return mRenderPass->GetDevice();
+	}
 
 	GraphicsPipeline::GraphicsPipeline(VkPipeline handle, PipelineLayout& layout, RenderPass& renderPass)
 		: mPipeline(handle)

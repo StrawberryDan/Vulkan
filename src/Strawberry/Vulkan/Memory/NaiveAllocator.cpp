@@ -10,7 +10,7 @@ namespace Strawberry::Vulkan
 
 	AllocationResult NaiveAllocator::Allocate(const AllocationRequest& allocationRequest) noexcept
 	{
-		MemoryPool memoryPool = MemoryPool::Allocate(*GetDevice(), GetMemoryTypeIndex(), allocationRequest.size).Unwrap();
+		MemoryPool memoryPool = MemoryPool::Allocate(GetDevice(), GetMemoryTypeIndex(), allocationRequest.size).Unwrap();
 
 		Allocation allocation = memoryPool.AllocateView(*this, 0, memoryPool.Size());
 		mMemoryPools.emplace(allocation.Address(), std::move(memoryPool));

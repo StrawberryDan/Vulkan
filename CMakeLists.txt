@@ -67,6 +67,8 @@ if (NOT TARGET StrawberryVulkan)
 		src/Strawberry/Vulkan/Memory/MotherAllocator.hpp
 		src/Strawberry/Vulkan/Memory/NaiveAllocator.cpp
 		src/Strawberry/Vulkan/Memory/NaiveAllocator.hpp
+		src/Strawberry/Vulkan/Memory/NaiveMultiAllocator.cpp
+		src/Strawberry/Vulkan/Memory/NaiveMultiAllocator.hpp
 		src/Strawberry/Vulkan/PhysicalDevice.cpp
 		src/Strawberry/Vulkan/PhysicalDevice.hpp
 		src/Strawberry/Vulkan/PipelineLayout.cpp

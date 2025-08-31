@@ -114,18 +114,7 @@ void BasicRendering()
 	CommandPool commandPool(*queue, true);
 	CommandBuffer commandBuffer(commandPool);
 
-	auto hostVisibleMemoryType = gpu.SearchMemoryTypes(MemoryTypeCriteria::HostVisible())[0].index;
-	auto deviceLocalMemoryType = gpu.SearchMemoryTypes(MemoryTypeCriteria::DeviceLocal())[0].index;
 
-	FreeListAllocator hostVisibleAllocator(
-		MemoryPool::Allocate(device, hostVisibleMemoryType, 128 * 1024 * 1024).Unwrap());
-	FreeListAllocator deviceLocalAllocator(
-		MemoryPool::Allocate(device, deviceLocalMemoryType, 128 * 1024 * 1024).Unwrap());
-
-
-	Buffer buffer(hostVisibleAllocator,
-				  6 * sizeof(float) * 3,
-				  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 	Core::IO::DynamicByteBuffer vertices;
 	vertices.Push<Core::Math::Vec3f>(Core::Math::Vec3f(0.0f, 0.0f, 0.0f));
 	vertices.Push<Core::Math::Vec3f>(Core::Math::Vec3f(1.0f, 0.0f, 0.0f));
@@ -133,16 +122,22 @@ void BasicRendering()
 	vertices.Push<Core::Math::Vec3f>(Core::Math::Vec3f(0.5f, 0.5f, 0.0f));
 	vertices.Push<Core::Math::Vec3f>(Core::Math::Vec3f(1.0f, 0.5f, 0.0f));
 	vertices.Push<Core::Math::Vec3f>(Core::Math::Vec3f(0.5f, 1.0f, 0.0f));
-	buffer.SetData(vertices);
+
+	Buffer buffer = Buffer::Builder(device, MemoryTypeCriteria::HostVisible())
+		.WithData(vertices)
+		.WithUsage(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT)
+		.Build();
 
 
-	auto framebuffer = Framebuffer(renderPass, deviceLocalAllocator, Core::Math::Vec2u(1920, 1080));
+	auto framebuffer = Framebuffer(renderPass, Core::Math::Vec2u(1920, 1080));
 
 
 	auto [size, channels, bytes] = Core::IO::DynamicByteBuffer::FromImage("data/dio.png").Unwrap();
-	Buffer textureBuffer(hostVisibleAllocator, bytes.Size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
-	textureBuffer.SetData(bytes);
-	Image texture = Image::Builder(deviceLocalAllocator)
+	Buffer textureBuffer = Buffer::Builder(device, MemoryTypeCriteria::HostVisible())
+		.WithData(bytes)
+		.WithUsage(VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT)
+		.Build();
+	Image texture = Image::Builder(device, MemoryTypeCriteria::DeviceLocal())
 					.WithExtent(size).WithFormat(VK_FORMAT_R8G8B8A8_SRGB)
 					.WithUsage(
 						VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT).
@@ -196,7 +191,10 @@ void BasicRendering()
 
 	DescriptorPool computeDescriptorPool(device, 0, 1, { VkDescriptorPoolSize { .type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, .descriptorCount = 1}});
 	DescriptorSet computeDescriptorSet(computeDescriptorPool, computePipelineLayout.GetSetLayout(0));
-	Buffer computeBuffer(hostVisibleAllocator, sizeof(uint32_t) * 256 * 256, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
+	Buffer computeBuffer = Buffer::Builder(device, MemoryTypeCriteria::HostVisible())
+		.WithSize(sizeof(uint32_t) * 256 * 256)
+		.WithUsage(VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
+		.Build();
 	computeDescriptorSet.SetStorageBuffer(0, 0, computeBuffer);
 
 
@@ -290,7 +288,6 @@ void BasicRendering()
 		commandBuffer.End();
 		queue->Submit(commandBuffer);
 		queue->WaitUntilIdle();
-
 
 		swapchain.Present();
 	}

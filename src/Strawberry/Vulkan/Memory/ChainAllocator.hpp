@@ -43,7 +43,8 @@ namespace Strawberry::Vulkan
 					allocator.allocations.emplace(result.Value().Address());
 					return result;
 				}
-				else if (!result.Err().template IsType<AllocationError::OutOfMemory>())
+
+				if (!result.Err().template IsType<AllocationError::OutOfMemory>())
 				{
 					return result;
 				}
@@ -74,8 +75,8 @@ namespace Strawberry::Vulkan
 	void ChainAllocator<T>::ExtendChain()
 	{
 		ChainItem item {
-			.allocations = {},
-			.allocator = T(MemoryPool::Allocate(*GetDevice(), GetMemoryTypeIndex(), mPoolSize).Unwrap())
+			.allocations{},
+			.allocator{ T(MemoryPool::Allocate(GetDevice(), GetMemoryTypeIndex(), mPoolSize).Unwrap()) }
 		};
 
 		mAllocatorChain.emplace_back(std::move(item));

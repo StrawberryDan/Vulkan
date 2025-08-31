@@ -50,7 +50,7 @@ namespace Strawberry::Vulkan
 		void WaitUntilIdle() const;
 
 
-		Core::ReflexivePointer<Device> GetDevice() const;
+		Device& GetDevice();
 
 
 		uint32_t GetFamilyIndex() const;

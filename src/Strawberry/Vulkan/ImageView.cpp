@@ -20,7 +20,7 @@ namespace Strawberry::Vulkan
 	                     VkComponentMapping      componentMapping,
 	                     VkImageSubresourceRange subresourceRange)
 		: mImageView(nullptr)
-		, mDevice(image.mDevice)
+		, mDevice(image.GetDevice())
 	{
 		VkImageViewCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
@@ -33,7 +33,7 @@ namespace Strawberry::Vulkan
 			.subresourceRange = subresourceRange,
 		};
 
-		Core::AssertEQ(vkCreateImageView(image.mDevice, &createInfo, nullptr, &mImageView), VK_SUCCESS);
+		Core::AssertEQ(vkCreateImageView(image.GetDevice(), &createInfo, nullptr, &mImageView), VK_SUCCESS);
 	}
 
 

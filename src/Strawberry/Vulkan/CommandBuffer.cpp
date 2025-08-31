@@ -34,7 +34,7 @@ namespace Strawberry::Vulkan
 	CommandBuffer::CommandBuffer(CommandPool& commandPool, VkCommandBufferLevel level)
 		: mCommandBuffer{}
 		, mCommandPool(commandPool)
-		, mExecutionFenceOrParentBuffer(ConstructExecutionFence(*commandPool.mQueue->GetDevice(), level))
+		, mExecutionFenceOrParentBuffer(ConstructExecutionFence(commandPool.mQueue->GetDevice(), level))
 	{
 		VkCommandBufferAllocateInfo allocateInfo{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
@@ -44,7 +44,7 @@ namespace Strawberry::Vulkan
 			.commandBufferCount = 1,
 		};
 
-		Core::Assert(vkAllocateCommandBuffers(*mCommandPool->GetQueue()->GetDevice(), &allocateInfo, &mCommandBuffer) == VK_SUCCESS);
+		Core::Assert(vkAllocateCommandBuffers(mCommandPool->GetQueue()->GetDevice(), &allocateInfo, &mCommandBuffer) == VK_SUCCESS);
 	}
 
 
@@ -73,7 +73,7 @@ namespace Strawberry::Vulkan
 	{
 		if (mCommandBuffer)
 		{
-			vkFreeCommandBuffers(*mCommandPool->GetQueue()->GetDevice(), mCommandPool->mCommandPool, 1, &mCommandBuffer);
+			vkFreeCommandBuffers(mCommandPool->GetQueue()->GetDevice(), mCommandPool->mCommandPool, 1, &mCommandBuffer);
 		}
 	}
 
@@ -239,17 +239,17 @@ namespace Strawberry::Vulkan
 		vkCmdBindPipeline(mCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
 	}
 
-	void CommandBuffer::Dispatch(size_t x)
+	void CommandBuffer::Dispatch(uint32_t x)
 	{
 		vkCmdDispatch(mCommandBuffer, x, 1, 1);
 	}
 
-	void CommandBuffer::Dispatch(size_t x, size_t y)
+	void CommandBuffer::Dispatch(uint32_t x, uint32_t y)
 	{
 		vkCmdDispatch(mCommandBuffer, x, y, 1);
 	}
 
-	void CommandBuffer::Dispatch(size_t x, size_t y, size_t z)
+	void CommandBuffer::Dispatch(uint32_t x, uint32_t y, uint32_t z)
 	{
 		vkCmdDispatch(mCommandBuffer, x, y, z);
 	}
@@ -316,11 +316,11 @@ namespace Strawberry::Vulkan
 		                     srcMask,
 		                     dstMask,
 		                     dependencyFlags,
-		                     memoryBarriers.size(),
+		                     static_cast<uint32_t>(memoryBarriers.size()),
 		                     memoryBarriers.data(),
-		                     bufferBarriers.size(),
+                             static_cast<uint32_t>(bufferBarriers.size()),
 		                     bufferBarriers.data(),
-		                     imageBarriers.size(),
+                             static_cast<uint32_t>(imageBarriers.size()),
 		                     imageBarriers.data());
 	}
 
@@ -343,7 +343,7 @@ namespace Strawberry::Vulkan
 			.bufferImageHeight = 0,
 			.imageSubresource = subresource,
 			.imageOffset{.x = 0, .y = 0, .z = 0},
-			.imageExtent{.width = image.mSize[0], .height = image.mSize[1], .depth = 1}
+			.imageExtent{.width = image.mExtent[0], .height = image.mExtent[1], .depth = 1}
 		};
 		vkCmdCopyBufferToImage(mCommandBuffer, buffer, image.mImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 	}
@@ -483,7 +483,7 @@ namespace Strawberry::Vulkan
 		                        VK_PIPELINE_BIND_POINT_GRAPHICS,
 		                        *pipeline.mPipelineLayout,
 		                        firstSet,
-		                        setHandles.size(),
+		                        static_cast<uint32_t>(setHandles.size()),
 		                        setHandles.data(),
 		                        0,
 		                        nullptr);
@@ -516,7 +516,7 @@ namespace Strawberry::Vulkan
 								VK_PIPELINE_BIND_POINT_COMPUTE,
 								pipeline.GetLayout(),
 								firstSet,
-								setHandles.size(),
+								static_cast<uint32_t>(setHandles.size()),
 								setHandles.data(),
 								0,
 								nullptr);
@@ -560,7 +560,7 @@ namespace Strawberry::Vulkan
 	void CommandBuffer::PushConstants(const GraphicsPipeline& pipeline, VkShaderStageFlags stage, const Core::IO::DynamicByteBuffer& bytes, uint32_t offset)
 	{
 		Core::Assert(State() == CommandBufferState::Recording);
-		vkCmdPushConstants(mCommandBuffer, *pipeline.mPipelineLayout, stage, offset, bytes.Size(), bytes.Data());
+		vkCmdPushConstants(mCommandBuffer, *pipeline.mPipelineLayout, stage, offset, static_cast<uint32_t>(bytes.Size()), bytes.Data());
 	}
 
 

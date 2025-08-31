@@ -51,9 +51,9 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Core::ReflexivePointer<Device> RenderPass::GetDevice() const
+	Device& RenderPass::GetDevice()
 	{
-		return mDevice;
+		return *mDevice;
 	}
 
 

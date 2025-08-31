@@ -15,6 +15,10 @@
 #include <numeric>
 #include <cstring>
 
+#include "Memory/FallbackAllocator.hpp"
+#include "Memory/FreelistAllocator.hpp"
+#include "Memory/NaiveMultiAllocator.hpp"
+
 
 //======================================================================================================================
 //  Class Definitions
@@ -91,18 +95,21 @@ namespace Strawberry::Vulkan
 		Core::AssertEQ(vkCreateDevice(physicalDevice.mPhysicalDevice, &createInfo, nullptr, &mDevice), VK_SUCCESS);
 
 
-		for (auto& createInfo: queueCreateInfo)
+		for (auto& createInfo : queueCreateInfo)
 		{
 			for (int i = 0; i < createInfo.count; i++)
 				mQueues[createInfo.familyIndex].emplace_back(Queue(*this, createInfo.familyIndex, i));
 		}
+
+		mAllocator = std::make_unique<NaiveMultiAllocator<FallbackChainAllocator<FreeListAllocator>>>(*this);
 	}
 
 
 	Device::Device(Device&& rhs) noexcept
 		: mDevice(std::exchange(rhs.mDevice, nullptr))
 		, mPhysicalDevice(std::move(rhs.mPhysicalDevice))
-		, mQueues(std::move(rhs.mQueues)) {}
+		, mQueues(std::move(rhs.mQueues))
+		, mAllocator(std::move(rhs.mAllocator)) {}
 
 
 	Device& Device::operator=(Device&& rhs) noexcept
@@ -121,10 +128,11 @@ namespace Strawberry::Vulkan
 	{
 		ZoneScoped;
 
-		WaitUntilIdle();
-		mQueues.clear();
 		if (mDevice)
 		{
+			WaitUntilIdle();
+			mAllocator.reset();
+			mQueues.clear();
 			Core::Assert(vkDeviceWaitIdle(mDevice) == VK_SUCCESS);
 			vkDestroyDevice(mDevice, nullptr);
 		}
@@ -160,5 +168,10 @@ namespace Strawberry::Vulkan
 	Queue& Device::GetQueue(uint32_t family, uint32_t index)
 	{
 		return mQueues[family][index];
+	}
+
+	MultiAllocator& Device::GetAllocator() const
+	{
+		return *mAllocator;
 	}
 }

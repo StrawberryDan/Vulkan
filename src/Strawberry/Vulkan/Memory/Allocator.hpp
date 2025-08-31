@@ -122,11 +122,10 @@ namespace Strawberry::Vulkan
 
 
 		virtual void             Free(Allocation&& address) noexcept = 0;
-		virtual                  ~Allocator() = default;
 
 
-
-		Core::ReflexivePointer<Device> GetDevice() const { return mDevice; }
+		[[nodiscard]]       Device& GetDevice()       { return *mDevice; }
+		[[nodiscard]] const Device& GetDevice() const { return *mDevice; }
 
 
 	private:
@@ -179,7 +178,9 @@ namespace Strawberry::Vulkan
 	public:
 		using Allocator::Allocator;
 
-		virtual AllocationResult Allocate(const AllocationRequest& allocationResult, const MemoryTypeCriteria& memoryTypeCriteria) noexcept = 0;
+		~MultiAllocator() override = default;
+
+		virtual AllocationResult Allocate(const AllocationRequest& allocationRequest, const MemoryTypeCriteria& memoryTypeCriteria) noexcept = 0;
 	};
 
 
@@ -187,7 +188,7 @@ namespace Strawberry::Vulkan
 	{
 	public:
 		Allocation() = default;
-		Allocation(const Device& device, Allocator& allocator, MemoryPool& allocation, size_t offset, size_t size);
+		Allocation(Allocator& allocator, MemoryPool& allocation, size_t offset, size_t size);
 		Allocation(const Allocation&)            = delete;
 		Allocation& operator=(const Allocation&) = delete;
 		Allocation(Allocation&& other) noexcept;
@@ -198,7 +199,8 @@ namespace Strawberry::Vulkan
 		explicit operator bool() const noexcept;
 
 
-		[[nodiscard]] VkDevice                          GetDevice() const noexcept;
+		[[nodiscard]]       Device&                     GetDevice()       noexcept;
+		[[nodiscard]] const Device&                     GetDevice() const noexcept;
 		[[nodiscard]] Core::ReflexivePointer<Allocator> GetAllocator() const noexcept;
 		[[nodiscard]] Address                           Address() const noexcept;
 		[[nodiscard]] VkDeviceMemory                    Memory() const noexcept;
@@ -213,7 +215,6 @@ namespace Strawberry::Vulkan
 
 
 	private:
-		VkDevice                           mDevice     = VK_NULL_HANDLE;
 		Core::ReflexivePointer<Allocator>  mAllocator  = nullptr;
 		Core::ReflexivePointer<MemoryPool> mMemoryPool = nullptr;
 		size_t                             mOffset     = 0;

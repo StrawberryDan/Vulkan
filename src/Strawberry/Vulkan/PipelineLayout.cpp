@@ -48,6 +48,11 @@ namespace Strawberry::Vulkan
 		}
 	}
 
+	Core::ReflexivePointer<Device> PipelineLayout::GetDevice() const
+	{
+		return mDevice;
+	}
+
 
 	PipelineLayout::operator VkPipelineLayout() const
 	{
