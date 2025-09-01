@@ -53,6 +53,8 @@ if (NOT TARGET StrawberryVulkan)
 		src/Strawberry/Vulkan/ImageView.hpp
 		src/Strawberry/Vulkan/Instance.cpp
 		src/Strawberry/Vulkan/Instance.hpp
+		src/Strawberry/Vulkan/Memory/Allocation.hpp
+		src/Strawberry/Vulkan/Memory/AllocationError.hpp
 		src/Strawberry/Vulkan/Memory/AllocationRequest.hpp
 		src/Strawberry/Vulkan/Memory/Allocator.cpp
 		src/Strawberry/Vulkan/Memory/Allocator.hpp
@@ -62,13 +64,17 @@ if (NOT TARGET StrawberryVulkan)
 		src/Strawberry/Vulkan/Memory/FreelistAllocator.hpp
 		src/Strawberry/Vulkan/Memory/Memory.cpp
 		src/Strawberry/Vulkan/Memory/Memory.hpp
+		src/Strawberry/Vulkan/Memory/MemoryPool.hpp
 		src/Strawberry/Vulkan/Memory/MemoryTypeCriteria.cpp
 		src/Strawberry/Vulkan/Memory/MemoryTypeCriteria.hpp
 		src/Strawberry/Vulkan/Memory/MotherAllocator.hpp
+		src/Strawberry/Vulkan/Memory/MultiAllocator.hpp
 		src/Strawberry/Vulkan/Memory/NaiveAllocator.cpp
 		src/Strawberry/Vulkan/Memory/NaiveAllocator.hpp
 		src/Strawberry/Vulkan/Memory/NaiveMultiAllocator.cpp
 		src/Strawberry/Vulkan/Memory/NaiveMultiAllocator.hpp
+		src/Strawberry/Vulkan/Memory/PoolAllocator.hpp
+		src/Strawberry/Vulkan/Memory/SingleAllocator.hpp
 		src/Strawberry/Vulkan/PhysicalDevice.cpp
 		src/Strawberry/Vulkan/PhysicalDevice.hpp
 		src/Strawberry/Vulkan/PipelineLayout.cpp

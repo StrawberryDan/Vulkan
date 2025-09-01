@@ -1,5 +1,6 @@
 #pragma once
-#include "Allocator.hpp"
+#include "SingleAllocator.hpp"
+#include "MultiAllocator.hpp"
 #include <unordered_set>
 
 
@@ -10,7 +11,7 @@ namespace Strawberry::Vulkan
         : public MultiAllocator
     {
     public:
-        explicit NaiveMultiAllocator(Device &device)
+        explicit NaiveMultiAllocator(Device& device)
             : MultiAllocator(device)
         {}
 

@@ -5,15 +5,15 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 // Strawberry Vulkan
-#include "Memory/Allocator.hpp"
+#include "Memory/MemoryTypeCriteria.hpp"
+#include "Memory/Allocation.hpp"
+#include "Memory/SingleAllocator.hpp"
 // Strawberry Core
-#include "Strawberry/Core/Types/Overload.hpp"
 #include "Strawberry/Core/Types/Optional.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
 #include "Strawberry/Core/Types/ReflexivePointer.hpp"
 // Vulkan
 #include <vulkan/vulkan.h>
-// Standard Library
 
 
 //======================================================================================================================
