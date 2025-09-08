@@ -1,0 +1,175 @@
+//======================================================================================================================
+//  Includes
+//----------------------------------------------------------------------------------------------------------------------
+// Strawberry Graphics
+#include "Device.hpp"
+#include "Strawberry/Vulkan/Device/Instance.hpp"
+#include "Strawberry/Vulkan/Memory/Allocator/FallbackAllocator.hpp"
+#include "Strawberry/Vulkan/Memory/Allocator/FreelistAllocator.hpp"
+#include "Strawberry/Vulkan/Memory/Allocator/NaiveMultiAllocator.hpp"
+// Strawberry Core
+#include "Strawberry/Core/Assert.hpp"
+// Standard Library
+#include <algorithm>
+#include <utility>
+#include <vector>
+
+
+//======================================================================================================================
+//  Class Definitions
+//----------------------------------------------------------------------------------------------------------------------
+namespace Strawberry::Vulkan
+{
+	Device::Device(const PhysicalDevice&        physicalDevice, const VkPhysicalDeviceFeatures& features,
+				   std::vector<QueueCreateInfo> queueCreateInfo)
+		: mDevice{}
+		  , mPhysicalDevice(physicalDevice)
+	{
+		ZoneScoped;
+
+		// Describes Queues
+		std::vector<VkDeviceQueueCreateInfo> queues;
+		std::vector<std::vector<float> >     queuePriorities;
+		for (auto& info: queueCreateInfo)
+		{
+			queuePriorities.emplace_back(info.count, 1.0f);
+			queues.push_back
+					(VkDeviceQueueCreateInfo
+					 {
+						 .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+						 .pNext = nullptr,
+						 .flags = 0,
+						 .queueFamilyIndex = info.familyIndex,
+						 .queueCount = info.count,
+						 .pQueuePriorities = queuePriorities.back().data()
+					 });
+		}
+
+		// Select Layers
+		std::vector<const char*> layers;
+
+		// Select Extensions
+		std::vector<const char*> extensions
+		{
+			"VK_KHR_dynamic_rendering",
+			"VK_KHR_swapchain",
+#ifdef STRAWBERRY_DEBUG
+			"VK_KHR_shader_non_semantic_info",
+#endif
+		};
+
+		// Enumerate Extension Properties of Physical Device
+		auto extensionProperties = GetPhysicalDevice().GetExtensionProperties();
+
+
+		// Add portability subset if available
+		if (std::any_of(extensionProperties.begin(),
+						extensionProperties.end(),
+						[](VkExtensionProperties x) {
+							return strcmp(x.extensionName, "VK_KHR_portability_subset") == 0;
+						}))
+		{
+			extensions.push_back("VK_KHR_portability_subset");
+		}
+
+
+		// Populate info struct
+		VkDeviceCreateInfo createInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = 0,
+			.queueCreateInfoCount = static_cast<uint32_t>(queues.size()),
+			.pQueueCreateInfos = queues.data(),
+			.enabledLayerCount = static_cast<uint32_t>(layers.size()),
+			.ppEnabledLayerNames = layers.data(),
+			.enabledExtensionCount = static_cast<uint32_t>(extensions.size()),
+			.ppEnabledExtensionNames = extensions.data(),
+			.pEnabledFeatures = &features
+		};
+
+		// Create Device
+		Core::AssertEQ(vkCreateDevice(physicalDevice.mPhysicalDevice, &createInfo, nullptr, &mDevice), VK_SUCCESS);
+
+
+		for (auto& createInfo: queueCreateInfo)
+		{
+			for (int i = 0; i < createInfo.count; i++)
+				mQueues[createInfo.familyIndex].emplace_back(Queue(*this, createInfo.familyIndex, i));
+		}
+
+		mAllocator = std::make_unique<NaiveMultiAllocator<FallbackChainAllocator<FreeListAllocator> > >(*this);
+	}
+
+
+	Device::Device(Device&& rhs) noexcept
+		: mDevice(std::exchange(rhs.mDevice, nullptr))
+		  , mPhysicalDevice(std::move(rhs.mPhysicalDevice))
+		  , mQueues(std::move(rhs.mQueues))
+		  , mAllocator(std::move(rhs.mAllocator)) {}
+
+
+	Device& Device::operator=(Device&& rhs) noexcept
+	{
+		if (this != &rhs)
+		{
+			std::destroy_at(this);
+			std::construct_at(this, std::move(rhs));
+		}
+
+		return *this;
+	}
+
+
+	Device::~Device()
+	{
+		ZoneScoped;
+
+		if (mDevice)
+		{
+			WaitUntilIdle();
+			mAllocator.reset();
+			mQueues.clear();
+			Core::Assert(vkDeviceWaitIdle(mDevice) == VK_SUCCESS);
+			vkDestroyDevice(mDevice, nullptr);
+		}
+	}
+
+
+	Device::operator VkDevice() const
+	{
+		return mDevice;
+	}
+
+
+	void Device::WaitUntilIdle() const
+	{
+		ZoneScoped;
+
+		Core::AssertEQ(vkDeviceWaitIdle(mDevice), VK_SUCCESS);
+	}
+
+
+	Core::ReflexivePointer<Instance> Device::GetInstance() const
+	{
+		return GetPhysicalDevice().GetInstance();
+	}
+
+
+	const PhysicalDevice& Device::GetPhysicalDevice() const
+	{
+		return *mPhysicalDevice;
+	}
+
+
+	Queue& Device::GetQueue(uint32_t family, uint32_t index)
+	{
+		return mQueues[family][index];
+	}
+
+
+	MultiAllocator& Device::GetAllocator() const
+	{
+		return *mAllocator;
+	}
+}

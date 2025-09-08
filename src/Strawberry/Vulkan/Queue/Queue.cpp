@@ -1,0 +1,101 @@
+//======================================================================================================================
+//  Includes
+//----------------------------------------------------------------------------------------------------------------------
+#include "Strawberry/Vulkan/Queue/Queue.hpp"
+#include "Strawberry/Vulkan/Device/Device.hpp"
+#include "Strawberry/Vulkan/Queue/CommandBuffer.hpp"
+// Strawberry Core
+#include "Strawberry/Core/Assert.hpp"
+// Standard Library
+#include <memory>
+
+
+//======================================================================================================================
+//  Class Definitions
+//----------------------------------------------------------------------------------------------------------------------
+namespace Strawberry::Vulkan
+{
+	Queue::Queue(Device& device, uint32_t family, uint32_t index)
+		: mFamilyIndex(family)
+		, mDevice(device)
+	{
+		vkGetDeviceQueue(*mDevice, mFamilyIndex, index, &mQueue);
+	}
+
+
+	Queue::Queue(Queue&& rhs) noexcept
+		: mQueue(std::exchange(rhs.mQueue, nullptr))
+		, mFamilyIndex(std::exchange(rhs.mFamilyIndex, 0))
+		, mDevice(std::move(rhs.mDevice)) {}
+
+
+	Queue& Queue::operator=(Queue&& rhs)
+	{
+		if (this != &rhs)
+		{
+			std::destroy_at(this);
+			std::construct_at(this, std::move(rhs));
+		}
+
+		return *this;
+	}
+
+
+	Queue::~Queue()
+	{
+		ZoneScoped;
+
+		if (mQueue)
+		{
+			WaitUntilIdle();
+		}
+	}
+
+
+	void Queue::Submit(const CommandBuffer& commandBuffer)
+	{
+		ZoneScoped;
+
+		Core::AssertEQ(commandBuffer.Level(), VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+
+		VkCommandBuffer handle = commandBuffer;
+		VkSubmitInfo    submitInfo{
+			.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+			.pNext = nullptr,
+			.waitSemaphoreCount = 0,
+			.pWaitSemaphores = nullptr,
+			.pWaitDstStageMask = nullptr,
+			.commandBufferCount = 1,
+			.pCommandBuffers = &handle,
+			.signalSemaphoreCount = 0,
+			.pSignalSemaphores = nullptr,
+		};
+
+		commandBuffer.mExecutionFenceOrParentBuffer.Ptr<Fence>()->Reset();
+		commandBuffer.MoveIntoPendingState();
+		Core::AssertEQ(vkQueueSubmit(mQueue, 1, &submitInfo, commandBuffer.mExecutionFenceOrParentBuffer.Ptr<Fence>()->mFence), VK_SUCCESS);
+		commandBuffer.mExecutionFenceOrParentBuffer.Ptr<Fence>()->Wait();
+	}
+
+
+	void Queue::WaitUntilIdle() const
+	{
+		ZoneScoped;
+
+		Core::AssertEQ(
+			vkQueueWaitIdle(mQueue),
+			VK_SUCCESS);
+	}
+
+
+	Device& Queue::GetDevice()
+	{
+		return *mDevice;
+	}
+
+
+	uint32_t Queue::GetFamilyIndex() const
+	{
+		return mFamilyIndex;
+	}
+}

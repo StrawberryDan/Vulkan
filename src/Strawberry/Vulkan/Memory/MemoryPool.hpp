@@ -1,7 +1,7 @@
 #pragma once
 #include "Allocator/AllocationError.hpp"
 #include "Allocation.hpp"
-#include "Strawberry/Vulkan/Device.hpp"
+#include "../Device/Device.hpp"
 #include "Strawberry/Core/Types/Result.hpp"
 #include "Strawberry/Core/Types/ReflexivePointer.hpp"
 

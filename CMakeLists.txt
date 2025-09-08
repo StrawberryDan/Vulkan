@@ -23,36 +23,36 @@ if (NOT TARGET StrawberryVulkan)
 
 
 	list(APPEND StrawberryVulkan_Source
-		src/Strawberry/Vulkan/Buffer.cpp
-		src/Strawberry/Vulkan/Buffer.hpp
-		src/Strawberry/Vulkan/BufferView.cpp
-		src/Strawberry/Vulkan/BufferView.hpp
-		src/Strawberry/Vulkan/CommandBuffer.cpp
-		src/Strawberry/Vulkan/CommandBuffer.hpp
-		src/Strawberry/Vulkan/CommandPool.cpp
-		src/Strawberry/Vulkan/CommandPool.hpp
-		src/Strawberry/Vulkan/ComputePipeline.cpp
-		src/Strawberry/Vulkan/ComputePipeline.hpp
-		src/Strawberry/Vulkan/DescriptorPool.cpp
-		src/Strawberry/Vulkan/DescriptorPool.hpp
-		src/Strawberry/Vulkan/DescriptorSet.cpp
-		src/Strawberry/Vulkan/DescriptorSet.hpp
-		src/Strawberry/Vulkan/Device.cpp
-		src/Strawberry/Vulkan/Device.hpp
-		src/Strawberry/Vulkan/Fence.cpp
-		src/Strawberry/Vulkan/Fence.hpp
-		src/Strawberry/Vulkan/Framebuffer.cpp
-		src/Strawberry/Vulkan/Framebuffer.hpp
-		src/Strawberry/Vulkan/GraphicsPipeline.cpp
-		src/Strawberry/Vulkan/GraphicsPipeline.hpp
-		src/Strawberry/Vulkan/Image.cpp
-		src/Strawberry/Vulkan/Image.hpp
-		src/Strawberry/Vulkan/ImageMemoryBarrier.cpp
-		src/Strawberry/Vulkan/ImageMemoryBarrier.hpp
-		src/Strawberry/Vulkan/ImageView.cpp
-		src/Strawberry/Vulkan/ImageView.hpp
-		src/Strawberry/Vulkan/Instance.cpp
-		src/Strawberry/Vulkan/Instance.hpp
+            src/Strawberry/Vulkan/Resource/Buffer.cpp
+            src/Strawberry/Vulkan/Resource/Buffer.hpp
+            src/Strawberry/Vulkan/Resource/BufferView.cpp
+            src/Strawberry/Vulkan/Resource/BufferView.hpp
+            src/Strawberry/Vulkan/Queue/CommandBuffer.cpp
+            src/Strawberry/Vulkan/Queue/CommandBuffer.hpp
+            src/Strawberry/Vulkan/Queue/CommandPool.cpp
+            src/Strawberry/Vulkan/Queue/CommandPool.hpp
+            src/Strawberry/Vulkan/Pipeline/ComputePipeline.cpp
+            src/Strawberry/Vulkan/Pipeline/ComputePipeline.hpp
+            src/Strawberry/Vulkan/Descriptor/DescriptorPool.cpp
+            src/Strawberry/Vulkan/Descriptor/DescriptorPool.hpp
+            src/Strawberry/Vulkan/Descriptor/DescriptorSet.cpp
+            src/Strawberry/Vulkan/Descriptor/DescriptorSet.hpp
+            src/Strawberry/Vulkan/Device/Device.cpp
+            src/Strawberry/Vulkan/Device/Device.hpp
+            src/Strawberry/Vulkan/Synchronisation/Fence.cpp
+            src/Strawberry/Vulkan/Synchronisation/Fence.hpp
+            src/Strawberry/Vulkan/Resource/Framebuffer.cpp
+            src/Strawberry/Vulkan/Resource/Framebuffer.hpp
+            src/Strawberry/Vulkan/Pipeline/GraphicsPipeline.cpp
+            src/Strawberry/Vulkan/Pipeline/GraphicsPipeline.hpp
+            src/Strawberry/Vulkan/Resource/Image.cpp
+            src/Strawberry/Vulkan/Resource/Image.hpp
+            src/Strawberry/Vulkan/Queue/ImageMemoryBarrier.cpp
+            src/Strawberry/Vulkan/Queue/ImageMemoryBarrier.hpp
+            src/Strawberry/Vulkan/Resource/ImageView.cpp
+            src/Strawberry/Vulkan/Resource/ImageView.hpp
+            src/Strawberry/Vulkan/Device/Instance.cpp
+            src/Strawberry/Vulkan/Device/Instance.hpp
 		src/Strawberry/Vulkan/Memory/Allocation.cpp
 		src/Strawberry/Vulkan/Memory/Allocation.hpp
             src/Strawberry/Vulkan/Memory/Allocator/AllocationError.hpp
@@ -78,23 +78,23 @@ if (NOT TARGET StrawberryVulkan)
             src/Strawberry/Vulkan/Memory/Allocator/PoolAllocator.hpp
             src/Strawberry/Vulkan/Memory/Allocator/SingleAllocator.cpp
             src/Strawberry/Vulkan/Memory/Allocator/SingleAllocator.hpp
-		src/Strawberry/Vulkan/PhysicalDevice.cpp
-		src/Strawberry/Vulkan/PhysicalDevice.hpp
-		src/Strawberry/Vulkan/PipelineLayout.cpp
-		src/Strawberry/Vulkan/PipelineLayout.hpp
-		src/Strawberry/Vulkan/Projection.hpp
-		src/Strawberry/Vulkan/Queue.cpp
-		src/Strawberry/Vulkan/Queue.hpp
-		src/Strawberry/Vulkan/RenderPass.cpp
-		src/Strawberry/Vulkan/RenderPass.hpp
-		src/Strawberry/Vulkan/Sampler.cpp
-		src/Strawberry/Vulkan/Sampler.hpp
-		src/Strawberry/Vulkan/Shader.cpp
-		src/Strawberry/Vulkan/Shader.hpp
-		src/Strawberry/Vulkan/Surface.cpp
-		src/Strawberry/Vulkan/Surface.hpp
-		src/Strawberry/Vulkan/Swapchain.cpp
-		src/Strawberry/Vulkan/Swapchain.hpp
+            src/Strawberry/Vulkan/Device/PhysicalDevice.cpp
+            src/Strawberry/Vulkan/Device/PhysicalDevice.hpp
+            src/Strawberry/Vulkan/Pipeline/PipelineLayout.cpp
+            src/Strawberry/Vulkan/Pipeline/PipelineLayout.hpp
+            src/Strawberry/Vulkan/Math/Projection.hpp
+            src/Strawberry/Vulkan/Queue/Queue.cpp
+            src/Strawberry/Vulkan/Queue/Queue.hpp
+            src/Strawberry/Vulkan/Pipeline/RenderPass.cpp
+            src/Strawberry/Vulkan/Pipeline/RenderPass.hpp
+            src/Strawberry/Vulkan/Descriptor/Sampler.cpp
+            src/Strawberry/Vulkan/Descriptor/Sampler.hpp
+            src/Strawberry/Vulkan/Pipeline/Shader.cpp
+            src/Strawberry/Vulkan/Pipeline/Shader.hpp
+            src/Strawberry/Vulkan/Device/Surface.cpp
+            src/Strawberry/Vulkan/Device/Surface.hpp
+            src/Strawberry/Vulkan/Device/Swapchain.cpp
+            src/Strawberry/Vulkan/Device/Swapchain.hpp
 	)
 
 

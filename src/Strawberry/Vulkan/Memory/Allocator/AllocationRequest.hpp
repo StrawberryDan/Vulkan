@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "Strawberry/Vulkan/Device.hpp"
+#include "../../Device/Device.hpp"
 
 
 namespace Strawberry::Vulkan
