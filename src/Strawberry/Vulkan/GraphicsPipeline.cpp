@@ -3,8 +3,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 #include "GraphicsPipeline.hpp"
 #include "Shader.hpp"
-#include "Sampler.hpp"
-#include "ImageView.hpp"
 #include "RenderPass.hpp"
 // Strawberry Graphics
 #include "Device.hpp"
@@ -12,7 +10,6 @@
 #include "Strawberry/Core/Assert.hpp"
 // Standard Library
 #include <bit>
-#include <cmath>
 #include <utility>
 
 #include "Framebuffer.hpp"
