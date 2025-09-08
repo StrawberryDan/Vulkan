@@ -1,10 +1,17 @@
 #pragma once
 
-#include "Allocator.hpp"
+#include "Memory.hpp"
+#include "Strawberry/Core/Types/ReflexivePointer.hpp"
+#include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
 
 
 namespace Strawberry::Vulkan
 {
+	class Allocator;
+	class MemoryPool;
+	class Device;
+
+
 	class Allocation
 	{
 	public:

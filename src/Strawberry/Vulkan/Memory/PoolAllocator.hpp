@@ -8,14 +8,11 @@ namespace Strawberry::Vulkan
 		: public SingleAllocator
 	{
 	public:
-		PoolAllocator(MemoryPool&& memoryPool)
-			: SingleAllocator(*memoryPool.GetDevice(), memoryPool.GetMemoryTypeIndex())
-			, mMemoryPool(std::move(memoryPool))
-		{}
+		explicit PoolAllocator(MemoryPool&& memoryPool);
 
+		const MemoryPool& Memory() const noexcept;
 
-		const MemoryPool& Memory() const noexcept { return mMemoryPool; }
-		MemoryPool& Memory()       noexcept { return mMemoryPool; }
+		MemoryPool& Memory() noexcept;
 
 
 	private:

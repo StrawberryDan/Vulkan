@@ -1,4 +1,9 @@
 #pragma once
+#include "AllocationError.hpp"
+#include "Allocation.hpp"
+#include "Strawberry/Vulkan/Device.hpp"
+#include "Strawberry/Core/Types/Result.hpp"
+#include "Strawberry/Core/Types/ReflexivePointer.hpp"
 
 
 namespace Strawberry::Vulkan
@@ -26,7 +31,7 @@ namespace Strawberry::Vulkan
 		Allocation AllocateView(Allocator& allocator, size_t offset, size_t size);
 
 
-		Core::ReflexivePointer<Device> GetDevice() const noexcept;
+		Device& GetDevice() const noexcept;
 		VkDeviceMemory Memory() const noexcept;
 		MemoryTypeIndex GetMemoryTypeIndex() const noexcept;
 		size_t Size() const noexcept;

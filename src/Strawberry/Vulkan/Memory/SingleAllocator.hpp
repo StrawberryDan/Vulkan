@@ -1,5 +1,7 @@
 #pragma once
 #include "Allocation.hpp"
+#include "Allocator.hpp"
+#include "AllocationRequest.hpp"
 #include "Strawberry/Core/Types/Result.hpp"
 
 
@@ -12,15 +14,12 @@ namespace Strawberry::Vulkan
 		: public Allocator
 	{
 	public:
-		SingleAllocator(Device& device, MemoryTypeIndex memoryTypeIndex)
-			: Allocator(device)
-			, mMemoryTypeIndex(memoryTypeIndex)
-		{}
+		SingleAllocator(Device& device, MemoryTypeIndex memoryTypeIndex);
 
 		virtual AllocationResult Allocate(const AllocationRequest& allocationRequest) noexcept = 0;
 
 
-		const MemoryTypeIndex GetMemoryTypeIndex() const noexcept { return mMemoryTypeIndex; }
+		const MemoryTypeIndex GetMemoryTypeIndex() const noexcept;
 
 
 	private:
