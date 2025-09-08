@@ -1,11 +1,11 @@
 #pragma once
-#include "SingleAllocator.hpp"
+#include "MonoAllocator.hpp"
 
 
 namespace Strawberry::Vulkan
 {
 	class NaiveAllocator
-		: public SingleAllocator
+		: public MonoAllocator
 	{
 	public:
 		NaiveAllocator(Device& device, MemoryTypeIndex memoryType);

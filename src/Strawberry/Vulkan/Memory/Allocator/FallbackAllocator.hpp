@@ -8,13 +8,13 @@
 
 namespace Strawberry::Vulkan
 {
-	template<std::derived_from<SingleAllocator> T>
+	template<std::derived_from<MonoAllocator> T>
 	class FallbackAllocator
-			: public SingleAllocator
+			: public MonoAllocator
 	{
 	public:
 		FallbackAllocator(T&& allocator)
-			: SingleAllocator(allocator.GetDevice(), allocator.GetMemoryTypeIndex())
+			: MonoAllocator(allocator.GetDevice(), allocator.GetMemoryTypeIndex())
 			  , mMainAllocator(std::move(allocator))
 			  , mFallbackAllocator(mMainAllocator.GetDevice(), mMainAllocator.GetMemoryTypeIndex()) {}
 

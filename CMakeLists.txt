@@ -69,15 +69,15 @@ if (NOT TARGET StrawberryVulkan)
 		src/Strawberry/Vulkan/Memory/MemoryPool.hpp
 		src/Strawberry/Vulkan/Memory/MemoryTypeCriteria.cpp
 		src/Strawberry/Vulkan/Memory/MemoryTypeCriteria.hpp
-            src/Strawberry/Vulkan/Memory/Allocator/MultiAllocator.hpp
+            src/Strawberry/Vulkan/Memory/Allocator/PolyAllocator.hpp
             src/Strawberry/Vulkan/Memory/Allocator/NaiveAllocator.cpp
             src/Strawberry/Vulkan/Memory/Allocator/NaiveAllocator.hpp
-            src/Strawberry/Vulkan/Memory/Allocator/NaiveMultiAllocator.cpp
-            src/Strawberry/Vulkan/Memory/Allocator/NaiveMultiAllocator.hpp
+            src/Strawberry/Vulkan/Memory/Allocator/NaivePolyAllocator.cpp
+            src/Strawberry/Vulkan/Memory/Allocator/NaivePolyAllocator.hpp
             src/Strawberry/Vulkan/Memory/Allocator/PoolAllocator.cpp
             src/Strawberry/Vulkan/Memory/Allocator/PoolAllocator.hpp
-            src/Strawberry/Vulkan/Memory/Allocator/SingleAllocator.cpp
-            src/Strawberry/Vulkan/Memory/Allocator/SingleAllocator.hpp
+            src/Strawberry/Vulkan/Memory/Allocator/MonoAllocator.cpp
+            src/Strawberry/Vulkan/Memory/Allocator/MonoAllocator.hpp
             src/Strawberry/Vulkan/Device/PhysicalDevice.cpp
             src/Strawberry/Vulkan/Device/PhysicalDevice.hpp
             src/Strawberry/Vulkan/Pipeline/PipelineLayout.cpp

@@ -122,8 +122,8 @@ namespace Strawberry::Vulkan
 		vkGetImageMemoryRequirements(device, imageHandle, &memoryRequirements);
 		MemoryBlock memory = mAllocationSource.Visit(
 			[&](MemoryBlock& allocation) { return AllocationResult(std::move(allocation)); },
-			[&](SingleAllocator* allocator) { return allocator->Allocate(memoryRequirements); },
-			[&](MultiAllocator* allocator) { return allocator->Allocate(memoryRequirements, mMemoryTypeCriteria); }
+			[&](MonoAllocator* allocator) { return allocator->Allocate(memoryRequirements); },
+			[&](PolyAllocator* allocator) { return allocator->Allocate(memoryRequirements, mMemoryTypeCriteria); }
 		).Unwrap();
 
 		Core::AssertEQ(vkBindImageMemory(device, imageHandle, memory.Memory(), memory.Offset()), VK_SUCCESS);
@@ -139,11 +139,11 @@ namespace Strawberry::Vulkan
 			{
 				return allocation.GetDevice();
 			},
-			[&](const SingleAllocator* allocator) -> const Device&
+			[&](const MonoAllocator* allocator) -> const Device&
 			{
 				return allocator->GetDevice();
 			},
-			[&](const MultiAllocator* allocator) -> const Device&
+			[&](const PolyAllocator* allocator) -> const Device&
 			{
 				return allocator->GetDevice();
 			}

@@ -3,13 +3,13 @@
 
 namespace Strawberry::Vulkan
 {
-	class MultiAllocator
+	class PolyAllocator
 		: public Allocator
 	{
 	public:
 		using Allocator::Allocator;
 
-		~MultiAllocator() override = default;
+		~PolyAllocator() override = default;
 
 		virtual AllocationResult Allocate(const AllocationRequest& allocationRequest, const MemoryTypeCriteria& memoryTypeCriteria) noexcept = 0;
 	};

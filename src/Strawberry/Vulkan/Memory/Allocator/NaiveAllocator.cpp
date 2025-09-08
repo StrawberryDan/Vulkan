@@ -4,7 +4,7 @@
 namespace Strawberry::Vulkan
 {
 	NaiveAllocator::NaiveAllocator(Device& device, MemoryTypeIndex memoryType)
-		: SingleAllocator(device, memoryType)
+		: MonoAllocator(device, memoryType)
 	{
 	}
 

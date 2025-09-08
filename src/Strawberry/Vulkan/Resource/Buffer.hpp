@@ -5,8 +5,8 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 // Strawberry Vulkan
-#include "Strawberry/Vulkan/Memory/Allocator/SingleAllocator.hpp"
-#include "Strawberry/Vulkan/Memory/Allocator/MultiAllocator.hpp"
+#include "Strawberry/Vulkan/Memory/Allocator/MonoAllocator.hpp"
+#include "Strawberry/Vulkan/Memory/Allocator/PolyAllocator.hpp"
 // Strawberry Core
 #include "Strawberry/Core/IO/DynamicByteBuffer.hpp"
 // Vulkan
@@ -28,8 +28,8 @@ namespace Strawberry::Vulkan
 		public:
 			Builder(Device& device, MemoryTypeCriteria memoryTypeCriteria);
 			Builder(MemoryBlock allocation);
-			Builder(SingleAllocator& allocator);
-			Builder(MultiAllocator& allocator, MemoryTypeCriteria memoryTypeCriteria);
+			Builder(MonoAllocator& allocator);
+			Builder(PolyAllocator& allocator, MemoryTypeCriteria memoryTypeCriteria);
 
 
 			Builder& WithSize(size_t size) { mData = size; return *this; }
@@ -48,7 +48,7 @@ namespace Strawberry::Vulkan
 			MemoryBlock AllocateMemory(const VkMemoryRequirements& requirements) const;
 
 
-			mutable Core::Variant<MemoryBlock, SingleAllocator*, MultiAllocator*> mAllocationSource;
+			mutable Core::Variant<MemoryBlock, MonoAllocator*, PolyAllocator*> mAllocationSource;
 
 
 			Core::Variant<size_t, Core::IO::DynamicByteBuffer> mData {static_cast<size_t>(0)};

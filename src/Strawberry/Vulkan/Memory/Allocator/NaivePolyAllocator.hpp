@@ -1,22 +1,22 @@
 #pragma once
-#include "Strawberry/Vulkan/Memory/Allocator/SingleAllocator.hpp"
-#include "Strawberry/Vulkan/Memory/Allocator/MultiAllocator.hpp"
+#include "Strawberry/Vulkan/Memory/Allocator/MonoAllocator.hpp"
+#include "Strawberry/Vulkan/Memory/Allocator/PolyAllocator.hpp"
 #include <unordered_set>
 
 
 namespace Strawberry::Vulkan
 {
-	template<std::derived_from<SingleAllocator> Base>
-	class NaiveMultiAllocator
-			: public MultiAllocator
+	template<std::derived_from<MonoAllocator> Base>
+	class NaivePolyAllocator
+			: public PolyAllocator
 	{
 	public:
-		explicit NaiveMultiAllocator(Device& device)
-			: MultiAllocator(device) {}
+		explicit NaivePolyAllocator(Device& device)
+			: PolyAllocator(device) {}
 
-		~NaiveMultiAllocator() override = default;
+		~NaivePolyAllocator() override = default;
 
-		SingleAllocator& GetAllocator(MemoryTypeIndex typeIndex);
+		MonoAllocator& GetAllocator(MemoryTypeIndex typeIndex);
 
 		AllocationResult Allocate(const AllocationRequest&  allocationResult,
 								  const MemoryTypeCriteria& memoryTypeCriteria) noexcept override;
@@ -34,8 +34,8 @@ namespace Strawberry::Vulkan
 	};
 
 
-	template<std::derived_from<SingleAllocator> Base>
-	SingleAllocator& NaiveMultiAllocator<Base>::GetAllocator(MemoryTypeIndex typeIndex)
+	template<std::derived_from<MonoAllocator> Base>
+	MonoAllocator& NaivePolyAllocator<Base>::GetAllocator(MemoryTypeIndex typeIndex)
 	{
 		if (!mAllocators.contains(typeIndex)) [[unlikely]]
 		{
@@ -45,8 +45,8 @@ namespace Strawberry::Vulkan
 		return mAllocators.at(typeIndex).allocator;
 	}
 
-	template<std::derived_from<SingleAllocator> Base>
-	AllocationResult NaiveMultiAllocator<Base>::Allocate(
+	template<std::derived_from<MonoAllocator> Base>
+	AllocationResult NaivePolyAllocator<Base>::Allocate(
 		const AllocationRequest&  allocationResult,
 		const MemoryTypeCriteria& memoryTypeCriteria) noexcept
 	{
@@ -64,8 +64,8 @@ namespace Strawberry::Vulkan
 		return result;
 	}
 
-	template<std::derived_from<SingleAllocator> Base>
-	void NaiveMultiAllocator<Base>::Free(MemoryBlock&& address) noexcept
+	template<std::derived_from<MonoAllocator> Base>
+	void NaivePolyAllocator<Base>::Free(MemoryBlock&& address) noexcept
 	{
 		for (auto& allocator: mAllocators)
 		{

@@ -4,7 +4,7 @@
 namespace Strawberry::Vulkan
 {
 	PoolAllocator::PoolAllocator(MemoryPool&& memoryPool)
-			: SingleAllocator(memoryPool.GetDevice(), memoryPool.GetMemoryTypeIndex())
+			: MonoAllocator(memoryPool.GetDevice(), memoryPool.GetMemoryTypeIndex())
 			, mMemoryPool(std::move(memoryPool))
 	{}
 

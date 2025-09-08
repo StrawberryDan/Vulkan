@@ -1,11 +1,11 @@
 #pragma once
-#include "SingleAllocator.hpp"
+#include "MonoAllocator.hpp"
 
 
 namespace Strawberry::Vulkan
 {
 	class PoolAllocator
-		: public SingleAllocator
+		: public MonoAllocator
 	{
 	public:
 		explicit PoolAllocator(MemoryPool&& memoryPool);

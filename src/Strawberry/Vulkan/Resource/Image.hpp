@@ -7,7 +7,7 @@
 // Strawberry Vulkan
 #include "Strawberry/Vulkan/Memory/MemoryTypeCriteria.hpp"
 #include "Strawberry/Vulkan/Memory/MemoryBlock.hpp"
-#include "Strawberry/Vulkan/Memory/Allocator/SingleAllocator.hpp"
+#include "Strawberry/Vulkan/Memory/Allocator/MonoAllocator.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Types/Optional.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"
@@ -43,11 +43,11 @@ namespace Strawberry::Vulkan
 				: mAllocationSource(std::move(allocation)) {}
 
 
-			Builder(SingleAllocator& allocator)
+			Builder(MonoAllocator& allocator)
 				: mAllocationSource(&allocator) {}
 
 
-			Builder(MultiAllocator& allocator, MemoryTypeCriteria memoryTypeCriteria)
+			Builder(PolyAllocator& allocator, MemoryTypeCriteria memoryTypeCriteria)
 				: mAllocationSource(&allocator)
 				  , mMemoryTypeCriteria(memoryTypeCriteria) {}
 
@@ -77,7 +77,7 @@ namespace Strawberry::Vulkan
 			const Device& GetDevice() const;
 
 
-			mutable Core::Variant<MemoryBlock, SingleAllocator*, MultiAllocator*> mAllocationSource;
+			mutable Core::Variant<MemoryBlock, MonoAllocator*, PolyAllocator*> mAllocationSource;
 			MemoryTypeCriteria                                                   mMemoryTypeCriteria;
 
 

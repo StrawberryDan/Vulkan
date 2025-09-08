@@ -11,11 +11,11 @@ namespace Strawberry::Vulkan
 	using AllocationResult = Core::Result<MemoryBlock, AllocationError>;
 
 
-	class SingleAllocator
+	class MonoAllocator
 			: public Allocator
 	{
 	public:
-		SingleAllocator(Device& device, MemoryTypeIndex memoryTypeIndex);
+		MonoAllocator(Device& device, MemoryTypeIndex memoryTypeIndex);
 
 		virtual AllocationResult Allocate(const AllocationRequest& allocationRequest) noexcept = 0;
 

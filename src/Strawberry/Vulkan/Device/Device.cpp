@@ -6,7 +6,7 @@
 #include "Strawberry/Vulkan/Device/Instance.hpp"
 #include "Strawberry/Vulkan/Memory/Allocator/FallbackAllocator.hpp"
 #include "Strawberry/Vulkan/Memory/Allocator/FreelistAllocator.hpp"
-#include "Strawberry/Vulkan/Memory/Allocator/NaiveMultiAllocator.hpp"
+#include "Strawberry/Vulkan/Memory/Allocator/NaivePolyAllocator.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Assert.hpp"
 // Standard Library
@@ -98,7 +98,7 @@ namespace Strawberry::Vulkan
 				mQueues[createInfo.familyIndex].emplace_back(Queue(*this, createInfo.familyIndex, i));
 		}
 
-		mAllocator = std::make_unique<NaiveMultiAllocator<FallbackChainAllocator<FreeListAllocator> > >(*this);
+		mAllocator = std::make_unique<NaivePolyAllocator<FallbackChainAllocator<FreeListAllocator> > >(*this);
 	}
 
 
@@ -168,7 +168,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	MultiAllocator& Device::GetAllocator() const
+	PolyAllocator& Device::GetAllocator() const
 	{
 		return *mAllocator;
 	}

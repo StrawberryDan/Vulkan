@@ -18,7 +18,7 @@
 
 namespace Strawberry::Vulkan
 {
-	class MultiAllocator;
+	class PolyAllocator;
 }
 
 //======================================================================================================================
@@ -59,12 +59,12 @@ namespace Strawberry::Vulkan
 		[[nodiscard]] Core::ReflexivePointer<Instance>      GetInstance() const;
 		[[nodiscard]] const PhysicalDevice&                 GetPhysicalDevice() const;
 		[[nodiscard]] Queue&                                GetQueue(uint32_t family, uint32_t index);
-		[[nodiscard]] MultiAllocator&                       GetAllocator() const;
+		[[nodiscard]] PolyAllocator&                       GetAllocator() const;
 
 	private:
 		VkDevice                                            mDevice;
 		Core::ReflexivePointer<const PhysicalDevice>        mPhysicalDevice;
 		std::map<uint32_t, std::vector<Queue>>              mQueues;
-		std::unique_ptr<MultiAllocator>                     mAllocator;
+		std::unique_ptr<PolyAllocator>                     mAllocator;
 	};
 }

@@ -15,7 +15,7 @@ namespace Strawberry::Vulkan
 
 
         template<typename T>
-        AllocationError(T&& info)
+        explicit AllocationError(T&& info)
             : mInfo(std::forward<T>(info)) {}
 
 

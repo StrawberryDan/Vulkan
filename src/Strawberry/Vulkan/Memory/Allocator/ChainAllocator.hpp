@@ -1,6 +1,6 @@
 #pragma once
 #include "PoolAllocator.hpp"
-#include "SingleAllocator.hpp"
+#include "MonoAllocator.hpp"
 #include <unordered_set>
 
 
@@ -9,11 +9,11 @@ namespace Strawberry::Vulkan
 {
 	template <std::derived_from<PoolAllocator> T>
 	class ChainAllocator
-		: public SingleAllocator
+		: public MonoAllocator
 	{
 	public:
 		ChainAllocator(Device& device, MemoryTypeIndex memoryTypeIndex, size_t poolSize) noexcept
-			: SingleAllocator(device, memoryTypeIndex)
+			: MonoAllocator(device, memoryTypeIndex)
 			, mPoolSize(poolSize)
 		{
 			ExtendChain();

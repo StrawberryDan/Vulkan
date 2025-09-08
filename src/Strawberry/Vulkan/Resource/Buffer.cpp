@@ -22,7 +22,7 @@ namespace Strawberry::Vulkan
 		: mAllocationSource(std::move(allocation))
 	{}
 
-	Buffer::Builder::Builder(SingleAllocator& allocator)
+	Buffer::Builder::Builder(MonoAllocator& allocator)
 		: mAllocationSource(&allocator)
 	{}
 
@@ -33,11 +33,11 @@ namespace Strawberry::Vulkan
 			{
 				return allocation.GetDevice();
 			},
-			[](SingleAllocator* allocator) -> const Device&
+			[](MonoAllocator* allocator) -> const Device&
 			{
 				return allocator->GetDevice();
 			},
-			[](MultiAllocator* allocator) -> const Device&
+			[](PolyAllocator* allocator) -> const Device&
 			{
 				return allocator->GetDevice();
 			});
@@ -63,11 +63,11 @@ namespace Strawberry::Vulkan
 			{
 				return std::move(allocation);
 			},
-			[&](SingleAllocator* allocator)
+			[&](MonoAllocator* allocator)
 			{
 				return allocator->Allocate( AllocationRequest(requirements)).Unwrap();
 			},
-			[&](MultiAllocator* allocator)
+			[&](PolyAllocator* allocator)
 			{
 				return allocator->Allocate(AllocationRequest(requirements), mMemoryTypeCriteria).Unwrap();
 			}
@@ -75,7 +75,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Buffer::Builder::Builder(MultiAllocator& allocator, MemoryTypeCriteria memoryTypeCriteria)
+	Buffer::Builder::Builder(PolyAllocator& allocator, MemoryTypeCriteria memoryTypeCriteria)
 		: mAllocationSource(&allocator)
 		, mMemoryTypeCriteria(memoryTypeCriteria)
 	{}
