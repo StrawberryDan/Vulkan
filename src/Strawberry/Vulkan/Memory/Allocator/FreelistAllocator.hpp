@@ -2,13 +2,11 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
-// Straberry Vulkan
-#include "Strawberry/Vulkan/Memory/Allocator.hpp"
+// Strawberry Vulkan
+#include "Strawberry/Vulkan/Memory/Allocator/ChainAllocator.hpp"
+#include "Strawberry/Vulkan/Memory/Allocator/Allocator.hpp"
 // Standard Library
-#include <cstdint>
 #include <list>
-
-#include "ChainAllocator.hpp"
 
 
 //======================================================================================================================
@@ -24,8 +22,8 @@ namespace Strawberry::Vulkan
 
 
 		AllocationResult Allocate(const AllocationRequest& allocationRequest) noexcept override;
-		void             Free(Allocation&& address) noexcept override;
 
+		void Free(Allocation&& address) noexcept override;
 
 	private:
 		struct FreeRegion
@@ -40,20 +38,24 @@ namespace Strawberry::Vulkan
 		// The container of all the regions of free memory
 		std::map<Offset, FreeRegion> mRegions;
 		// Associates the 
-		std::list<Offset>            mRegionsBySize;
+		std::list<Offset> mRegionsBySize;
 
 
 		// Functions for managing the list of regions.
 		//
 		// Add a new free region to the list
-		void       AddFreeRegion(FreeRegion region);
+		void AddFreeRegion(FreeRegion region);
+
 		// Remove the region associate with the given ID
 		FreeRegion RemoveRegion(Offset id);
+
 		// Expand the given block to fill empty space
-		void       ExpandBlock(Offset id);
+		void ExpandBlock(Offset id);
+
 		// Checks if 2 blocks are adjacent to eachother without any gap. Region A must be to the left of region B.
-		bool       AreBlocksContiguous(Offset a, Offset b) const noexcept;
+		bool AreBlocksContiguous(Offset a, Offset b) const noexcept;
+
 		// Marge the given list to regions into a single block
-		void       MergeBlocks(const std::list<Offset>& regions) noexcept;
+		void MergeBlocks(const std::list<Offset>& regions) noexcept;
 	};
 }

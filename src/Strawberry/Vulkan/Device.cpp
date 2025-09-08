@@ -2,22 +2,17 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 // Strawberry Graphics
-#include "Device.hpp"
-#include "Instance.hpp"
-#include "Memory/Allocator.hpp"
+#include "Strawberry/Vulkan/Device.hpp"
+#include "Strawberry/Vulkan/Instance.hpp"
+#include "Strawberry/Vulkan/Memory/Allocator/FallbackAllocator.hpp"
+#include "Strawberry/Vulkan/Memory/Allocator/FreelistAllocator.hpp"
+#include "Strawberry/Vulkan/Memory/Allocator/NaiveMultiAllocator.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Assert.hpp"
-#include "Strawberry/Core/Types/Optional.hpp"
 // Standard Library
 #include <algorithm>
 #include <utility>
 #include <vector>
-#include <numeric>
-#include <cstring>
-
-#include "Memory/FallbackAllocator.hpp"
-#include "Memory/FreelistAllocator.hpp"
-#include "Memory/NaiveMultiAllocator.hpp"
 
 
 //======================================================================================================================
@@ -25,26 +20,27 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Device::Device(const PhysicalDevice& physicalDevice, const VkPhysicalDeviceFeatures& features, std::vector<QueueCreateInfo> queueCreateInfo)
+	Device::Device(const PhysicalDevice&        physicalDevice, const VkPhysicalDeviceFeatures& features,
+				   std::vector<QueueCreateInfo> queueCreateInfo)
 		: mDevice{}
-		, mPhysicalDevice(physicalDevice)
+		  , mPhysicalDevice(physicalDevice)
 	{
 		ZoneScoped;
 
 		// Describes Queues
 		std::vector<VkDeviceQueueCreateInfo> queues;
-		std::vector<std::vector<float>>      queuePriorities;
+		std::vector<std::vector<float> >     queuePriorities;
 		for (auto& info: queueCreateInfo)
 		{
 			queuePriorities.emplace_back(info.count, 1.0f);
 			queues.push_back(VkDeviceQueueCreateInfo{
-				.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-				.pNext = nullptr,
-				.flags = 0,
-				.queueFamilyIndex = info.familyIndex,
-				.queueCount = info.count,
-				.pQueuePriorities = queuePriorities.back().data()
-			});
+								 .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+								 .pNext = nullptr,
+								 .flags = 0,
+								 .queueFamilyIndex = info.familyIndex,
+								 .queueCount = info.count,
+								 .pQueuePriorities = queuePriorities.back().data()
+							 });
 		}
 
 		// Select Layers
@@ -66,11 +62,10 @@ namespace Strawberry::Vulkan
 
 		// Add portability subset if available
 		if (std::any_of(extensionProperties.begin(),
-		                extensionProperties.end(),
-		                [](VkExtensionProperties x)
-		                {
-			                return strcmp(x.extensionName, "VK_KHR_portability_subset") == 0;
-		                }))
+						extensionProperties.end(),
+						[](VkExtensionProperties x) {
+							return strcmp(x.extensionName, "VK_KHR_portability_subset") == 0;
+						}))
 		{
 			extensions.push_back("VK_KHR_portability_subset");
 		}
@@ -95,21 +90,21 @@ namespace Strawberry::Vulkan
 		Core::AssertEQ(vkCreateDevice(physicalDevice.mPhysicalDevice, &createInfo, nullptr, &mDevice), VK_SUCCESS);
 
 
-		for (auto& createInfo : queueCreateInfo)
+		for (auto& createInfo: queueCreateInfo)
 		{
 			for (int i = 0; i < createInfo.count; i++)
 				mQueues[createInfo.familyIndex].emplace_back(Queue(*this, createInfo.familyIndex, i));
 		}
 
-		mAllocator = std::make_unique<NaiveMultiAllocator<FallbackChainAllocator<FreeListAllocator>>>(*this);
+		mAllocator = std::make_unique<NaiveMultiAllocator<FallbackChainAllocator<FreeListAllocator> > >(*this);
 	}
 
 
 	Device::Device(Device&& rhs) noexcept
 		: mDevice(std::exchange(rhs.mDevice, nullptr))
-		, mPhysicalDevice(std::move(rhs.mPhysicalDevice))
-		, mQueues(std::move(rhs.mQueues))
-		, mAllocator(std::move(rhs.mAllocator)) {}
+		  , mPhysicalDevice(std::move(rhs.mPhysicalDevice))
+		  , mQueues(std::move(rhs.mQueues))
+		  , mAllocator(std::move(rhs.mAllocator)) {}
 
 
 	Device& Device::operator=(Device&& rhs) noexcept

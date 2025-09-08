@@ -1,7 +1,7 @@
 #include "Strawberry/Core/IO/Logging.hpp"
 #include "Strawberry/Core/Math/Matrix.hpp"
 #include "Strawberry/Core/UTF.hpp"
-#include "Strawberry/Vulkan/Memory/Allocator.hpp"
+#include "../src/Strawberry/Vulkan/Memory/Allocator/Allocator.hpp"
 #include "Strawberry/Vulkan/Buffer.hpp"
 #include "Strawberry/Vulkan/CommandBuffer.hpp"
 #include "Strawberry/Vulkan/CommandPool.hpp"
@@ -17,7 +17,7 @@
 #include "Strawberry/Vulkan/Shader.hpp"
 #include "Strawberry/Vulkan/Surface.hpp"
 #include "Strawberry/Vulkan/Swapchain.hpp"
-#include "Strawberry/Vulkan/Memory/FreelistAllocator.hpp"
+#include "../src/Strawberry/Vulkan/Memory/Allocator/FreelistAllocator.hpp"
 #include "Strawberry/Window/Window.hpp"
 
 

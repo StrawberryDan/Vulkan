@@ -26,9 +26,7 @@ namespace Strawberry::Vulkan
 	GraphicsPipeline::GraphicsPipeline(GraphicsPipeline&& rhs) noexcept
 		: mPipeline(std::exchange(rhs.mPipeline, nullptr))
 		  , mPipelineLayout(std::exchange(rhs.mPipelineLayout, nullptr))
-		  , mRenderPass(std::move(rhs.mRenderPass))
-	{
-	}
+		  , mRenderPass(std::move(rhs.mRenderPass)) {}
 
 
 	GraphicsPipeline& GraphicsPipeline::operator=(GraphicsPipeline&& rhs) noexcept
@@ -51,10 +49,12 @@ namespace Strawberry::Vulkan
 		}
 	}
 
+
 	GraphicsPipeline::operator struct VkPipeline_T*() const
 	{
 		return mPipeline;
 	}
+
 
 	const PipelineLayout& GraphicsPipeline::GetLayout() const noexcept
 	{
@@ -65,9 +65,7 @@ namespace Strawberry::Vulkan
 	GraphicsPipeline::Builder::Builder(PipelineLayout& layout, RenderPass& renderPass, uint32_t subpass)
 		: mRenderPass(renderPass)
 		  , mSubpass(subpass)
-		  , mPipelineLayout(layout)
-	{
-	}
+		  , mPipelineLayout(layout) {}
 
 
 	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithShaderStage(VkShaderStageFlagBits stage, Shader shader)
@@ -78,21 +76,24 @@ namespace Strawberry::Vulkan
 		return *this;
 	}
 
-	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithInputBinding(uint32_t binding, uint32_t stride,
-		VkVertexInputRate inputRate)
+
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithInputBinding(uint32_t          binding, uint32_t stride,
+																		   VkVertexInputRate inputRate)
 	{
 		mVertexInputBindings.emplace_back(VkVertexInputBindingDescription{
-			.binding = binding, .stride = stride, .inputRate = inputRate
-		});
+											  .binding = binding, .stride = stride, .inputRate = inputRate
+										  });
 		return *this;
 	}
 
+
 	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithInputAttribute(uint32_t location, uint32_t binding,
-		uint32_t offset, VkFormat format)
+																			 uint32_t offset, VkFormat   format)
 	{
 		mVertexInputAttributes.emplace_back(VkVertexInputAttributeDescription{
-			.location = location, .binding = binding, .format = format, .offset = offset
-		});
+												.location = location, .binding = binding, .format = format,
+												.offset = offset
+											});
 		return *this;
 	}
 
@@ -128,41 +129,44 @@ namespace Strawberry::Vulkan
 
 
 	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithViewport(const std::vector<VkViewport>& viewports,
-																	   const std::vector<VkRect2D>& scissors)
+																	   const std::vector<VkRect2D>&   scissors)
 	{
 		mViewports.append_range(viewports);
 		mScissorRegions.append_range(scissors);
 		return *this;
 	}
 
+
 	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithViewport(const Framebuffer& framebuffer, bool negateY)
 	{
 		return WithViewport(
-			{
-				VkViewport{
-					.x = 0,
-					.y = negateY ? static_cast<float>(framebuffer.GetSize()[1]) : 0,
-					.width = framebuffer.GetSize().AsType<float>()[0],
-					.height = negateY ? -static_cast<float>(framebuffer.GetSize()[1]) : static_cast<float>(framebuffer.GetSize()[1]),
-					.minDepth = 0.0,
-					.maxDepth = 1.0
-				}
-			},
-			{
-				VkRect2D{
-					.offset = VkOffset2D
-					{
-						.x = 0,
-						.y = 0
-					},
-					.extent = VkExtent2D
-					{
-						.width = framebuffer.GetSize()[0],
-						.height = framebuffer.GetSize()[1]
-					}
-				}
-			}
-		);
+							{
+								VkViewport{
+									.x = 0,
+									.y = negateY ? static_cast<float>(framebuffer.GetSize()[1]) : 0,
+									.width = framebuffer.GetSize().AsType<float>()[0],
+									.height = negateY
+												  ? -static_cast<float>(framebuffer.GetSize()[1])
+												  : static_cast<float>(framebuffer.GetSize()[1]),
+									.minDepth = 0.0,
+									.maxDepth = 1.0
+								}
+							},
+							{
+								VkRect2D{
+									.offset = VkOffset2D
+									{
+										.x = 0,
+										.y = 0
+									},
+									.extent = VkExtent2D
+									{
+										.width = framebuffer.GetSize()[0],
+										.height = framebuffer.GetSize()[1]
+									}
+								}
+							}
+						   );
 	}
 
 
@@ -216,18 +220,19 @@ namespace Strawberry::Vulkan
 		return *this;
 	}
 
+
 	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithDepthTesting()
 	{
 		return WithDepthStencil({
-			.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
-			.pNext = nullptr,
-			.flags = 0,
-			.depthTestEnable = VK_TRUE,
-			.depthWriteEnable = VK_TRUE,
-			.depthCompareOp = VK_COMPARE_OP_LESS,
-			.depthBoundsTestEnable = VK_FALSE,
-			.stencilTestEnable = VK_FALSE,
-		});
+									.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+									.pNext = nullptr,
+									.flags = 0,
+									.depthTestEnable = VK_TRUE,
+									.depthWriteEnable = VK_TRUE,
+									.depthCompareOp = VK_COMPARE_OP_LESS,
+									.depthBoundsTestEnable = VK_FALSE,
+									.stencilTestEnable = VK_FALSE,
+								});
 	}
 
 
@@ -246,21 +251,23 @@ namespace Strawberry::Vulkan
 		return *this;
 	}
 
+
 	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithAlphaColorBlending()
 	{
 		mColorBlendingAttachmentStates.emplace_back(
-			VkPipelineColorBlendAttachmentState{
-				.blendEnable = VK_TRUE,
-				.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
-				.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
-				.colorBlendOp = VK_BLEND_OP_ADD,
-				.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
-				.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
-				.alphaBlendOp = VK_BLEND_OP_ADD,
-				.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
-				VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT
-			}
-		);
+													VkPipelineColorBlendAttachmentState{
+														.blendEnable = VK_TRUE,
+														.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
+														.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
+														.colorBlendOp = VK_BLEND_OP_ADD,
+														.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
+														.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
+														.alphaBlendOp = VK_BLEND_OP_ADD,
+														.colorWriteMask =
+														VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
+														VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT
+													}
+												   );
 		return *this;
 	}
 
@@ -292,12 +299,11 @@ namespace Strawberry::Vulkan
 		return mRenderPass->GetDevice();
 	}
 
+
 	GraphicsPipeline::GraphicsPipeline(VkPipeline handle, PipelineLayout& layout, RenderPass& renderPass)
 		: mPipeline(handle)
 		  , mPipelineLayout(layout)
-		  , mRenderPass(renderPass)
-	{
-	}
+		  , mRenderPass(renderPass) {}
 
 
 	GraphicsPipeline GraphicsPipeline::Builder::Build()
@@ -322,17 +328,19 @@ namespace Strawberry::Vulkan
 
 		// Create Shader Stages
 		std::vector<VkPipelineShaderStageCreateInfo> stages;
-		for (auto& [stage, shader] : mStages)
+		for (auto& [stage, shader]: mStages)
 		{
 			stages.emplace_back(VkPipelineShaderStageCreateInfo{
-				.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-				.pNext = nullptr,
-				.flags = 0,
-				.stage = stage,
-				.module = shader,
-				.pName = "main",
-				.pSpecializationInfo = mShaderSpecializationEntries.empty() ? nullptr : &specializationInfo,
-			});
+									.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+									.pNext = nullptr,
+									.flags = 0,
+									.stage = stage,
+									.module = shader,
+									.pName = "main",
+									.pSpecializationInfo = mShaderSpecializationEntries.empty()
+															   ? nullptr
+															   : &specializationInfo,
+								});
 		}
 
 
@@ -362,11 +370,11 @@ namespace Strawberry::Vulkan
 			.logicOp = {},
 			.attachmentCount = static_cast<uint32_t>(mColorBlendingAttachmentStates.size()),
 			.pAttachments = mColorBlendingAttachmentStates.data(),
-			.blendConstants = {0.0f, 0.0f, 0.0f, 0.0f}
+			.blendConstants = { 0.0f, 0.0f, 0.0f, 0.0f }
 		};
 
 
-		VkPipelineViewportStateCreateInfo viewportStateCreateInfo {
+		VkPipelineViewportStateCreateInfo viewportStateCreateInfo{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,
@@ -377,7 +385,7 @@ namespace Strawberry::Vulkan
 		};
 
 
-		VkPipelineVertexInputStateCreateInfo inputStateCreateInfo {
+		VkPipelineVertexInputStateCreateInfo inputStateCreateInfo{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
 			.pNext = nullptr,
 			.flags = 0,

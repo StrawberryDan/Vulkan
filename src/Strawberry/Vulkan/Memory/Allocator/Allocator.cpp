@@ -2,7 +2,7 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 #include "Allocator.hpp"
-#include "Allocation.hpp"
+#include "Strawberry/Vulkan/Memory/Allocation.hpp"
 
 
 //======================================================================================================================
@@ -11,26 +11,23 @@
 namespace Strawberry::Vulkan
 {
 	Allocator::Allocator(Device& device)
-		: mDevice(device)
-	{}
+		: mDevice(device) {}
 
-	Allocation::Allocation(Allocator& allocator,
-		                   MemoryPool& allocation,
-		                   size_t offset,
-	                       size_t size)
+	Allocation::Allocation(Allocator&  allocator,
+						   MemoryPool& allocation,
+						   size_t      offset,
+						   size_t      size)
 		: mAllocator(allocator)
 		  , mMemoryPool(allocation)
 		  , mOffset(offset)
-		  , mSize(size)
-	{}
+		  , mSize(size) {}
 
 
 	Allocation::Allocation(Allocation&& other) noexcept
 		: mAllocator(std::move(other.mAllocator))
-		, mMemoryPool(std::move(other.mMemoryPool))
-		, mOffset(other.mOffset)
-		, mSize(other.mSize)
-	{}
+		  , mMemoryPool(std::move(other.mMemoryPool))
+		  , mOffset(other.mOffset)
+		  , mSize(other.mSize) {}
 
 
 	Allocation& Allocation::operator=(Allocation&& other) noexcept
@@ -60,7 +57,7 @@ namespace Strawberry::Vulkan
 		return mAllocator;
 	}
 
-	Device & Allocation::GetDevice() noexcept
+	Device& Allocation::GetDevice() noexcept
 	{
 		return mAllocator->GetDevice();
 	}

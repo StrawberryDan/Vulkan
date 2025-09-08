@@ -7,7 +7,7 @@
 // Strawberry Vulkan
 #include "Memory/MemoryTypeCriteria.hpp"
 #include "Memory/Allocation.hpp"
-#include "Memory/SingleAllocator.hpp"
+#include "Memory/Allocator/SingleAllocator.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Types/Optional.hpp"
 #include "Strawberry/Core/Math/Vector.hpp"

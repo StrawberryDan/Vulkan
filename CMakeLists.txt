@@ -55,29 +55,29 @@ if (NOT TARGET StrawberryVulkan)
 		src/Strawberry/Vulkan/Instance.hpp
 		src/Strawberry/Vulkan/Memory/Allocation.cpp
 		src/Strawberry/Vulkan/Memory/Allocation.hpp
-		src/Strawberry/Vulkan/Memory/AllocationError.hpp
-		src/Strawberry/Vulkan/Memory/AllocationRequest.hpp
-		src/Strawberry/Vulkan/Memory/Allocator.cpp
-		src/Strawberry/Vulkan/Memory/Allocator.hpp
-		src/Strawberry/Vulkan/Memory/ChainAllocator.hpp
-		src/Strawberry/Vulkan/Memory/FallbackAllocator.hpp
-		src/Strawberry/Vulkan/Memory/FreelistAllocator.cpp
-		src/Strawberry/Vulkan/Memory/FreelistAllocator.hpp
+            src/Strawberry/Vulkan/Memory/Allocator/AllocationError.hpp
+            src/Strawberry/Vulkan/Memory/Allocator/AllocationRequest.hpp
+            src/Strawberry/Vulkan/Memory/Allocator/Allocator.cpp
+            src/Strawberry/Vulkan/Memory/Allocator/Allocator.hpp
+            src/Strawberry/Vulkan/Memory/Allocator/ChainAllocator.hpp
+            src/Strawberry/Vulkan/Memory/Allocator/FallbackAllocator.hpp
+            src/Strawberry/Vulkan/Memory/Allocator/FreelistAllocator.cpp
+            src/Strawberry/Vulkan/Memory/Allocator/FreelistAllocator.hpp
 		src/Strawberry/Vulkan/Memory/Memory.cpp
 		src/Strawberry/Vulkan/Memory/Memory.hpp
 		src/Strawberry/Vulkan/Memory/MemoryPool.cpp
 		src/Strawberry/Vulkan/Memory/MemoryPool.hpp
 		src/Strawberry/Vulkan/Memory/MemoryTypeCriteria.cpp
 		src/Strawberry/Vulkan/Memory/MemoryTypeCriteria.hpp
-		src/Strawberry/Vulkan/Memory/MultiAllocator.hpp
-		src/Strawberry/Vulkan/Memory/NaiveAllocator.cpp
-		src/Strawberry/Vulkan/Memory/NaiveAllocator.hpp
-		src/Strawberry/Vulkan/Memory/NaiveMultiAllocator.cpp
-		src/Strawberry/Vulkan/Memory/NaiveMultiAllocator.hpp
-		src/Strawberry/Vulkan/Memory/PoolAllocator.cpp
-		src/Strawberry/Vulkan/Memory/PoolAllocator.hpp
-		src/Strawberry/Vulkan/Memory/SingleAllocator.cpp
-		src/Strawberry/Vulkan/Memory/SingleAllocator.hpp
+            src/Strawberry/Vulkan/Memory/Allocator/MultiAllocator.hpp
+            src/Strawberry/Vulkan/Memory/Allocator/NaiveAllocator.cpp
+            src/Strawberry/Vulkan/Memory/Allocator/NaiveAllocator.hpp
+            src/Strawberry/Vulkan/Memory/Allocator/NaiveMultiAllocator.cpp
+            src/Strawberry/Vulkan/Memory/Allocator/NaiveMultiAllocator.hpp
+            src/Strawberry/Vulkan/Memory/Allocator/PoolAllocator.cpp
+            src/Strawberry/Vulkan/Memory/Allocator/PoolAllocator.hpp
+            src/Strawberry/Vulkan/Memory/Allocator/SingleAllocator.cpp
+            src/Strawberry/Vulkan/Memory/Allocator/SingleAllocator.hpp
 		src/Strawberry/Vulkan/PhysicalDevice.cpp
 		src/Strawberry/Vulkan/PhysicalDevice.hpp
 		src/Strawberry/Vulkan/PipelineLayout.cpp

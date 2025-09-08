@@ -1,8 +1,9 @@
 #pragma once
-#include "Allocation.hpp"
-#include "Allocator.hpp"
-#include "AllocationRequest.hpp"
+
+#include "Strawberry/Vulkan/Memory/Allocation.hpp"
 #include "Strawberry/Core/Types/Result.hpp"
+#include "Strawberry/Vulkan/Memory/Allocator/Allocator.hpp"
+#include "Strawberry/Vulkan/Memory/Allocator/AllocationRequest.hpp"
 
 
 namespace Strawberry::Vulkan
@@ -11,7 +12,7 @@ namespace Strawberry::Vulkan
 
 
 	class SingleAllocator
-		: public Allocator
+			: public Allocator
 	{
 	public:
 		SingleAllocator(Device& device, MemoryTypeIndex memoryTypeIndex);
@@ -20,7 +21,6 @@ namespace Strawberry::Vulkan
 
 
 		const MemoryTypeIndex GetMemoryTypeIndex() const noexcept;
-
 
 	private:
 		MemoryTypeIndex mMemoryTypeIndex;
