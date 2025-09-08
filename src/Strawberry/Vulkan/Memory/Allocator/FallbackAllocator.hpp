@@ -19,7 +19,7 @@ namespace Strawberry::Vulkan
 			  , mFallbackAllocator(mMainAllocator.GetDevice(), mMainAllocator.GetMemoryTypeIndex()) {}
 
 
-		void Free(Allocation&& allocation) noexcept override
+		void Free(MemoryBlock&& allocation) noexcept override
 		{
 			if (mFallbackAllocations.contains(allocation.Address()))
 			{

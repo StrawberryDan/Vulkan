@@ -67,7 +67,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Allocation MemoryPool::AllocateView(Allocator& allocator, size_t offset, size_t size)
+	MemoryBlock MemoryPool::AllocateView(Allocator& allocator, size_t offset, size_t size)
 	{
 		return { allocator, *this, offset, size };
 	}

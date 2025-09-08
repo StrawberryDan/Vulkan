@@ -2,7 +2,7 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 #include "Allocator.hpp"
-#include "Strawberry/Vulkan/Memory/Allocation.hpp"
+#include "Strawberry/Vulkan/Memory/MemoryBlock.hpp"
 
 
 //======================================================================================================================
@@ -13,7 +13,7 @@ namespace Strawberry::Vulkan
 	Allocator::Allocator(Device& device)
 		: mDevice(device) {}
 
-	Allocation::Allocation(Allocator&  allocator,
+	MemoryBlock::MemoryBlock(Allocator&  allocator,
 						   MemoryPool& allocation,
 						   size_t      offset,
 						   size_t      size)
@@ -23,14 +23,14 @@ namespace Strawberry::Vulkan
 		  , mSize(size) {}
 
 
-	Allocation::Allocation(Allocation&& other) noexcept
+	MemoryBlock::MemoryBlock(MemoryBlock&& other) noexcept
 		: mAllocator(std::move(other.mAllocator))
 		  , mMemoryPool(std::move(other.mMemoryPool))
 		  , mOffset(other.mOffset)
 		  , mSize(other.mSize) {}
 
 
-	Allocation& Allocation::operator=(Allocation&& other) noexcept
+	MemoryBlock& MemoryBlock::operator=(MemoryBlock&& other) noexcept
 	{
 		if (this != &other) [[likely]]
 		{
@@ -41,7 +41,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Allocation::~Allocation()
+	MemoryBlock::~MemoryBlock()
 	{
 		Core::AssertImplication(!mAllocator, !mMemoryPool);
 		if (mAllocator)
@@ -51,30 +51,30 @@ namespace Strawberry::Vulkan
 		}
 	}
 
-	Allocation::operator bool() const noexcept
+	MemoryBlock::operator bool() const noexcept
 	{
 		Core::AssertImplication(!mAllocator, mMemoryPool);
 		return mAllocator;
 	}
 
-	Device& Allocation::GetDevice() noexcept
+	Device& MemoryBlock::GetDevice() noexcept
 	{
 		return mAllocator->GetDevice();
 	}
 
 
-	const Device& Allocation::GetDevice() const noexcept
+	const Device& MemoryBlock::GetDevice() const noexcept
 	{
 		return mAllocator->GetDevice();
 	}
 
-	Core::ReflexivePointer<Allocator> Allocation::GetAllocator() const noexcept
+	Core::ReflexivePointer<Allocator> MemoryBlock::GetAllocator() const noexcept
 	{
 		return mAllocator;
 	}
 
 
-	Address Allocation::Address() const noexcept
+	Address MemoryBlock::Address() const noexcept
 	{
 		return {
 			.deviceMemory = mMemoryPool->Memory(),
@@ -83,37 +83,37 @@ namespace Strawberry::Vulkan
 	}
 
 
-	VkDeviceMemory Allocation::Memory() const noexcept
+	VkDeviceMemory MemoryBlock::Memory() const noexcept
 	{
 		return mMemoryPool->Memory();
 	}
 
 
-	size_t Allocation::Offset() const noexcept
+	size_t MemoryBlock::Offset() const noexcept
 	{
 		return mOffset;
 	}
 
 
-	size_t Allocation::Size() const noexcept
+	size_t MemoryBlock::Size() const noexcept
 	{
 		return mSize;
 	}
 
 
-	VkMemoryPropertyFlags Allocation::Properties() const
+	VkMemoryPropertyFlags MemoryBlock::Properties() const
 	{
 		return mMemoryPool->Properties();
 	}
 
 
-	uint8_t* Allocation::GetMappedAddress() const noexcept
+	uint8_t* MemoryBlock::GetMappedAddress() const noexcept
 	{
 		return mMemoryPool->GetMappedAddress() + mOffset;
 	}
 
 
-	void Allocation::Flush() const noexcept
+	void MemoryBlock::Flush() const noexcept
 	{
 		VkMappedMemoryRange range
 		{
@@ -127,7 +127,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	void Allocation::Overwrite(const Core::IO::DynamicByteBuffer& bytes) const noexcept
+	void MemoryBlock::Overwrite(const Core::IO::DynamicByteBuffer& bytes) const noexcept
 	{
 		Core::Assert(bytes.Size() <= Size());
 		std::memcpy(GetMappedAddress(), bytes.Data(), bytes.Size());

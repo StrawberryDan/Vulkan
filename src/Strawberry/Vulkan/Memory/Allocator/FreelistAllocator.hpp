@@ -23,7 +23,7 @@ namespace Strawberry::Vulkan
 
 		AllocationResult Allocate(const AllocationRequest& allocationRequest) noexcept override;
 
-		void Free(Allocation&& address) noexcept override;
+		void Free(MemoryBlock&& address) noexcept override;
 
 	private:
 		struct FreeRegion

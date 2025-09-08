@@ -1,6 +1,6 @@
 #pragma once
 #include "Allocator/AllocationError.hpp"
-#include "Allocation.hpp"
+#include "MemoryBlock.hpp"
 #include "../Device/Device.hpp"
 #include "Strawberry/Core/Types/Result.hpp"
 #include "Strawberry/Core/Types/ReflexivePointer.hpp"
@@ -8,7 +8,7 @@
 
 namespace Strawberry::Vulkan
 {
-	class Allocation;
+	class MemoryBlock;
 
 
 	// Class representing a block of allocated Vulkan Memory.
@@ -28,7 +28,7 @@ namespace Strawberry::Vulkan
 		~MemoryPool() override;
 
 
-		Allocation AllocateView(Allocator& allocator, size_t offset, size_t size);
+		MemoryBlock AllocateView(Allocator& allocator, size_t offset, size_t size);
 
 
 		Device& GetDevice() const noexcept;

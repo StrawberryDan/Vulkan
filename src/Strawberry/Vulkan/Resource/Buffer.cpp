@@ -18,7 +18,7 @@ namespace Strawberry::Vulkan
 		: Builder(device.GetAllocator(), memoryTypeCriteria)
 	{}
 
-	Buffer::Builder::Builder(Allocation allocation)
+	Buffer::Builder::Builder(MemoryBlock allocation)
 		: mAllocationSource(std::move(allocation))
 	{}
 
@@ -29,7 +29,7 @@ namespace Strawberry::Vulkan
 	const Device& Buffer::Builder::GetDevice() const
 	{
 		return mAllocationSource.Visit(
-			[](Allocation& allocation) -> const Device&
+			[](MemoryBlock& allocation) -> const Device&
 			{
 				return allocation.GetDevice();
 			},
@@ -56,10 +56,10 @@ namespace Strawberry::Vulkan
 			});
 	}
 
-	Allocation Buffer::Builder::AllocateMemory(const VkMemoryRequirements& requirements) const
+	MemoryBlock Buffer::Builder::AllocateMemory(const VkMemoryRequirements& requirements) const
 	{
 		return mAllocationSource.Visit(
-			[&](Allocation& allocation)
+			[&](MemoryBlock& allocation)
 			{
 				return std::move(allocation);
 			},

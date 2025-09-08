@@ -11,7 +11,7 @@ namespace Strawberry::Vulkan
 		NaiveAllocator(Device& device, MemoryTypeIndex memoryType);
 
 		AllocationResult Allocate(const AllocationRequest& allocationRequest) noexcept override;
-		void             Free(Allocation&& address) noexcept override;
+		void             Free(MemoryBlock&& address) noexcept override;
 
 	private:
 		std::unordered_map<Address, MemoryPool> mMemoryPools;

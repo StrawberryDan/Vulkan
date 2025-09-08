@@ -12,12 +12,12 @@ namespace Strawberry::Vulkan
 	{
 		MemoryPool memoryPool = MemoryPool::Allocate(GetDevice(), GetMemoryTypeIndex(), allocationRequest.size).Unwrap();
 
-		Allocation allocation = memoryPool.AllocateView(*this, 0, memoryPool.Size());
+		MemoryBlock allocation = memoryPool.AllocateView(*this, 0, memoryPool.Size());
 		mMemoryPools.emplace(allocation.Address(), std::move(memoryPool));
 		return allocation;
 	}
 
-	void NaiveAllocator::Free(Allocation&& address) noexcept
+	void NaiveAllocator::Free(MemoryBlock&& address) noexcept
 	{
 		mMemoryPools.erase(address.Address());
 	}

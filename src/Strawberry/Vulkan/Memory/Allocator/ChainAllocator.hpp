@@ -19,7 +19,7 @@ namespace Strawberry::Vulkan
 			ExtendChain();
 		}
 
-		void Free(Allocation&& allocation) noexcept override
+		void Free(MemoryBlock&& allocation) noexcept override
 		{
 			for (auto& allocator : mAllocatorChain)
 			{

@@ -20,7 +20,7 @@ namespace Strawberry::Vulkan
 		Allocator(Device& device);
 
 
-		virtual void Free(Allocation&& address) noexcept = 0;
+		virtual void Free(MemoryBlock&& address) noexcept = 0;
 
 
 		[[nodiscard]]       Device& GetDevice()       { return *mDevice; }

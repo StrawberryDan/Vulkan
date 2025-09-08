@@ -27,7 +27,7 @@ namespace Strawberry::Vulkan
 		class Builder {
 		public:
 			Builder(Device& device, MemoryTypeCriteria memoryTypeCriteria);
-			Builder(Allocation allocation);
+			Builder(MemoryBlock allocation);
 			Builder(SingleAllocator& allocator);
 			Builder(MultiAllocator& allocator, MemoryTypeCriteria memoryTypeCriteria);
 
@@ -45,10 +45,10 @@ namespace Strawberry::Vulkan
 		private:
 			const Device& GetDevice() const;
 			size_t GetSize() const;
-			Allocation AllocateMemory(const VkMemoryRequirements& requirements) const;
+			MemoryBlock AllocateMemory(const VkMemoryRequirements& requirements) const;
 
 
-			mutable Core::Variant<Allocation, SingleAllocator*, MultiAllocator*> mAllocationSource;
+			mutable Core::Variant<MemoryBlock, SingleAllocator*, MultiAllocator*> mAllocationSource;
 
 
 			Core::Variant<size_t, Core::IO::DynamicByteBuffer> mData {static_cast<size_t>(0)};
@@ -96,7 +96,7 @@ namespace Strawberry::Vulkan
 		// The amount of space allocated to this buffer.
 		uint64_t                          mSize;
 		// The memory allocated to this buffer.
-		Allocation                        mMemory;
+		MemoryBlock                        mMemory;
 #ifdef STRAWBERRY_DEBUG
         // The usage flags for this buffer
         VkBufferUsageFlags mUsage;

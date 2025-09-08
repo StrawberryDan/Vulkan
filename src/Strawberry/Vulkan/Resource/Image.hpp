@@ -6,7 +6,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Strawberry Vulkan
 #include "Strawberry/Vulkan/Memory/MemoryTypeCriteria.hpp"
-#include "Strawberry/Vulkan/Memory/Allocation.hpp"
+#include "Strawberry/Vulkan/Memory/MemoryBlock.hpp"
 #include "Strawberry/Vulkan/Memory/Allocator/SingleAllocator.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Types/Optional.hpp"
@@ -39,7 +39,7 @@ namespace Strawberry::Vulkan
 			Builder(Device& device, MemoryTypeCriteria memoryTypeCriteria);
 
 
-			Builder(Allocation&& allocation)
+			Builder(MemoryBlock&& allocation)
 				: mAllocationSource(std::move(allocation)) {}
 
 
@@ -77,7 +77,7 @@ namespace Strawberry::Vulkan
 			const Device& GetDevice() const;
 
 
-			mutable Core::Variant<Allocation, SingleAllocator*, MultiAllocator*> mAllocationSource;
+			mutable Core::Variant<MemoryBlock, SingleAllocator*, MultiAllocator*> mAllocationSource;
 			MemoryTypeCriteria                                                   mMemoryTypeCriteria;
 
 
@@ -119,7 +119,7 @@ namespace Strawberry::Vulkan
 
 	private:
 		Image(VkImage           imageHandle,
-			  Allocation&&      allocation,
+			  MemoryBlock&&      allocation,
 			  Core::Math::Vec3u extent,
 			  VkFormat          format);
 
@@ -129,7 +129,7 @@ namespace Strawberry::Vulkan
 
 
 		VkImage           mImage;
-		Allocation        mMemory;
+		MemoryBlock        mMemory;
 		VkFormat          mFormat;
 		Core::Math::Vec3u mExtent;
 	};

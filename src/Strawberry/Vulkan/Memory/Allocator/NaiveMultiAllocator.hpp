@@ -21,7 +21,7 @@ namespace Strawberry::Vulkan
 		AllocationResult Allocate(const AllocationRequest&  allocationResult,
 								  const MemoryTypeCriteria& memoryTypeCriteria) noexcept override;
 
-		void Free(Allocation&& address) noexcept override;
+		void Free(MemoryBlock&& address) noexcept override;
 
 	private:
 		struct BaseAllocator
@@ -65,7 +65,7 @@ namespace Strawberry::Vulkan
 	}
 
 	template<std::derived_from<SingleAllocator> Base>
-	void NaiveMultiAllocator<Base>::Free(Allocation&& address) noexcept
+	void NaiveMultiAllocator<Base>::Free(MemoryBlock&& address) noexcept
 	{
 		for (auto& allocator: mAllocators)
 		{

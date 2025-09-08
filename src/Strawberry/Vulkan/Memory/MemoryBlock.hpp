@@ -12,16 +12,16 @@ namespace Strawberry::Vulkan
 	class Device;
 
 
-	class Allocation
+	class MemoryBlock
 	{
 	public:
-		Allocation() = default;
-		Allocation(Allocator& allocator, MemoryPool& allocation, size_t offset, size_t size);
-		Allocation(const Allocation&)            = delete;
-		Allocation& operator=(const Allocation&) = delete;
-		Allocation(Allocation&& other) noexcept;
-		Allocation& operator=(Allocation&& other) noexcept;
-		~Allocation();
+		MemoryBlock() = default;
+		MemoryBlock(Allocator& allocator, MemoryPool& allocation, size_t offset, size_t size);
+		MemoryBlock(const MemoryBlock&)            = delete;
+		MemoryBlock& operator=(const MemoryBlock&) = delete;
+		MemoryBlock(MemoryBlock&& other) noexcept;
+		MemoryBlock& operator=(MemoryBlock&& other) noexcept;
+		~MemoryBlock();
 
 
 		explicit operator bool() const noexcept;

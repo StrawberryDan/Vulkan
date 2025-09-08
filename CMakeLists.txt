@@ -53,8 +53,8 @@ if (NOT TARGET StrawberryVulkan)
             src/Strawberry/Vulkan/Resource/ImageView.hpp
             src/Strawberry/Vulkan/Device/Instance.cpp
             src/Strawberry/Vulkan/Device/Instance.hpp
-		src/Strawberry/Vulkan/Memory/Allocation.cpp
-		src/Strawberry/Vulkan/Memory/Allocation.hpp
+            src/Strawberry/Vulkan/Memory/MemoryBlock.cpp
+            src/Strawberry/Vulkan/Memory/MemoryBlock.hpp
             src/Strawberry/Vulkan/Memory/Allocator/AllocationError.hpp
             src/Strawberry/Vulkan/Memory/Allocator/AllocationRequest.hpp
             src/Strawberry/Vulkan/Memory/Allocator/Allocator.cpp

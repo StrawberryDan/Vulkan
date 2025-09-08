@@ -120,8 +120,8 @@ namespace Strawberry::Vulkan
 
 		VkMemoryRequirements memoryRequirements;
 		vkGetImageMemoryRequirements(device, imageHandle, &memoryRequirements);
-		Allocation memory = mAllocationSource.Visit(
-			[&](Allocation& allocation) { return AllocationResult(std::move(allocation)); },
+		MemoryBlock memory = mAllocationSource.Visit(
+			[&](MemoryBlock& allocation) { return AllocationResult(std::move(allocation)); },
 			[&](SingleAllocator* allocator) { return allocator->Allocate(memoryRequirements); },
 			[&](MultiAllocator* allocator) { return allocator->Allocate(memoryRequirements, mMemoryTypeCriteria); }
 		).Unwrap();
@@ -135,7 +135,7 @@ namespace Strawberry::Vulkan
 	const Device& Image::Builder::GetDevice() const
 	{
 		return mAllocationSource.Visit(
-			[&](const Allocation& allocation) -> const Device&
+			[&](const MemoryBlock& allocation) -> const Device&
 			{
 				return allocation.GetDevice();
 			},
@@ -194,7 +194,7 @@ namespace Strawberry::Vulkan
 		return mExtent;
 	}
 
-	Image::Image(VkImage imageHandle, Allocation &&allocation, Core::Math::Vec3u extent, VkFormat format)
+	Image::Image(VkImage imageHandle, MemoryBlock &&allocation, Core::Math::Vec3u extent, VkFormat format)
 		: mImage(imageHandle)
 		, mMemory(std::move(allocation))
 		, mFormat(format)

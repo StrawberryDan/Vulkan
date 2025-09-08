@@ -58,7 +58,7 @@ namespace Strawberry::Vulkan
 		uintptr_t alignedAddress = AlignedAddress(region->offset, region->size, allocationRequest.alignment).Unwrap();
 		uintptr_t alignmentDifference = alignedAddress - region->offset;
 		// Create allocation in the segment of the region.
-		Allocation result = Memory().AllocateView(*this, alignedAddress, allocationRequest.size);
+		MemoryBlock result = Memory().AllocateView(*this, alignedAddress, allocationRequest.size);
 
 		// Track skipped padding
 		const FreeRegion priorRegion{.offset = region->offset, .size = alignmentDifference};
@@ -83,7 +83,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	void FreeListAllocator::Free(Allocation&& address) noexcept
+	void FreeListAllocator::Free(MemoryBlock&& address) noexcept
 	{
 		AddFreeRegion(FreeRegion{.offset = address.Offset(), .size = address.Size()});
 		ExpandBlock(address.Offset());
