@@ -76,6 +76,16 @@ namespace Strawberry::Vulkan
 		// Overwrite the region of memory mapped to this buffer
 		void SetData(const Core::IO::DynamicByteBuffer& bytes);
 
+		// Functions for interpreting buffer data as types.
+		template <typename T> requires (!std::is_pointer_v<T>)
+		T& InterpretAs()  { return *reinterpret_cast<T*>(mMemory.GetMappedAddress()); }
+		template <typename T> requires (std::is_pointer_v<T>)
+		T* InterpretAs() { return reinterpret_cast<T*>(mMemory.GetMappedAddress()); }
+		template <typename T> requires (!std::is_pointer_v<T>)
+		const T& InterpretAs() const { return *reinterpret_cast<const T*>(mMemory.GetMappedAddress()); }
+		template <typename T> requires (std::is_pointer_v<T>)
+		const T* InterpretAs() const { return reinterpret_cast<T*>(mMemory.GetMappedAddress()); }
+
 		// Returns the address to the mapped memory location for this buffer;
 		[[nodiscard]]       uint8_t* GetData();
 		// Returns the address to the mapped memory location for this buffer;
