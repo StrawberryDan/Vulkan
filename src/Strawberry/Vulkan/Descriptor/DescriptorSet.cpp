@@ -16,19 +16,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	DescriptorSet::DescriptorSet(DescriptorPool& descriptorPool, VkDescriptorSetLayout layout)
+	DescriptorSet::DescriptorSet(Device& device, const DescriptorSetLayout& layout)
+		: DescriptorSet(device.AllocateDescriptorSet(layout))
+	{}
+
+
+	DescriptorSet::DescriptorSet(DescriptorPool& descriptorPool, const DescriptorSetLayout& layout)
 		: mDescriptorSet(VK_NULL_HANDLE)
 		, mDescriptorPool(descriptorPool)
 	{
+		VkDescriptorSetLayout layoutHandle = layout.Handle();
+
 		VkDescriptorSetAllocateInfo allocateInfo{
 			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
 			.pNext = nullptr,
 			.descriptorPool = mDescriptorPool->mDescriptorPool,
 			.descriptorSetCount = 1,
-			.pSetLayouts = &layout,
+			.pSetLayouts = &layoutHandle,
 		};
 
-		Core::AssertEQ(vkAllocateDescriptorSets(*mDescriptorPool->GetDevice(), &allocateInfo, &mDescriptorSet),
+		Core::AssertEQ(vkAllocateDescriptorSets(mDescriptorPool->GetDevice()->Handle(), &allocateInfo, &mDescriptorSet),
 		               VK_SUCCESS);
 	}
 
@@ -55,7 +62,7 @@ namespace Strawberry::Vulkan
 		if (mDescriptorSet && mDescriptorPool && mDescriptorPool->mFlags & VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT)
 		{
 			Core::AssertEQ(
-				vkFreeDescriptorSets(*mDescriptorPool->GetDevice(), mDescriptorPool->mDescriptorPool, 1, &mDescriptorSet),
+				vkFreeDescriptorSets(mDescriptorPool->GetDevice()->Handle(), mDescriptorPool->mDescriptorPool, 1, &mDescriptorSet),
 				VK_SUCCESS);
 		}
 	}
@@ -80,7 +87,7 @@ namespace Strawberry::Vulkan
 			.pBufferInfo = &bufferInfo,
 			.pTexelBufferView = nullptr,
 		};
-		vkUpdateDescriptorSets(*mDescriptorPool->GetDevice(), 1, &write, 0, nullptr);
+		vkUpdateDescriptorSets(mDescriptorPool->GetDevice()->Handle(), 1, &write, 0, nullptr);
 	}
 
 
@@ -103,15 +110,60 @@ namespace Strawberry::Vulkan
 			.pBufferInfo = &bufferInfo,
 			.pTexelBufferView = nullptr,
 		};
-		vkUpdateDescriptorSets(*mDescriptorPool->GetDevice(), 1, &write, 0, nullptr);
+		vkUpdateDescriptorSets(mDescriptorPool->GetDevice()->Handle(), 1, &write, 0, nullptr);
 	}
 
 
-	void DescriptorSet::SetUniformTexture(uint32_t         binding,
-	                                      uint32_t         arrayElement,
-	                                      const Sampler&   sampler,
-	                                      const ImageView& image,
-	                                      VkImageLayout    layout)
+	void DescriptorSet::SetTexture(uint32_t binding, uint32_t arrayElement, const ImageView& imageView, VkImageLayout layout)
+	{
+		VkDescriptorImageInfo imageInfo{
+			.sampler = VK_NULL_HANDLE,
+			.imageView = imageView,
+			.imageLayout = layout,
+		};
+		VkWriteDescriptorSet write{
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.pNext = nullptr,
+			.dstSet = mDescriptorSet,
+			.dstBinding = binding,
+			.dstArrayElement = arrayElement,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
+			.pImageInfo = &imageInfo,
+			.pBufferInfo = nullptr,
+			.pTexelBufferView = nullptr,
+		};
+		vkUpdateDescriptorSets(mDescriptorPool->GetDevice()->Handle(), 1, &write, 0, nullptr);
+	}
+
+	void DescriptorSet::SetSampler(uint32_t binding, uint32_t arrayElement, const Sampler& sampler, VkImageLayout layout)
+	{
+		VkDescriptorImageInfo imageInfo{
+			.sampler = sampler,
+			.imageView = VK_NULL_HANDLE,
+			.imageLayout = layout,
+		};
+		VkWriteDescriptorSet write{
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.pNext = nullptr,
+			.dstSet = mDescriptorSet,
+			.dstBinding = binding,
+			.dstArrayElement = arrayElement,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER,
+			.pImageInfo = &imageInfo,
+			.pBufferInfo = nullptr,
+			.pTexelBufferView = nullptr,
+		};
+		vkUpdateDescriptorSets(mDescriptorPool->GetDevice()->Handle(), 1, &write, 0, nullptr);
+	}
+
+
+	void DescriptorSet::SetCombinedImageSampler(uint32_t         binding,
+												uint32_t         arrayElement,
+												const Sampler&   sampler,
+												const ImageView& image,
+												VkImageLayout    layout)
 	{
 		VkDescriptorImageInfo imageInfo{
 			.sampler = sampler,
@@ -130,6 +182,6 @@ namespace Strawberry::Vulkan
 			.pBufferInfo = nullptr,
 			.pTexelBufferView = nullptr,
 		};
-		vkUpdateDescriptorSets(*mDescriptorPool->GetDevice(), 1, &write, 0, nullptr);
+		vkUpdateDescriptorSets(mDescriptorPool->GetDevice()->Handle(), 1, &write, 0, nullptr);
 	}
 }

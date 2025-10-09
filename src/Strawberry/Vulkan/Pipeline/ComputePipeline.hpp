@@ -12,10 +12,12 @@ namespace Strawberry::Vulkan
 
 
 		ComputePipeline(const ComputePipeline&) = delete;
+
 		ComputePipeline& operator=(const ComputePipeline&) = delete;
 
 
 		ComputePipeline(ComputePipeline&&) noexcept;
+
 		ComputePipeline& operator=(ComputePipeline&&) noexcept;
 
 		~ComputePipeline() noexcept;
@@ -24,27 +26,27 @@ namespace Strawberry::Vulkan
 		operator VkPipeline() const;
 
 
-		      PipelineLayout& GetLayout();
+		PipelineLayout& GetLayout();
+
 		const PipelineLayout& GetLayout() const;
 
-
 	private:
-		ComputePipeline(const Device& device, PipelineLayout& layout, VkPipeline&& pipeline);
+		ComputePipeline(Device& device, PipelineLayout& layout, VkPipeline&& pipeline);
 
 
-		VkDevice mDevice;
+		VkDevice                               mDevice;
 		Core::ReflexivePointer<PipelineLayout> mPipelineLayout;
-		VkPipeline mPipeline;
+		VkPipeline                             mPipeline;
 	};
 
 
 	class ComputePipeline::Builder
 	{
 	public:
-		Builder(const Device& device, PipelineLayout& layout, Shader&& shader);
+		Builder(Device& device, PipelineLayout& layout, Shader&& shader);
 
 
-		template <typename T, typename... Ts>
+		template<typename T, typename... Ts>
 		Builder& WithShaderSpecializationConstants(T t, Ts... ts)
 		{
 			VkSpecializationMapEntry entry
@@ -58,7 +60,7 @@ namespace Strawberry::Vulkan
 			mShaderSpecializationData.Push(std::forward<T>(t));
 
 
-			if constexpr(sizeof...(ts) > 0)
+			if constexpr (sizeof...(ts) > 0)
 			{
 				return WithShaderSpecializationConstants(std::forward<Ts>(ts)...);
 			}
@@ -69,14 +71,13 @@ namespace Strawberry::Vulkan
 
 		ComputePipeline Build();
 
-
 	private:
-		const Device& mDevice;
-		PipelineLayout& mPipelineLayout;
-		Shader mShader;
+		Core::ReflexivePointer<Device> mDevice;
+		PipelineLayout&                mPipelineLayout;
+		Shader                         mShader;
 
 
 		std::vector<VkSpecializationMapEntry> mShaderSpecializationEntries;
-		Core::IO::DynamicByteBuffer mShaderSpecializationData;
+		Core::IO::DynamicByteBuffer           mShaderSpecializationData;
 	};
 }

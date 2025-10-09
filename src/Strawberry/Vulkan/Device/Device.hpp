@@ -6,6 +6,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 #include "Strawberry/Vulkan/Device/PhysicalDevice.hpp"
 #include "Strawberry/Vulkan/Queue/Queue.hpp"
+#include "Strawberry/Vulkan/Descriptor/DescriptorSet.hpp"
 // Strawberry Core
 #include "Strawberry/Core/Types/ReflexivePointer.hpp"
 #include "Strawberry/Core/Types/Optional.hpp"
@@ -16,10 +17,7 @@
 #include <map>
 
 
-namespace Strawberry::Vulkan
-{
-	class PolyAllocator;
-}
+
 
 //======================================================================================================================
 //  Class Declaration
@@ -29,6 +27,9 @@ namespace Strawberry::Vulkan
 	class Allocator;
 	class Instance;
 	class GraphicsPipeline;
+	class DescriptorPoolAllocator;
+	class PolyAllocator;
+	class DescriptorSetLayout;
 
 
 	struct QueueCreateInfo
@@ -39,32 +40,46 @@ namespace Strawberry::Vulkan
 
 
 	class Device
-		: public Core::EnableReflexivePointer
+			: public Core::EnableReflexivePointer
 	{
 	public:
-		explicit Device(const PhysicalDevice& physicalDevice, const VkPhysicalDeviceFeatures& features, std::vector<QueueCreateInfo> queueCreateInfo);
-		Device(const Device& rhs)            = delete;
+		explicit Device(const PhysicalDevice&           physicalDevice,
+						const VkPhysicalDeviceFeatures& features,
+						std::vector<QueueCreateInfo>    queueCreateInfo);
+
+		Device(const Device& rhs) = delete;
+
 		Device& operator=(const Device& rhs) = delete;
+
 		Device(Device&& rhs) noexcept;
+
 		Device& operator=(Device&& rhs) noexcept;
+
 		~Device();
 
 
-		operator VkDevice() const;
+		[[nodiscard]] VkDevice Handle() const;
+		explicit operator VkDevice() const;
 
 
 		void WaitUntilIdle() const;
 
 
-		[[nodiscard]] Core::ReflexivePointer<Instance>      GetInstance() const;
-		[[nodiscard]] const PhysicalDevice&                 GetPhysicalDevice() const;
-		[[nodiscard]] Queue&                                GetQueue(uint32_t family, uint32_t index);
-		[[nodiscard]] PolyAllocator&                       GetAllocator() const;
+		[[nodiscard]] Core::ReflexivePointer<Instance> GetInstance() const;
+
+		[[nodiscard]] const PhysicalDevice& GetPhysicalDevice() const;
+
+		[[nodiscard]] Queue& GetQueue(uint32_t family, uint32_t index);
+
+		[[nodiscard]] PolyAllocator& GetAllocator() const;
+
+		[[nodiscard]] DescriptorSet AllocateDescriptorSet(const DescriptorSetLayout& descriptorSetLayout);
 
 	private:
-		VkDevice                                            mDevice;
-		Core::ReflexivePointer<const PhysicalDevice>        mPhysicalDevice;
-		std::map<uint32_t, std::vector<Queue>>              mQueues;
-		std::unique_ptr<PolyAllocator>                     mAllocator;
+		VkDevice                                     mDevice;
+		Core::ReflexivePointer<const PhysicalDevice> mPhysicalDevice;
+		std::map<uint32_t, std::vector<Queue> >      mQueues;
+		std::unique_ptr<PolyAllocator>               mAllocator;
+		std::unique_ptr<DescriptorPoolAllocator>     mDescriptorPoolAllocator;
 	};
 }

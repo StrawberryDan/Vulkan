@@ -4,6 +4,7 @@
 // Strawberry Graphics
 #include "Device.hpp"
 #include "Strawberry/Vulkan/Device/Instance.hpp"
+#include "Strawberry/Vulkan/Device/DescriptorPoolAllocator.hpp"
 #include "Strawberry/Vulkan/Memory/Allocator/FallbackAllocator.hpp"
 #include "Strawberry/Vulkan/Memory/Allocator/FreelistAllocator.hpp"
 #include "Strawberry/Vulkan/Memory/Allocator/NaivePolyAllocator.hpp"
@@ -99,6 +100,7 @@ namespace Strawberry::Vulkan
 		}
 
 		mAllocator = std::make_unique<NaivePolyAllocator<FallbackChainAllocator<FreeListAllocator> > >(*this);
+		mDescriptorPoolAllocator = std::make_unique<DescriptorPoolAllocator>(*this);
 	}
 
 
@@ -106,7 +108,8 @@ namespace Strawberry::Vulkan
 		: mDevice(std::exchange(rhs.mDevice, nullptr))
 		  , mPhysicalDevice(std::move(rhs.mPhysicalDevice))
 		  , mQueues(std::move(rhs.mQueues))
-		  , mAllocator(std::move(rhs.mAllocator)) {}
+		  , mAllocator(std::move(rhs.mAllocator))
+		  , mDescriptorPoolAllocator(std::move(rhs.mDescriptorPoolAllocator)) {}
 
 
 	Device& Device::operator=(Device&& rhs) noexcept
@@ -130,9 +133,17 @@ namespace Strawberry::Vulkan
 			WaitUntilIdle();
 			mAllocator.reset();
 			mQueues.clear();
+			mAllocator.reset();
+			mDescriptorPoolAllocator.reset();
 			Core::Assert(vkDeviceWaitIdle(mDevice) == VK_SUCCESS);
 			vkDestroyDevice(mDevice, nullptr);
 		}
+	}
+
+
+	VkDevice Device::Handle() const
+	{
+		return mDevice;
 	}
 
 
@@ -171,5 +182,11 @@ namespace Strawberry::Vulkan
 	PolyAllocator& Device::GetAllocator() const
 	{
 		return *mAllocator;
+	}
+
+
+	DescriptorSet Device::AllocateDescriptorSet(const DescriptorSetLayout& descriptorSetLayout)
+	{
+		return mDescriptorPoolAllocator->Allocate(*this, descriptorSetLayout);
 	}
 }

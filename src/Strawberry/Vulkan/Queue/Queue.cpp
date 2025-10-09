@@ -19,7 +19,7 @@ namespace Strawberry::Vulkan
 		: mFamilyIndex(family)
 		, mDevice(device)
 	{
-		vkGetDeviceQueue(*mDevice, mFamilyIndex, index, &mQueue);
+		vkGetDeviceQueue(mDevice->Handle(), mFamilyIndex, index, &mQueue);
 	}
 
 
@@ -89,6 +89,12 @@ namespace Strawberry::Vulkan
 
 
 	Device& Queue::GetDevice()
+	{
+		return *mDevice;
+	}
+
+
+	const Device& Queue::GetDevice() const
 	{
 		return *mDevice;
 	}

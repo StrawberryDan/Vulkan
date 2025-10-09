@@ -26,7 +26,7 @@ namespace Strawberry::Vulkan
 			.pPoolSizes = poolSizes.data(),
 		};
 
-		Core::AssertEQ(vkCreateDescriptorPool(*mDevice, &createInfo, nullptr, &mDescriptorPool),
+		Core::AssertEQ(vkCreateDescriptorPool(static_cast<VkDevice>(*mDevice), &createInfo, nullptr, &mDescriptorPool),
 		               VK_SUCCESS);
 	}
 
@@ -54,7 +54,7 @@ namespace Strawberry::Vulkan
 	{
 		if (mDescriptorPool)
 		{
-			vkDestroyDescriptorPool(*mDevice, std::exchange(mDescriptorPool, VK_NULL_HANDLE), nullptr);
+			vkDestroyDescriptorPool(mDevice->Handle(), std::exchange(mDescriptorPool, VK_NULL_HANDLE), nullptr);
 		}
 	}
 

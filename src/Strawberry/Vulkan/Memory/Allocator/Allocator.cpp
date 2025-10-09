@@ -123,7 +123,7 @@ namespace Strawberry::Vulkan
 			.offset = Offset(),
 			.size = VK_WHOLE_SIZE
 		};
-		Core::AssertEQ(vkFlushMappedMemoryRanges(mAllocator->GetDevice(), 1, &range), VK_SUCCESS);
+		Core::AssertEQ(vkFlushMappedMemoryRanges(static_cast<VkDevice>(mAllocator->GetDevice()), 1, &range), VK_SUCCESS);
 	}
 
 

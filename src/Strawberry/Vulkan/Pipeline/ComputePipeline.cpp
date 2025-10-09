@@ -1,5 +1,7 @@
 #include "ComputePipeline.hpp"
 
+#include "Strawberry/Vulkan/Device/Device.hpp"
+
 
 namespace Strawberry::Vulkan
 {
@@ -42,14 +44,14 @@ namespace Strawberry::Vulkan
 		return *mPipelineLayout;
 	}
 
-	ComputePipeline::ComputePipeline(const Device& device, PipelineLayout& layout, VkPipeline&& pipeline)
+	ComputePipeline::ComputePipeline(Device& device, PipelineLayout& layout, VkPipeline&& pipeline)
 		: mDevice(device)
 		, mPipelineLayout(layout)
 		, mPipeline(std::exchange(pipeline, VK_NULL_HANDLE))
 	{}
 
-	ComputePipeline::Builder::Builder(const Device& device, PipelineLayout& layout, Shader&& shader)
-		: mDevice(device)
+	ComputePipeline::Builder::Builder(Device& device, PipelineLayout& layout, Shader&& shader)
+		: mDevice(device.GetReflexivePointer())
 		, mPipelineLayout(layout)
 		, mShader(std::move(shader))
 	{}
@@ -84,16 +86,16 @@ namespace Strawberry::Vulkan
 			.pNext = nullptr,
 			.flags = 0,
 			.stage = stageCreateInfo,
-			.layout = mPipelineLayout,
+			.layout = mPipelineLayout.Handle(),
 			.basePipelineHandle = VK_NULL_HANDLE,
 			.basePipelineIndex = 0
 		};
 
 		VkPipeline pipeline = VK_NULL_HANDLE;
 		Core::AssertEQ(vkCreateComputePipelines(
-			mDevice, VK_NULL_HANDLE, 1, &createInfo, nullptr, &pipeline), VK_SUCCESS);
+			mDevice->Handle(), VK_NULL_HANDLE, 1, &createInfo, nullptr, &pipeline), VK_SUCCESS);
 
 
-		return ComputePipeline(mDevice, mPipelineLayout, std::move(pipeline));
+		return ComputePipeline(*mDevice, mPipelineLayout, std::move(pipeline));
 	}
 }

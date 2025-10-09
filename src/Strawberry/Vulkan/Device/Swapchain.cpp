@@ -79,13 +79,13 @@ namespace Strawberry::Vulkan
 			.oldSwapchain = VK_NULL_HANDLE,
 		};
 
-		Core::AssertEQ(vkCreateSwapchainKHR(queue.GetDevice(), &createInfo, nullptr, &mSwapchain), VK_SUCCESS);
+		Core::AssertEQ(vkCreateSwapchainKHR(queue.GetDevice().Handle(), &createInfo, nullptr, &mSwapchain), VK_SUCCESS);
 
 
 		uint32_t imageCount = 0;
-		Core::AssertEQ(vkGetSwapchainImagesKHR(queue.GetDevice(), mSwapchain, &imageCount, nullptr), VK_SUCCESS);
+		Core::AssertEQ(vkGetSwapchainImagesKHR(queue.GetDevice().Handle(), mSwapchain, &imageCount, nullptr), VK_SUCCESS);
 		std::vector<VkImage> imageHandles(imageCount);
-		Core::AssertEQ(vkGetSwapchainImagesKHR(queue.GetDevice(), mSwapchain, &imageCount, imageHandles.data()), VK_SUCCESS);
+		Core::AssertEQ(vkGetSwapchainImagesKHR(queue.GetDevice().Handle(), mSwapchain, &imageCount, imageHandles.data()), VK_SUCCESS);
 		for (VkImage handle: imageHandles)
 		{
 			Image image(handle, mSize.AsType<unsigned int>().AppendedWith(1), mFormat.format);
@@ -125,7 +125,7 @@ namespace Strawberry::Vulkan
 
 		if (mSwapchain)
 		{
-			vkDestroySwapchainKHR(mQueue->GetDevice(), mSwapchain, nullptr);
+			vkDestroySwapchainKHR(mQueue->GetDevice().Handle(), mSwapchain, nullptr);
 		}
 	}
 
@@ -165,7 +165,7 @@ namespace Strawberry::Vulkan
 
 		Fence    fence(mQueue->GetDevice());
 		uint32_t imageIndex = 0;
-		auto     result     = vkAcquireNextImageKHR(mQueue->GetDevice(), mSwapchain, 0, VK_NULL_HANDLE, fence.mFence, &imageIndex);
+		auto     result     = vkAcquireNextImageKHR(mQueue->GetDevice().Handle(), mSwapchain, 0, VK_NULL_HANDLE, fence.mFence, &imageIndex);
 		fence.Wait();
 
 
@@ -192,7 +192,7 @@ namespace Strawberry::Vulkan
 
 		Fence    fence(mQueue->GetDevice());
 		uint32_t imageIndex = 0;
-		auto     result     = vkAcquireNextImageKHR(mQueue->GetDevice(), mSwapchain, 0, VK_NULL_HANDLE, fence.mFence, &imageIndex);
+		auto     result     = vkAcquireNextImageKHR(mQueue->GetDevice().Handle(), mSwapchain, 0, VK_NULL_HANDLE, fence.mFence, &imageIndex);
 		fence.Wait();
 
 		switch (result)

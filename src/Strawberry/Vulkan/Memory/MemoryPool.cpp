@@ -15,7 +15,7 @@ namespace Strawberry::Vulkan
 		};
 
 		Address address;
-		switch (vkAllocateMemory(device, &allocateInfo, nullptr, &address.deviceMemory))
+		switch (vkAllocateMemory(static_cast<VkDevice>(device), &allocateInfo, nullptr, &address.deviceMemory))
 		{
 			case VK_ERROR_OUT_OF_HOST_MEMORY:
 			case VK_ERROR_OUT_OF_DEVICE_MEMORY:
@@ -62,7 +62,7 @@ namespace Strawberry::Vulkan
 	{
 		if (mMemory != VK_NULL_HANDLE)
 		{
-			vkFreeMemory(*mDevice, mMemory, nullptr);
+			vkFreeMemory(static_cast<VkDevice>(*mDevice), mMemory, nullptr);
 		}
 	}
 
@@ -105,7 +105,7 @@ namespace Strawberry::Vulkan
 		{
 			Core::Assert(Properties() & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 			void* mappedAddress = nullptr;
-			Core::AssertEQ(vkMapMemory(*mDevice, mMemory, 0, VK_WHOLE_SIZE, 0, &mappedAddress), VK_SUCCESS);
+			Core::AssertEQ(vkMapMemory(static_cast<VkDevice>(*mDevice), mMemory, 0, VK_WHOLE_SIZE, 0, &mappedAddress), VK_SUCCESS);
 			mMappedAddress = static_cast<uint8_t*>(mappedAddress);
 		}
 		return mMappedAddress.Value();
@@ -122,7 +122,7 @@ namespace Strawberry::Vulkan
 			.offset = 0,
 			.size = VK_WHOLE_SIZE
 		};
-		Core::AssertEQ(vkFlushMappedMemoryRanges(*mDevice, 1, &range), VK_SUCCESS);
+		Core::AssertEQ(vkFlushMappedMemoryRanges(mDevice->Handle(), 1, &range), VK_SUCCESS);
 	}
 
 

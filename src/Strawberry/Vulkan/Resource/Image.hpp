@@ -117,6 +117,8 @@ namespace Strawberry::Vulkan
 
 		[[nodiscard]] Core::Math::Vec3u GetSize() const;
 
+		[[nodiscard]] unsigned int GetArrayLayerCount() const;
+
 	private:
 		Image(VkImage           imageHandle,
 			  MemoryBlock&&      allocation,
@@ -132,5 +134,6 @@ namespace Strawberry::Vulkan
 		MemoryBlock        mMemory;
 		VkFormat          mFormat;
 		Core::Math::Vec3u mExtent;
+		unsigned int mArrayLayerCount = 1;
 	};
 }

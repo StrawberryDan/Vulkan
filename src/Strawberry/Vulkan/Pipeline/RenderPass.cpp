@@ -40,7 +40,7 @@ namespace Strawberry::Vulkan
 	{
 		if (mRenderPass)
 		{
-			vkDestroyRenderPass(*mDevice, mRenderPass, nullptr);
+			vkDestroyRenderPass(mDevice->Handle(), mRenderPass, nullptr);
 		}
 	}
 
@@ -231,7 +231,7 @@ namespace Strawberry::Vulkan
 			.dependencyCount = static_cast<uint32_t>(mDependencies.size()),
 			.pDependencies = mDependencies.data(),
 		};
-		Core::AssertEQ(vkCreateRenderPass(*mDevice, &renderPassCreateInfo, nullptr, &renderPass.mRenderPass),
+		Core::AssertEQ(vkCreateRenderPass(mDevice->Handle(), &renderPassCreateInfo, nullptr, &renderPass.mRenderPass),
 		               VK_SUCCESS);
 
 

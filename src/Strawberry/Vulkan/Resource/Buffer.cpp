@@ -84,15 +84,15 @@ namespace Strawberry::Vulkan
 	Buffer Buffer::Builder::Build() const
 	{
 		// Create Buffer
-		Buffer buffer {GetDevice(), GetSize(), mUsage};
+		Buffer buffer {GetDevice().Handle(), GetSize(), mUsage};
 		// Get memory requirements
-		VkMemoryRequirements memoryRequirements = buffer.GetMemoryRequirements(GetDevice());
+		VkMemoryRequirements memoryRequirements = buffer.GetMemoryRequirements(GetDevice().Handle());
 		// Allocate memory
 		buffer.mMemory = AllocateMemory(memoryRequirements);
 		// Bind memory to buffer
 		Core::AssertEQ(
 			vkBindBufferMemory(
-				GetDevice(),
+				GetDevice().Handle(),
 				buffer.mHandle,
 				buffer.mMemory.Memory(),
 				buffer.mMemory.Offset()),
@@ -148,7 +148,7 @@ namespace Strawberry::Vulkan
 
 	VkDevice Buffer::GetDevice() const
 	{
-		return mMemory.GetDevice();
+		return mMemory.GetDevice().Handle();
 	}
 
 

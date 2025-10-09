@@ -43,7 +43,7 @@ namespace Strawberry::Vulkan
 		operator VkFramebuffer() const noexcept;
 
 
-		[[nodiscard]] Core::ReflexivePointer<RenderPass>           GetRenderPass() const;
+		[[nodiscard]]       RenderPass&                            GetRenderPass() const;
 		[[nodiscard]]       Device&                                GetDevice();
 		[[nodiscard]] const Device&                                GetDevice() const;
 		[[nodiscard]] const PhysicalDevice&                        GetPhysicalDevice() const;

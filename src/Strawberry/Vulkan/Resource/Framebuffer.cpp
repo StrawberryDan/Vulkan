@@ -75,7 +75,7 @@ namespace Strawberry::Vulkan
 			.height = mSize[1],
 			.layers = 1,
 		};
-		Core::AssertEQ(vkCreateFramebuffer(*mRenderPass->mDevice, &createInfo, nullptr, &mFramebuffer), VK_SUCCESS);
+		Core::AssertEQ(vkCreateFramebuffer(mRenderPass->mDevice->Handle(), &createInfo, nullptr, &mFramebuffer), VK_SUCCESS);
 	}
 
 
@@ -105,7 +105,7 @@ namespace Strawberry::Vulkan
 	{
 		if (mFramebuffer)
 		{
-			vkDestroyFramebuffer(*mRenderPass->mDevice, mFramebuffer, nullptr);
+			vkDestroyFramebuffer(mRenderPass->mDevice->Handle(), mFramebuffer, nullptr);
 		}
 	}
 
@@ -116,19 +116,19 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Core::ReflexivePointer<RenderPass> Framebuffer::GetRenderPass() const
+	RenderPass& Framebuffer::GetRenderPass() const
 	{
-		return mRenderPass;
+		return *mRenderPass;
 	}
 
 	Device& Framebuffer::GetDevice()
 	{
-		return GetRenderPass()->GetDevice();
+		return GetRenderPass().GetDevice();
 	}
 
 	const Device& Framebuffer::GetDevice() const
 	{
-		return GetRenderPass()->GetDevice();
+		return GetRenderPass().GetDevice();
 	}
 
 	const PhysicalDevice& Framebuffer::GetPhysicalDevice() const

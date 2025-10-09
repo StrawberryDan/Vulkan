@@ -49,6 +49,7 @@ namespace Strawberry::Vulkan
 
 
 		Device& GetDevice();
+		const Device& GetDevice() const;
 
 
 		uint32_t GetFamilyIndex() const;

@@ -238,7 +238,7 @@ void BasicRendering()
 								(std::cos(0.5 * clock) + 1.0f) / 2.0f);
 
 
-		textureDescriptorSet.SetUniformTexture(0, 0, sampler, textureView, VK_IMAGE_LAYOUT_GENERAL);
+		textureDescriptorSet.SetCombinedImageSampler(0, 0, sampler, textureView, VK_IMAGE_LAYOUT_GENERAL);
 
 
 		commandBuffer.Begin(true);

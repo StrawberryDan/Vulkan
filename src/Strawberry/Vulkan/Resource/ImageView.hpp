@@ -34,6 +34,8 @@ namespace Strawberry::Vulkan
 
 		operator VkImageView() const;
 
+		const VkImageSubresourceRange& GetSubresourceRange() const;
+
 	private:
 		ImageView(const Image&            image,
 		          VkImageViewType         viewType,
@@ -44,6 +46,7 @@ namespace Strawberry::Vulkan
 	private:
 		VkImageView mImageView;
 		VkDevice    mDevice;
+		VkImageSubresourceRange mSubresourceRange;
 	};
 
 

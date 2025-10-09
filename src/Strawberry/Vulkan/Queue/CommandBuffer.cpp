@@ -44,7 +44,7 @@ namespace Strawberry::Vulkan
 			.commandBufferCount = 1,
 		};
 
-		Core::Assert(vkAllocateCommandBuffers(mCommandPool->GetQueue()->GetDevice(), &allocateInfo, &mCommandBuffer) ==
+		Core::Assert(vkAllocateCommandBuffers(mCommandPool->GetQueue()->GetDevice().Handle(), &allocateInfo, &mCommandBuffer) ==
 					 VK_SUCCESS);
 	}
 
@@ -74,7 +74,7 @@ namespace Strawberry::Vulkan
 	{
 		if (mCommandBuffer)
 		{
-			vkFreeCommandBuffers(mCommandPool->GetQueue()->GetDevice(), mCommandPool->mCommandPool, 1, &mCommandBuffer);
+			vkFreeCommandBuffers(mCommandPool->GetQueue()->GetDevice().Handle(), mCommandPool->mCommandPool, 1, &mCommandBuffer);
 		}
 	}
 
@@ -484,7 +484,7 @@ namespace Strawberry::Vulkan
 										  const DescriptorSet&    descriptorSet)
 	{
 		Core::Assert(State() == CommandBufferState::Recording);
-		vkCmdBindDescriptorSets(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, *pipeline.mPipelineLayout, set, 1,
+		vkCmdBindDescriptorSets(mCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.mPipelineLayout->Handle(), set, 1,
 								&descriptorSet.mDescriptorSet, 0, nullptr);
 	}
 
@@ -504,7 +504,7 @@ namespace Strawberry::Vulkan
 					   });
 		vkCmdBindDescriptorSets(mCommandBuffer,
 								VK_PIPELINE_BIND_POINT_GRAPHICS,
-								*pipeline.mPipelineLayout,
+								pipeline.mPipelineLayout->Handle(),
 								firstSet,
 								static_cast<uint32_t>(setHandles.size()),
 								setHandles.data(),
@@ -519,7 +519,7 @@ namespace Strawberry::Vulkan
 		const DescriptorSet&   descriptorSet)
 	{
 		Core::Assert(State() == CommandBufferState::Recording);
-		vkCmdBindDescriptorSets(mCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline.GetLayout(), set, 1,
+		vkCmdBindDescriptorSets(mCommandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline.GetLayout().Handle(), set, 1,
 								&descriptorSet.mDescriptorSet, 0, nullptr);
 	}
 
@@ -539,7 +539,7 @@ namespace Strawberry::Vulkan
 					   });
 		vkCmdBindDescriptorSets(mCommandBuffer,
 								VK_PIPELINE_BIND_POINT_COMPUTE,
-								pipeline.GetLayout(),
+								pipeline.GetLayout().Handle(),
 								firstSet,
 								static_cast<uint32_t>(setHandles.size()),
 								setHandles.data(),
@@ -589,7 +589,7 @@ namespace Strawberry::Vulkan
 									  const Core::IO::DynamicByteBuffer& bytes, uint32_t              offset)
 	{
 		Core::Assert(State() == CommandBufferState::Recording);
-		vkCmdPushConstants(mCommandBuffer, *pipeline.mPipelineLayout, stage, offset,
+		vkCmdPushConstants(mCommandBuffer, pipeline.mPipelineLayout->Handle(), stage, offset,
 						   static_cast<uint32_t>(bytes.Size()), bytes.Data());
 	}
 

@@ -5,11 +5,10 @@
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
 // Strawberry Core
+#include "Strawberry/Vulkan/Pipeline/PipelineLayout.hpp"
 #include <Strawberry/Core/Types/ReflexivePointer.hpp>
 // Vulkan
 #include <vulkan/vulkan.h>
-// Standard Library
-#include <vector>
 
 
 //======================================================================================================================
@@ -28,9 +27,11 @@ namespace Strawberry::Vulkan
 		friend class CommandBuffer;
 
 	public:
-		DescriptorSet(DescriptorPool& descriptorPool, VkDescriptorSetLayout layout);
+		DescriptorSet(Device& device, const DescriptorSetLayout& layout);
+		DescriptorSet(DescriptorPool& descriptorPool, const DescriptorSetLayout& layout);
 		DescriptorSet(const DescriptorSet& rhs)            = default;
 		DescriptorSet& operator=(const DescriptorSet& rhs) = default;
+
 		DescriptorSet(DescriptorSet&& rhs) noexcept;
 		DescriptorSet& operator=(DescriptorSet&& rhs) noexcept;
 		~DescriptorSet();
@@ -40,7 +41,9 @@ namespace Strawberry::Vulkan
 		void SetStorageBuffer(uint32_t binding, uint32_t arrayElement, const Buffer& buffer);
 
 
-		void SetUniformTexture(uint32_t binding, uint32_t arrayElement, const Sampler& sampler, const ImageView& image, VkImageLayout layout);
+		void SetTexture(uint32_t binding, uint32_t arrayElement, const ImageView& imageView, VkImageLayout layout);
+		void SetSampler(uint32_t binding, uint32_t arrayElement, const Sampler& sampler, VkImageLayout layout);
+		void SetCombinedImageSampler(uint32_t binding, uint32_t arrayElement, const Sampler& sampler, const ImageView& image, VkImageLayout layout);
 
 	private:
 		VkDescriptorSet                        mDescriptorSet;

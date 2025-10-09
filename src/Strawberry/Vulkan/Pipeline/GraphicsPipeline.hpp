@@ -16,6 +16,8 @@
 #include <map>
 #include <vector>
 
+#include "Strawberry/Vulkan/Descriptor/DescriptorSet.hpp"
+
 
 //======================================================================================================================
 //  Class Declaration
@@ -50,6 +52,7 @@ namespace Strawberry::Vulkan
 		const PipelineLayout& GetLayout() const noexcept;
 		      Device&         GetDevice()       noexcept;
 		const Device&         GetDevice() const noexcept;
+		DescriptorSet         CreateDescriptorSet(unsigned int);
 
 
 	private:

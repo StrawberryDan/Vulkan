@@ -92,7 +92,7 @@ namespace Strawberry::Vulkan
 	{
 		const Device& device = GetDevice();
 
-		VkImage imageHandle = VK_NULL_HANDLE;;
+		VkImage imageHandle = VK_NULL_HANDLE;
 
 		VkImageCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
@@ -115,21 +115,23 @@ namespace Strawberry::Vulkan
 			.pQueueFamilyIndices = nullptr,
 			.initialLayout = mInitialLayout
 		};
-		Core::AssertEQ(vkCreateImage(device, &createInfo, nullptr, &imageHandle), VK_SUCCESS);
+		Core::AssertEQ(vkCreateImage(device.Handle(), &createInfo, nullptr, &imageHandle), VK_SUCCESS);
 
 
 		VkMemoryRequirements memoryRequirements;
-		vkGetImageMemoryRequirements(device, imageHandle, &memoryRequirements);
+		vkGetImageMemoryRequirements(device.Handle(), imageHandle, &memoryRequirements);
 		MemoryBlock memory = mAllocationSource.Visit(
 			[&](MemoryBlock& allocation) { return AllocationResult(std::move(allocation)); },
 			[&](MonoAllocator* allocator) { return allocator->Allocate(memoryRequirements); },
 			[&](PolyAllocator* allocator) { return allocator->Allocate(memoryRequirements, mMemoryTypeCriteria); }
 		).Unwrap();
 
-		Core::AssertEQ(vkBindImageMemory(device, imageHandle, memory.Memory(), memory.Offset()), VK_SUCCESS);
+		Core::AssertEQ(vkBindImageMemory(device.Handle(), imageHandle, memory.Memory(), memory.Offset()), VK_SUCCESS);
 
 
-		return Image(imageHandle, std::move(memory), mExtent.Value(), mFormat.Value());
+		Image image(imageHandle, std::move(memory), mExtent.Value(), mFormat.Value());
+		image.mArrayLayerCount = mArrayLayers;
+		return image;
 	}
 
 	const Device& Image::Builder::GetDevice() const
@@ -167,7 +169,7 @@ namespace Strawberry::Vulkan
 	{
 		if (mImage)
 		{
-			vkDestroyImage(GetDevice(), mImage, nullptr);
+			vkDestroyImage(GetDevice().Handle(), mImage, nullptr);
 		}
 	}
 
@@ -193,6 +195,13 @@ namespace Strawberry::Vulkan
 	{
 		return mExtent;
 	}
+
+
+	unsigned int Image::GetArrayLayerCount() const
+	{
+		return mArrayLayerCount;
+	}
+
 
 	Image::Image(VkImage imageHandle, MemoryBlock &&allocation, Core::Math::Vec3u extent, VkFormat format)
 		: mImage(imageHandle)

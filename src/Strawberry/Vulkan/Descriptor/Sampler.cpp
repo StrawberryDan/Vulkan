@@ -37,7 +37,7 @@ namespace Strawberry::Vulkan
 			.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_BLACK,
 			.unnormalizedCoordinates = normaliseCoords ? VK_FALSE : VK_TRUE,
 		};
-		Core::AssertEQ(vkCreateSampler(*mDevice, &createInfo, nullptr, &mSampler), VK_SUCCESS);
+		Core::AssertEQ(vkCreateSampler(static_cast<VkDevice>(*mDevice), &createInfo, nullptr, &mSampler), VK_SUCCESS);
 	}
 
 
@@ -62,7 +62,7 @@ namespace Strawberry::Vulkan
 	{
 		if (mSampler)
 		{
-			vkDestroySampler(*mDevice, mSampler, nullptr);
+			vkDestroySampler(static_cast<VkDevice>(*mDevice), mSampler, nullptr);
 		}
 	}
 

@@ -15,12 +15,13 @@
 namespace Strawberry::Vulkan
 {
 	ImageView::ImageView(const Image&            image,
-	                     VkImageViewType         viewType,
-	                     VkFormat                format,
-	                     VkComponentMapping      componentMapping,
-	                     VkImageSubresourceRange subresourceRange)
+						 VkImageViewType         viewType,
+						 VkFormat                format,
+						 VkComponentMapping      componentMapping,
+						 VkImageSubresourceRange subresourceRange)
 		: mImageView(nullptr)
-		, mDevice(image.GetDevice())
+		  , mDevice(image.GetDevice())
+		  , mSubresourceRange(subresourceRange)
 	{
 		VkImageViewCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
@@ -30,16 +31,18 @@ namespace Strawberry::Vulkan
 			.viewType = viewType,
 			.format = format,
 			.components = componentMapping,
-			.subresourceRange = subresourceRange,
+			.subresourceRange = mSubresourceRange,
 		};
 
-		Core::AssertEQ(vkCreateImageView(image.GetDevice(), &createInfo, nullptr, &mImageView), VK_SUCCESS);
+		Core::AssertEQ(vkCreateImageView(static_cast<VkDevice>(image.GetDevice()), &createInfo, nullptr, &mImageView),
+					   VK_SUCCESS);
 	}
 
 
 	ImageView::ImageView(ImageView&& rhs) noexcept
 		: mImageView(std::exchange(rhs.mImageView, nullptr))
-		, mDevice(std::exchange(rhs.mDevice, nullptr)) {}
+		  , mDevice(std::exchange(rhs.mDevice, nullptr))
+		  , mSubresourceRange(rhs.GetSubresourceRange()) {}
 
 
 	ImageView& ImageView::operator=(ImageView&& rhs) noexcept
@@ -66,6 +69,12 @@ namespace Strawberry::Vulkan
 	ImageView::operator VkImageView_T*() const
 	{
 		return mImageView;
+	}
+
+
+	const VkImageSubresourceRange& ImageView::GetSubresourceRange() const
+	{
+		return mSubresourceRange;
 	}
 
 

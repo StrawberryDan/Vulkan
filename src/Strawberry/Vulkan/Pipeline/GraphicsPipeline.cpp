@@ -42,7 +42,7 @@ namespace Strawberry::Vulkan
 	{
 		if (mPipeline)
 		{
-			vkDestroyPipeline(*mRenderPass->mDevice, mPipeline, nullptr);
+			vkDestroyPipeline(mRenderPass->mDevice->Handle(), mPipeline, nullptr);
 		}
 	}
 
@@ -297,6 +297,12 @@ namespace Strawberry::Vulkan
 	}
 
 
+	DescriptorSet GraphicsPipeline::CreateDescriptorSet(unsigned int index)
+	{
+		return mPipelineLayout->GetDevice()->AllocateDescriptorSet(mPipelineLayout->GetSetLayout(index));
+	}
+
+
 	GraphicsPipeline::GraphicsPipeline(VkPipeline handle, PipelineLayout& layout, RenderPass& renderPass)
 		: mPipeline(handle)
 		  , mPipelineLayout(layout)
@@ -409,7 +415,7 @@ namespace Strawberry::Vulkan
 			.pDepthStencilState = mDepthStencilStateCreateInfo.AsPtr().UnwrapOr(nullptr),
 			.pColorBlendState = &colorBlendCreateInfo,
 			.pDynamicState = mDynamicStateCreateInfo.AsPtr().UnwrapOr(nullptr),
-			.layout = *mPipelineLayout,
+			.layout = mPipelineLayout->Handle(),
 			.renderPass = mRenderPass->mRenderPass,
 			.subpass = mSubpass,
 			.basePipelineHandle = nullptr,
@@ -418,7 +424,7 @@ namespace Strawberry::Vulkan
 
 
 		VkPipeline handle = VK_NULL_HANDLE;
-		Core::AssertEQ(vkCreateGraphicsPipelines(*mRenderPass->mDevice,
+		Core::AssertEQ(vkCreateGraphicsPipelines(mRenderPass->mDevice->Handle(),
 												 nullptr,
 												 1,
 												 &createInfo,
