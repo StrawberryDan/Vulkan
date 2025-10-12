@@ -76,7 +76,7 @@ namespace Strawberry::Vulkan
 
 
 		Builder& WithShaderStage(VkShaderStageFlagBits stage, Shader shader);
-buil		Builder& WithShaderStages(Shader vertexShader, Shader fragmentShader);
+		Builder& WithShaderStages(Shader vertexShader, Shader fragmentShader);
 		Builder& WithShaderStages(Shader vertexShader, Shader geometryShader, Shader fragmentShader);
 		Builder& WithShaderStages(Shader vertexShader, Shader tessellationControl, Shader tessellationEvaluation, Shader fragmentShader);
 		Builder& WithShaderStages(Shader vertexShader, Shader tessellationControl, Shader tessellationEvaluation, Shader geometry, Shader fragmentShader);
