@@ -5,10 +5,10 @@ import subprocess
 import tempfile
 
 
-def compile_shader(glslc_executable, source, header):
+def compile_shader(glslc_executable, arguments, source, header):
     binary_file = tempfile.NamedTemporaryFile(delete=False)
 
-    command = f"{glslc_executable} {source} -o {binary_file.name}"
+    command = f"{glslc_executable} {source} {arguments} -o {binary_file.name}"
     print(command)
     glsl = subprocess.run(command, shell=True)
     if glsl.returncode != 0:
@@ -27,4 +27,4 @@ def compile_shader(glslc_executable, source, header):
     pass
 
 
-compile_shader(sys.argv[1], sys.argv[2], sys.argv[3])
+compile_shader(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
