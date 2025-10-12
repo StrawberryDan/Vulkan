@@ -74,6 +74,39 @@ namespace Strawberry::Vulkan
 	}
 
 
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithShaderStages(Shader vertexShader, Shader fragmentShader)
+	{
+		return WithShaderStage(VK_SHADER_STAGE_VERTEX_BIT, std::move(vertexShader))
+			.WithShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT, std::move(fragmentShader));
+	}
+
+
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithShaderStages(Shader vertexShader, Shader geometryShader,
+		Shader fragmentShader)
+	{
+		return WithShaderStages(std::move(vertexShader), std::move(fragmentShader))
+			.WithShaderStage(VK_SHADER_STAGE_GEOMETRY_BIT, std::move(geometryShader));
+	}
+
+
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithShaderStages(Shader vertexShader,
+		Shader tessellationControl, Shader tessellationEvaluation, Shader fragmentShader)
+	{
+		return WithShaderStages(std::move(vertexShader), std::move(fragmentShader))
+			.WithShaderStage(VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT, std::move(tessellationControl))
+			.WithShaderStage(VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT, std::move(tessellationEvaluation));
+	}
+
+
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithShaderStages(Shader vertexShader,
+		Shader tessellationControl, Shader tessellationEvaluation, Shader geometry, Shader fragmentShader)
+	{
+		return WithShaderStages(std::move(vertexShader), std::move(geometry), std::move(fragmentShader))
+		.WithShaderStage(VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT, std::move(tessellationControl))
+		.WithShaderStage(VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT, std::move(tessellationEvaluation));
+	}
+
+
 	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithInputBinding(uint32_t          binding, uint32_t stride,
 																		   VkVertexInputRate inputRate)
 	{

@@ -76,6 +76,10 @@ namespace Strawberry::Vulkan
 
 
 		Builder& WithShaderStage(VkShaderStageFlagBits stage, Shader shader);
+buil		Builder& WithShaderStages(Shader vertexShader, Shader fragmentShader);
+		Builder& WithShaderStages(Shader vertexShader, Shader geometryShader, Shader fragmentShader);
+		Builder& WithShaderStages(Shader vertexShader, Shader tessellationControl, Shader tessellationEvaluation, Shader fragmentShader);
+		Builder& WithShaderStages(Shader vertexShader, Shader tessellationControl, Shader tessellationEvaluation, Shader geometry, Shader fragmentShader);
 
 
 		Builder& WithInputBinding(uint32_t binding, uint32_t stride, VkVertexInputRate inputRate = VK_VERTEX_INPUT_RATE_VERTEX);
