@@ -5,6 +5,7 @@
 #include "Strawberry/Vulkan/Pipeline/PipelineLayout.hpp"
 #include "Strawberry/Vulkan/Device/Device.hpp"
 // Standary Library
+#include <ranges>
 #include <utility>
 
 
