@@ -1,24 +1,26 @@
 #include "Strawberry/Core/IO/Logging.hpp"
 #include "Strawberry/Core/Math/Matrix.hpp"
 #include "Strawberry/Core/UTF.hpp"
-#include "../src/Strawberry/Vulkan/Memory/Allocator/Allocator.hpp"
-#include "../src/Strawberry/Vulkan/Resource/Buffer.hpp"
-#include "Strawberry/Vulkan/CommandBuffer.hpp"
-#include "../src/Strawberry/Vulkan/Queue/CommandPool.hpp"
-#include "Strawberry/Vulkan/ComputePipeline.hpp"
-#include "../src/Strawberry/Vulkan/Device/Device.hpp"
-#include "../src/Strawberry/Vulkan/Resource/Framebuffer.hpp"
-#include "../src/Strawberry/Vulkan/Pipeline/GraphicsPipeline.hpp"
-#include "../src/Strawberry/Vulkan/Resource/Image.hpp"
-#include "Strawberry/Vulkan/Instance.hpp"
-#include "../src/Strawberry/Vulkan/Queue/Queue.hpp"
-#include "Strawberry/Vulkan/RenderPass.hpp"
-#include "../src/Strawberry/Vulkan/Descriptor/Sampler.hpp"
-#include "../src/Strawberry/Vulkan/Pipeline/Shader.hpp"
-#include "../src/Strawberry/Vulkan/Device/Surface.hpp"
-#include "Strawberry/Vulkan/Swapchain.hpp"
-#include "../src/Strawberry/Vulkan/Memory/Allocator/FreelistAllocator.hpp"
+#include "Strawberry/Vulkan/Memory/Allocator/Allocator.hpp"
+#include "Strawberry/Vulkan/Resource/Buffer.hpp"
+#include "Strawberry/Vulkan/Queue/CommandBuffer.hpp"
+#include "Strawberry/Vulkan/Queue/CommandPool.hpp"
+#include "Strawberry/Vulkan/Pipeline/ComputePipeline.hpp"
+#include "Strawberry/Vulkan/Device/Device.hpp"
+#include "Strawberry/Vulkan/Resource/Framebuffer.hpp"
+#include "Strawberry/Vulkan/Pipeline/GraphicsPipeline.hpp"
+#include "Strawberry/Vulkan/Resource/Image.hpp"
+#include "Strawberry/Vulkan/Device/Instance.hpp"
+#include "Strawberry/Vulkan/Queue/Queue.hpp"
+#include "Strawberry/Vulkan/Pipeline/RenderPass.hpp"
+#include "Strawberry/Vulkan/Descriptor/Sampler.hpp"
+#include "Strawberry/Vulkan/Pipeline/Shader.hpp"
+#include "Strawberry/Vulkan/Device/Surface.hpp"
+#include "Strawberry/Vulkan/Device/Swapchain.hpp"
+#include "Strawberry/Vulkan/Memory/Allocator/FreelistAllocator.hpp"
 #include "Strawberry/Window/Window.hpp"
+#include "Strawberry/Vulkan/Descriptor/DescriptorPool.hpp"
+#include <iostream>
 
 
 using namespace Strawberry;
@@ -260,8 +262,8 @@ void BasicRendering()
 		commandBuffer.BindPipeline(pipeline);
 		commandBuffer.BindVertexBuffer(0, buffer);
 		commandBuffer.BindDescriptorSet(pipeline, 0, textureDescriptorSet);
-		commandBuffer.PushConstants(pipeline, VK_SHADER_STAGE_VERTEX_BIT, Core::IO::DynamicByteBuffer(MVPMatrix), 0);
-		commandBuffer.PushConstants(pipeline, VK_SHADER_STAGE_FRAGMENT_BIT, Core::IO::DynamicByteBuffer(Color), 64);
+		commandBuffer.PushConstants(pipeline, VK_SHADER_STAGE_VERTEX_BIT, Core::IO::DynamicByteBuffer::FromObjects(MVPMatrix), 0);
+		commandBuffer.PushConstants(pipeline, VK_SHADER_STAGE_FRAGMENT_BIT, Core::IO::DynamicByteBuffer::FromObjects(Color), 64);
 		commandBuffer.Draw(6);
 		commandBuffer.EndRenderPass();
 		commandBuffer.PipelineBarrier(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
