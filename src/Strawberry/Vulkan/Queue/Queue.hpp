@@ -10,7 +10,6 @@
 #include <vulkan/vulkan.h>
 // Strawberry Core
 #include <Strawberry/Core/Types/ReflexivePointer.hpp>
-#include <Strawberry/Core/Types/Uninitialised.hpp>
 
 
 //======================================================================================================================
