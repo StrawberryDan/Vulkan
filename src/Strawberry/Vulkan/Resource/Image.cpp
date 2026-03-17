@@ -60,6 +60,13 @@ namespace Strawberry::Vulkan
 	}
 
 
+	Image::Builder&& Image::Builder::WithSamples(VkSampleCountFlagBits samples)
+	{
+		mSamples = samples;
+		return std::move(*this);
+	}
+
+
 	Image::Builder&& Image::Builder::WithMipLevels(uint32_t mipLevels)
 	{
 		this->mMipLevels = mipLevels;
@@ -107,7 +114,7 @@ namespace Strawberry::Vulkan
 			},
 			.mipLevels = mMipLevels,
 			.arrayLayers = mArrayLayers,
-			.samples = VK_SAMPLE_COUNT_1_BIT,
+			.samples = mSamples,
 			.tiling = mTiling,
 			.usage = mUsage.Value(),
 			.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
@@ -130,6 +137,7 @@ namespace Strawberry::Vulkan
 
 
 		Image image(imageHandle, std::move(memory), mExtent.Value(), mFormat.Value());
+		image.mSamples = mSamples;
 		image.mArrayLayerCount = mArrayLayers;
 		return image;
 	}
@@ -194,6 +202,12 @@ namespace Strawberry::Vulkan
 	Core::Math::Vec3u Image::GetSize() const
 	{
 		return mExtent;
+	}
+
+
+	VkSampleCountFlagBits Image::GetSamples() const
+	{
+		return mSamples;
 	}
 
 

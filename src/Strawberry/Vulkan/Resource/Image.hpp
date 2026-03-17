@@ -62,6 +62,8 @@ namespace Strawberry::Vulkan
 
 			Builder&& WithUsage(VkImageUsageFlags usage);
 
+			Builder&& WithSamples(VkSampleCountFlagBits samples);
+
 			Builder&& WithMipLevels(uint32_t mipLevels);
 
 			Builder&& WithArrayLayers(uint32_t arrayLayers);
@@ -85,6 +87,7 @@ namespace Strawberry::Vulkan
 			Core::Optional<Core::Math::Vec3u> mExtent;
 			Core::Optional<VkFormat>          mFormat;
 			Core::Optional<VkImageUsageFlags> mUsage;
+			VkSampleCountFlagBits             mSamples       = VK_SAMPLE_COUNT_1_BIT;
 			uint32_t                          mMipLevels     = 1;
 			uint32_t                          mArrayLayers   = 1;
 			VkImageTiling                     mTiling        = VK_IMAGE_TILING_OPTIMAL;
@@ -117,6 +120,8 @@ namespace Strawberry::Vulkan
 
 		[[nodiscard]] Core::Math::Vec3u GetSize() const;
 
+		[[nodiscard]] VkSampleCountFlagBits GetSamples() const;
+
 		[[nodiscard]] unsigned int GetArrayLayerCount() const;
 
 	private:
@@ -134,6 +139,7 @@ namespace Strawberry::Vulkan
 		MemoryBlock        mMemory;
 		VkFormat          mFormat;
 		Core::Math::Vec3u mExtent;
+		VkSampleCountFlagBits mSamples = VK_SAMPLE_COUNT_1_BIT;
 		unsigned int mArrayLayerCount = 1;
 	};
 }
