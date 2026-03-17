@@ -32,7 +32,7 @@ namespace Strawberry::Vulkan
 
 
 	public:
-		Framebuffer(RenderPass& mRenderPass, Core::Math::Vec2u size);
+		Framebuffer(RenderPass& mRenderPass, Core::Math::Vec2u size, VkSampleCountFlagBits = VK_SAMPLE_COUNT_1_BIT);
 		Framebuffer(const Framebuffer& rhs)            = delete;
 		Framebuffer& operator=(const Framebuffer& rhs) = delete;
 		Framebuffer(Framebuffer&& rhs) noexcept;

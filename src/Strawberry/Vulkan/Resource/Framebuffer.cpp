@@ -17,7 +17,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Framebuffer::Framebuffer(RenderPass& renderPass, Core::Math::Vec2u size)
+	Framebuffer::Framebuffer(RenderPass& renderPass, Core::Math::Vec2u size, VkSampleCountFlagBits samples)
 		: mRenderPass(renderPass)
 		, mSize(size)
 	{
@@ -28,6 +28,7 @@ namespace Strawberry::Vulkan
 				.WithExtent(mSize)
 				.WithFormat(renderPass.mAttachmentFormats[i])
 				.WithUsage(renderPass.mAttachmentUsages[i])
+				.WithSamples(samples)
 				.Build();
 
 			mAttachments.emplace_back(std::move(image));

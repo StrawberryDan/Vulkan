@@ -97,6 +97,7 @@ namespace Strawberry::Vulkan
 																  VkAttachmentStoreOp storeOp,
 																  VkImageLayout       initialLayout,
 																  VkImageLayout       finalLayout,
+																  VkSampleCountFlagBits sampleCount,
 																  Core::Math::Vec4f   clearColor,
 																  VkAttachmentLoadOp  stencilLoadOp, VkAttachmentStoreOp stencilStoreOp)
 	{
@@ -109,7 +110,7 @@ namespace Strawberry::Vulkan
 				{
 					.flags = 0,
 					.format = format,
-					.samples = VK_SAMPLE_COUNT_1_BIT,
+					.samples = sampleCount,
 					.loadOp = loadOp,
 					.storeOp = storeOp,
 					.stencilLoadOp = stencilLoadOp,
@@ -128,6 +129,7 @@ namespace Strawberry::Vulkan
 																  VkAttachmentStoreOp storeOp,
 																  VkImageLayout       initialLayout,
 																  VkImageLayout       finalLayout,
+																  VkSampleCountFlagBits sampleCount,
 																  float               clearValue,
 																  VkAttachmentLoadOp  stencilLoadOp,
 																  VkAttachmentStoreOp stencilStoreOp)
@@ -138,7 +140,7 @@ namespace Strawberry::Vulkan
 			.description = VkAttachmentDescription{
 				.flags = 0,
 				.format = format,
-				.samples = VK_SAMPLE_COUNT_1_BIT,
+				.samples = sampleCount,
 				.loadOp = loadOp,
 				.storeOp = storeOp,
 				.stencilLoadOp = stencilLoadOp,

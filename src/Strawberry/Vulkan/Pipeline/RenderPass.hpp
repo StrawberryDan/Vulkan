@@ -90,6 +90,7 @@ namespace Strawberry::Vulkan
 									 VkAttachmentStoreOp storeOp,
 									 VkImageLayout       initialLayout,
 									 VkImageLayout       finalLayout,
+									 VkSampleCountFlagBits sampleCount = VK_SAMPLE_COUNT_1_BIT,
 									 Core::Math::Vec4f   clearColor     = Core::Math::Vec4f(0.0f, 0.0f, 0.0f, 0.0f),
 									 VkAttachmentLoadOp  stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE, VkAttachmentStoreOp stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE);
 		Builder& WithDepthStencilAttachment(VkImageUsageFlags usage,
@@ -98,8 +99,10 @@ namespace Strawberry::Vulkan
 									 VkAttachmentStoreOp storeOp,
 									 VkImageLayout       initialLayout,
 									 VkImageLayout       finalLayout,
+									 VkSampleCountFlagBits sampleCount = VK_SAMPLE_COUNT_1_BIT,
 									 float               clearValue     = 1.0f,
 									 VkAttachmentLoadOp  stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE, VkAttachmentStoreOp stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE);
+
 
 
 		Builder& WithSubpass(const SubpassDescription& subpass);
