@@ -21,10 +21,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Device::Device(const PhysicalDevice&        physicalDevice, const VkPhysicalDeviceFeatures& features,
-				   std::vector<QueueCreateInfo> queueCreateInfo)
-		: mDevice{}
-		  , mPhysicalDevice(physicalDevice)
+	Device::Device(
+		const PhysicalDevice&        physicalDevice,
+		const VkPhysicalDeviceFeatures& features,
+		std::vector<QueueCreateInfo> queueCreateInfo)
+			: mDevice{}
+			, mPhysicalDevice(physicalDevice)
 	{
 		ZoneScoped;
 
@@ -99,7 +101,7 @@ namespace Strawberry::Vulkan
 				mQueues[createInfo.familyIndex].emplace_back(Queue(*this, createInfo.familyIndex, i));
 		}
 
-		mAllocator = std::make_unique<NaivePolyAllocator<FallbackChainAllocator<FreeListAllocator> > >(*this);
+		mAllocator = std::make_unique<NaivePolyAllocator<FallbackChainAllocator<FreeListAllocator>>>(*this);
 		mDescriptorPoolAllocator = std::make_unique<DescriptorPoolAllocator>(*this);
 	}
 
