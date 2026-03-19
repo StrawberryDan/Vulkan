@@ -54,8 +54,6 @@ namespace Strawberry::Vulkan
 
 		[[nodiscard]] uint32_t GetAttachmentCount() const;
 		Image&                 GetAttachment(uint32_t index);
-		Image&                 GetDepthAttachment();
-		Image&                 GetStencilAttachment();
 
 	private:
 		Image     CreateDepthImage(const Device& device, Allocator& allocator);

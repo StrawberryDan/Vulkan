@@ -33,20 +33,8 @@ namespace Strawberry::Vulkan
 
 			mAttachments.emplace_back(std::move(image));
 
-			VkImageAspectFlags aspectFlags = [&]()
-			{
-				switch (renderPass.mAttachmentFormats[i])
-				{
-				case VK_FORMAT_D16_UNORM:
-				case VK_FORMAT_D32_SFLOAT:
-				case VK_FORMAT_D16_UNORM_S8_UINT:
-				case VK_FORMAT_D24_UNORM_S8_UINT:
-				case VK_FORMAT_D32_SFLOAT_S8_UINT:
-					return VK_IMAGE_ASPECT_DEPTH_BIT;
-				default:
-					return VK_IMAGE_ASPECT_COLOR_BIT;;
-				}
-			}();
+			VkImageAspectFlags aspectFlags = mRenderPass->mAttachmentAspectFlags[i];
+			VkImageLayout initialLayout = mRenderPass->mInitialLayouts[i];
 
 			ImageView view = ImageView::Builder(mAttachments.back(), aspectFlags)
 										 .WithType(VK_IMAGE_VIEW_TYPE_2D)
