@@ -553,6 +553,24 @@ namespace Strawberry::Vulkan
 	{
 		Core::Assert(State() == CommandBufferState::Recording);
 
+		std::vector<Barrier> memoryBarriers;
+		memoryBarriers.reserve(framebuffer.GetAttachmentCount());
+		for (int i = 0; i < framebuffer.GetAttachmentCount(); i++)
+		{
+			memoryBarriers.emplace_back(
+				ImageMemoryBarrier(
+					framebuffer.GetAttachment(i),
+					renderPass.mAttachmentAspectFlags[i])
+					.FromLayout(VK_IMAGE_LAYOUT_UNDEFINED)
+					.ToLayout(renderPass.mInitialLayouts[i])
+					.WithDstAccessMask(VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT));
+		}
+
+		PipelineBarrier(VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+			VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+			0,
+			memoryBarriers);
+
 		VkRenderPassBeginInfo beginInfo{
 			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 			.pNext = nullptr,
