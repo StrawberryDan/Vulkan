@@ -127,7 +127,10 @@ namespace Strawberry::Vulkan
 		void ClearColorImage(Image& image, VkImageLayout layout, Core::Math::Vec4f clearColor = {0.0f, 0.0f, 0.0f, 1.0f});
 
 
-		void BlitToSwapchain(Swapchain& swapchain, Framebuffer& framebuffer);
+		void BlitToSwapchain(
+			Swapchain& swapchain,
+			Image& src,
+			VkImageLayout srcLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 
 
 		void BindDescriptorSet(const GraphicsPipeline& pipeline, uint32_t set, const DescriptorSet& descriptorSet);

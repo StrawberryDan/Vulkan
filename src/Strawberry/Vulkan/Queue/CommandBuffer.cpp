@@ -444,7 +444,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	void CommandBuffer::BlitToSwapchain(Swapchain& swapchain, Framebuffer& framebuffer)
+	void CommandBuffer::BlitToSwapchain(Swapchain& swapchain, Image& src, VkImageLayout srcLayout)
 	{
 		// Get next presentation image
 		Image* nextSwapchainImage = swapchain.GetNextImage().Unwrap();
@@ -461,8 +461,8 @@ namespace Strawberry::Vulkan
 		// ...
 		// ...
 		BlitImage(
-				  framebuffer.GetAttachment(0),
-				  VK_IMAGE_LAYOUT_GENERAL,
+				  src,
+				  srcLayout,
 				  *nextSwapchainImage,
 				  VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
 				  VK_IMAGE_ASPECT_COLOR_BIT,
