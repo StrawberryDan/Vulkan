@@ -99,7 +99,8 @@ namespace Strawberry::Vulkan
 																  VkImageLayout       finalLayout,
 																  VkSampleCountFlagBits sampleCount,
 																  Core::Math::Vec4f   clearColor,
-																  VkAttachmentLoadOp  stencilLoadOp, VkAttachmentStoreOp stencilStoreOp)
+																  VkAttachmentLoadOp  stencilLoadOp,
+																  VkAttachmentStoreOp stencilStoreOp)
 	{
 		mAttachments.emplace_back(
 			Attachment{
@@ -117,22 +118,25 @@ namespace Strawberry::Vulkan
 					.stencilStoreOp = stencilStoreOp,
 					.initialLayout = initialLayout,
 					.finalLayout = finalLayout,
-				}});
+				},
+				.aspect = VK_IMAGE_ASPECT_COLOR_BIT,
+			});
 
 		return *this;
 	}
 
 
-	RenderPass::Builder& RenderPass::Builder::WithDepthStencilAttachment(VkImageUsageFlags usage,
-																  VkFormat            format,
-																  VkAttachmentLoadOp  loadOp,
-																  VkAttachmentStoreOp storeOp,
-																  VkImageLayout       initialLayout,
-																  VkImageLayout       finalLayout,
-																  VkSampleCountFlagBits sampleCount,
-																  float               clearValue,
-																  VkAttachmentLoadOp  stencilLoadOp,
-																  VkAttachmentStoreOp stencilStoreOp)
+	RenderPass::Builder& RenderPass::Builder::WithDepthAttachment(
+		VkImageUsageFlags usage,
+		VkFormat format,
+		VkAttachmentLoadOp loadOp,
+		VkAttachmentStoreOp storeOp,
+		VkImageLayout initialLayout,
+		VkImageLayout finalLayout,
+		VkSampleCountFlagBits sampleCount,
+		float clearValue,
+		VkAttachmentLoadOp stencilLoadOp,
+		VkAttachmentStoreOp stencilStoreOp)
 	{
 		Attachment attachment {
 			.usage = usage,
@@ -147,7 +151,43 @@ namespace Strawberry::Vulkan
 				.stencilStoreOp = stencilStoreOp,
 				.initialLayout = initialLayout,
 				.finalLayout = finalLayout,
-		}};
+			},
+			.aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
+		};
+
+		mAttachments.emplace_back(std::move(attachment));
+
+		return *this;
+	}
+
+
+	RenderPass::Builder& RenderPass::Builder::WithDepthStencilAttachment(VkImageUsageFlags usage,
+																		 VkFormat            format,
+																		 VkAttachmentLoadOp  loadOp,
+																		 VkAttachmentStoreOp storeOp,
+																		 VkImageLayout       initialLayout,
+																		 VkImageLayout       finalLayout,
+																		 VkSampleCountFlagBits sampleCount,
+																		 float               clearValue,
+																		 VkAttachmentLoadOp  stencilLoadOp,
+																		 VkAttachmentStoreOp stencilStoreOp)
+	{
+		Attachment attachment {
+			.usage = usage,
+			.clearColor = VkClearValue{.depthStencil{.depth = clearValue, .stencil = 0}},
+			.description = VkAttachmentDescription{
+				.flags = 0,
+				.format = format,
+				.samples = sampleCount,
+				.loadOp = loadOp,
+				.storeOp = storeOp,
+				.stencilLoadOp = stencilLoadOp,
+				.stencilStoreOp = stencilStoreOp,
+				.initialLayout = initialLayout,
+				.finalLayout = finalLayout,
+			},
+			.aspect = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
+		};
 
 		mAttachments.emplace_back(std::move(attachment));
 
@@ -193,6 +233,17 @@ namespace Strawberry::Vulkan
 		renderPass.mAttachmentUsages = mAttachments |
 			std::views::transform([](auto&& x){ return x.usage; }) |
 				std::ranges::to<std::vector>();
+
+
+		renderPass.mAttachmentAspectFlags = mAttachments
+		| std::views::transform([] (const Attachment& attachment) { return attachment.aspect; })
+		| std::ranges::to<std::vector>();
+
+
+		renderPass.mInitialLayouts = mAttachments
+			| std::views::transform(([] (const Attachment& attachment) { return attachment.description.initialLayout; }))
+			| std::ranges::to<std::vector>();
+
 
 		renderPass.mClearColors = mAttachments |
 			std::views::transform([](auto&& x) { return x.clearColor; }) |

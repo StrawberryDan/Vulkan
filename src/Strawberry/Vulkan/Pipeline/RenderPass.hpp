@@ -51,11 +51,13 @@ namespace Strawberry::Vulkan
 
 
 	private:
-		VkRenderPass                   mRenderPass;
-		Core::ReflexivePointer<Device> mDevice;
-		std::vector<VkFormat>          mAttachmentFormats;
-		std::vector<VkImageUsageFlags> mAttachmentUsages;
-		std::vector<VkClearValue>      mClearColors;
+		VkRenderPass                    mRenderPass;
+		Core::ReflexivePointer<Device>  mDevice;
+		std::vector<VkFormat>           mAttachmentFormats;
+		std::vector<VkImageUsageFlags>  mAttachmentUsages;
+		std::vector<VkClearValue>       mClearColors;
+		std::vector<VkImageAspectFlags> mAttachmentAspectFlags;
+		std::vector<VkImageLayout>      mInitialLayouts;
 	};
 
 
@@ -69,6 +71,7 @@ namespace Strawberry::Vulkan
 
 		SubpassDescription& WithInputAttachment(uint32_t index, VkImageLayout layout);
 		SubpassDescription& WithColorAttachment(uint32_t index, VkImageLayout layout);
+		SubpassDescription& WithDepthAttachment(uint32_t index, VkImageLayout layout);
 		SubpassDescription& WithDepthStencilAttachment(uint32_t index, VkImageLayout layout);
 
 	private:
@@ -92,6 +95,15 @@ namespace Strawberry::Vulkan
 									 VkImageLayout       finalLayout,
 									 VkSampleCountFlagBits sampleCount = VK_SAMPLE_COUNT_1_BIT,
 									 Core::Math::Vec4f   clearColor     = Core::Math::Vec4f(0.0f, 0.0f, 0.0f, 0.0f),
+									 VkAttachmentLoadOp  stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE, VkAttachmentStoreOp stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE);
+		Builder& WithDepthAttachment(VkImageUsageFlags usage,
+									 VkFormat            format,
+									 VkAttachmentLoadOp  loadOp,
+									 VkAttachmentStoreOp storeOp,
+									 VkImageLayout       initialLayout,
+									 VkImageLayout       finalLayout,
+									 VkSampleCountFlagBits sampleCount = VK_SAMPLE_COUNT_1_BIT,
+									 float               clearValue     = 1.0f,
 									 VkAttachmentLoadOp  stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE, VkAttachmentStoreOp stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE);
 		Builder& WithDepthStencilAttachment(VkImageUsageFlags usage,
 									 VkFormat            format,
@@ -127,6 +139,7 @@ namespace Strawberry::Vulkan
 			VkImageUsageFlags usage;
 			VkClearValue clearColor;
 			VkAttachmentDescription description;
+			VkImageAspectFlags aspect;
 		};
 
 		std::vector<Attachment> mAttachments;
