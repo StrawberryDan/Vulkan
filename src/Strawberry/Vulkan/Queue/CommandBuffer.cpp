@@ -321,6 +321,10 @@ namespace Strawberry::Vulkan
 			{
 				imageBarriers.emplace_back(barrier.Ref<ImageMemoryBarrier>());
 			}
+			else [[unlikely]]
+			{
+				Core::Unreachable();
+			}
 		}
 
 		vkCmdPipelineBarrier(mCommandBuffer,
