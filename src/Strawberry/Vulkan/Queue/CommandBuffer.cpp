@@ -273,7 +273,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	void CommandBuffer::BindVertexBuffer(uint32_t binding, Buffer& buffer, VkDeviceSize offset)
+	void CommandBuffer::BindVertexBuffer(uint32_t binding, const Buffer& buffer, VkDeviceSize offset)
 	{
 		Core::Assert(State() == CommandBufferState::Recording);
 		VkBuffer handle = buffer;

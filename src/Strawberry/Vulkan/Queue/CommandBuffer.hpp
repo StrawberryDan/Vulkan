@@ -104,7 +104,7 @@ namespace Strawberry::Vulkan
 		void PushConstants(const GraphicsPipeline& pipeline, VkShaderStageFlags stage, const Core::IO::DynamicByteBuffer& bytes, uint32_t offset);
 
 
-		void BindVertexBuffer(uint32_t binding, Buffer& buffer, VkDeviceSize offset = 0);
+		void BindVertexBuffer(uint32_t binding, const Buffer& buffer, VkDeviceSize offset = 0);
 		void BindIndexBuffer(const Buffer& buffer, VkIndexType indexType, uint32_t offset = 0);
 		void Draw(uint32_t vertexCount, uint32_t instanceCount = 1, uint32_t vertexOffset = 0, uint32_t instanceOffset = 0);
 		void DrawIndexed(uint32_t indexCount, uint32_t instanceCount = 1, uint32_t firstIndex = 0, uint32_t firstInstance = 0, int32_t vertexOffset = 0);
