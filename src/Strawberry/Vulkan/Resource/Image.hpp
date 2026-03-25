@@ -66,7 +66,7 @@ namespace Strawberry::Vulkan
 
 			Builder&& WithMipLevels(uint32_t mipLevels);
 
-			Builder&& WithArrayLayers(uint32_t arrayLayers);
+			Builder&& WithArrayLayers(size_t arrayLayers);
 
 			Builder&& WithTiling(VkImageTiling tiling);
 
@@ -89,7 +89,7 @@ namespace Strawberry::Vulkan
 			Core::Optional<VkImageUsageFlags> mUsage;
 			VkSampleCountFlagBits             mSamples       = VK_SAMPLE_COUNT_1_BIT;
 			uint32_t                          mMipLevels     = 1;
-			uint32_t                          mArrayLayers   = 1;
+			size_t                            mArrayLayers   = 1;
 			VkImageTiling                     mTiling        = VK_IMAGE_TILING_OPTIMAL;
 			VkImageLayout                     mInitialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		};

@@ -74,7 +74,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Image::Builder&& Image::Builder::WithArrayLayers(uint32_t arrayLayers)
+	Image::Builder&& Image::Builder::WithArrayLayers(size_t arrayLayers)
 	{
 		this->mArrayLayers = arrayLayers;
 		return std::move(*this);
@@ -113,7 +113,7 @@ namespace Strawberry::Vulkan
 				static_cast<uint32_t>(mExtent.Value()[2])
 			},
 			.mipLevels = mMipLevels,
-			.arrayLayers = mArrayLayers,
+			.arrayLayers = static_cast<uint32_t>(mArrayLayers),
 			.samples = mSamples,
 			.tiling = mTiling,
 			.usage = mUsage.Value(),
@@ -138,7 +138,7 @@ namespace Strawberry::Vulkan
 
 		Image image(imageHandle, std::move(memory), mExtent.Value(), mFormat.Value());
 		image.mSamples = mSamples;
-		image.mArrayLayerCount = mArrayLayers;
+		image.mArrayLayerCount = static_cast<uint32_t>(mArrayLayers);
 		return image;
 	}
 
