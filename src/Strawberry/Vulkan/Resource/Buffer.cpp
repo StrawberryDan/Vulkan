@@ -155,6 +155,7 @@ namespace Strawberry::Vulkan
 
 	void Buffer::SetData(const Core::IO::DynamicByteBuffer& bytes)
 	{
+		Core::Assert(bytes.Size() <= mSize);
 		mMemory.Overwrite(bytes);
 	}
 
