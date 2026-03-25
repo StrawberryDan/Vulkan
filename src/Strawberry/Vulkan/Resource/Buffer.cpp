@@ -101,7 +101,8 @@ namespace Strawberry::Vulkan
 		// Copy data into the buffer if required.
 		if (mData.IsType<Core::IO::DynamicByteBuffer>())
 		{
-			Core::Assert(mUsage & VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+			Core::Assert(mUsage & VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+				"Attempt to set the data of a buffer without VK_BUFFER_USAGE_TRANSFER_DST_BIT set in the usage!");
 			buffer.SetData(mData.Ref<Core::IO::DynamicByteBuffer>());
 		}
 
