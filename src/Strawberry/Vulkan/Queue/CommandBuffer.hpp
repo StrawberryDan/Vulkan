@@ -65,6 +65,9 @@ namespace Strawberry::Vulkan
 		operator VkCommandBuffer() const;
 
 
+		std::future<void> Submit();
+
+
 		Core::ReflexivePointer<CommandPool> GetCommandPool() const;
 
 

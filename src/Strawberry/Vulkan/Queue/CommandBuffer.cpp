@@ -85,6 +85,12 @@ namespace Strawberry::Vulkan
 	}
 
 
+	std::future<void> CommandBuffer::Submit()
+	{
+		return mCommandPool->GetQueue()->Submit(*this);
+	}
+
+
 	Core::ReflexivePointer<CommandPool> CommandBuffer::GetCommandPool() const
 	{
 		return mCommandPool;
