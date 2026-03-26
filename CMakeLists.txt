@@ -23,6 +23,9 @@ if (NOT TARGET StrawberryVulkan)
 
 
 	list(APPEND StrawberryVulkan_Source
+			src/Strawberry/Vulkan/Queue/Batch.hpp
+			src/Strawberry/Vulkan/Queue/BatchRenderer.cpp
+			src/Strawberry/Vulkan/Queue/BatchRenderer.hpp
             src/Strawberry/Vulkan/Descriptor/DescriptorPool.cpp
             src/Strawberry/Vulkan/Descriptor/DescriptorPool.hpp
             src/Strawberry/Vulkan/Descriptor/DescriptorSet.cpp
