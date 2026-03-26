@@ -15,13 +15,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	CommandPool::CommandPool(Queue& queue, bool resetBit)
+	CommandPool::CommandPool(Queue& queue, bool individualReset)
 		: mQueue(queue)
 	{
 		VkCommandPoolCreateInfo createInfo{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
 			.pNext = nullptr,
-			.flags = resetBit ? VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT : VkCommandPoolCreateFlags(0),
+			.flags = individualReset ? VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT : VkCommandPoolCreateFlags(0),
 		};
 
 		Core::Assert(vkCreateCommandPool(mQueue->GetDevice().Handle(), &createInfo, nullptr, &mCommandPool) == VK_SUCCESS);
