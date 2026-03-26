@@ -15,9 +15,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	Queue::Queue(Device& device, uint32_t family, uint32_t index)
+	Queue::Queue(Device& device, uint32_t family, uint32_t index, VkQueueFlags queueProperties)
 		: mFamilyIndex(family)
 		, mDevice(device)
+		, mQueueFlags(queueProperties)
 	{
 		vkGetDeviceQueue(mDevice->Handle(), mFamilyIndex, index, &mQueue);
 	}
@@ -26,10 +27,12 @@ namespace Strawberry::Vulkan
 	Queue::Queue(Queue&& rhs) noexcept
 		: mQueue(std::exchange(rhs.mQueue, nullptr))
 		, mFamilyIndex(std::exchange(rhs.mFamilyIndex, 0))
-		, mDevice(std::move(rhs.mDevice)) {}
+		, mDevice(std::move(rhs.mDevice))
+		, mQueueFlags(std::exchange(rhs.mQueueFlags, 0))
+	{}
 
 
-	Queue& Queue::operator=(Queue&& rhs)
+	Queue& Queue::operator=(Queue&& rhs) noexcept
 	{
 		if (this != &rhs)
 		{

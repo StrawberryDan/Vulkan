@@ -32,7 +32,7 @@ namespace Strawberry::Vulkan
 		Queue(const Queue& rhs)            = delete;
 		Queue& operator=(const Queue& rhs) = delete;
 		Queue(Queue&& rhs) noexcept;
-		Queue& operator=(Queue&& rhs);
+		Queue& operator=(Queue&& rhs) noexcept;
 		~Queue();
 
 
@@ -53,14 +53,17 @@ namespace Strawberry::Vulkan
 
 		uint32_t GetFamilyIndex() const;
 
+		VkQueueFlags GetFlags() const { return mQueueFlags; }
+
 
 	protected:
-		explicit Queue(Device& device, uint32_t family, uint32_t index);
+		explicit Queue(Device& device, uint32_t family, uint32_t index, VkQueueFlags queueFlags);
 
 
 	private:
 		VkQueue                        mQueue;
 		uint32_t                       mFamilyIndex;
 		Core::ReflexivePointer<Device> mDevice;
+		VkQueueFlags                   mQueueFlags;
 	};
 }

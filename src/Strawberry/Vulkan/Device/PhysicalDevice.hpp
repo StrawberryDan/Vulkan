@@ -18,6 +18,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
+	struct QueueCriteria;
 	class Instance;
 
 
@@ -49,6 +50,7 @@ namespace Strawberry::Vulkan
 
 
 		std::vector<uint32_t>   SearchQueueFamilies(VkQueueFlags flagBits) const;
+		std::vector<uint32_t>   SearchQueueFamilies(const QueueCriteria& queueCriteria) const;
 		std::vector<MemoryType> SearchMemoryTypes(const MemoryTypeCriteria& memoryCriteria) const;
 
 	protected:

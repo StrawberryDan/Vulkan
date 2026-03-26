@@ -8,6 +8,8 @@
 #include <numeric>
 #include <ranges>
 
+#include "Device.hpp"
+
 
 //======================================================================================================================
 //  Method Definitions
@@ -151,6 +153,12 @@ namespace Strawberry::Vulkan
 		          });
 
 		return familyIndices;
+	}
+
+
+	std::vector<uint32_t> PhysicalDevice::SearchQueueFamilies(const QueueCriteria& criteria) const
+	{
+		return SearchQueueFamilies(criteria.flags);
 	}
 
 

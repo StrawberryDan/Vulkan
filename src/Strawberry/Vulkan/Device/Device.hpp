@@ -39,13 +39,25 @@ namespace Strawberry::Vulkan
 	};
 
 
+	struct QueueCriteria
+	{
+		VkQueueFlags flags;
+
+
+		QueueCriteria operator|(const QueueCriteria& other) const { return { .flags = flags | other.flags }; }
+
+
+		static QueueCriteria Graphics();
+		static QueueCriteria Transfer();
+		static QueueCriteria Compute();
+	};
+
+
 	class Device
 			: public Core::EnableReflexivePointer
 	{
 	public:
-		explicit Device(const PhysicalDevice&           physicalDevice,
-						const VkPhysicalDeviceFeatures& features,
-						std::vector<QueueCreateInfo>    queueCreateInfo);
+		class Builder;
 
 		Device(const Device& rhs) = delete;
 
@@ -71,15 +83,45 @@ namespace Strawberry::Vulkan
 
 		[[nodiscard]] Queue& GetQueue(uint32_t family, uint32_t index);
 
+		[[nodiscard]] Queue& GetQueue(const QueueCriteria& queueCriteria);
+
 		[[nodiscard]] PolyAllocator& GetAllocator() const;
 
 		[[nodiscard]] DescriptorSet AllocateDescriptorSet(const DescriptorSetLayout& descriptorSetLayout);
 
 	private:
+		explicit Device(const PhysicalDevice&           physicalDevice,
+						const VkPhysicalDeviceFeatures& features,
+						std::vector<QueueCreateInfo>    queueCreateInfo);
+
+
 		VkDevice                                     mDevice;
 		Core::ReflexivePointer<const PhysicalDevice> mPhysicalDevice;
-		std::map<uint32_t, std::vector<Queue> >      mQueues;
+		std::map<uint32_t, std::vector<Queue>>       mQueues;
 		std::unique_ptr<PolyAllocator>               mAllocator;
 		std::unique_ptr<DescriptorPoolAllocator>     mDescriptorPoolAllocator;
+	};
+
+
+	class Device::Builder
+	{
+	public:
+		Builder(const PhysicalDevice& physicalDevice);
+
+
+		Builder& WithFeature(VkBool32 VkPhysicalDeviceFeatures::*Member)
+		{
+			mFeatures.get()->*Member = VK_TRUE;
+			return *this;
+		}
+
+		Builder& WithQueue(const QueueCriteria& queueCriteria, unsigned int count = 1);
+
+		Device Build();
+
+	private:
+		const PhysicalDevice& device;
+		std::unique_ptr<VkPhysicalDeviceFeatures> mFeatures;
+		std::vector<QueueCreateInfo> mQueueCreateInfo;
 	};
 }

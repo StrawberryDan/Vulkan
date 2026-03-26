@@ -12,6 +12,7 @@
 #include "Strawberry/Core/Assert.hpp"
 // Standard Library
 #include <algorithm>
+#include <deque>
 #include <utility>
 #include <vector>
 
@@ -21,6 +22,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
+	QueueCriteria QueueCriteria::Graphics()
+	{
+		return {.flags = VK_QUEUE_GRAPHICS_BIT };
+	}
+
+	QueueCriteria QueueCriteria::Transfer()
+	{
+		return {.flags = VK_QUEUE_TRANSFER_BIT };
+	}
+
+	QueueCriteria QueueCriteria::Compute()
+	{
+		return {.flags = VK_QUEUE_COMPUTE_BIT };
+	}
+
 	Device::Device(
 		const PhysicalDevice&        physicalDevice,
 		const VkPhysicalDeviceFeatures& features,
@@ -94,11 +110,16 @@ namespace Strawberry::Vulkan
 		// Create Device
 		Core::AssertEQ(vkCreateDevice(physicalDevice.mPhysicalDevice, &createInfo, nullptr, &mDevice), VK_SUCCESS);
 
+		const auto& queueFamilyProperties = physicalDevice.GetQueueFamilyProperties();
 
-		for (auto& createInfo: queueCreateInfo)
+		for (const auto& createInfo: queueCreateInfo)
 		{
 			for (int i = 0; i < createInfo.count; i++)
-				mQueues[createInfo.familyIndex].emplace_back(Queue(*this, createInfo.familyIndex, i));
+				mQueues[createInfo.familyIndex].emplace_back(Queue(
+					*this,
+					createInfo.familyIndex,
+					i,
+					queueFamilyProperties[createInfo.familyIndex].queueFlags));
 		}
 
 		mAllocator = std::make_unique<NaivePolyAllocator<FallbackChainAllocator<FreeListAllocator>>>(*this);
@@ -181,6 +202,21 @@ namespace Strawberry::Vulkan
 	}
 
 
+	Queue& Device::GetQueue(const QueueCriteria& criteria)
+	{
+		const auto& queueProperties = mPhysicalDevice->GetQueueFamilyProperties();
+		for (auto& [index, family] : mQueues)
+		{
+			if ((queueProperties[index].queueFlags & criteria.flags) == criteria.flags)
+			{
+				return family[0];
+			}
+		}
+
+		Core::Unreachable();
+	}
+
+
 	PolyAllocator& Device::GetAllocator() const
 	{
 		return *mAllocator;
@@ -190,5 +226,80 @@ namespace Strawberry::Vulkan
 	DescriptorSet Device::AllocateDescriptorSet(const DescriptorSetLayout& descriptorSetLayout)
 	{
 		return mDescriptorPoolAllocator->Allocate(*this, descriptorSetLayout);
+	}
+
+	Device::Builder::Builder(const PhysicalDevice& physicalDevice)
+		: device(physicalDevice)
+	{
+		mFeatures = std::make_unique<VkPhysicalDeviceFeatures>();
+		std::memset(mFeatures.get(), 0, sizeof(VkPhysicalDeviceFeatures));
+	}
+
+
+	Device::Builder& Device::Builder::WithQueue(const QueueCriteria& queueCriteria, unsigned int count)
+	{
+		const auto& queueProperties = device.GetQueueFamilyProperties();
+
+		auto candidates = device.SearchQueueFamilies(queueCriteria) | std::ranges::to<std::deque>();
+
+		std::erase_if(candidates, [&, this] (const uint32_t x) {
+			return std::ranges::any_of(mQueueCreateInfo, [&] (const QueueCreateInfo& createInfo) {
+				Core::Assert(createInfo.count <= queueProperties[x].queueCount);
+				return createInfo.familyIndex == x && createInfo.count == queueProperties[x].queueCount;
+			});
+		});
+
+
+		while (count > 0 && !candidates.empty())
+		{
+			uint32_t familyIndex = candidates.front();
+			candidates.pop_front();
+
+			auto search = std::ranges::find_if(mQueueCreateInfo,
+				[&] (const QueueCreateInfo& queueCreateInfo) { return queueCreateInfo.familyIndex == familyIndex; });
+			if (search != mQueueCreateInfo.end())
+			{
+				unsigned int max = queueProperties[familyIndex].queueCount - search->count;
+
+				if (count <= max)
+				{
+					search->count += count;
+					count = 0;
+				}
+				else
+				{
+					search->count = queueProperties[familyIndex].queueCount;
+					count -= max;
+				}
+			}
+			else
+			{
+				QueueCreateInfo createInfo;
+				createInfo.familyIndex = familyIndex;
+				unsigned int max = queueProperties[familyIndex].queueCount;
+
+				if (count <= max)
+				{
+					createInfo.count = count;
+					count = 0;
+				}
+				else
+				{
+					createInfo.count = queueProperties[familyIndex].queueCount;
+					count -= max;
+				}
+				mQueueCreateInfo.emplace_back(createInfo);
+			}
+		}
+
+		Core::AssertEQ(count, 0);
+
+		return *this;
+	}
+
+
+	Device Device::Builder::Build()
+	{
+		return Device(device, *mFeatures, mQueueCreateInfo);
 	}
 }
