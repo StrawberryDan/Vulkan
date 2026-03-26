@@ -61,5 +61,15 @@ namespace Strawberry::Vulkan
 				buffer.BindVertexBuffer(index, vertexBuffer.Resolve());
 			}
 		}
+
+		if (batch.mIndexBuffer && (!lastBatch.HasValue() || lastBatch->mIndexBuffer != batch.mIndexBuffer))
+		{
+			buffer.BindIndexBuffer(batch.mIndexBuffer->buffer.Resolve(), batch.mIndexBuffer->type, 0);
+		}
+
+		for (const auto& [index, pushContant] : batch.mPushConstants)
+		{
+			buffer.PushConstants(*batch.mGraphicsPipeline, pushContant.pipelineStages, pushContant.bytes, 0);
+		}
 	}
 }

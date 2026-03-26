@@ -15,6 +15,21 @@ namespace Strawberry::Vulkan
 	public:
 		friend class BatchRenderer;
 
+		struct IndexBuffer
+		{
+			bool operator==(const IndexBuffer&) const = default;
+			bool operator!=(const IndexBuffer&) const = default;
+
+			VkIndexType            type;
+			Core::ValOrPtr<Buffer> buffer;
+		};
+
+		struct PushConstant
+		{
+			VkPipelineStageFlags pipelineStages;
+			Core::IO::DynamicByteBuffer bytes;
+		};
+
 
 		Batch(const Batch&) = delete;
 		Batch& operator=(const Batch&) = delete;
@@ -38,9 +53,9 @@ namespace Strawberry::Vulkan
 			return *this;
 		}
 
-		Batch& WithIndexBuffer(Core::ValOrPtr<Buffer> buffer)
+		Batch& WithIndexBuffer(VkIndexType type, Core::ValOrPtr<Buffer> buffer)
 		{
-			mIndexBuffer.Emplace(std::move(buffer));
+			mIndexBuffer.Emplace(type, std::move(buffer));
 			return *this;
 		}
 
@@ -56,6 +71,12 @@ namespace Strawberry::Vulkan
 			return *this;
 		}
 
+		Batch& WithPushConstants(unsigned int index, const PushConstant& pushConstant)
+		{
+			mPushConstants.emplace(0, std::move(pushConstant));
+			return *this;
+		}
+
 	private:
 		/// Pipeline to use to render batch
 		GraphicsPipeline* mGraphicsPipeline = nullptr;
@@ -64,7 +85,9 @@ namespace Strawberry::Vulkan
 		/// Vertex Buffers used to render batch
 		std::map<unsigned int, Core::ValOrPtr<Buffer>> mVertexBuffers;
 		/// Potential Index Buffer to use render batch
-		Core::Optional<Core::ValOrPtr<Buffer>> mIndexBuffer;
+		Core::Optional<IndexBuffer> mIndexBuffer;
+		/// A set of push constants
+		std::map<unsigned int, PushConstant> mPushConstants;
 
 		/// Vertex count or index count if using index buffer.
 		unsigned int mVertexCount   = 0;
