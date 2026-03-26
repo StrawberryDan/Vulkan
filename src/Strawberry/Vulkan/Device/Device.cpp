@@ -202,14 +202,15 @@ namespace Strawberry::Vulkan
 	}
 
 
-	Queue& Device::GetQueue(const QueueCriteria& criteria)
+	Queue& Device::GetQueue(const QueueCriteria& criteria, unsigned int order)
 	{
 		const auto& queueProperties = mPhysicalDevice->GetQueueFamilyProperties();
+
 		for (auto& [index, family] : mQueues)
 		{
 			if ((queueProperties[index].queueFlags & criteria.flags) == criteria.flags)
 			{
-				return family[0];
+				return family[order % family.size()];
 			}
 		}
 

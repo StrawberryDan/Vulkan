@@ -83,7 +83,7 @@ namespace Strawberry::Vulkan
 
 		[[nodiscard]] Queue& GetQueue(uint32_t family, uint32_t index);
 
-		[[nodiscard]] Queue& GetQueue(const QueueCriteria& queueCriteria);
+		[[nodiscard]] Queue& GetQueue(const QueueCriteria& queueCriteria, unsigned int index = 0);
 
 		[[nodiscard]] PolyAllocator& GetAllocator() const;
 
