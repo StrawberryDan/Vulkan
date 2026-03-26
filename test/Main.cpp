@@ -58,7 +58,9 @@ void BasicRendering()
 	uint32_t computeQueueFamily = gpu.SearchQueueFamilies(VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT)[0];
 
 
-	Device device(gpu, {}, {QueueCreateInfo{queueFamily, 1}});
+	Device device = Device::Builder(gpu)
+		.WithQueue(QueueCriteria::Graphics() | QueueCriteria::Transfer())
+		.Build();
 	Surface surface(window, device);
 	RenderPass renderPass = RenderPass::Builder(device)
 							.WithColorAttachment(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
@@ -288,9 +290,7 @@ void BasicRendering()
 											  VK_IMAGE_LAYOUT_PRESENT_SRC_KHR)
 									  });
 		commandBuffer.End();
-		queue->Submit(commandBuffer);
-		queue->WaitUntilIdle();
-
+		commandBuffer.Submit().wait();
 		swapchain.Present();
 	}
 }
