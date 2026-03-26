@@ -37,13 +37,6 @@ namespace Strawberry::Vulkan
 
 		Core::ReflexivePointer<Queue> GetQueue() const;
 
-
-		template<std::movable T, typename... Args> requires (std::constructible_from<T, const CommandPool&, Args...>)
-		T Create(const Args&... args) const
-		{
-			return T(*this, std::forward<const Args&>(args)...);
-		}
-
 	private:
 		VkCommandPool                 mCommandPool;
 		Core::ReflexivePointer<Queue> mQueue;
