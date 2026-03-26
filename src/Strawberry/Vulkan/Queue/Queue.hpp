@@ -9,6 +9,7 @@
 // Vulkan
 #include <vulkan/vulkan.h>
 // Strawberry Core
+#include <future>
 #include <Strawberry/Core/Types/ReflexivePointer.hpp>
 
 
@@ -43,7 +44,7 @@ namespace Strawberry::Vulkan
 		}
 
 
-		void Submit(const CommandBuffer& commandBuffer);
+		std::future<void> Submit(const CommandBuffer& commandBuffer);
 		void WaitUntilIdle() const;
 
 
