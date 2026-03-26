@@ -10,6 +10,16 @@ namespace Strawberry::Vulkan
 		void Enqueue(Batch&& batch);
 
 
+		template <std::ranges::range Range>
+		void Enqueue(Range&& range)
+		{
+			for (auto&& item : range)
+			{
+				this->Enqueue(std::move(item));
+			}
+		}
+
+
 		void WriteQueue(CommandBuffer& buffer);
 
 
