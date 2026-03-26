@@ -54,6 +54,12 @@ namespace Strawberry::Vulkan
 	}
 
 
+	void CommandPool::Reset()
+	{
+		Core::AssertEQ(vkResetCommandPool(GetQueue()->GetDevice().Handle(), mCommandPool, 0), VK_SUCCESS);
+	}
+
+
 	Core::ReflexivePointer<Queue> CommandPool::GetQueue() const
 	{
 		return mQueue;

@@ -35,6 +35,9 @@ namespace Strawberry::Vulkan
 		~CommandPool();
 
 
+		void Reset();
+
+
 		Core::ReflexivePointer<Queue> GetQueue() const;
 
 	private:
