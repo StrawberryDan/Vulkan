@@ -35,8 +35,12 @@ namespace Strawberry::Vulkan
 			.pSetLayouts = &layoutHandle,
 		};
 
-		Core::AssertEQ(vkAllocateDescriptorSets(mDescriptorPool->GetDevice()->Handle(), &allocateInfo, &mDescriptorSet),
-		               VK_SUCCESS);
+		Core::AssertEQ(
+			vkAllocateDescriptorSets(
+				mDescriptorPool->GetDevice()->Handle(),
+				&allocateInfo,
+				&mDescriptorSet),
+			VK_SUCCESS);
 	}
 
 
