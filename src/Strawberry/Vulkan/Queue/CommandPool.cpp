@@ -9,6 +9,8 @@
 // Standard Library
 #include <memory>
 
+#include "CommandBuffer.hpp"
+
 
 //======================================================================================================================
 //  Class Definitions
@@ -57,6 +59,11 @@ namespace Strawberry::Vulkan
 	void CommandPool::Reset()
 	{
 		Core::AssertEQ(vkResetCommandPool(GetQueue()->GetDevice().Handle(), mCommandPool, 0), VK_SUCCESS);
+
+		for (auto& commandBuffer : mCommandBuffers)
+		{
+			commandBuffer->mState = CommandBufferState::Initial;
+		}
 	}
 
 

@@ -11,6 +11,7 @@
 // Standard Library
 #include <concepts>
 #include <utility>
+#include <set>
 
 
 //======================================================================================================================
@@ -19,6 +20,7 @@
 namespace Strawberry::Vulkan
 {
 	class Queue;
+	class CommandBuffer;
 
 
 	class CommandPool
@@ -40,8 +42,10 @@ namespace Strawberry::Vulkan
 
 		Core::ReflexivePointer<Queue> GetQueue() const;
 
+
 	private:
-		VkCommandPool                 mCommandPool;
-		Core::ReflexivePointer<Queue> mQueue;
+		VkCommandPool                                   mCommandPool;
+		Core::ReflexivePointer<Queue>                   mQueue;
+		std::set<Core::ReflexivePointer<CommandBuffer>> mCommandBuffers;
 	};
 }

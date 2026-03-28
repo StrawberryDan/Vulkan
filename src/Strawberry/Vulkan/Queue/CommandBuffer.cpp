@@ -33,8 +33,8 @@ namespace Strawberry::Vulkan
 {
 	CommandBuffer::CommandBuffer(CommandPool& commandPool, VkCommandBufferLevel level)
 		: mCommandBuffer{}
-		  , mCommandPool(commandPool)
-		  , mExecutionFenceOrParentBuffer(ConstructExecutionFence(commandPool.mQueue->GetDevice(), level))
+		, mCommandPool(commandPool)
+		, mExecutionFenceOrParentBuffer(ConstructExecutionFence(commandPool.mQueue->GetDevice(), level))
 	{
 		VkCommandBufferAllocateInfo allocateInfo{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
@@ -46,6 +46,8 @@ namespace Strawberry::Vulkan
 
 		Core::Assert(vkAllocateCommandBuffers(mCommandPool->GetQueue()->GetDevice().Handle(), &allocateInfo, &mCommandBuffer) ==
 					 VK_SUCCESS);
+
+		commandPool.mCommandBuffers.emplace(GetReflexivePointer());
 	}
 
 
@@ -72,6 +74,7 @@ namespace Strawberry::Vulkan
 
 	CommandBuffer::~CommandBuffer()
 	{
+		mCommandPool->mCommandBuffers.erase(GetReflexivePointer());
 		if (mCommandBuffer)
 		{
 			vkFreeCommandBuffers(mCommandPool->GetQueue()->GetDevice().Handle(), mCommandPool->mCommandPool, 1, &mCommandBuffer);

@@ -51,6 +51,7 @@ namespace Strawberry::Vulkan
 			: public Core::EnableReflexivePointer
 	{
 		friend class Queue;
+		friend class CommandPool;
 
 	public:
 		explicit CommandBuffer(CommandPool& commandPool, VkCommandBufferLevel level = VK_COMMAND_BUFFER_LEVEL_PRIMARY);
