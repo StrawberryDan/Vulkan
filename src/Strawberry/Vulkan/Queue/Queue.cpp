@@ -80,6 +80,7 @@ namespace Strawberry::Vulkan
 
 		return std::async(std::launch::async, [&]() {
 			commandBuffer.mExecutionFenceOrParentBuffer.Ptr<Fence>()->Wait();
+			commandBuffer.MoveIntoCompletedState();
 		});
 	}
 
