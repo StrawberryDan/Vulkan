@@ -344,13 +344,20 @@ namespace Strawberry::Vulkan
 
 	GraphicsPipeline GraphicsPipeline::Builder::Build()
 	{
+		// Any graphics pipeline has at least 2 shaders in it.
+		Core::Assert(mStages.size() >= 2,
+			"Attempt to create graphics pipeline without at least 2 shaders!");
 		// Input Assembly MUST be specified.
-		Core::Assert(mInputAssemblyStateCreateInfo.HasValue());
+		Core::Assert(mInputAssemblyStateCreateInfo.HasValue(),
+			"Attempt to create graphics pipeline without input assembly state info!");
 		// At least one viewport and once scissor region must be specified
-		Core::Assert(!mViewports.empty());
-		Core::Assert(!mScissorRegions.empty());
+		Core::Assert(!mViewports.empty(),
+			"Attempt to create graphics pipeline without any viewports set!");
+		Core::Assert(!mScissorRegions.empty(),
+			"Attempt to create graphics pipeline without any scissor regions set.");
 		// Rasterization State MUST be specified.
-		Core::Assert(mRasterizationStateCreateInfo.HasValue());
+		Core::Assert(mRasterizationStateCreateInfo.HasValue(),
+			"Attempt to create graphics pipeline without any rasterisation info set!");
 
 
 		VkSpecializationInfo specializationInfo
