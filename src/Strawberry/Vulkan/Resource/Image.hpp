@@ -94,6 +94,8 @@ namespace Strawberry::Vulkan
 			VkImageLayout                     mInitialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		};
 
+		using Handle = VkImage;
+
 		Image(const Image& rhs) = delete;
 
 		Image& operator=(const Image& rhs) = delete;
@@ -108,9 +110,15 @@ namespace Strawberry::Vulkan
 		VkImage Release();
 
 
-		operator VkImage() const
+		Handle GetHandle() const
 		{
 			return mImage;
+		}
+
+
+		operator VkImage() const
+		{
+			return GetHandle();
 		}
 
 
