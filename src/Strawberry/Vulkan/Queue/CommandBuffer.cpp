@@ -340,14 +340,25 @@ namespace Strawberry::Vulkan
 
 	void CommandBuffer::CopyBufferToImage(const Buffer& buffer, Image& image, uint32_t arrayLayer)
 	{
+		return CopyBufferToImage(CommandCopyBufferToImage()
+			.WithSrcBuffer(buffer)
+			.WithDstImage(image)
+			.WithDstArrayLayer(arrayLayer));
+	}
+
+
+	void CommandBuffer::CopyBufferToImage(const CommandCopyBufferToImage& command)
+	{
 		Core::Assert(State() == CommandBufferState::Recording);
+
+		Core::Math::Vec3u dstExtent = command.mDstExtent.ValueOr(command.mDstImage->GetSize());
 
 		// Setup copy
 		VkImageSubresourceLayers subresource
 		{
-			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+			.aspectMask = command.mAspect,
 			.mipLevel = 0,
-			.baseArrayLayer = arrayLayer,
+			.baseArrayLayer = command.mDstArrayLayer,
 			.layerCount = 1,
 		};
 		VkBufferImageCopy region{
@@ -355,10 +366,16 @@ namespace Strawberry::Vulkan
 			.bufferRowLength = 0,
 			.bufferImageHeight = 0,
 			.imageSubresource = subresource,
-			.imageOffset{ .x = 0, .y = 0, .z = 0 },
-			.imageExtent{ .width = image.mExtent[0], .height = image.mExtent[1], .depth = 1 }
+			.imageOffset{ .x = (int) command.mDstOffset[0], .y = (int) command.mDstOffset[1], .z = (int) command.mDstOffset[2] },
+			.imageExtent{ .width = dstExtent[0], .height = dstExtent[1], .depth = dstExtent[2] }
 		};
-		vkCmdCopyBufferToImage(mCommandBuffer, buffer, image.mImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+		vkCmdCopyBufferToImage(
+			mCommandBuffer,
+			*command.mSrcBuffer,
+			*command.mDstImage,
+			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+			1,
+			&region);
 	}
 
 
@@ -392,37 +409,54 @@ namespace Strawberry::Vulkan
 
 	void CommandBuffer::BlitImage(const Image&       source,
 								  VkImageLayout      srcLayout,
-								  const Image&       dest,
+								  Image&             dest,
 								  VkImageLayout      destLayout,
 								  VkImageAspectFlags aspect,
 								  VkFilter           filter)
+	{
+		return BlitImage(CommandBlitImage()
+			.WithSource(source, srcLayout)
+			.WithDest(dest, destLayout)
+			.WithAspect(aspect)
+			.WithFilter(filter));
+	}
+
+
+	void CommandBuffer::BlitImage(const CommandBlitImage& command)
 	{
 		Core::Assert(State() == CommandBufferState::Recording);
 
 		VkImageBlit region{
 			.srcSubresource = VkImageSubresourceLayers{
-				.aspectMask = aspect,
+				.aspectMask = command.mAspect,
 				.mipLevel = 0,
 				.baseArrayLayer = 0,
 				.layerCount = 1
 			},
 			.srcOffsets = {
 				VkOffset3D{ 0, 0, 0 },
-				VkOffset3D{ (int) source.GetSize()[0], (int) source.GetSize()[1], (int) source.GetSize()[2] }
+				VkOffset3D{ (int) command.mSrc->GetSize()[0], (int) command.mSrc->GetSize()[1], (int) command.mSrc->GetSize()[2] }
 			},
 			.dstSubresource = VkImageSubresourceLayers{
-				.aspectMask = aspect,
+				.aspectMask = command.mAspect,
 				.mipLevel = 0,
 				.baseArrayLayer = 0,
 				.layerCount = 1,
 			},
 			.dstOffsets = {
 				VkOffset3D{ 0, 0, 0 },
-				VkOffset3D{ (int) dest.GetSize()[0], (int) dest.GetSize()[1], (int) dest.GetSize()[2] }
+				VkOffset3D{
+					(int) command.mDstExtent->operator[](0),
+					(int) command.mDstExtent->operator[](1),
+					(int) command.mDstExtent->operator[](2) }
 			},
 		};
 
-		vkCmdBlitImage(mCommandBuffer, source.mImage, srcLayout, dest.mImage, destLayout, 1, &region, filter);
+		vkCmdBlitImage(
+			mCommandBuffer,
+			*command.mSrc, command.mSrcLayout,
+			*command.mDst, command.mDstLayout,
+			1, &region, command.mFilter);
 	}
 
 

@@ -84,6 +84,7 @@ if (NOT TARGET StrawberryVulkan)
             src/Strawberry/Vulkan/Pipeline/Shader.hpp
             src/Strawberry/Vulkan/Queue/CommandBuffer.cpp
             src/Strawberry/Vulkan/Queue/CommandBuffer.hpp
+			src/Strawberry/Vulkan/Queue/CommandParameters.hpp
             src/Strawberry/Vulkan/Queue/CommandPool.cpp
             src/Strawberry/Vulkan/Queue/CommandPool.hpp
             src/Strawberry/Vulkan/Queue/ImageMemoryBarrier.cpp

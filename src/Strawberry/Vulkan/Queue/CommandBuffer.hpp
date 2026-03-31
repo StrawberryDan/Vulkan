@@ -4,9 +4,10 @@
 //======================================================================================================================
 //  Includes
 //----------------------------------------------------------------------------------------------------------------------
-#include "Strawberry/Vulkan/Synchronisation/Fence.hpp"
-#include "Strawberry/Vulkan/Resource/ImageView.hpp"
+#include "Strawberry/Vulkan/Queue/CommandParameters.hpp"
 #include "Strawberry/Vulkan/Queue/ImageMemoryBarrier.hpp"
+#include "Strawberry/Vulkan/Resource/Image.hpp"
+#include "Strawberry/Vulkan/Synchronisation/Fence.hpp"
 // Vulkan
 #include <vulkan/vulkan.h>
 // Strawberry Core
@@ -122,13 +123,15 @@ namespace Strawberry::Vulkan
 
 
 		void CopyBufferToImage(const Buffer& buffer, Image& image, uint32_t arrayLayer = 0);
+		void CopyBufferToImage(const CommandCopyBufferToImage& command);
 		void CopyImageToImage(const Image& source, VkImageLayout srcLayout, const Image& dest, VkImageLayout destLayout, VkImageAspectFlags aspect);
 		void BlitImage(const Image&       source,
 		               VkImageLayout      srcLayout,
-		               const Image&       dest,
+		               Image&             dest,
 		               VkImageLayout      destLayout,
 		               VkImageAspectFlags aspect,
 		               VkFilter           filter);
+		void BlitImage(const CommandBlitImage& command);
 		void ClearColorImage(Image& image, VkImageLayout layout, Core::Math::Vec4f clearColor = {0.0f, 0.0f, 0.0f, 1.0f});
 
 
