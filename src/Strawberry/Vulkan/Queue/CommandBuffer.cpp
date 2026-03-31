@@ -102,6 +102,17 @@ namespace Strawberry::Vulkan
 
 	CommandBufferState CommandBuffer::State() const noexcept
 	{
+		// Check if we can move the buffer out of the Pending state.
+		if (mState == CommandBufferState::Pending)
+		{
+			// If we own the fence we can check it normally.
+			if (IsExecutionFenceSignalled())
+			{
+				mExecutionFenceOrParentBuffer.Ptr<Fence>()->Reset();
+				MoveIntoCompletedState();
+			}
+		}
+
 		return mState;
 	}
 
