@@ -45,7 +45,7 @@ namespace Strawberry::Vulkan
 	{
 		Core::Optional<DescriptorSet> result;
 
-		for (auto& [available, pool]: pools)
+		for (auto& [available, pool] : pools)
 		{
 			if (available < pool.DESCRIPTOR_POOL_SIZE)
 			{
