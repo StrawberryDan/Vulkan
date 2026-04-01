@@ -37,14 +37,7 @@ namespace Strawberry::Vulkan
 		~Queue();
 
 
-		template<typename T, typename... Args>
-		T Create(Args&&... args) const
-		{
-			return T(*this, std::forward<Args>(args)...);
-		}
-
-
-		std::future<void> Submit(const CommandBuffer& commandBuffer);
+		void Submit(const CommandBuffer& commandBuffer);
 		void WaitUntilIdle() const;
 
 

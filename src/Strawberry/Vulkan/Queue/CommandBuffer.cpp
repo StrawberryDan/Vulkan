@@ -88,9 +88,15 @@ namespace Strawberry::Vulkan
 	}
 
 
-	std::future<void> CommandBuffer::Submit()
+	void CommandBuffer::Submit()
 	{
-		return mCommandPool->GetQueue()->Submit(*this);
+		mCommandPool->GetQueue()->Submit(*this);
+	}
+
+
+	void CommandBuffer::Wait() const
+	{
+		return mExecutionFenceOrParentBuffer.Ptr<Fence>()->Wait();
 	}
 
 

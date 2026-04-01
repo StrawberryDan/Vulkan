@@ -55,7 +55,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	std::future<void> Queue::Submit(const CommandBuffer& commandBuffer)
+	void Queue::Submit(const CommandBuffer& commandBuffer)
 	{
 		ZoneScoped;
 
@@ -77,10 +77,6 @@ namespace Strawberry::Vulkan
 		commandBuffer.mExecutionFenceOrParentBuffer.Ptr<Fence>()->Reset();
 		commandBuffer.MoveIntoPendingState();
 		Core::AssertEQ(vkQueueSubmit(mQueue, 1, &submitInfo, commandBuffer.mExecutionFenceOrParentBuffer.Ptr<Fence>()->mFence), VK_SUCCESS);
-
-		return std::async(std::launch::async, [&]() {
-			commandBuffer.mExecutionFenceOrParentBuffer.Ptr<Fence>()->Wait();
-		});
 	}
 
 
