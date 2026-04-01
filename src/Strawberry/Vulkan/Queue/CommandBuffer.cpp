@@ -96,6 +96,8 @@ namespace Strawberry::Vulkan
 
 	void CommandBuffer::Wait() const
 	{
+		ZoneScoped;
+
 		return mExecutionFenceOrParentBuffer.Ptr<Fence>()->Wait();
 	}
 

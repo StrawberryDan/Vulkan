@@ -213,6 +213,8 @@ namespace Strawberry::Vulkan
 
 	void Swapchain::Present()
 	{
+		ZoneScoped;
+
 		uint32_t imageIndex = WaitForNextImageIndex().Unwrap();
 
 
