@@ -53,6 +53,7 @@ namespace Strawberry::Vulkan
 
 	bool Fence::Signaled() const noexcept
 	{
+		ZoneScoped;
 		auto result = vkGetFenceStatus(mDevice, mFence);
 		switch (result)
 		{
@@ -68,12 +69,14 @@ namespace Strawberry::Vulkan
 
 	void Fence::Wait()
 	{
+		ZoneScoped;
 		Core::AssertEQ(vkWaitForFences(mDevice, 1, &mFence, VK_TRUE, UINT64_MAX), VK_SUCCESS);
 	}
 
 
 	void Fence::Reset()
 	{
+		ZoneScoped;
 		Core::AssertEQ(vkResetFences(mDevice, 1, &mFence), VK_SUCCESS);
 	}
 }
