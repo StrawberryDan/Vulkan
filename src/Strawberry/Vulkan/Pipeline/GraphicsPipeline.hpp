@@ -82,8 +82,8 @@ namespace Strawberry::Vulkan
 		Builder& WithShaderStages(Shader vertexShader, Shader tessellationControl, Shader tessellationEvaluation, Shader geometry, Shader fragmentShader);
 
 
-		Builder& WithInputBinding(uint32_t binding, uint32_t stride, VkVertexInputRate inputRate = VK_VERTEX_INPUT_RATE_VERTEX);
-		Builder& WithInputAttribute(uint32_t location, uint32_t binding, uint32_t offset, VkFormat format);
+		Builder& WithInputBinding(uint32_t binding, VkVertexInputRate inputRate);
+		Builder& WithInputAttribute(uint32_t location, uint32_t binding, uint32_t size, VkFormat format);
 		Builder& WithInputAssembly(VkPrimitiveTopology topology);
 		Builder& WithTesselation(uint32_t controlPoints);
 		Builder& WithViewport(const std::vector<VkViewport>& viewports, const std::vector<VkRect2D>& scissors);

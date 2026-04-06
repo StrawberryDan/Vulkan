@@ -107,23 +107,34 @@ namespace Strawberry::Vulkan
 	}
 
 
-	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithInputBinding(uint32_t          binding, uint32_t stride,
-																		   VkVertexInputRate inputRate)
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithInputBinding(
+		uint32_t          binding,
+		VkVertexInputRate inputRate)
 	{
-		mVertexInputBindings.emplace_back(VkVertexInputBindingDescription{
-											  .binding = binding, .stride = stride, .inputRate = inputRate
-										  });
+		mVertexInputBindings.emplace_back(
+			VkVertexInputBindingDescription{
+				.binding = binding, .stride = 0, .inputRate = inputRate
+			});
 		return *this;
 	}
 
 
-	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithInputAttribute(uint32_t location, uint32_t binding,
-																			 uint32_t offset, VkFormat   format)
+	GraphicsPipeline::Builder& GraphicsPipeline::Builder::WithInputAttribute(
+		uint32_t location,
+		uint32_t binding,
+		uint32_t size,
+		VkFormat format)
 	{
-		mVertexInputAttributes.emplace_back(VkVertexInputAttributeDescription{
-												.location = location, .binding = binding, .format = format,
-												.offset = offset
-											});
+		mVertexInputAttributes.emplace_back(
+			VkVertexInputAttributeDescription{
+				.location = location,
+				.binding = binding,
+				.format = format,
+				.offset = mVertexInputBindings.at(binding).stride
+		});
+
+		mVertexInputBindings.at(binding).stride += size;
+
 		return *this;
 	}
 
