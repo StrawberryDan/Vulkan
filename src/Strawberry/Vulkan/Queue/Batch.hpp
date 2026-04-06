@@ -31,6 +31,7 @@ namespace Strawberry::Vulkan
 		};
 
 
+		Batch() = default;
 		Batch(const Batch&) = delete;
 		Batch& operator=(const Batch&) = delete;
 		Batch(Batch&&) = default;
