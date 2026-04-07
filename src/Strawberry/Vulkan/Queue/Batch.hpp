@@ -42,41 +42,42 @@ namespace Strawberry::Vulkan
 			: mGraphicsPipeline(&pipeline)
 		{}
 
-		Batch& WithDescriptorSet(unsigned int index, Core::ValOrPtr<DescriptorSet> descriptorSet)
+		Batch&& WithDescriptorSet(unsigned int index, Core::ValOrPtr<DescriptorSet> descriptorSet)
 		{
 			mDescriptorSets.emplace(index, std::move(descriptorSet));
-			return *this;
+			return std::move(*this);
 		}
 
-		Batch& WithVertexBuffer(unsigned int index, Core::ValOrPtr<Buffer> buffer)
+		Batch&& WithVertexBuffer(unsigned int index, Core::ValOrPtr<Buffer> buffer)
 		{
 			mVertexBuffers.emplace(index, std::move(buffer));
-			return *this;
+			return std::move(*this);
 		}
 
-		Batch& WithIndexBuffer(VkIndexType type, Core::ValOrPtr<Buffer> buffer)
+		Batch&& WithIndexBuffer(VkIndexType type, Core::ValOrPtr<Buffer> buffer)
 		{
 			mIndexBuffer.Emplace(type, std::move(buffer));
-			return *this;
+			return std::move(*this);
 		}
 
-		Batch& WithVertexCount(unsigned int vertexCount)
+		Batch&& WithVertexCount(unsigned int vertexCount)
 		{
 			mVertexCount = vertexCount;
-			return *this;
+			return std::move(*this);
 		}
 
-		Batch& WithInstanceCount(unsigned int instanceCount)
+		Batch&& WithInstanceCount(unsigned int instanceCount)
 		{
 			mInstanceCount = instanceCount;
-			return *this;
+			return std::move(*this);
 		}
 
-		Batch& WithPushConstants(unsigned int index, const PushConstant& pushConstant)
+		Batch&& WithPushConstants(unsigned int index, const PushConstant& pushConstant)
 		{
 			mPushConstants.emplace(0, std::move(pushConstant));
-			return *this;
+			return std::move(*this);
 		}
+
 
 	private:
 		/// Pipeline to use to render batch
