@@ -22,8 +22,8 @@ namespace Strawberry::Vulkan
 {
 	GraphicsPipeline::GraphicsPipeline(GraphicsPipeline&& rhs) noexcept
 		: mPipeline(std::exchange(rhs.mPipeline, nullptr))
-		  , mPipelineLayout(std::exchange(rhs.mPipelineLayout, nullptr))
-		  , mRenderPass(std::move(rhs.mRenderPass)) {}
+		, mPipelineLayout(std::exchange(rhs.mPipelineLayout, nullptr))
+		, mRenderPass(std::move(rhs.mRenderPass)) {}
 
 
 	GraphicsPipeline& GraphicsPipeline::operator=(GraphicsPipeline&& rhs) noexcept
