@@ -22,13 +22,14 @@ namespace Strawberry::Vulkan
 		  , mSetLayouts(std::move(setLayouts)) {}
 
 
-	PipelineLayout::PipelineLayout(PipelineLayout&& rhs)
-		: mHandle(std::exchange(rhs.mHandle, VK_NULL_HANDLE))
-		  , mDevice(std::move(rhs.mDevice))
-		  , mSetLayouts(std::move(rhs.mSetLayouts)) {}
+	PipelineLayout::PipelineLayout(PipelineLayout&& rhs) noexcept
+		: EnableReflexivePointer(std::move(rhs))
+		, mHandle(std::exchange(rhs.mHandle, VK_NULL_HANDLE))
+		, mDevice(std::move(rhs.mDevice))
+		, mSetLayouts(std::move(rhs.mSetLayouts)) {}
 
 
-	PipelineLayout& PipelineLayout::operator=(PipelineLayout&& rhs)
+	PipelineLayout& PipelineLayout::operator=(PipelineLayout&& rhs) noexcept
 	{
 		if (this != &rhs)
 		{
@@ -75,7 +76,7 @@ namespace Strawberry::Vulkan
 	DescriptorSetLayout PipelineLayout::GetSetLayout(uint32_t index)
 	{
 		Core::Assert(index < mSetLayouts.size());
-		return mSetLayouts[index];
+		return mSetLayouts.at(index);
 	}
 
 

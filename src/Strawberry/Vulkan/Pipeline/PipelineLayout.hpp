@@ -26,11 +26,11 @@ namespace Strawberry::Vulkan
 
 		PipelineLayout(const PipelineLayout&) = delete;
 
-		PipelineLayout(PipelineLayout&&);
+		PipelineLayout(PipelineLayout&&) noexcept;
 
 		PipelineLayout& operator=(const PipelineLayout&) = delete;
 
-		PipelineLayout& operator=(PipelineLayout&&);
+		PipelineLayout& operator=(PipelineLayout&&) noexcept;
 
 		~PipelineLayout();
 
