@@ -23,9 +23,11 @@ if (NOT TARGET StrawberryVulkan)
 
 
 	list(APPEND StrawberryVulkan_Source
+			src/Strawberry/Vulkan/Error.hpp
 			src/Strawberry/Vulkan/Queue/Batch.hpp
 			src/Strawberry/Vulkan/Queue/BatchRenderer.cpp
 			src/Strawberry/Vulkan/Queue/BatchRenderer.hpp
+			src/Strawberry/Vulkan/Queue/CommandParameters.hpp
             src/Strawberry/Vulkan/Descriptor/DescriptorPool.cpp
             src/Strawberry/Vulkan/Descriptor/DescriptorPool.hpp
             src/Strawberry/Vulkan/Descriptor/DescriptorSet.cpp
@@ -84,7 +86,6 @@ if (NOT TARGET StrawberryVulkan)
             src/Strawberry/Vulkan/Pipeline/Shader.hpp
             src/Strawberry/Vulkan/Queue/CommandBuffer.cpp
             src/Strawberry/Vulkan/Queue/CommandBuffer.hpp
-			src/Strawberry/Vulkan/Queue/CommandParameters.hpp
             src/Strawberry/Vulkan/Queue/CommandPool.cpp
             src/Strawberry/Vulkan/Queue/CommandPool.hpp
             src/Strawberry/Vulkan/Queue/ImageMemoryBarrier.cpp

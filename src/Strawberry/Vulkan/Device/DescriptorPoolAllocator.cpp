@@ -10,7 +10,7 @@ namespace Strawberry::Vulkan
 	DescriptorPoolAllocator::DescriptorPoolAllocator(Device& device) {}
 
 
-	DescriptorSet DescriptorPoolAllocator::Allocate(Device& device, DescriptorSetLayout layout)
+	Result<DescriptorSet> DescriptorPoolAllocator::Allocate(Device& device, DescriptorSetLayout layout)
 	{
 		return mPoolLists[layout.Handle()].Allocate(device, std::move(layout));
 	}
@@ -23,9 +23,9 @@ namespace Strawberry::Vulkan
 	}
 
 
-	DescriptorSet DescriptorPoolAllocator::Pool::Allocate(Device& device, DescriptorSetLayout layout)
+	Result<DescriptorSet> DescriptorPoolAllocator::Pool::Allocate(Device& device, DescriptorSetLayout layout)
 	{
-		return DescriptorSet(descriptorPool, layout);
+		return DescriptorSet::Allocate(descriptorPool, layout);
 	}
 
 
@@ -41,9 +41,9 @@ namespace Strawberry::Vulkan
 	}
 
 
-	DescriptorSet DescriptorPoolAllocator::PoolList::Allocate(Device& device, const DescriptorSetLayout& layout)
+	Result<DescriptorSet> DescriptorPoolAllocator::PoolList::Allocate(Device& device, const DescriptorSetLayout& layout)
 	{
-		Core::Optional<DescriptorSet> result;
+		Result<DescriptorSet> result = ErrorUnknown{};
 
 		for (auto& [available, pool] : pools)
 		{

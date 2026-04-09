@@ -16,16 +16,16 @@ namespace Strawberry::Vulkan
 		DescriptorPoolAllocator(Device& device);
 
 
-		DescriptorSet Allocate(Device& device, DescriptorSetLayout layout);
+		Result<DescriptorSet> Allocate(Device& device, DescriptorSetLayout layout);
 
 	private:
 		struct Pool
 		{
-			static constexpr uint32_t DESCRIPTOR_POOL_SIZE = 1024;
+			static constexpr uint32_t DESCRIPTOR_POOL_SIZE = 2 * 1024;
 
 			static Pool Create(Device& device, std::vector<VkDescriptorPoolSize> poolSizes);
 
-			DescriptorSet Allocate(Device& device, DescriptorSetLayout layout);
+			Result<DescriptorSet> Allocate(Device& device, DescriptorSetLayout layout);
 
 			DescriptorPool descriptorPool;
 		};
@@ -35,7 +35,7 @@ namespace Strawberry::Vulkan
 		{
 			static PoolList Create(Device& device, VkDescriptorSetLayout layout, std::vector<VkDescriptorPoolSize> poolSizes);
 
-			DescriptorSet Allocate(Device& device, const DescriptorSetLayout& layout);
+			Result<DescriptorSet> Allocate(Device& device, const DescriptorSetLayout& layout);
 
 			VkDescriptorSetLayout                       layout;
 			std::vector<std::pair<unsigned int, Pool> > pools;

@@ -16,31 +16,37 @@
 //----------------------------------------------------------------------------------------------------------------------
 namespace Strawberry::Vulkan
 {
-	DescriptorSet::DescriptorSet(Device& device, const DescriptorSetLayout& layout)
-		: DescriptorSet(device.AllocateDescriptorSet(layout))
-	{}
-
-
-	DescriptorSet::DescriptorSet(DescriptorPool& descriptorPool, const DescriptorSetLayout& layout)
-		: mDescriptorSet(VK_NULL_HANDLE)
-		, mDescriptorPool(descriptorPool)
+	Result<DescriptorSet> DescriptorSet::Allocate(Device& device, const DescriptorSetLayout& layout)
 	{
+		return device.AllocateDescriptorSet(layout);
+	}
+
+	Result<DescriptorSet> DescriptorSet::Allocate(DescriptorPool& pool, const DescriptorSetLayout& layout)
+	{
+		VkDescriptorSet set;
 		VkDescriptorSetLayout layoutHandle = layout.Handle();
 
 		VkDescriptorSetAllocateInfo allocateInfo{
 			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
 			.pNext = nullptr,
-			.descriptorPool = mDescriptorPool->mDescriptorPool,
+			.descriptorPool = pool.mDescriptorPool,
 			.descriptorSetCount = 1,
 			.pSetLayouts = &layoutHandle,
 		};
 
-		Core::AssertEQ(
+		switch (auto result =
 			vkAllocateDescriptorSets(
-				mDescriptorPool->GetDevice()->Handle(),
+				pool.GetDevice()->Handle(),
 				&allocateInfo,
-				&mDescriptorSet),
-			VK_SUCCESS);
+				&set))
+		{
+			case VK_SUCCESS:
+				return DescriptorSet(set, pool);
+			case VK_ERROR_OUT_OF_POOL_MEMORY:
+				return ErrorOutOfMemory{};
+			default:
+				Core::Unreachable();
+		}
 	}
 
 
@@ -188,4 +194,10 @@ namespace Strawberry::Vulkan
 		};
 		vkUpdateDescriptorSets(mDescriptorPool->GetDevice()->Handle(), 1, &write, 0, nullptr);
 	}
+
+
+	DescriptorSet::DescriptorSet(VkDescriptorSet set, DescriptorPool& pool)
+		: mDescriptorSet(set)
+		, mDescriptorPool(pool)
+	{}
 }

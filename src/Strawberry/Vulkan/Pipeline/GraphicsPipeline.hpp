@@ -52,7 +52,7 @@ namespace Strawberry::Vulkan
 		const PipelineLayout& GetLayout() const noexcept;
 		      Device&         GetDevice()       noexcept;
 		const Device&         GetDevice() const noexcept;
-		DescriptorSet         CreateDescriptorSet(unsigned int);
+		Result<DescriptorSet>         CreateDescriptorSet(unsigned int);
 
 
 	private:

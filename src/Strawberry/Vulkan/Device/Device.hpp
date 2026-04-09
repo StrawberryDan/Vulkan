@@ -87,7 +87,7 @@ namespace Strawberry::Vulkan
 
 		[[nodiscard]] PolyAllocator& GetAllocator() const;
 
-		[[nodiscard]] DescriptorSet AllocateDescriptorSet(const DescriptorSetLayout& descriptorSetLayout);
+		[[nodiscard]] Result<DescriptorSet> AllocateDescriptorSet(const DescriptorSetLayout& descriptorSetLayout);
 
 	private:
 		explicit Device(const PhysicalDevice&           physicalDevice,

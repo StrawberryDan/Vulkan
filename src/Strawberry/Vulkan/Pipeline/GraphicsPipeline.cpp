@@ -341,7 +341,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	DescriptorSet GraphicsPipeline::CreateDescriptorSet(unsigned int index)
+	Result<DescriptorSet> GraphicsPipeline::CreateDescriptorSet(unsigned int index)
 	{
 		return mPipelineLayout->GetDevice()->AllocateDescriptorSet(mPipelineLayout->GetSetLayout(index));
 	}

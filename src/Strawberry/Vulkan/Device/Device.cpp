@@ -224,7 +224,7 @@ namespace Strawberry::Vulkan
 	}
 
 
-	DescriptorSet Device::AllocateDescriptorSet(const DescriptorSetLayout& descriptorSetLayout)
+	Result<DescriptorSet> Device::AllocateDescriptorSet(const DescriptorSetLayout& descriptorSetLayout)
 	{
 		return mDescriptorPoolAllocator->Allocate(*this, descriptorSetLayout);
 	}
