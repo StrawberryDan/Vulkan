@@ -13,6 +13,7 @@ namespace Strawberry::Vulkan
 
 	void BatchRenderer::WriteQueue(CommandBuffer& buffer)
 	{
+		std::ranges::sort(mBatches, {}, [] (const auto& x) { return x.mOrderingConstant; });
 		Core::Optional<const Batch*> lastBatch;
 		for (const auto& batch : mBatches)
 		{

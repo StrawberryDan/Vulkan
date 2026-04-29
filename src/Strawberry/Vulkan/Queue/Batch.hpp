@@ -10,6 +10,22 @@ namespace Strawberry::Vulkan
 	class DescriptorSet;
 	class GraphicsPipeline;
 
+	struct OrderingConstant
+		: public Core::Variant<double, unsigned int>
+	{
+		using Variant::Variant;
+
+
+		bool operator<(const OrderingConstant& other) const noexcept
+		{
+			return Visit([&] (const auto& x) {
+				return other.Visit([&] (const auto& y) {
+					return x < y;
+				});
+			});
+		}
+	};
+
 	class Batch
 	{
 	public:
@@ -41,6 +57,12 @@ namespace Strawberry::Vulkan
 		Batch(GraphicsPipeline& pipeline)
 			: mGraphicsPipeline(&pipeline)
 		{}
+
+		Batch&& WithOrderingConstant(OrderingConstant constant)
+		{
+			mOrderingConstant = constant;
+			return std::move(*this);
+		}
 
 		Batch&& WithDescriptorSet(unsigned int index, Core::ValOrPtr<DescriptorSet> descriptorSet)
 		{
@@ -80,6 +102,8 @@ namespace Strawberry::Vulkan
 
 
 	private:
+		Core::Optional<OrderingConstant> mOrderingConstant;
+
 		/// Pipeline to use to render batch
 		GraphicsPipeline* mGraphicsPipeline = nullptr;
 		/// Descriptor sets to use to to render batch

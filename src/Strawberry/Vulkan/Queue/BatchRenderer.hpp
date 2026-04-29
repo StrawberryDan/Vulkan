@@ -10,7 +10,7 @@ namespace Strawberry::Vulkan
 		void Enqueue(Batch&& batch);
 
 
-		template <std::ranges::range Range>
+		template <std::ranges::range Range> requires (std::convertible_to<std::ranges::range_value_t<Range>, Batch>)
 		void Enqueue(Range&& range)
 		{
 			for (auto&& item : range)
