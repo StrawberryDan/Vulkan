@@ -10,8 +10,9 @@ namespace Strawberry::Vulkan
 	class DescriptorSet;
 	class GraphicsPipeline;
 
+
 	struct OrderingConstant
-		: public Core::Variant<double, unsigned int>
+		: Core::Variant<double, unsigned int>
 	{
 		using Variant::Variant;
 
@@ -25,6 +26,7 @@ namespace Strawberry::Vulkan
 			});
 		}
 	};
+
 
 	class Batch
 	{
