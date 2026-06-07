@@ -71,6 +71,9 @@ void BasicRendering()
 												 VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
 							.WithSubpass(SubpassDescription().WithColorAttachment(0, VK_IMAGE_LAYOUT_GENERAL))
 							.Build();
+
+	auto framebuffer = Framebuffer(renderPass, Core::Math::Vec2u(1920, 1080));
+
 	auto vertexShader = Shader::Compile(device, meshVertexShader)
 		.Unwrap();
 	auto fragmentShader = Shader::Compile(
@@ -81,36 +84,30 @@ void BasicRendering()
 							.WithDescriptor(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
 							.Build();
 	GraphicsPipeline pipeline = GraphicsPipeline::Builder(layout, renderPass, 0)
-								.WithShaderStage(VK_SHADER_STAGE_VERTEX_BIT, std::move(vertexShader))
-								.WithShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT, std::move(fragmentShader))
-								.WithInputBinding(0, 3 * sizeof(float))
-								.WithInputAttribute(0, 0, 0, VK_FORMAT_R32G32B32_SFLOAT)
-								.WithInputAssembly(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
-								.WithViewport({
-												  VkViewport{
-													  .x = 0, .y = 0, .width = 1920.0, .height = 1080.0,
-													  .minDepth = 0.0, .maxDepth = 1.0
-												  }
-											  },
-											  {VkRect2D{.offset = {0, 0}, .extent = {1920, 1080}}})
-								.WithRasterization(VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE,
-												   VK_FRONT_FACE_COUNTER_CLOCKWISE)
-								.WithColorBlending({
-									VkPipelineColorBlendAttachmentState{
-										.blendEnable = VK_TRUE,
-										.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
-										.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
-										.colorBlendOp = VK_BLEND_OP_ADD,
-										.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
-										.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
-										.alphaBlendOp = VK_BLEND_OP_ADD,
-										.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
-										VK_COLOR_COMPONENT_B_BIT |
-										VK_COLOR_COMPONENT_A_BIT
-									}
-								})
-								.WithMultisample(VK_SAMPLE_COUNT_1_BIT)
-								.Build();
+		.WithShaderStage(VK_SHADER_STAGE_VERTEX_BIT, std::move(vertexShader))
+		.WithShaderStage(VK_SHADER_STAGE_FRAGMENT_BIT, std::move(fragmentShader))
+		.WithInputBinding(0, VK_VERTEX_INPUT_RATE_VERTEX)
+		.WithInputAttribute(0, 0, 0, VK_FORMAT_R32G32B32_SFLOAT)
+		.WithInputAssembly(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
+		.WithViewport(framebuffer)
+		.WithRasterization(VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE,
+						   VK_FRONT_FACE_COUNTER_CLOCKWISE)
+		.WithColorBlending({
+				VkPipelineColorBlendAttachmentState{
+					.blendEnable = VK_TRUE,
+					.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
+					.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
+					.colorBlendOp = VK_BLEND_OP_ADD,
+					.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
+					.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
+					.alphaBlendOp = VK_BLEND_OP_ADD,
+					.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
+					VK_COLOR_COMPONENT_B_BIT |
+					VK_COLOR_COMPONENT_A_BIT
+				}
+			})
+		.WithMultisample(VK_SAMPLE_COUNT_1_BIT)
+		.Build();
 	auto queue = device.GetQueue(queueFamily, 0).GetReflexivePointer();
 	auto computeQueue = device.GetQueue(computeQueueFamily, 0).GetReflexivePointer();
 	Swapchain swapchain(*queue, surface, Core::Math::Vec2i(1920, 1080),
@@ -131,9 +128,6 @@ void BasicRendering()
 		.WithData(vertices)
 		.WithUsage(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT)
 		.Build();
-
-
-	auto framebuffer = Framebuffer(renderPass, Core::Math::Vec2u(1920, 1080));
 
 
 	auto [size, channels, bytes] = Core::IO::DynamicByteBuffer::FromImage("data/dio.png").Unwrap();
@@ -173,13 +167,7 @@ void BasicRendering()
 								   .Build();
 	Sampler sampler(device, VK_FILTER_NEAREST, VK_FILTER_NEAREST);
 
-	DescriptorPool descriptorPool(device, 0, 1, {
-											  VkDescriptorPoolSize{
-												  .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-												  .descriptorCount = 1
-											  }
-										  });
-	DescriptorSet textureDescriptorSet(descriptorPool, layout.GetSetLayout(0));
+	DescriptorSet textureDescriptorSet = DescriptorSet::Allocate(device, layout.GetSetLayout(0)).Unwrap();
 
 
 	Shader computeShader = Shader::Compile(device, computeShaderCode).Unwrap();
@@ -194,7 +182,7 @@ void BasicRendering()
 
 
 	DescriptorPool computeDescriptorPool(device, 0, 1, { VkDescriptorPoolSize { .type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, .descriptorCount = 1}});
-	DescriptorSet computeDescriptorSet(computeDescriptorPool, computePipelineLayout.GetSetLayout(0));
+	DescriptorSet computeDescriptorSet = DescriptorSet::Allocate(device, computePipelineLayout.GetSetLayout(0)).Unwrap();
 	Buffer computeBuffer = Buffer::Builder(device, MemoryTypeCriteria::HostVisible())
 		.WithSize(sizeof(uint32_t) * 256 * 256)
 		.WithUsage(VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
@@ -290,7 +278,7 @@ void BasicRendering()
 											  VK_IMAGE_LAYOUT_PRESENT_SRC_KHR)
 									  });
 		commandBuffer.End();
-		commandBuffer.Submit().wait();
+		commandBuffer.Submit();
 		swapchain.Present();
 	}
 }
